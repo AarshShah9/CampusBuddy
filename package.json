@@ -1,0 +1,26 @@
+{
+  "name": "campusmobileapp",
+  "version": "1.0.0",
+  "description": "This is the repository meant to house Aarsh's TechStart project. Simply set up for now. Will update name and description soon!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run server\" \"npm run app\"",
+    "server": "cd backend && npm start",
+    "app": "cd frontend && npx react-native run-ios"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techstartucalgary/CampusMobileApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/techstartucalgary/CampusMobileApp/issues"
+  },
+  "homepage": "https://github.com/techstartucalgary/CampusMobileApp#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
