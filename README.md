@@ -4,7 +4,14 @@ This is the repository meant to house Aarsh's TechStart project. Simply set up f
 
 # Setup
 
-### Running the application locally
+### Installations
+- Node.js (https://nodejs.org/en/download/)
+- Expo CLI
+```
+npm install -g expo-cli
+```
+- Git (https://git-scm.com/downloads)
+- IDE of your choice
 
 ### IDE's
 
