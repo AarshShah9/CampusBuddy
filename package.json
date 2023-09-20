@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npm run server\" \"npm run metro\"",
+    "start": "npm-run-all --parallel server metro",
     "server": "cd backend && npm start",
     "metro": "cd frontend && npm start"
   },
@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/techstartucalgary/CampusMobileApp/issues"
   },
-  "homepage": "https://github.com/techstartucalgary/CampusMobileApp#readme"
+  "homepage": "https://github.com/techstartucalgary/CampusMobileApp#readme",
+  "dependencies": {
+    "npm-run-all": "^4.1.5"
+  }
 }

@@ -38,3 +38,14 @@ $ git add . # Adds all file changes and tracks files
 $ git commit -am "<commit-message>" # Adds all file changes and commits them (non-tracked files will not be included)
 ```
 
+
+Development Testing:
+
+- Download the Expo app on your phone
+- Run the following command in the project directory
+```
+npm run start
+```
+- Then scan the QR code with your phone camera
+- The app should open up on your phone
+
