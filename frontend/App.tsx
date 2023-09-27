@@ -6,10 +6,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 function HomeScreen() {
+    const testCallback = async () =>{
+        fetch('http://192.168.0.163:3000/test')
+            .then(response => response.json())
+            .then(data => console.log(data));
+    }
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Home!</Text>
-        </View>
+                <Text>Open up App.tsx to start working on your app!</Text>
+                <Button title={"Test"} onPress={testCallback} />
+                <StatusBar style="auto" />
+            </View>
     );
 }
 
@@ -25,12 +33,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
 
-  const testCallback = async () =>{
-      console.log("Test")
-    fetch('https://swapi.dev/api/people/2')
-        .then(response => response.json())
-        .then(data => console.log(data));
-  }
+
 
   return (
       <NavigationContainer>
@@ -39,11 +42,6 @@ export default function App() {
               <Tab.Screen name="Settings" component={SettingsScreen} />
           </Tab.Navigator>
       </NavigationContainer>
-    // <View style={styles.container}>
-    //   <Text>Open up App.tsx to start working on your app!</Text>
-    //   <Button title={"Test"} onPress={testCallback} />
-    //   <StatusBar style="auto" />
-    // </View>
   );
 }
 
