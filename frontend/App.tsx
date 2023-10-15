@@ -7,7 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 function HomeScreen() {
     const testCallback = async () =>{
-        fetch('http://192.168.0.163:3000/test')
+        fetch('http://192.168.0.240:3000/Test')
             .then(response => response.json())
             .then(data => console.log(data));
     }
