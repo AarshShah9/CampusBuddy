@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all --parallel server metro",
-    "server": "cd backend && npm dev",
-    "metro": "cd frontend && npm dev"
+    "server": "cd backend && npm run dev",
+    "metro": "cd frontend && npm run dev"
   },
   "repository": {
     "type": "git",
