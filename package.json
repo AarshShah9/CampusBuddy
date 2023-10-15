@@ -4,10 +4,11 @@
   "description": "This is the repository meant to house Aarsh's TechStart project. Simply set up for now. Will update name and description soon!",
   "main": "index.js",
   "scripts": {
+    "prestart": "nvm exec --silent && nvm use 18.13.0",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm-run-all --parallel server metro",
-    "server": "cd backend && npm dev",
-    "metro": "cd frontend && npm dev"
+    "start": "npm install && npm-run-all --parallel server metro",
+    "server": "cd backend && npm run dev",
+    "metro": "cd frontend && npm run dev"
   },
   "repository": {
     "type": "git",
