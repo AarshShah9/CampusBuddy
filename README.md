@@ -7,6 +7,7 @@ This is the repository meant to house Aarsh's TechStart project. Simply set up f
 ### Installations
 - Node.js (https://nodejs.org/en/download/)
 - Expo CLI
+- Node Version Package Manager (nvm: https://github.com/nvm-sh/nvm)
 ```
 npm install -g expo-cli
 ```
