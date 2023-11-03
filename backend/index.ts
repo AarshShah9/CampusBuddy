@@ -23,6 +23,6 @@ app.get('/Test', (req: Request, res: Response) => {
     res.json({message: 'Hello World!'});
 });
 
-app.listen(port, '192.168.0.240', () => {
-    console.log(`Example app listening at http://192.168.0.240:${port}`);
+app.listen(port, '10.13.148.13', () => {
+    console.log(`Example app listening at http://10.13.148.13:${port}`);
 });

@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/techstartucalgary/CampusMobileApp#readme",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "npm-run-all": "^4.1.5"
   }
 }
