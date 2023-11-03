@@ -14,6 +14,25 @@ npm install -g expo-cli
 - Git (https://git-scm.com/downloads)
 - IDE of your choice
 
+### USER NOTES
+
+- Manage your packages
+
+There will be stuff that won't install when you do npm install.
+To fix this issue you need to manually install the missing packages.
+
+- Change your IP
+
+Remember to put in your IPv4 address in both:
+-> App.tsx for Frontend
+-> index.tsx for Backend
+The app won't compile and run properly otherwise
+
+- NVM being janky
+
+If on Windows, make sure you open CMD as Admin and run your npm commands through there
+If on Mac, make sure you use sudo and run your npm commands that way
+
 ### IDE's
 
 - JetBrain's Webstorm
