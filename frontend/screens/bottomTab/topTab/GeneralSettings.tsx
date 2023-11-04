@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { ThemedText } from '../../components/ThemeProvider';
+import { ThemedText } from '../../../components/ThemeProvider';
 
 export default function GeneralSettings() {
     return (

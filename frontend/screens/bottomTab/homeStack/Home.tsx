@@ -1,12 +1,21 @@
 import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
-import { ThemedText } from '../../components/ThemeProvider';
+import { ThemedText } from '../../../components/ThemeProvider';
+import useAppContext from '../../../hooks/useAppContext';
 
 export default function Home() {
+    const { startLoading, stopLoading } = useAppContext();
+
     const testCallback = async () =>{
-        fetch('http://10.0.0.247:3000/Test') // 172.20.10.13
-            .then(response => response.json())
-            .then(data => console.log(data));
+        startLoading();
+        setTimeout(() => {
+            fetch('http://10.0.0.247:3000/Test') // 172.20.10.13
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    stopLoading()
+                });
+        }, 3000)
     }
 
     const { navigate } = useNavigation<any>();
