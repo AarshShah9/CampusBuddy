@@ -1,10 +1,8 @@
 import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
-import useAppContext from '../../hooks/useAppContext';
+import { ThemedText } from '../../components/ThemeProvider';
 
 export default function Home() {
-    const { inDarkMode } = useAppContext();
-
     const testCallback = async () =>{
         fetch('http://10.0.0.247:3000/Test') // 172.20.10.13
             .then(response => response.json())
@@ -15,7 +13,7 @@ export default function Home() {
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: inDarkMode ? 'white' : 'black' }}>Open up App.tsx to start working on your app!</Text>
+            <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
             <Button title={"Test"} onPress={testCallback} />
             <View style={styles.mockEventsContainer}>
                 <TouchableOpacity style={styles.mockEventContainer} onPress={() => {
