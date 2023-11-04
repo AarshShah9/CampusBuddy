@@ -6,8 +6,7 @@ type appContext = { inDarkMode: boolean, setIsLoading: (arg: boolean) => void };
 const AppContext = createContext<appContext | null>(null);
 
 export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
-    const currentTheme = useColorScheme();
-    const inDarkMode = currentTheme === 'dark';
+    const inDarkMode = useColorScheme() === 'dark';
 
     const [isLoading, setIsLoading] = useState(false);
     const updateLoading = useCallback((arg: boolean) => {
