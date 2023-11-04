@@ -10,15 +10,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import Home from "./screens/homeStack/Home";
-import EventDetails from './screens/homeStack/EventDetails';
+import Home from "./screens/bottomTab/homeStack/Home";
+import EventDetails from './screens/bottomTab/homeStack/EventDetails';
 
 import Carpool from './screens/drawer/Carpool';
 
 import Marketplace from './screens/bottomTab/Marketplace';
 
-import GeneralSettings from './screens/topTab/GeneralSettings';
-import NotificationSettings from './screens/topTab/Notifications';
+import GeneralSettings from './screens/bottomTab/topTab/GeneralSettings';
+import NotificationSettings from './screens/bottomTab/topTab/Notifications';
 
 
 

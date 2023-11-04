@@ -1,24 +1,28 @@
 import { createContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
-import { ActivityIndicator, Modal, Text, SafeAreaView, Animated, useColorScheme } from 'react-native';
+import { ActivityIndicator, Modal, SafeAreaView, Animated, useColorScheme } from 'react-native';
 
-type appContext = { inDarkMode: boolean, setIsLoading: (arg: boolean) => void };
+type appContext = { inDarkMode: boolean, startLoading: () => void, stopLoading: () => void };
 const AppContext = createContext<appContext | null>(null);
 
 export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
     const inDarkMode = useColorScheme() === 'dark';
 
     const [isLoading, setIsLoading] = useState(false);
-    const updateLoading = useCallback((arg: boolean) => {
-        setIsLoading(arg);
+    const startLoading = useCallback(() => {
+        setIsLoading(true);
+    }, [setIsLoading])
+
+    const stopLoading = useCallback(() => {
+        setIsLoading(false);
     }, [setIsLoading])
 
     const opacityAnim = useRef(new Animated.Value(1)).current;
-
+    const loadingOpacity = 0.35;
     useEffect(() => {
         Animated.timing(
             opacityAnim, {
-              toValue: isLoading ? 0.5: 1,
+              toValue: isLoading ? loadingOpacity : 1,
               duration: 400,
               useNativeDriver: true,
             }
@@ -26,7 +30,7 @@ export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element
     }, [isLoading]);
 
     return (
-        <AppContext.Provider value={{ inDarkMode, setIsLoading: updateLoading }}>
+        <AppContext.Provider value={{ inDarkMode, startLoading, stopLoading }}>
             <Animated.View style={{ flex: 1, opacity: opacityAnim }}>
                 {children}
             </Animated.View>

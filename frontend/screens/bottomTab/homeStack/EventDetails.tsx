@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useLayoutEffect } from 'react';
-import useAppContext from '../../hooks/useAppContext';
+import useAppContext from '../../../hooks/useAppContext';
 
 export default function EventDetails() {
     const { inDarkMode } = useAppContext();

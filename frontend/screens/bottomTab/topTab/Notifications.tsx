@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import useAppContext from "../../hooks/useAppContext";
+import useAppContext from "../../../hooks/useAppContext";
 
 export default function NotificationSettings() {
     const { inDarkMode } = useAppContext();
