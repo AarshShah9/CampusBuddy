@@ -1,6 +1,6 @@
 .vscode
 .idea
-.env
+backend/.env
 node_modules
 
 # Frontend ignores
@@ -37,6 +37,7 @@ frontend/*.pem
 
 # local env files
 frontend/.env*.local
+frontend/.env
 
 # typescript
 frontend/*.tsbuildinfo
