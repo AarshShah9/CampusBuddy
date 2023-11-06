@@ -1,13 +1,11 @@
 import { createContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
-import { ActivityIndicator, Modal, Text, SafeAreaView, Animated, useColorScheme } from 'react-native';
+import { ActivityIndicator, Modal, SafeAreaView, Animated } from 'react-native';
 
-type appContext = { inDarkMode: boolean, startLoading: () => void, stopLoading: () => void };
+type appContext = { startLoading: () => void, stopLoading: () => void };
 const AppContext = createContext<appContext | null>(null);
 
 export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
-    const inDarkMode = useColorScheme() === 'dark';
-
     const [isLoading, setIsLoading] = useState(false);
     const startLoading = useCallback(() => {
         setIsLoading(true);
@@ -29,7 +27,7 @@ export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element
     }, [isLoading]);
 
     return (
-        <AppContext.Provider value={{ inDarkMode, startLoading, stopLoading }}>
+        <AppContext.Provider value={{ startLoading, stopLoading }}>
             <Animated.View style={{ flex: 1, opacity: opacityAnim }}>
                 {children}
             </Animated.View>

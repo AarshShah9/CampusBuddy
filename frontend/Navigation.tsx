@@ -2,9 +2,9 @@ import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-ico
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, TouchableOpacity } from 'react-native';
 
-import useAppContext from './hooks/useAppContext';
+import useThemeContext from './hooks/useThemeContext';
 
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
+import { NavigationContainer } from "@react-navigation/native"
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -22,8 +22,9 @@ import NotificationSettings from './screens/bottomTab/topTab/Notifications';
 
 
 
+
 const DrawerIcon = ({ navigation }: { navigation: any }) => {
-    const { inDarkMode } = useAppContext();
+    const { inDarkMode } = useThemeContext();
     const iconColor = inDarkMode ? 'white' : 'black';
 
     return (
@@ -40,7 +41,7 @@ const DrawerIcon = ({ navigation }: { navigation: any }) => {
 
 
 const UserIcon = () => {
-    const { inDarkMode } = useAppContext();
+    const { inDarkMode } = useThemeContext();
     const iconColor = inDarkMode ? 'white' : 'black';
     
     return (
@@ -153,12 +154,10 @@ function DrawerGroup() {
 
 
 export default function Navigation() {
-    const { inDarkMode } = useAppContext();
-
+    const { theme } = useThemeContext();
+    
     return (
-        <NavigationContainer
-            theme={ inDarkMode ? DarkTheme : DefaultTheme}
-        >
+        <NavigationContainer theme={theme}>
             <StatusBar style="auto" />
             <DrawerGroup />
         </NavigationContainer>

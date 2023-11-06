@@ -1,14 +1,14 @@
 import { StyleProp, Text, TextStyle } from 'react-native';
 import type { PropsWithChildren } from 'react';
-import useAppContext from '../hooks/useAppContext';
+import useThemeContext from '../hooks/useThemeContext';
 
 type themedText = PropsWithChildren<{
     style?: StyleProp<TextStyle>
-  }>;
+}>;
 export const ThemedText = ({ style, children }: themedText) => {
-    const { inDarkMode } = useAppContext();
+    const { theme } = useThemeContext();
 
-    const styles = style ? [{ color: inDarkMode ? 'white' : 'black' }, style] : { color: inDarkMode ? 'white' : 'black' };
+    const styles = style ? [{ color: theme.colors.text }, style] : { color: theme.colors.text };
     
     return (
         <Text style={styles}>{children}</Text>
