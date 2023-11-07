@@ -15,7 +15,7 @@ export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element
     }, [setIsLoading])
 
     const opacityAnim = useRef(new Animated.Value(1)).current;
-    const loadingOpacity = 0.35
+    const loadingOpacity = 0.8 // should brainstorm and decide on a value
     useEffect(() => {
         Animated.timing(
             opacityAnim, {

@@ -5,7 +5,7 @@ import { Pressable, TouchableOpacity } from 'react-native';
 import useThemeContext from './hooks/useThemeContext';
 
 import { NavigationContainer } from "@react-navigation/native"
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -21,34 +21,33 @@ import GeneralSettings from './screens/bottomTab/topTab/GeneralSettings';
 import NotificationSettings from './screens/bottomTab/topTab/Notifications';
 
 
-
-
 const DrawerIcon = ({ navigation }: { navigation: any }) => {
-    const { inDarkMode } = useThemeContext();
-    const iconColor = inDarkMode ? 'white' : 'black';
+    const { theme } = useThemeContext();
+    //const iconColor = inDarkMode ? 'white' : 'black';
 
     return (
         <TouchableOpacity 
             style={{ 
-                marginLeft: 10, justifyContent: 'center', alignItems: 'center', 
+                justifyContent: 'center', alignItems: 'center', 
             }}
             onPress={() => navigation.openDrawer()}
         >
-            <Ionicons name="menu" size={32} color={iconColor} />
+            <Ionicons name="menu" size={32} color={theme.colors.onSurfaceVariant} />
         </TouchableOpacity>
     )
 }
 
-
 const UserIcon = () => {
-    const { inDarkMode } = useThemeContext();
-    const iconColor = inDarkMode ? 'white' : 'black';
+    const { theme } = useThemeContext();
+    //const iconColor = inDarkMode ? 'white' : 'black';
     
     return (
-        <TouchableOpacity style={{ 
-                marginRight: 10, justifyContent: 'center', alignItems: 'center', 
-            }}>
-            <FontAwesome5 name="user-circle" size={28} color={iconColor} />
+        <TouchableOpacity 
+            style={{ 
+                justifyContent: 'center', alignItems: 'center', 
+            }}
+        >
+            <FontAwesome5 name="user-circle" size={28} color={theme.colors.onSurfaceVariant} />
         </TouchableOpacity>
     )
 }
@@ -78,16 +77,84 @@ function TopTabsGroup() {
     )
 }
 
+const Stack = createNativeStackNavigator();
 
-const BottomTab = createBottomTabNavigator();
+function HomeScreenStack() {
+    const { theme } = useThemeContext();
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerTintColor: theme.colors.onSurfaceVariant,
+                headerStyle: {
+                    backgroundColor: theme.colors.surfaceVariant
+                }
+            }}
+        >
+            <Stack.Screen 
+                name="HomeScreen" component={Home} 
+                options={({ navigation }) => ({ 
+                    title: 'Home',
+                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerRight: () => <UserIcon />,
+                })} 
+            />
+        </Stack.Navigator>
+    )
+}
+function MarketplaceScreenStack() {
+    const { theme } = useThemeContext();
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerTintColor: theme.colors.onSurfaceVariant,
+                headerStyle: {
+                    backgroundColor: theme.colors.surfaceVariant
+                }
+            }}
+        >
+            <Stack.Screen 
+                name="MarketplaceScreen" component={Marketplace} 
+                options={({ navigation }) => ({ 
+                    title: 'Marketplace',
+                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerRight: () => <UserIcon />,
+                })}
+            />
+        </Stack.Navigator>
+    )
+}
+function SettingsScreenStack() {
+    const { theme } = useThemeContext();
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerTintColor: theme.colors.onSurfaceVariant,
+                headerStyle: {
+                    backgroundColor: theme.colors.surfaceVariant
+                }
+            }}
+        >
+            <Stack.Screen 
+                name="SettingsScreen" component={TopTabsGroup} 
+                options={({ navigation }) => ({ 
+                    title: 'Settings',
+                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerRight: () => <UserIcon />,
+                })}
+            />
+        </Stack.Navigator>
+    )
+}
 
-function TabGroup() {
+//const BottomTab = createBottomTabNavigator();
+const BottomTab = createMaterialBottomTabNavigator();
+
+function BottomTabGroup() {
     return (
         <BottomTab.Navigator
             screenOptions={({ route, navigation }) => ({
-                headerLeft: () => <DrawerIcon {...{ navigation }} />,
-                headerRight: () => <UserIcon />, 
-                tabBarIcon: ({ color, focused, size}) => {
+                
+                tabBarIcon: ({ color, focused }) => {
                     let iconName: any;
                     if(route.name === 'Home')
                         iconName = focused ? "home" : "home-outline"
@@ -96,58 +163,74 @@ function TabGroup() {
                             <MaterialCommunityIcons 
                                 {...{ 
                                     name: focused ? "shopping" : "shopping-outline", 
-                                    size, color 
+                                    size: 24, color 
                                 }} 
                             />
                         )
                     else if(route.name === 'Settings')
                         iconName = focused ? "settings" : "ios-settings-sharp"
 
-                    return <Ionicons {...{ name: iconName, size, color }} />
+                    return <Ionicons {...{ name: iconName, size: 24, color }} />
                 }
             })}
         >
-            <BottomTab.Screen name="Home" component={Home} />
-            <BottomTab.Screen name="Marketplace" component={Marketplace} />
-            <BottomTab.Screen name="Settings" component={TopTabsGroup} />
+            <BottomTab.Screen name="Home" component={HomeScreenStack} />
+            <BottomTab.Screen name="Marketplace" component={MarketplaceScreenStack} />
+            <BottomTab.Screen name="Settings" component={SettingsScreenStack} />
         </BottomTab.Navigator>
     )
 }
 
-
-const HomeStack = createNativeStackNavigator();
-
 function HomeStackGroup() {
     return (
-        <HomeStack.Navigator>
-            <HomeStack.Screen  
-                name="TabGroup" 
-                component={TabGroup}
+        <Stack.Navigator>
+            <Stack.Screen  
+                name="BottomTabGroup" 
+                component={BottomTabGroup}
                 options={{ headerShown: false }}
             />
-            <HomeStack.Screen  
+            <Stack.Screen  
                 name="EventDetails" 
                 component={EventDetails}
                 options={{ presentation: 'modal' }}
             />
-        </HomeStack.Navigator>
+        </Stack.Navigator>
     )
 }
 
 
+function CarpoolScreenStack() {
+    const { theme } = useThemeContext();
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerTintColor: theme.colors.onSurfaceVariant,
+                headerStyle: {
+                    backgroundColor: theme.colors.surfaceVariant
+                }
+            }}
+        >
+            <Stack.Screen 
+                name="CarpoolScreen" component={Carpool} 
+                options={({ navigation }) => ({ 
+                    title: 'Carpool',
+                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerRight: () => <UserIcon />,
+                })}
+            />
+        </Stack.Navigator>
+    )
+}
+
 const Drawer = createDrawerNavigator();
 
 function DrawerGroup() {
+    const { theme } = useThemeContext();
+
     return (
-        <Drawer.Navigator 
-            screenOptions={({ navigation }) => ({
-                headerShown: false,
-                headerLeft: () => <DrawerIcon {...{ navigation }} />,
-                headerRight: () => <UserIcon />, 
-            })}
-        >
+        <Drawer.Navigator screenOptions={{ headerShown: false, drawerStyle: { backgroundColor: theme.colors.surfaceVariant } }}>
             <Drawer.Screen name="Home" component={HomeStackGroup} />
-            <Drawer.Screen name="Carpool" component={Carpool} options={{ headerShown: true }} />
+            <Drawer.Screen name="Carpool" component={CarpoolScreenStack} />
         </Drawer.Navigator>
     )
 }
