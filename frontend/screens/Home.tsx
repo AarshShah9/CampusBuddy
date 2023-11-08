@@ -10,7 +10,7 @@ export default function Home() {
     const testCallback = async () =>{
         startLoading();
         setTimeout(() => {
-            fetch('http://10.0.0.247:3000/Test') // 172.20.10.13
+            fetch('http://172.20.10.13:3000/Test') // 172.20.10.13, 10.0.0.247
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)

@@ -2,12 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GeneralSettings from '../../../../../screens/GeneralSettings';
 import NotificationSettings from '../../../../../screens/Notifications';
+import useThemeContext from '../../../../../hooks/useThemeContext';
 
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function TopTabsGroup() {
+    const { theme } = useThemeContext();
     return (
-        <TopTabs.Navigator>
+        <TopTabs.Navigator screenOptions={{ tabBarStyle: { backgroundColor: theme.colors.background }}}>
             <TopTabs.Screen name="General" component={GeneralSettings} />
             <TopTabs.Screen 
                 name="Notifications" 

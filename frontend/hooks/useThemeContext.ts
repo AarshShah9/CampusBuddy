@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import ThemeContext from '../contexts/themeContext';
 
-const useThemeContext = () => {
+export default function useThemeContext() {
   const contextValues = useContext(ThemeContext);
 
   if (!contextValues) 
@@ -9,5 +9,3 @@ const useThemeContext = () => {
 
   return contextValues;
 };
-
-export default useThemeContext;

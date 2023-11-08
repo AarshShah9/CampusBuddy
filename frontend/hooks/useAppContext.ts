@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import AppContext from '../contexts/appContext';
 
-const useAppContext = () => {
+export default function useAppContext() {
   const contextValues = useContext(AppContext);
 
   if (!contextValues) 
@@ -9,5 +9,3 @@ const useAppContext = () => {
 
   return contextValues;
 };
-
-export default useAppContext;
