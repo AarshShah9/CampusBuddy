@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { ThemedText } from '../components/ThemedComponents';
+import { Card } from 'react-native-paper';
 import useAppContext from '../hooks/useAppContext';
 
 export default function Home() {
@@ -25,16 +26,26 @@ export default function Home() {
             <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
             <Button title={"Test"} onPress={testCallback} />
             <View style={styles.mockEventsContainer}>
-                <TouchableOpacity style={styles.mockEventContainer} onPress={() => {
-                    navigate('EventDetails', { eventNumber: 1 })
-                }}>
-                    <Text>Mock Event 1</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.mockEventContainer} onPress={() => {
-                    navigate('EventDetails', { eventNumber: 2 })
-                }}>
-                    <Text>Mock Event 2</Text>
-                </TouchableOpacity>
+                <Card style={styles.mockEventContainer}
+                    mode='elevated' 
+                    onPress={() => {
+                        navigate('EventDetails', { eventNumber: 1 })
+                    }}
+                >
+                    <Card.Content style={{ alignItems: 'center' }}>
+                        <ThemedText>Mock Event 1</ThemedText>
+                    </Card.Content>
+                </Card>
+                <Card style={styles.mockEventContainer}
+                    mode='elevated' 
+                    onPress={() => {
+                        navigate('EventDetails', { eventNumber: 2 })
+                    }}
+                >
+                    <Card.Content style={{ alignItems: 'center' }}>
+                        <ThemedText>Mock Event 2</ThemedText>
+                    </Card.Content>
+                </Card>
             </View>
         </SafeAreaView>
     );
@@ -52,17 +63,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     mockEventContainer: {
-        display: 'flex',
         width: 100,
         height: 100,
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-        elevation: 5,
-        shadowColor: 'lightgrey',
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 1,
-        shadowRadius: 4,
+        justifyContent: 'center'
     }
 })
