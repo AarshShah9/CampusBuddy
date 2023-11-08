@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
-import { ThemedText } from '../../../components/ThemedComponents';
-import useAppContext from '../../../hooks/useAppContext';
+import { ThemedText } from '../components/ThemedComponents';
+import useAppContext from '../hooks/useAppContext';
 
 export default function Home() {
     const { startLoading, stopLoading } = useAppContext();
