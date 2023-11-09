@@ -18,7 +18,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // route requires
-const user = require('./routes/user.routes');
+const user = require('./routes/student.routes');
 const school = require('./routes/school.routes');
 
 // routes
