@@ -1,24 +1,36 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
-import {internalIpV4, internalIpV4Sync} from 'internal-ip';
-
-const result = dotenv.config();
+import bodyParser from 'body-parser';
 
 const app = express();
 const port = 3000;
+const result = dotenv.config();
 
-app.use((req, res, next) => {
+// middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.header("Content-Type", "application/json");
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+// route requires
+const user = require('./routes/user.routes');
+const school = require('./routes/school.routes');
+
+// routes
+app.use('/api', user);
+app.use('/api', school);
 
 app.get('/Test', (req: Request, res: Response) => {
     console.log("The backend is hit")
     res.json({message: 'Hello World!'});
 });
 
+// server start
 app.listen(port, '192.168.1.72', () => {
-    console.log(internalIpV4Sync());
     console.log(`Example app listening at http://192.168.1.72:${port}`);
 });
