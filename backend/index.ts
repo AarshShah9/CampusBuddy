@@ -1,15 +1,11 @@
-const os = require('os');
 import dotenv from 'dotenv';
-
 import express, { Request, Response, NextFunction } from 'express';
+import {internalIpV4, internalIpV4Sync} from 'internal-ip';
 
 const result = dotenv.config();
-const ip = process.env.IP_ADDRESS ?? 'localhost';
-
 
 const app = express();
 const port = 3000;
-
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -22,6 +18,7 @@ app.get('/Test', (req: Request, res: Response) => {
     res.json({message: 'Hello World!'});
 });
 
-app.listen(port, ip, () => {
-    console.log(`Example app listening at http://${ip}:${port}`);
+app.listen(port, '192.168.1.72', () => {
+    console.log(internalIpV4Sync());
+    console.log(`Example app listening at http://192.168.1.72:${port}`);
 });

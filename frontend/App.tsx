@@ -1,13 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, View } from 'react-native';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {IP_ADDRESS} from "@env";
 
 function HomeScreen() {
     const testCallback = async () => {
-        fetch(`http://${IP_ADDRESS}:3000/Test`)
+        fetch(`http://192.168.1.72:3000/Test`)
             .then(response => response.json())
             .then(data => console.log(data));
     }
