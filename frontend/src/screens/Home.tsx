@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ThemedText } from '../components/ThemedComponents';
 import { Card } from 'react-native-paper';
 import useAppContext from '../hooks/useAppContext';
+import { IP_ADDRESS } from '@env';
 
 export default function Home() {
     const { startLoading, stopLoading } = useAppContext();
@@ -10,7 +11,7 @@ export default function Home() {
     const testCallback = async () =>{
         startLoading();
         setTimeout(() => {
-            fetch('http://172.20.10.13:3000/Test') // 172.20.10.13, 10.0.0.247
+            fetch(`http://${IP_ADDRESS}:3000/Test`) 
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)

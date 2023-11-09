@@ -9,10 +9,10 @@ export const AppContextProvider = ({ children }: PropsWithChildren): JSX.Element
     const [isLoading, setIsLoading] = useState(false);
     const startLoading = useCallback(() => {
         setIsLoading(true);
-    }, [setIsLoading])
+    }, [])
     const stopLoading = useCallback(() => {
         setIsLoading(false);
-    }, [setIsLoading])
+    }, [])
 
     const opacityAnim = useRef(new Animated.Value(1)).current;
     const loadingOpacity = 0.8 // should brainstorm and decide on a value

@@ -4,8 +4,6 @@ import useThemeContext from "../hooks/useThemeContext";
 
 export default function DrawerIcon ({ navigation }: { navigation: any }) {
     const { theme } = useThemeContext();
-    //const iconColor = inDarkMode ? 'white' : 'black';
-
     return (
         <TouchableOpacity 
             style={{ 
