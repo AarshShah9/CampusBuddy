@@ -2,11 +2,11 @@ import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from '
 import { useNavigation } from '@react-navigation/native'
 import { ThemedText } from '../components/ThemedComponents';
 import { Card } from 'react-native-paper';
-import useAppContext from '../hooks/useAppContext';
+import useLoadingContext from '../hooks/useLoadingContext';
 import { IP_ADDRESS } from '@env';
 
 export default function Home() {
-    const { startLoading, stopLoading } = useAppContext();
+    const { startLoading, stopLoading } = useLoadingContext();
 
     const testCallback = async () =>{
         startLoading();
