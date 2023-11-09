@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
-import { ThemeContextProvider } from './contexts/themeContext';
-import { AppContextProvider } from './contexts/appContext';
-import Navigation from './navigation/Navigation';
+import { ThemeContextProvider } from './src/contexts/themeContext';
+import { AppContextProvider } from './src/contexts/appContext';
+import Navigation from './src/navigation/Navigation';
 
 
 export default function App() {
