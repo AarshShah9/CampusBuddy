@@ -1,34 +1,14 @@
-import Express, { Request, Response } from 'express';
-import { Prisma, PrismaClient } from '@prisma/client';
+import express from 'express';
+import {
+    studentTest,
+    createNewStudent,
+    getAllStudents,
+} from '../controllers/student.controller';
 
-const router = Express.Router();
-const prisma = new PrismaClient();
+const router = express.Router();
 
-// test User
-router.get('/studentTest', async (req: Request , res: Response) => {
-    res.send("User -> Valid");
-})
-
-// create new User
-router.post('/createNewStudent', async (req: Request, res: Response) => {
-    const { school, email, username, name } = req.body;
-
-    // get school ID
-    
-
-    // create and add user
-    const student = await prisma.student.create({
-        data : {
-            
-        },
-    })
-});
-
-// get all Users
-router.get('/getAllStudents', async (req: Request, res: Response) => {
-    const allStudents = await prisma.student.findMany();
-
-    res.json(allStudents);
-});
+router.get('/studentTest', studentTest);
+router.post('/createNewStudent', createNewStudent);
+router.get('/getAllStudents', getAllStudents);
 
 module.exports = router;

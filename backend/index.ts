@@ -31,6 +31,6 @@ app.get('/Test', (req: Request, res: Response) => {
 });
 
 // server start
-app.listen(port, '192.168.1.72', () => {
-    console.log(`Example app listening at http://192.168.1.72:${port}`);
+app.listen(port, '10.13.148.91', () => {
+    console.log(`Example app listening at http://10.13.148.91:${port}`);
 });
