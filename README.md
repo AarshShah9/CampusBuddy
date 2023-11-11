@@ -1,8 +1,27 @@
-# CampusMobileApp
-This is the repository meant to house Aarsh's TechStart project. Simply set up for now. Will update name and description soon!
+# CampusBuddy
 
+This repo houses the CampusBuddy Tech Start project. We're aiming to build an application that streamlines campus engagement in many different ways. Keep an eye out for our MVP!
 
-# Setup
+## Contributors
+- Aarsh Shah (Project Manager/ Technical Lead)
+- Yang Liu (Business Strategist)
+- Rafi (UI Designer)
+- James Robert (Front-end Developer)
+- Johnny Tran (Front-end/ UI Developer)
+- Ajaypal Sallh (Front-end/ UI Developer)
+- Noman Sanjari (Backend Developer)
+- JC Pretorius (Backend Developer)
+- Stalin Cunha (Backend Developer)
+
+## Timeline/ Roadmap
+- Ideation/ Tech Mapping
+- Market Research/ Empathy Mapping
+- UI Set-up
+- Development
+- Testing
+- Production Release
+
+## Setup
 
 ### Installations
 - Node.js (https://nodejs.org/en/download/)
@@ -16,22 +35,25 @@ npm install -g expo-cli
 
 ### USER NOTES
 
-- Manage your packages
+Windows
+- Should simply be able to run to run the entire application
+```
+./start.sh
+```
 
-There will be stuff that won't install when you do npm install.
-To fix this issue you need to manually install the missing packages.
+Linux/ Mac OS (UNIX)
+The same command as windows should still work as separate scripts are used depending on the OS however you will have to give execution permissions to the following scripts:
+- start.sh
+- /scripts/install.sh
+- /scripts/ipscript.sh
+- /scripts/ipscriptUNIX.sh
 
-- Change your IP
+To do this you will have to do the following on all of the commands.
+1. Ensure you are in the working directory of the script. For instance, you may have to run ```cd scripts``` for all of the scripts that are in the folder
+2. Run ```chmod a+x <script-name>```. This essentially changes the permissions to add execution instructions for all users. 'a' = all, '+' = add, x = execution.
+3. Then you can run the start script to start the application (make sure you are again in the working directory). ```./start.sh```
 
-Remember to put in your IPv4 address in both:
--> App.tsx for Frontend
--> index.tsx for Backend
-The app won't compile and run properly otherwise
 
-- NVM being janky
-
-If on Windows, make sure you open CMD as Admin and run your npm commands through there
-If on Mac, make sure you use sudo and run your npm commands that way
 
 ### IDE's
 
@@ -48,7 +70,7 @@ $ git config --global push.default current
 - Naming Convention:
 Please use the following naming convention for branches:
 ```
-<your name>/<feature-ticket-number>
+<your name>/<feature-ticket-number/name>
 ```
 
 - Common git commands:
@@ -56,6 +78,7 @@ Please use the following naming convention for branches:
 $ git checkout -b <branch-name> # Creates a new branch and switches to it
 $ git add . # Adds all file changes and tracks files
 $ git commit -am "<commit-message>" # Adds all file changes and commits them (non-tracked files will not be included)
+$ git merge origin main # please run this before making a PR and resolve any merge conflicts.
 ```
 
 
