@@ -1,8 +1,9 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import useThemeContext from '../../../../hooks/useThemeContext';
-import Marketplace from '../../../../screens/Marketplace';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import useThemeContext from '~/hooks/useThemeContext';
+import Marketplace from '~/screens/Marketplace';
 import DrawerIcon from '../../../DrawerIcon';
 import UserIcon from '../../../UserIcon';
+import React from "react";
 
 const Stack = createNativeStackNavigator();
 

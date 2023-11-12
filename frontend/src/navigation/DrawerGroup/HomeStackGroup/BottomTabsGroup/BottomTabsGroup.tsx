@@ -1,8 +1,9 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import HomeScreenStack from './HomeScreenStack';
 import MarketplaceScreenStack from './MarketplaceScreenStack';
 import SettingsScreenStack from './SettingsScreenStack/SettingsScreenStack';
+import React from "react";
 
 const BottomTab = createMaterialBottomTabNavigator();
 

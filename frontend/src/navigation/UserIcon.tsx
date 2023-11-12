@@ -1,6 +1,7 @@
-import { FontAwesome5 } from '@expo/vector-icons';
-import { TouchableOpacity } from "react-native";
-import useThemeContext from '../hooks/useThemeContext';
+import {FontAwesome5} from '@expo/vector-icons';
+import {TouchableOpacity} from "react-native";
+import useThemeContext from '~/hooks/useThemeContext';
+import React from "react";
 
 export default function UserIcon () {
     const { theme } = useThemeContext();    

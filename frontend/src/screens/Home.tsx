@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, Button, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
-import { ThemedText } from '~/components/ThemedComponents';
-import { Card } from 'react-native-paper';
-import useLoadingContext from '../hooks/useLoadingContext';
-import { IP_ADDRESS } from '@env';
+import {Button, SafeAreaView, StyleSheet, View} from 'react-native';
+import {useNavigation} from '@react-navigation/native'
+import {ThemedText} from '~/components/ThemedComponents';
+import {Card} from 'react-native-paper';
+import useLoadingContext from '~/hooks/useLoadingContext';
+import {IP_ADDRESS} from '@env';
+import React from "react";
 
 export default function Home() {
     const { startLoading, stopLoading } = useLoadingContext();
