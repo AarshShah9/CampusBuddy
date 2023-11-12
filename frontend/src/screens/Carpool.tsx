@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import { ThemedText } from "../components/ThemedComponents";
+import {View} from "react-native";
+import {ThemedText} from "~/components/ThemedComponents";
 
 export default function Carpool() {
     return (
