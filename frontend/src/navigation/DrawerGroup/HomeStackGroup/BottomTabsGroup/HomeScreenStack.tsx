@@ -1,8 +1,9 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import useThemeContext from '../../../../hooks/useThemeContext';
-import Home from '../../../../screens/Home';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import useThemeContext from '~/hooks/useThemeContext';
+import Home from '~/screens/Home';
 import DrawerIcon from '../../../DrawerIcon';
 import UserIcon from '../../../UserIcon';
+import React from "react";
 
 const Stack = createNativeStackNavigator();
 

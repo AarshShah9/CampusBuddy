@@ -1,8 +1,8 @@
-import { createContext } from "react";
-import type { PropsWithChildren } from 'react';
-import { adaptNavigationTheme, PaperProvider } from 'react-native-paper';
-import { DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme } from "@react-navigation/native"
-import { useColorScheme } from "react-native";
+import type {PropsWithChildren} from 'react';
+import React, {createContext} from "react";
+import {adaptNavigationTheme, PaperProvider} from 'react-native-paper';
+import {DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme} from "@react-navigation/native"
+import {useColorScheme} from "react-native";
 import lightColors from "../themeColors/lightColors";
 import darkColors from "../themeColors/darkColors";
 
