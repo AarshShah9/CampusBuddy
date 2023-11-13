@@ -3,7 +3,6 @@ import useThemeContext from '~/hooks/useThemeContext';
 import Home from '~/screens/Home';
 import DrawerIcon from '../../../DrawerIcon';
 import UserIcon from '../../../UserIcon';
-import React from "react";
 
 const Stack = createNativeStackNavigator();
 

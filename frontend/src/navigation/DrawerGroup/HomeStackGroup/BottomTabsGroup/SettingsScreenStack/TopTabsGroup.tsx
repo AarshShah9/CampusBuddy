@@ -3,7 +3,6 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import GeneralSettings from '~/screens/GeneralSettings';
 import NotificationSettings from '~/screens/Notifications';
 import useThemeContext from '~/hooks/useThemeContext';
-import React from "react";
 
 const TopTabs = createMaterialTopTabNavigator();
 

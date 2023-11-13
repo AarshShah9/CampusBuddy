@@ -1,6 +1,6 @@
 import {View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useLayoutEffect} from 'react';
+import {useLayoutEffect} from 'react';
 import {ThemedText} from '~/components/ThemedComponents';
 
 export default function EventDetails() {

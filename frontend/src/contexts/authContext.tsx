@@ -1,5 +1,5 @@
 import type {PropsWithChildren} from 'react';
-import React, {createContext, useState} from 'react';
+import {createContext, useState} from 'react';
 
 type authContext = { user: { name: string, email: string } | null };
 const AuthContext = createContext<authContext | null>(null);

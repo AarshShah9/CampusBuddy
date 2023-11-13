@@ -2,7 +2,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabsGroup from './BottomTabsGroup/BottomTabsGroup';
 import EventDetails from '~/screens/EventDetails';
 import useThemeContext from '~/hooks/useThemeContext';
-import React from "react";
 
 const Stack = createNativeStackNavigator();
 
