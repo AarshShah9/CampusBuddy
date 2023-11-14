@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/schoolTest', schoolTest);
 router.post('/createNewSchool', createNewSchool);
-router.post('/getSchoolIDFromName', getSchoolIDFromName);
+router.get('/getSchoolIDFromName', getSchoolIDFromName);
 router.get('/getAllSchools', getAllSchools);
 
 module.exports = router;

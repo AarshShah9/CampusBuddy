@@ -23,7 +23,15 @@ export const createNewSchool = async (req: Request, res: Response) => {
 
 // get SchoolID using School name
 export const getSchoolIDFromName = async (req: Request, res: Response) => {
-    // TO DO
+    const { schoolName } = req.body;
+
+    const schoolID = await prisma.school.findFirst({
+        where: {
+            name: schoolName,
+        },
+    });
+
+    res.status(200).json(schoolID);
 }
 
 // get all Schools

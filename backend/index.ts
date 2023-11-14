@@ -3,8 +3,10 @@ import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 
 const app = express();
-const port = 3000;
 const result = dotenv.config();
+
+const port = 3000;
+const ip = process.env.IP_ADDRESS ?? 'localhost';
 
 // middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,6 +33,6 @@ app.get('/Test', (req: Request, res: Response) => {
 });
 
 // server start
-app.listen(port, '10.13.148.91', () => {
-    console.log(`Example app listening at http://10.13.148.91:${port}`);
+app.listen(port, ip, () => {
+    console.log(`Example app listening at http://${ip}:${port}`);
 });
