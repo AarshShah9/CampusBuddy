@@ -22,6 +22,9 @@ app.get('/Test', (req: Request, res: Response) => {
     res.json({message: 'Hello World!'});
 });
 
-app.listen(port, ip, () => {
+const server = app.listen(port, ip, () => {
     console.log(`Example app listening at http://${ip}:${port}`);
 });
+
+export default app;
+export {server};
