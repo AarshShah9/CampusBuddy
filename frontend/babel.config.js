@@ -11,6 +11,25 @@ module.exports = function(api) {
         "safe": false,
         "allowUndefined": true
       }],
+        ['react-native-reanimated/plugin'],
+      [
+        'module-resolver',
+        {
+          extensions: [
+            '.js',
+            '.jsx',
+            '.ts',
+            '.tsx',
+            '.android.js',
+            '.android.tsx',
+            '.ios.js',
+            '.ios.tsx'
+          ],
+          alias: {
+            '~': './src'
+          }
+        }
+      ]
     ]
   };
 };
