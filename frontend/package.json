@@ -15,7 +15,6 @@
     }
   },
   "dependencies": {
-    "@jest/globals": "^29.7.0",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/drawer": "^6.6.6",
     "@react-navigation/material-bottom-tabs": "^6.2.19",
