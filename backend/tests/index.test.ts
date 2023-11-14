@@ -6,7 +6,7 @@ import app, {server} from '../index';
 test('Intial Test', async () => {
         const res = await request(app).get('/Test');
         expect(res.statusCode).toEqual(200);
-        expect(res.body).toEqual({"message": "Hello World!"});
+        expect(res.body).toEqual({"message": "Hello World! bad"});
 });
 
 afterAll(done => {
