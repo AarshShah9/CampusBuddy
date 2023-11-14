@@ -1,5 +1,7 @@
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
 import { PrismaClient } from '@prisma/client';
+
+import { getSchoolIDFromName } from './school.controller';
 
 const prisma = new PrismaClient();
 
@@ -10,9 +12,27 @@ export const studentTest = async (req: Request , res: Response) => {
 
 // create new User
 export const createNewStudent = async (req: Request, res: Response) => {
-    const { school, email, username, name } = req.body;
-    
-    // TO DO
+    const { schoolName, email, username, name } = req.body;
+
+    const schoolID = await prisma.school.findFirst({
+        where: {
+            name: schoolName,
+        },
+    });
+
+    // schoolName is valid
+    if (schoolID !== null) {
+        const newStudent = await prisma.student.create({
+            data: {
+                schoolID: schoolID.id,
+                email: email,
+                username: username,
+                name: name,
+            },
+        });
+
+        res.status(200).json(newStudent);
+    }
 }
 
 // get all Users
