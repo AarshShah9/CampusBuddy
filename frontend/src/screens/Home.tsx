@@ -16,7 +16,8 @@ export default function Home() {
                 .then(data => {
                     console.log(data)
                     stopLoading()
-                });
+                })
+                .catch(err => console.log(err));
         }, 3000)
     }
 
