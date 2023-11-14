@@ -11,4 +11,4 @@ router.get('/studentTest', studentTest);
 router.post('/createNewStudent', createNewStudent);
 router.get('/getAllStudents', getAllStudents);
 
-module.exports = router;
+export default router;

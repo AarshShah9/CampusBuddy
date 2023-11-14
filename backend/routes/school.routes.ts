@@ -13,4 +13,4 @@ router.post('/createNewSchool', createNewSchool);
 router.get('/getSchoolIDFromName', getSchoolIDFromName);
 router.get('/getAllSchools', getAllSchools);
 
-module.exports = router;
+export default router;

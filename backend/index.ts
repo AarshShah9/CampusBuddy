@@ -20,11 +20,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // route requires
-const user = require('./routes/student.routes');
-const school = require('./routes/school.routes');
+//const student = require('./routes/student.routes');
+import student from './routes/student.routes';
+import school from './routes/school.routes';
 
 // routes
-app.use('/api', user);
+app.use('/api', student);
 app.use('/api', school);
 
 app.get('/Test', (req: Request, res: Response) => {

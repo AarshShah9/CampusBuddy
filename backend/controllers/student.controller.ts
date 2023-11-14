@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
-import { getSchoolIDFromName } from './school.controller';
-
 const prisma = new PrismaClient();
 
 // test User
