@@ -10,7 +10,7 @@ const ip = process.env.IP_ADDRESS ?? 'localhost';
 const app = express();
 const port = 3000;
 
-d
+
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
