@@ -1,6 +1,5 @@
 import {View} from 'react-native';
 import {ThemedText} from '~/components/ThemedComponents';
-import React from "react";
 
 export default function GeneralSettings() {
     return (

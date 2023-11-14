@@ -1,5 +1,4 @@
 import {ActivityIndicator, Modal, SafeAreaView} from 'react-native';
-import React from "react";
 
 type Props = {
     isLoading: boolean

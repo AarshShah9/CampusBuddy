@@ -1,6 +1,5 @@
 import {StyleProp, TextStyle} from 'react-native';
 import type {PropsWithChildren} from 'react';
-import React from "react";
 import {Text} from 'react-native-paper';
 
 type themedText = PropsWithChildren<{

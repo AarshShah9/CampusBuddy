@@ -2,7 +2,6 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import useThemeContext from '~/hooks/useThemeContext';
 import HomeStackGroup from './HomeStackGroup/HomeStackGroup';
 import CarpoolScreenStack from './CarpoolScreenStack';
-import React from "react";
 
 const Drawer = createDrawerNavigator();
 
