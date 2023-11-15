@@ -1,7 +1,7 @@
 const os = require('os');
 import dotenv from 'dotenv';
 
-import express, { Request, Response, NextFunction } from 'express';
+import express, {Request, Response} from 'express';
 
 const result = dotenv.config();
 const ip = process.env.IP_ADDRESS ?? 'localhost';
@@ -22,6 +22,9 @@ app.get('/Test', (req: Request, res: Response) => {
     res.json({message: 'Hello World!'});
 });
 
-app.listen(port, ip, () => {
+const server = app.listen(port, ip, () => {
     console.log(`Example app listening at http://${ip}:${port}`);
 });
+
+export default app;
+export {server};
