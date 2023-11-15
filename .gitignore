@@ -44,4 +44,8 @@ frontend/.env
 frontend/*.tsbuildinfo
 backend/dist
 
+backend/coverage
+backend/coverage/*
+
+
 

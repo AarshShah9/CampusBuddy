@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import express, { Request, Response, NextFunction } from 'express';
+import express, {Request, Response} from 'express';
 import bodyParser from 'body-parser';
 
 const app = express();
@@ -34,6 +34,9 @@ app.get('/Test', (req: Request, res: Response) => {
 });
 
 // server start
-app.listen(port, ip, () => {
+const server = app.listen(port, ip, () => {
     console.log(`Example app listening at http://${ip}:${port}`);
 });
+
+export default app;
+export {server};
