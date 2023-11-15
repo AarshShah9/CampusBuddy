@@ -1,6 +1,10 @@
 import dotenv from 'dotenv';
-import express, {Request, Response} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import bodyParser from 'body-parser';
+// route requires
+//const student = require('./routes/student.routes');
+import student from './routes/student.routes';
+import school from './routes/school.routes';
 
 const app = express();
 const result = dotenv.config();
@@ -18,11 +22,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
-// route requires
-//const student = require('./routes/student.routes');
-import student from './routes/student.routes';
-import school from './routes/school.routes';
 
 // routes
 app.use('/api', student);
