@@ -1,6 +1,7 @@
 .vscode
 .idea
 backend/.env
+backend/node_modules
 node_modules
 
 # Frontend ignores
@@ -42,5 +43,9 @@ frontend/.env
 # typescript
 frontend/*.tsbuildinfo
 backend/dist
+
+backend/coverage
+backend/coverage/*
+
 
 
