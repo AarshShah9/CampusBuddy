@@ -14,6 +14,7 @@ datasource db {
 model School {
   id        Int     @id @default(autoincrement())
   name      String  
+  domain    String
   students  Student[]
 }
 
@@ -24,6 +25,10 @@ model Student {
   email     String
   username  String
   name      String
+  password  String 
+  otp       String?
+  jwt       String?
+  status    String
 
   @@index([schoolID])
 }
