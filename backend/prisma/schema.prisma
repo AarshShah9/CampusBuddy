@@ -6,24 +6,160 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model School {
-  id        Int     @id @default(autoincrement())
-  name      String  
-  students  Student[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  students Student[]
 }
 
 model Student {
-  id        Int     @id @default(autoincrement())
-  school    School  @relation(fields: [schoolID], references: [id])
-  schoolID  Int
-  email     String
-  username  String
-  name      String
+  id       Int    @id @default(autoincrement())
+  school   School @relation(fields: [schoolID], references: [id])
+  schoolID Int
+  email    String
+  username String
+  name     String
 
   @@index([schoolID])
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  userName          String              @unique
+  firstName         String
+  lastName          String
+  email             String              @unique
+  passwordHash      String
+  pictureUrl        String
+  yearOfStudy       Int
+  schoolId          Int                 @unique
+  events            Event[]
+  UserEventResponse UserEventResponse[]
+  Post              Post[]
+  Comment           Comment[]
+  User_Group_Role   User_Group_Role[]
+  Enrollment        Enrollment[]
+}
+
+model Event {
+  id                Int                 @id @default(autoincrement())
+  event             User                @relation(fields: [eventId], references: [id])
+  eventId           Int                 @unique
+  createdAt         DateTime            @default(now())
+  title             String
+  description       String?
+  location          String
+  startTime         DateTime
+  endTime           DateTime
+  mediaUrl          String?
+  UserEventResponse UserEventResponse[]
+}
+
+model UserEventResponse {
+  id                  User    @relation(fields: [userId], references: [id])
+  userId              Int     @id
+  event               Event   @relation(fields: [eventId], references: [id])
+  eventId             Int
+  participationStatus String?
+
+  @@index([userId])
+  @@index([eventId])
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime  @default(now())
+  title     String
+  text      String?
+  mediaUrl  String?
+  Comment   Comment[]
+
+  @@index([userId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+  createdAt DateTime @default(now())
+  text      String
+
+  @@index([userId])
+  @@index([postId])
+}
+
+model Group {
+  id                    Int                     @id @default(autoincrement())
+  groupName             String                  @unique
+  description           String?
+  createdAt             DateTime                @default(now())
+  status                String
+  User_Group_Role       User_Group_Role[]
+  Group_Role_Permission Group_Role_Permission[]
+}
+
+model User_Group_Role {
+  user    User  @relation(fields: [userId], references: [id])
+  userId  Int   @id
+  group   Group @relation(fields: [groupId], references: [id])
+  groupId Int
+  role    Role  @relation(fields: [roleId], references: [id])
+  roleId  Int
+
+  @@index([userId])
+  @@index([groupId])
+  @@index([roleId])
+}
+
+model Role {
+  id                    Int                     @id @default(autoincrement())
+  roleName              String
+  User_Group_Role       User_Group_Role[]
+  Group_Role_Permission Group_Role_Permission[]
+}
+
+model Group_Role_Permission {
+  group        Group     @relation(fields: [groupId], references: [id])
+  groupId      Int       @id
+  role         Role      @relation(fields: [roleId], references: [id])
+  roleId       Int
+  permission   Permssion @relation(fields: [permissionId], references: [id])
+  permissionId Int
+
+  @@index([groupId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model Permssion {
+  id                    Int                     @id @default(autoincrement())
+  permission_name       String
+  Group_Role_Permission Group_Role_Permission[]
+}
+
+model Enrollment {
+  program     Program @relation(fields: [programId], references: [id])
+  programId   Int     @id
+  user        User    @relation(fields: [userId], references: [id])
+  userId      Int
+  degree_type String
+
+  @@index([programId])
+  @@index([userId])
+}
+
+model Program {
+  id           Int          @id @default(autoincrement())
+  program_name String
+  department   String
+  Enrollment   Enrollment[]
 }
