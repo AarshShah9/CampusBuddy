@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import express, {NextFunction, Request, Response} from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
@@ -20,8 +20,6 @@ const ip = process.env.IP_ADDRESS ?? 'localhost';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(verifyAuthentication);
-
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.header("Content-Type", "application/json");
     res.header("Access-Control-Allow-Origin", "*");

@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.get('/studentTest', studentTest);
-router.post('/generateOTP', verifyOTP);
+router.post('/verifyOTP', verifyOTP);
 router.post('/createNewStudent', createNewStudent);
 router.get('/getAllStudents', getAllStudents);
 

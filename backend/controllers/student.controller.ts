@@ -3,9 +3,23 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 const prisma = new PrismaClient();
 const result = dotenv.config();
+
+// could use refactoring later
+// nodemailer config -> transport
+const config = {
+    service: 'gmail',
+    auth: {
+        user: 'nomansanjari2001@gmail.com',
+        pass: 'ttfgnbtjykxedjzp'
+    }
+}
+
+// mail transporter
+let transporter = nodemailer.createTransport(config);
 
 // test User
 export const studentTest = async (req: Request, res: Response) => {
@@ -27,12 +41,10 @@ export const verifyOTP = async (req: Request, res: Response) => {
     // if student exists
     if (student) {
         // generate user specific jwt
-        const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret", {
-            expiresIn: '1y'
-        });
+        const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret");
 
         // update user record to be verified and update token
-        const updateUser = await prisma.student.update({
+        await prisma.student.update({
             where: {
                 email: email,
             },
@@ -42,7 +54,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).cookie('authToken', token);
+        res.status(200).cookie('authToken', token).send("JWT Set!");
     }
     else {
         res.status(401);
@@ -89,7 +101,26 @@ export const createNewStudent = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json(newStudent);
+        const message = {
+            from: 'nomansanjari2001@gmail.com',
+            to: email,
+            subject: 'Verify OTP - CampusBuddy',
+            html: `<b>${otp}</b>`
+        }
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(201).json(
+                {
+                    otp: otp,
+                    msg: "Email sent",
+                    info: info.messageId,
+                    preview: nodemailer.getTestMessageUrl(info)
+                }
+            )
+        }).catch((err) => {
+            return res.status(500).json({ msg: err });
+        }
+        );
     }
 }
 
