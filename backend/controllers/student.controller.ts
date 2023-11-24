@@ -1,36 +1,52 @@
+import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import otpGenerator from 'otp-generator';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+const result = dotenv.config();
 
 // test User
 export const studentTest = async (req: Request, res: Response) => {
     res.status(200).json({success: true, message: 'Endpoint works'});
 }
 
-// generate OTP
-export const generateOTP = async (req: Request, res: Response) => {
-    // getting email to verify from the request body
-    const { email } = req.body;
-
-    // generating the OTP
-    const OTP = otpGenerator.generate(6, {
-        upperCaseAlphabets: false,
-        lowerCaseAlphabets: false,
-        specialChars: false,
-    });
-
-    // writing the OTP to the database
-
-    // email OTP
-
-    res.status(200).json(OTP);
-}
-
 // verify OTP
 export const verifyOTP = async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
 
+    // find student according to email and match otp
+    const student = await prisma.student.findFirst({
+        where: {
+            email: email,
+            otp: otp,
+        }
+    });
+
+    // if student exists
+    if (student) {
+        // generate user specific jwt
+        const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret", {
+            expiresIn: '1y'
+        });
+
+        // update user record to be verified and update token
+        const updateUser = await prisma.student.update({
+            where: {
+                email: email,
+            },
+            data: {
+                jwt: token,
+                status: true,
+            },
+        });
+
+        res.status(200).cookie('authToken', token);
+    }
+    else {
+        res.status(401);
+    }
 }
 
 // TODO implement JWT persistence and checking
@@ -41,15 +57,25 @@ export const verifyOTP = async (req: Request, res: Response) => {
 // create new User
 export const createNewStudent = async (req: Request, res: Response) => {
     const { schoolName, email, username, name, password } = req.body;
+    const domain = email.slice(email.indexOf('@') + 1);
 
+    // generating the OTP
+    const otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+    });
+
+    // verify if school is accepted
     const schoolID = await prisma.school.findFirst({
         where: {
             name: schoolName,
+            domain: domain
         },
     });
 
     // schoolName is valid
-    if (schoolID !== null) {
+    if (schoolID) {
         // creating newStudent object to write to DB
         const newStudent = await prisma.student.create({
             data: {
@@ -57,7 +83,9 @@ export const createNewStudent = async (req: Request, res: Response) => {
                 email: email,
                 username: username,
                 name: name,
-                password: password, // test purposes
+                password: password,
+                otp: otp,
+                status: false
             },
         });
 

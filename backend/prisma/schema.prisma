@@ -22,13 +22,13 @@ model Student {
   id        Int     @id @default(autoincrement())
   school    School  @relation(fields: [schoolID], references: [id])
   schoolID  Int
-  email     String
+  email     String  @unique
   username  String
   name      String
   password  String 
   otp       String?
   jwt       String?
-  status    String
+  status    Boolean
 
   @@index([schoolID])
 }

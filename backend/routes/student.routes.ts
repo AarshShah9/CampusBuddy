@@ -1,7 +1,7 @@
 import express from 'express';
 import {
     studentTest,
-    generateOTP,
+    verifyOTP,
     createNewStudent,
     getAllStudents,
 } from '../controllers/student.controller';
@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.get('/studentTest', studentTest);
-router.post('/generateOTP', generateOTP);
+router.post('/generateOTP', verifyOTP);
 router.post('/createNewStudent', createNewStudent);
 router.get('/getAllStudents', getAllStudents);
 
