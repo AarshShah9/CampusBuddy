@@ -44,7 +44,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
         const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret");
 
         // update user record to be verified and update token
-        await prisma.student.update({
+        await prisma.student.updateMany({
             where: {
                 email: email,
             },
