@@ -23,7 +23,66 @@ let transporter = nodemailer.createTransport(config);
 
 // test User
 export const studentTest = async (req: Request, res: Response) => {
-    res.status(200).json({success: true, message: 'Endpoint works'});
+    res.status(200).json({ success: true, message: 'Endpoint works' });
+}
+
+// create new User
+export const createNewStudent = async (req: Request, res: Response) => {
+    const { schoolName, email, username, name, password } = req.body;
+    const domain = email.slice(email.indexOf('@') + 1);
+
+    // generating the OTP
+    const otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+    });
+
+    // verify if school is accepted
+    const schoolID = await prisma.school.findFirst({
+        where: {
+            name: schoolName,
+            domain: domain
+        },
+    });
+
+    // schoolName is valid
+    if (schoolID) {
+        // creating newStudent object to write to DB
+        const newStudent = await prisma.student.create({
+            data: {
+                schoolID: schoolID.id,
+                email: email,
+                username: username,
+                name: name,
+                password: password,
+                otp: otp,
+                jwt: "",
+                status: false
+            },
+        });
+
+        const message = {
+            from: 'nomansanjari2001@gmail.com',
+            to: email,
+            subject: 'Verify OTP - CampusBuddy',
+            html: `<b>${otp}</b>`
+        }
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(201).json(
+                {
+                    otp: otp,
+                    msg: "Email sent",
+                    info: info.messageId,
+                    preview: nodemailer.getTestMessageUrl(info)
+                }
+            )
+        }).catch((err) => {
+            return res.status(500).json({ msg: err });
+        }
+        );
+    }
 }
 
 // verify OTP
@@ -61,67 +120,59 @@ export const verifyOTP = async (req: Request, res: Response) => {
     }
 }
 
-// TODO implement JWT persistence and checking
-// TODO implement login
-// login existing User
+// login existing Student
+export const loginStudent = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
 
-// TODO implement JWT persistence and checking
-// create new User
-export const createNewStudent = async (req: Request, res: Response) => {
-    const { schoolName, email, username, name, password } = req.body;
-    const domain = email.slice(email.indexOf('@') + 1);
-
-    // generating the OTP
-    const otp = otpGenerator.generate(6, {
-        upperCaseAlphabets: false,
-        lowerCaseAlphabets: false,
-        specialChars: false,
-    });
-
-    // verify if school is accepted
-    const schoolID = await prisma.school.findFirst({
+    // check if email exists and password matches
+    const existingStudent = await prisma.student.findFirst({
         where: {
-            name: schoolName,
-            domain: domain
+            email: email,
+            password: password
         },
     });
 
-    // schoolName is valid
-    if (schoolID) {
-        // creating newStudent object to write to DB
-        const newStudent = await prisma.student.create({
-            data: {
-                schoolID: schoolID.id,
+    if (existingStudent) {
+        // generate student specific jwt
+        const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret");
+
+        // update jwt on the database
+        const updateJwt = await prisma.student.updateMany({
+            where: {
                 email: email,
-                username: username,
-                name: name,
-                password: password,
-                otp: otp,
-                status: false
+                password: password
             },
+            data: {
+                jwt: token
+            }
         });
 
-        const message = {
-            from: 'nomansanjari2001@gmail.com',
-            to: email,
-            subject: 'Verify OTP - CampusBuddy',
-            html: `<b>${otp}</b>`
-        }
-
-        transporter.sendMail(message).then((info) => {
-            return res.status(201).json(
-                {
-                    otp: otp,
-                    msg: "Email sent",
-                    info: info.messageId,
-                    preview: nodemailer.getTestMessageUrl(info)
-                }
-            )
-        }).catch((err) => {
-            return res.status(500).json({ msg: err });
-        }
-        );
+        // send jwt to client
+        res.status(200).cookie('authToken', token).send("JWT Set!");
     }
+    else {
+        res.status(401);
+    }
+}
+
+// logout Student
+// protected route
+// client will have to send jwt in header
+export const logoutStudent = async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    // set jwt to null 
+    const loggedOut = await prisma.student.updateMany({
+        where: {
+            email: email,
+        },
+        data: {
+            jwt: ""
+        }
+    });
+
+    res.status(200).cookie('authToken', null).send("JWT Reset -> user logged out");
+
 }
 
 // get all Users

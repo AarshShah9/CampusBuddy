@@ -26,8 +26,8 @@ model Student {
   username  String
   name      String
   password  String 
-  otp       String?
-  jwt       String?
+  otp       String
+  jwt       String
   status    Boolean
 
   @@index([schoolID])

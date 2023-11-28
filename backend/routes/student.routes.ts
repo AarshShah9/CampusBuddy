@@ -1,16 +1,21 @@
 import express from 'express';
 import {
     studentTest,
-    verifyOTP,
     createNewStudent,
-    getAllStudents,
+    verifyOTP,
+    loginStudent,
+    logoutStudent,
+    getAllStudents
 } from '../controllers/student.controller';
+import { verifyAuthentication } from '../middleware/verifyAuth';
 
 const router = express.Router();
 
 router.get('/studentTest', studentTest);
-router.post('/verifyOTP', verifyOTP);
 router.post('/createNewStudent', createNewStudent);
+router.post('/verifyOTP', verifyOTP);
+router.post('/loginStudent', loginStudent);
+router.post('/logoutStudent', verifyAuthentication, logoutStudent);
 router.get('/getAllStudents', getAllStudents);
 
 export default router;
