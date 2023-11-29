@@ -3,9 +3,9 @@ import {createContext, useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const setAxiosTokenHeader = (token: string) => axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+const setAxiosTokenHeader = (token: string) => axios.defaults.headers.common['authToken'] = `${token}`
 
-const removeAxiosTokenHeader = () => axios.defaults.headers.common['Authorization'] = ''
+const removeAxiosTokenHeader = () => axios.defaults.headers.common['authToken'] = ''
 
 const TOKEN_KEY = 'cba-secure-token';
 type TOKEN_KEY_TYPE = typeof TOKEN_KEY
