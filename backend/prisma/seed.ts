@@ -1,21 +1,21 @@
-const { PrismaClient } = require('@prisma/client');
-const { schools,
+import { PrismaClient } from '@prisma/client';
+import { schools,
     users,
     events,
     userEventResponses,
     posts,
     comments,
     organizations,
-    userGroupRoles,
+    userOrganizationRoles,
     roles,
-    groupRolePermissions,
+    organizationRolePermissions,
     permissions,
     enrollments,
     programs,
     topics,
     eventTags,
     postTags,
-    topicSubscriptions } = require('./data.js');
+    topicSubscriptions } from './data';
 const prisma = new PrismaClient();
 
 const load = async () => {
@@ -39,16 +39,16 @@ const load = async () => {
         console.log('Deleted records in the Comment table')
 
         await prisma.$queryRaw`DELETE FROM organization`;
-        console.log('Deleted records in the Group table')
+        console.log('Deleted records in the Organization table')
 
-        await prisma.$queryRaw`DELETE FROM user_group_role`;
-        console.log('Deleted records in the User Group Role table')
+        await prisma.$queryRaw`DELETE FROM user_organization_role`;
+        console.log('Deleted records in the User Organization Role table')
 
         await prisma.$queryRaw`DELETE FROM role`;
         console.log('Deleted records in the Role table')
 
-        await prisma.$queryRaw`DELETE FROM group_role_permission`;
-        console.log('Deleted records in the Group Role Permission table')
+        await prisma.$queryRaw`DELETE FROM organization_role_permission`;
+        console.log('Deleted records in the Organization Role Permission table')
 
         await prisma.$queryRaw`DELETE FROM permission`;
         console.log('Deleted records in the Permission table')
@@ -56,10 +56,10 @@ const load = async () => {
         await prisma.$queryRaw`DELETE FROM enrollment`;
         console.log('Deleted records in the Enrollment table')
 
-        await prisma.$queryRaw`DELETE FROM Program`;
+        await prisma.$queryRaw`DELETE FROM program`;
         console.log('Deleted records in the Program table')
 
-        await prisma.$queryRaw`DELETE FROM Topic`;
+        await prisma.$queryRaw`DELETE FROM topic`;
         console.log('Deleted records in the Topic table')
 
         await prisma.$queryRaw`DELETE FROM event_tag`;
@@ -95,10 +95,10 @@ const load = async () => {
         await prisma.$queryRaw`ALTER TABLE permission AUTO_INCREMENT = 1`;
         console.log('reset Permission auto increment to 1');
 
-        await prisma.$queryRaw`ALTER TABLE Program AUTO_INCREMENT = 1`;
+        await prisma.$queryRaw`ALTER TABLE program AUTO_INCREMENT = 1`;
         console.log('reset Program auto increment to 1');
 
-        await prisma.$queryRaw`ALTER TABLE Topic AUTO_INCREMENT = 1`;
+        await prisma.$queryRaw`ALTER TABLE topic AUTO_INCREMENT = 1`;
         console.log('reset Topic auto increment to 1');
 
         await prisma.school.createMany({
@@ -124,7 +124,7 @@ const load = async () => {
         await prisma.post.createMany({
             data: posts,
         });
-        console.log('Added post data');
+        console.log('Added Post data');
 
         await prisma.comment.createMany({
             data: comments,
@@ -134,37 +134,37 @@ const load = async () => {
         await prisma.organization.createMany({
             data: organizations,
         });
-        console.log('Added group data');
+        console.log('Added Organization data');
 
-        await prisma.userGroupRole.createMany({
-            data: userGroupRoles,
+        await prisma.userOrganizationRole.createMany({
+            data: userOrganizationRoles,
         });
-        console.log('Added User Group Roles data');
+        console.log('Added User Organization Roles data');
 
         await prisma.role.createMany({
             data: roles,
         });
         console.log('Added Role data');
 
-        await prisma.groupRolePermission.createMany({
-            data: groupRolePermissions,
+        await prisma.organizationRolePermission.createMany({
+            data: organizationRolePermissions,
         });
-        console.log('Added Group Role Permissions data');
+        console.log('Added Organization Role Permissions data');
 
         await prisma.permission.createMany({
             data: permissions,
         });
-        console.log('Added Group Role Permissions data');
+        console.log('Added Permissions data');
 
         await prisma.enrollment.createMany({
             data: enrollments,
         });
-        console.log('Added enrollment data');
+        console.log('Added Enrollment data');
 
         await prisma.program.createMany({
             data: programs,
         });
-        console.log('Added program data');
+        console.log('Added Program data');
 
         await prisma.topic.createMany({
             data: topics,

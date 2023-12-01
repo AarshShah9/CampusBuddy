@@ -1,12 +1,12 @@
-const { Prisma } = require('@prisma/client');
+import { Prisma } from '@prisma/client'
 
-const schools = [
+export const schools = [
     {
         name: 'University of Calgary'
     }
 ];
 
-const users = [
+export const users = [
     {
         username: 'john_doe',
         firstName: 'John',
@@ -46,7 +46,7 @@ const users = [
 
 ];
 
-const events = [
+export const events = [
     {
 
         userId: 3,
@@ -76,7 +76,7 @@ const events = [
     },
 ];
 
-const userEventResponses =  [
+export const userEventResponses =  [
     {
         userId: 1,
         eventId: 1,
@@ -140,7 +140,7 @@ const userEventResponses =  [
 ];
 
 
-const posts = [
+export const posts = [
     {
         userId: 3,
         title: 'First Post',
@@ -155,7 +155,7 @@ const posts = [
     },
 ];
 
-const comments = [
+export const comments = [
     {
         userId: 1,
         postId: 1,
@@ -170,7 +170,7 @@ const comments = [
     },
 ];
 
-const organizations = [
+export const organizations = [
     {
         organizationName: 'Group A',
         description: 'Description for Group A.',
@@ -183,31 +183,31 @@ const organizations = [
     },
 ];
 
-const userGroupRoles = [
+export const userOrganizationRoles = [
     {
         userId: 1,
-        groupId: 1,
+        organizationId: 1,
         roleId: 2,
     },
     {
         userId: 2,
-        groupId: 2,
+        organizationId: 2,
         roleId: 2,
     },
     {
         userId: 3,
-        groupId: 1,
+        organizationId: 1,
         roleId: 1,
     },
     {
         userId: 4,
-        groupId: 2,
+        organizationId: 2,
         roleId: 1,
     },
 
 ]
 
-const roles = [
+export const roles = [
     {
         roleName: 'Admin',
     },
@@ -217,26 +217,26 @@ const roles = [
     },
 ];
 
-const groupRolePermissions = [
+export const organizationRolePermissions = [
     {
-        groupId: 1,
+        organizationId: 1,
         roleId: 1,
         permissionId: 1,
     },
     {
-        groupId: 2,
+        organizationId: 2,
         roleId: 1,
         permissionId: 1,
     },
 ];
 
-const permissions = [
+export const permissions = [
     {
         permissionName: 'Founder',
     },
 ];
 
-const enrollments = [
+export const enrollments = [
     {
         programId: 1,
         userId: 1,
@@ -263,7 +263,7 @@ const enrollments = [
 
 ];
 
-const programs = [
+export const programs = [
     {
         programName: 'Computer Science',
         department: 'Science Department',
@@ -286,7 +286,7 @@ const programs = [
 
 ];
 
-const topics = [
+export const topics = [
     {
         topicName: 'computer',
     },
@@ -300,7 +300,7 @@ const topics = [
         topicName: 'teacher',
     },
 ]
-const eventTags = [
+export const eventTags = [
     {
         eventId: 1,
         topicId: 3,
@@ -314,7 +314,7 @@ const eventTags = [
         topicId: 4,
     },
 ]
-const postTags = [
+export const postTags = [
     {
         postId: 1,
         topicId: 2 ,
@@ -324,7 +324,7 @@ const postTags = [
         topicId: 1 ,
     },
 ]
-const topicSubscriptions = [
+export const topicSubscriptions = [
     {
         userId: 1,
         topicId: 1,
@@ -345,22 +345,3 @@ const topicSubscriptions = [
 
 
 
-module.exports = {
-    schools,
-    users,
-    events,
-    userEventResponses,
-    posts,
-    comments,
-    organizations,
-    userGroupRoles,
-    roles,
-    groupRolePermissions,
-    permissions,
-    enrollments,
-    programs,
-    topics,
-    eventTags,
-    postTags,
-    topicSubscriptions
-};

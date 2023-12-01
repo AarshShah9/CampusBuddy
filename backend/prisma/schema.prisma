@@ -32,21 +32,21 @@ model Student {
 }
 
 model User {
-  id                Int                 @id @default(autoincrement())
-  username          String              @unique
-  firstName         String              @map("first_name")
-  lastName          String              @map("last_name")
-  email             String              @unique
-  passwordHash      String              @map("password_hash")
-  pictureUrl        String?             @map("picture_url")
-  yearOfStudy       Int                 @map("year_of_study")
-  schoolId          Int                 @map("school_id")
-  school            School?             @relation(fields: [schoolId], references: [id])
+  id                Int                    @id @default(autoincrement())
+  username          String                 @unique
+  firstName         String                 @map("first_name")
+  lastName          String                 @map("last_name")
+  email             String                 @unique
+  passwordHash      String                 @map("password_hash")
+  pictureUrl        String?                @map("picture_url")
+  yearOfStudy       Int                    @map("year_of_study")
+  schoolId          Int                    @map("school_id")
+  school            School?                @relation(fields: [schoolId], references: [id])
   events            Event[]
   UserEventResponse UserEventResponse[]
   posts             Post[]
   comments          Comment[]
-  groupRoles        UserGroupRole[]
+  organizationRoles UserOrganizationRole[]
   enrollments       Enrollment[]
   subscriptions     TopicSubscription[]
 
@@ -115,60 +115,60 @@ model Comment {
 }
 
 model Organization {
-  id                   Int                   @id @default(autoincrement())
-  organizationName     String                @unique @map("organization_name")
-  description          String?
-  createdAt            DateTime              @default(now()) @map("created_at")
-  status               String
-  userGroupRoles       UserGroupRole[]
-  userGroupPermissions GroupRolePermission[]
+  id                          Int                          @id @default(autoincrement())
+  organizationName            String                       @unique @map("organization_name")
+  description                 String?
+  createdAt                   DateTime                     @default(now()) @map("created_at")
+  status                      String
+  userOrganizationRoles       UserOrganizationRole[]
+  userOrganizationPermissions OrganizationRolePermission[]
 
   @@map("organization")
 }
 
-model UserGroupRole {
-  userId       Int           @map("user_id")
-  groupId      Int           @map("group_id")
-  roleId       Int           @map("role_id")
-  user         User?         @relation(fields: [userId], references: [id])
-  organization Organization? @relation(fields: [groupId], references: [id])
-  role         Role?         @relation(fields: [roleId], references: [id])
+model UserOrganizationRole {
+  userId         Int           @map("user_id")
+  organizationId Int           @map("organization_id")
+  roleId         Int           @map("role_id")
+  user           User?         @relation(fields: [userId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  role           Role?         @relation(fields: [roleId], references: [id])
 
-  @@id([userId, groupId, roleId])
+  @@id([userId, organizationId, roleId])
   @@index([userId])
-  @@index([groupId])
+  @@index([organizationId])
   @@index([roleId])
-  @@map("user_group_role")
+  @@map("user_organization_role")
 }
 
 model Role {
-  id                   Int                   @id @default(autoincrement())
-  roleName             String                @map("role_name")
-  userGroupRoles       UserGroupRole[]
-  groupRolePermissions GroupRolePermission[]
+  id                          Int                          @id @default(autoincrement())
+  roleName                    String                       @map("role_name")
+  userOrganizationRoles       UserOrganizationRole[]
+  organizationRolePermissions OrganizationRolePermission[]
 
   @@map("role")
 }
 
-model GroupRolePermission {
-  groupId      Int           @map("group_id")
-  roleId       Int           @map("role_id")
-  permissionId Int           @map("permission_id")
-  organization Organization? @relation(fields: [groupId], references: [id])
-  role         Role?         @relation(fields: [roleId], references: [id])
-  permission   Permission?   @relation(fields: [permissionId], references: [id])
+model OrganizationRolePermission {
+  organizationId Int           @map("organization_id")
+  roleId         Int           @map("role_id")
+  permissionId   Int           @map("permission_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  role           Role?         @relation(fields: [roleId], references: [id])
+  permission     Permission?   @relation(fields: [permissionId], references: [id])
 
-  @@id([groupId, roleId, permissionId])
-  @@index([groupId])
+  @@id([organizationId, roleId, permissionId])
+  @@index([organizationId])
   @@index([roleId])
   @@index([permissionId])
-  @@map("group_role_permission")
+  @@map("organization_role_permission")
 }
 
 model Permission {
-  id                   Int                   @id @default(autoincrement())
-  permissionName       String                @map("permission_name")
-  groupRolePermissions GroupRolePermission[]
+  id                          Int                          @id @default(autoincrement())
+  permissionName              String                       @map("permission_name")
+  organizationRolePermissions OrganizationRolePermission[]
 
   @@map("permission")
 }
@@ -191,6 +191,8 @@ model Program {
   programName String
   department  String
   enrollments Enrollment[]
+
+  @@map("program")
 }
 
 model Topic {
@@ -199,6 +201,8 @@ model Topic {
   eventTags     EventTag[]
   posts         PostTag[]
   subscriptions TopicSubscription[]
+
+  @@map("topic")
 }
 
 model EventTag {
