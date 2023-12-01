@@ -170,14 +170,14 @@ const comments = [
     },
 ];
 
-const groups = [
+const organizations = [
     {
-        groupName: 'Group A',
+        organizationName: 'Group A',
         description: 'Description for Group A.',
         status: 'Active',
     },
     {
-        groupName: 'Group B',
+        organizationName: 'Group B',
         description: 'Description for Group B.',
         status: 'Active',
     },
@@ -352,7 +352,7 @@ module.exports = {
     userEventResponses,
     posts,
     comments,
-    groups,
+    organizations,
     userGroupRoles,
     roles,
     groupRolePermissions,

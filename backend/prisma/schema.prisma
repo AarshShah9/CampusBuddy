@@ -114,25 +114,25 @@ model Comment {
   @@map("comment")
 }
 
-model Group {
+model Organization {
   id                   Int                   @id @default(autoincrement())
-  groupName            String                @unique @map("group_name")
+  organizationName     String                @unique @map("organization_name")
   description          String?
   createdAt            DateTime              @default(now()) @map("created_at")
   status               String
   userGroupRoles       UserGroupRole[]
   userGroupPermissions GroupRolePermission[]
 
-  @@map("group")
+  @@map("organization")
 }
 
 model UserGroupRole {
-  userId  Int    @map("user_id")
-  groupId Int    @map("group_id")
-  roleId  Int    @map("role_id")
-  user    User?  @relation(fields: [userId], references: [id])
-  group   Group? @relation(fields: [groupId], references: [id])
-  role    Role?  @relation(fields: [roleId], references: [id])
+  userId       Int           @map("user_id")
+  groupId      Int           @map("group_id")
+  roleId       Int           @map("role_id")
+  user         User?         @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [groupId], references: [id])
+  role         Role?         @relation(fields: [roleId], references: [id])
 
   @@id([userId, groupId, roleId])
   @@index([userId])
@@ -151,12 +151,12 @@ model Role {
 }
 
 model GroupRolePermission {
-  groupId      Int         @map("group_id")
-  roleId       Int         @map("role_id")
-  permissionId Int         @map("permission_id")
-  group        Group?      @relation(fields: [groupId], references: [id])
-  role         Role?       @relation(fields: [roleId], references: [id])
-  permission   Permission? @relation(fields: [permissionId], references: [id])
+  groupId      Int           @map("group_id")
+  roleId       Int           @map("role_id")
+  permissionId Int           @map("permission_id")
+  organization Organization? @relation(fields: [groupId], references: [id])
+  role         Role?         @relation(fields: [roleId], references: [id])
+  permission   Permission?   @relation(fields: [permissionId], references: [id])
 
   @@id([groupId, roleId, permissionId])
   @@index([groupId])

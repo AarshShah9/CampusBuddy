@@ -5,7 +5,7 @@ const { schools,
     userEventResponses,
     posts,
     comments,
-    groups,
+    organizations,
     userGroupRoles,
     roles,
     groupRolePermissions,
@@ -38,8 +38,8 @@ const load = async () => {
         await prisma.$queryRaw`DELETE FROM comment`;
         console.log('Deleted records in the Comment table')
 
-        //await prisma.$queryRaw`DELETE FROM group`;
-        //console.log('Deleted records in the Group table')
+        await prisma.$queryRaw`DELETE FROM organization`;
+        console.log('Deleted records in the Group table')
 
         await prisma.$queryRaw`DELETE FROM user_group_role`;
         console.log('Deleted records in the User Group Role table')
@@ -86,7 +86,7 @@ const load = async () => {
         await prisma.$queryRaw`ALTER TABLE comment AUTO_INCREMENT = 1`;
         console.log('reset Comment auto increment to 1');
 
-        await prisma.$queryRaw`ALTER TABLE group AUTO_INCREMENT = 1`;
+        await prisma.$queryRaw`ALTER TABLE organization AUTO_INCREMENT = 1`;
         console.log('reset Group auto increment to 1');
 
         await prisma.$queryRaw`ALTER TABLE role AUTO_INCREMENT = 1`;
@@ -131,10 +131,10 @@ const load = async () => {
         });
         console.log('Added Comment data');
 
-        //await prisma.group.createMany({
-            //data: groups,
-        //});
-        //console.log('Added group data');
+        await prisma.organization.createMany({
+            data: organizations,
+        });
+        console.log('Added group data');
 
         await prisma.userGroupRole.createMany({
             data: userGroupRoles,
