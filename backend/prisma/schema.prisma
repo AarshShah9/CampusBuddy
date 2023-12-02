@@ -41,7 +41,7 @@ model User {
   pictureUrl        String?                @map("picture_url")
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
-  school            School?                @relation(fields: [schoolId], references: [id])
+  school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   events            Event[]
   UserEventResponse UserEventResponse[]
   posts             Post[]
@@ -64,7 +64,7 @@ model Event {
   startTime      DateTime            @map("start_time")
   endTime        DateTime            @map("end_time")
   mediaUrl       String?             @map("media_url")
-  user           User?               @relation(fields: [userId], references: [id])
+  user           User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
   eventTags      EventTag[]
   eventResponses UserEventResponse[]
 
@@ -76,8 +76,8 @@ model UserEventResponse {
   userId              Int    @map("user_id")
   eventId             Int    @map("event_id")
   participationStatus String @map("participation_status")
-  user                User?  @relation(fields: [userId], references: [id])
-  event               Event? @relation(fields: [eventId], references: [id])
+  user                User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event               Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@id([userId, eventId])
   @@index([userId])
@@ -87,7 +87,7 @@ model UserEventResponse {
 
 model Post {
   id        Int       @id @default(autoincrement())
-  user      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int       @map("user_id")
   createdAt DateTime  @default(now()) @map("created_at")
   title     String
@@ -102,9 +102,9 @@ model Post {
 
 model Comment {
   id        Int      @id @default(autoincrement())
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int      @map("user_id")
-  post      Post?    @relation(fields: [postId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int      @map("post_id")
   createdAt DateTime @default(now()) @map("created_at")
   text      String
@@ -130,9 +130,9 @@ model UserOrganizationRole {
   userId         Int           @map("user_id")
   organizationId Int           @map("organization_id")
   roleId         Int           @map("role_id")
-  user           User?         @relation(fields: [userId], references: [id])
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  role           Role?         @relation(fields: [roleId], references: [id])
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, organizationId, roleId])
   @@index([userId])
@@ -154,9 +154,9 @@ model OrganizationRolePermission {
   organizationId Int           @map("organization_id")
   roleId         Int           @map("role_id")
   permissionId   Int           @map("permission_id")
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  role           Role?         @relation(fields: [roleId], references: [id])
-  permission     Permission?   @relation(fields: [permissionId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission     Permission?   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([organizationId, roleId, permissionId])
   @@index([organizationId])
@@ -177,8 +177,8 @@ model Enrollment {
   programId  Int      @map("program_id")
   userId     Int      @map("user_id")
   degreeType String   @map("degree_type")
-  program    Program? @relation(fields: [programId], references: [id])
-  user       User?    @relation(fields: [userId], references: [id])
+  program    Program? @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([programId, userId])
   @@index([programId])
@@ -208,8 +208,8 @@ model Topic {
 model EventTag {
   eventId Int    @map("event_id")
   topicId Int    @map("topic_id")
-  event   Event? @relation(fields: [eventId], references: [id])
-  topic   Topic? @relation(fields: [topicId], references: [id])
+  event   Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([eventId, topicId])
   @@index([eventId])
@@ -220,8 +220,8 @@ model EventTag {
 model PostTag {
   postId  Int    @map("post_id")
   topicId Int    @map("topic_id")
-  post    Post?  @relation(fields: [postId], references: [id])
-  topic   Topic? @relation(fields: [topicId], references: [id])
+  post    Post?  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([postId, topicId])
   @@index([postId])
@@ -232,8 +232,8 @@ model PostTag {
 model TopicSubscription {
   userId  Int   @map("user_id")
   topicId Int   @map("topic_id")
-  user    User? @relation(fields: [userId], references: [id])
-  topic   Topic @relation(fields: [topicId], references: [id])
+  user    User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([userId, topicId])
   @@index([userId])

@@ -20,55 +20,55 @@ const prisma = new PrismaClient();
 
 const load = async () => {
     try {
-        await prisma.$queryRaw`DELETE FROM school`;
+        await prisma.school.deleteMany();
         console.log('Deleted records in the School table')
 
-        await prisma.$queryRaw`DELETE FROM user`;
+        await prisma.user.deleteMany();
         console.log('Deleted records in the User table')
 
-        await prisma.$queryRaw`DELETE FROM event`;
+        await prisma.event.deleteMany();
         console.log('Deleted records in the Event table')
 
-        await prisma.$queryRaw`DELETE FROM user_event_response`;
+        await prisma.userEventResponse.deleteMany();
         console.log('Deleted records in the User Event Response table')
 
-        await prisma.$queryRaw`DELETE FROM post`;
+        await prisma.post.deleteMany();
         console.log('Deleted records in the Post table')
 
-        await prisma.$queryRaw`DELETE FROM comment`;
+        await prisma.comment.deleteMany();
         console.log('Deleted records in the Comment table')
 
-        await prisma.$queryRaw`DELETE FROM organization`;
+        await prisma.organization.deleteMany();
         console.log('Deleted records in the Organization table')
 
-        await prisma.$queryRaw`DELETE FROM user_organization_role`;
+        await prisma.userOrganizationRole.deleteMany();
         console.log('Deleted records in the User Organization Role table')
 
-        await prisma.$queryRaw`DELETE FROM role`;
+        await prisma.role.deleteMany();
         console.log('Deleted records in the Role table')
 
-        await prisma.$queryRaw`DELETE FROM organization_role_permission`;
+        await prisma.organizationRolePermission.deleteMany();
         console.log('Deleted records in the Organization Role Permission table')
 
-        await prisma.$queryRaw`DELETE FROM permission`;
+        await prisma.permission.deleteMany();
         console.log('Deleted records in the Permission table')
 
-        await prisma.$queryRaw`DELETE FROM enrollment`;
+        await prisma.enrollment.deleteMany();
         console.log('Deleted records in the Enrollment table')
 
-        await prisma.$queryRaw`DELETE FROM program`;
+        await prisma.program.deleteMany();
         console.log('Deleted records in the Program table')
 
-        await prisma.$queryRaw`DELETE FROM topic`;
+        await prisma.topic.deleteMany();
         console.log('Deleted records in the Topic table')
 
-        await prisma.$queryRaw`DELETE FROM event_tag`;
+        await prisma.eventTag.deleteMany();
         console.log('Deleted records in the Event Tag table')
 
-        await prisma.$queryRaw`DELETE FROM post_tag`;
+        await prisma.postTag.deleteMany();
         console.log('Deleted records in the Post Tag table')
 
-        await prisma.$queryRaw`DELETE FROM topic_subscription`;
+        await prisma.topicSubscription.deleteMany();
         console.log('Deleted records in the Topic Subscription table')
 
         await prisma.$queryRaw`ALTER TABLE school AUTO_INCREMENT = 1`;
