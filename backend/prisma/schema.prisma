@@ -15,11 +15,14 @@ model School {
   id       Int       @id @default(autoincrement())
   name     String
   students Student[]
+  users    User[]
+
+  @@map("school")
 }
 
 model Student {
-  id       Int    @id @default(autoincrement())
-  school   School @relation(fields: [schoolID], references: [id])
+  id       Int     @id @default(autoincrement())
+  school   School? @relation(fields: [schoolID], references: [id])
   schoolID Int
   email    String
   username String
@@ -29,137 +32,211 @@ model Student {
 }
 
 model User {
-  id                Int                 @id @default(autoincrement())
-  userName          String              @unique
-  firstName         String
-  lastName          String
-  email             String              @unique
-  passwordHash      String
-  pictureUrl        String
-  yearOfStudy       Int
-  schoolId          Int                 @unique
+  id                Int                    @id @default(autoincrement())
+  username          String                 @unique
+  firstName         String                 @map("first_name")
+  lastName          String                 @map("last_name")
+  email             String                 @unique
+  passwordHash      String                 @map("password_hash")
+  pictureUrl        String?                @map("picture_url")
+  yearOfStudy       Int                    @map("year_of_study")
+  schoolId          Int                    @map("school_id")
+  school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   events            Event[]
   UserEventResponse UserEventResponse[]
-  Post              Post[]
-  Comment           Comment[]
-  User_Group_Role   User_Group_Role[]
-  Enrollment        Enrollment[]
+  posts             Post[]
+  comments          Comment[]
+  organizationRoles UserOrganizationRole[]
+  enrollments       Enrollment[]
+  subscriptions     TopicSubscription[]
+
+  @@index([schoolId])
+  @@map("user")
 }
 
 model Event {
-  id                Int                 @id @default(autoincrement())
-  event             User                @relation(fields: [eventId], references: [id])
-  eventId           Int                 @unique
-  createdAt         DateTime            @default(now())
-  title             String
-  description       String?
-  location          String
-  startTime         DateTime
-  endTime           DateTime
-  mediaUrl          String?
-  UserEventResponse UserEventResponse[]
+  id             Int                 @id @default(autoincrement())
+  userId         Int                 @map("user_id")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  title          String
+  description    String?
+  location       String
+  startTime      DateTime            @map("start_time")
+  endTime        DateTime            @map("end_time")
+  mediaUrl       String?             @map("media_url")
+  user           User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventTags      EventTag[]
+  eventResponses UserEventResponse[]
+
+  @@index([userId])
+  @@map("event")
 }
 
 model UserEventResponse {
-  id                  User    @relation(fields: [userId], references: [id])
-  userId              Int     @id
-  event               Event   @relation(fields: [eventId], references: [id])
-  eventId             Int
-  participationStatus String?
+  userId              Int    @map("user_id")
+  eventId             Int    @map("event_id")
+  participationStatus String @map("participation_status")
+  user                User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event               Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  @@id([userId, eventId])
   @@index([userId])
   @@index([eventId])
+  @@map("user_event_response")
 }
 
 model Post {
   id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int
-  createdAt DateTime  @default(now())
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int       @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
   title     String
   text      String?
-  mediaUrl  String?
-  Comment   Comment[]
+  mediaUrl  String?   @map("media_url")
+  comments  Comment[]
+  postTags  PostTag[]
 
   @@index([userId])
+  @@map("post")
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    Int
-  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @map("user_id")
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int      @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
   text      String
 
   @@index([userId])
   @@index([postId])
+  @@map("comment")
 }
 
-model Group {
-  id                    Int                     @id @default(autoincrement())
-  groupName             String                  @unique
-  description           String?
-  createdAt             DateTime                @default(now())
-  status                String
-  User_Group_Role       User_Group_Role[]
-  Group_Role_Permission Group_Role_Permission[]
+model Organization {
+  id                          Int                          @id @default(autoincrement())
+  organizationName            String                       @unique @map("organization_name")
+  description                 String?
+  createdAt                   DateTime                     @default(now()) @map("created_at")
+  status                      String
+  userOrganizationRoles       UserOrganizationRole[]
+  userOrganizationPermissions OrganizationRolePermission[]
+
+  @@map("organization")
 }
 
-model User_Group_Role {
-  user    User  @relation(fields: [userId], references: [id])
-  userId  Int   @id
-  group   Group @relation(fields: [groupId], references: [id])
-  groupId Int
-  role    Role  @relation(fields: [roleId], references: [id])
-  roleId  Int
+model UserOrganizationRole {
+  userId         Int           @map("user_id")
+  organizationId Int           @map("organization_id")
+  roleId         Int           @map("role_id")
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
+  @@id([userId, organizationId, roleId])
   @@index([userId])
-  @@index([groupId])
+  @@index([organizationId])
   @@index([roleId])
+  @@map("user_organization_role")
 }
 
 model Role {
-  id                    Int                     @id @default(autoincrement())
-  roleName              String
-  User_Group_Role       User_Group_Role[]
-  Group_Role_Permission Group_Role_Permission[]
+  id                          Int                          @id @default(autoincrement())
+  roleName                    String                       @map("role_name")
+  userOrganizationRoles       UserOrganizationRole[]
+  organizationRolePermissions OrganizationRolePermission[]
+
+  @@map("role")
 }
 
-model Group_Role_Permission {
-  group        Group     @relation(fields: [groupId], references: [id])
-  groupId      Int       @id
-  role         Role      @relation(fields: [roleId], references: [id])
-  roleId       Int
-  permission   Permssion @relation(fields: [permissionId], references: [id])
-  permissionId Int
+model OrganizationRolePermission {
+  organizationId Int           @map("organization_id")
+  roleId         Int           @map("role_id")
+  permissionId   Int           @map("permission_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission     Permission?   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-  @@index([groupId])
+  @@id([organizationId, roleId, permissionId])
+  @@index([organizationId])
   @@index([roleId])
   @@index([permissionId])
+  @@map("organization_role_permission")
 }
 
-model Permssion {
-  id                    Int                     @id @default(autoincrement())
-  permission_name       String
-  Group_Role_Permission Group_Role_Permission[]
+model Permission {
+  id                          Int                          @id @default(autoincrement())
+  permissionName              String                       @map("permission_name")
+  organizationRolePermissions OrganizationRolePermission[]
+
+  @@map("permission")
 }
 
 model Enrollment {
-  program     Program @relation(fields: [programId], references: [id])
-  programId   Int     @id
-  user        User    @relation(fields: [userId], references: [id])
-  userId      Int
-  degree_type String
+  programId  Int      @map("program_id")
+  userId     Int      @map("user_id")
+  degreeType String   @map("degree_type")
+  program    Program? @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@id([programId, userId])
   @@index([programId])
   @@index([userId])
+  @@map("enrollment")
 }
 
 model Program {
-  id           Int          @id @default(autoincrement())
-  program_name String
-  department   String
-  Enrollment   Enrollment[]
+  id          Int          @id @default(autoincrement())
+  programName String
+  department  String
+  enrollments Enrollment[]
+
+  @@map("program")
+}
+
+model Topic {
+  id            Int                 @id @default(autoincrement())
+  topicName     String              @unique @map("topic_name")
+  eventTags     EventTag[]
+  posts         PostTag[]
+  subscriptions TopicSubscription[]
+
+  @@map("topic")
+}
+
+model EventTag {
+  eventId Int    @map("event_id")
+  topicId Int    @map("topic_id")
+  event   Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, topicId])
+  @@index([eventId])
+  @@index([topicId])
+  @@map("event_tag")
+}
+
+model PostTag {
+  postId  Int    @map("post_id")
+  topicId Int    @map("topic_id")
+  post    Post?  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([postId, topicId])
+  @@index([postId])
+  @@index([topicId])
+  @@map("post_tag")
+}
+
+model TopicSubscription {
+  userId  Int   @map("user_id")
+  topicId Int   @map("topic_id")
+  user    User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([userId, topicId])
+  @@index([userId])
+  @@index([topicId])
+  @@map("topic_subscription")
 }
