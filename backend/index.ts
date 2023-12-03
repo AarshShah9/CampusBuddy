@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
 // importing routes
-import student from './routes/student.routes';
+import student from './routes/user.routes';
 import school from './routes/school.routes';
 
 // importing middleware

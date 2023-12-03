@@ -2,7 +2,8 @@ import { Prisma } from '@prisma/client'
 
 export const schools = [
     {
-        name: 'University of Calgary'
+        name: 'University of Calgary',
+        domain: 'ucalgary.ca'
     }
 ];
 
@@ -12,36 +13,48 @@ export const users = [
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        passwordHash: 'hashed-password123',
+        password: 'hashed-password123',
         yearOfStudy: 1,
         schoolId: 1,
+        otp: "234123",
+        jwt: "",
+        status: true
     },
     {
         username: 'jane_smith',
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
-        passwordHash: 'hashed-password4569',
+        password: 'hashed-password4569',
         yearOfStudy: 2,
         schoolId: 1,
+        otp: "234123",
+        jwt: "",
+        status: true
     },
     {
         username: 'tom_dee',
         firstName: 'Tom',
         lastName: 'Dee',
         email: 'tom@example.com',
-        passwordHash: 'hashed-password1238',
+        password: 'hashed-password1238',
         yearOfStudy: 3,
         schoolId: 1,
+        otp: "234123",
+        jwt: "",
+        status: true
     },
     {
         username: 'tiffany_smalls',
         firstName: 'Tiffany',
         lastName: 'Smalls',
         email: 'tiffany@example.com',
-        passwordHash: 'hashed-password4560',
+        password: 'hashed-password4560',
         yearOfStudy: 4,
         schoolId: 1,
+        otp: "234123",
+        jwt: "",
+        status: true
     },
 
 ];
