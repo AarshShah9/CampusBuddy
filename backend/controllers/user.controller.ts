@@ -105,8 +105,47 @@ export const createNewStudent = async (req: Request, res: Response) => {
             res.status(400).json({ success: false, message: 'Invalid email account' });
         }
     }
+    // if student exists but status is false -> send OTP
+    else if (studentExists.status === false) {
+        // update user record with new otp
+        await prisma.user.update({
+            where: {
+                email: email
+            },
+            data: {
+                otp: otp
+            }
+        })
+
+        // send user an email with new otp
+        const message = {
+            from: 'nomansanjari2001@gmail.com',
+            to: email,
+            subject: 'Verify OTP - CampusBuddy',
+            html: `<b>${otp}</b>`
+        }
+
+        transporter.sendMail(message).then((info) => {
+            return res.status(201).json(
+                {
+                    otp: otp,
+                    msg: "Email sent",
+                    info: info.messageId,
+                    preview: nodemailer.getTestMessageUrl(info)
+                }
+            )
+        }).catch((err) => {
+            return res.status(500).json({ msg: err });
+        }
+        );
+
+        res.status(200).json({
+            status: true,
+            message: 'New OTP sent'
+        });
+    }
     else {
-        res.status(400).json({ success: false, message: 'User email already exists' });
+        res.status(400).json({ success: false, message: 'User email already exists and is verified' });
     }
 }
 
