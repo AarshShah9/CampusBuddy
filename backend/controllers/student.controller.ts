@@ -28,7 +28,14 @@ export const studentTest = async (req: Request, res: Response) => {
 
 // create new User
 export const createNewStudent = async (req: Request, res: Response) => {
-    const { schoolName, email, username, name, password } = req.body;
+    const { schoolName, 
+        email, 
+        firstName, 
+        lastName, 
+        username, 
+        yearOfStudy, 
+        password } = req.body;
+
     const domain = email.slice(email.indexOf('@') + 1);
 
     // generating the OTP
@@ -49,12 +56,14 @@ export const createNewStudent = async (req: Request, res: Response) => {
     // schoolName is valid
     if (schoolID) {
         // creating newStudent object to write to DB
-        const newStudent = await prisma.student.create({
+        const newStudent = await prisma.user.create({
             data: {
-                schoolID: schoolID.id,
+                schoolId: schoolID.id,
                 email: email,
+                firstName: firstName,
+                lastName: lastName,
                 username: username,
-                name: name,
+                yearOfStudy: yearOfStudy,
                 password: password,
                 otp: otp,
                 jwt: "",
@@ -90,7 +99,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
     const { email, otp } = req.body;
 
     // find student according to email and match otp
-    const student = await prisma.student.findFirst({
+    const student = await prisma.user.findFirst({
         where: {
             email: email,
             otp: otp,
@@ -103,7 +112,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
         const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret");
 
         // update user record to be verified and update token
-        await prisma.student.updateMany({
+        await prisma.user.updateMany({
             where: {
                 email: email,
             },
@@ -125,7 +134,7 @@ export const loginStudent = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     // check if email exists and password matches
-    const existingStudent = await prisma.student.findFirst({
+    const existingStudent = await prisma.user.findFirst({
         where: {
             email: email,
             password: password
@@ -137,7 +146,7 @@ export const loginStudent = async (req: Request, res: Response) => {
         const token = jwt.sign(email, process.env.JWT_SECRET ?? "testSecret");
 
         // update jwt on the database
-        const updateJwt = await prisma.student.updateMany({
+        const updateJwt = await prisma.user.updateMany({
             where: {
                 email: email,
                 password: password
@@ -162,7 +171,7 @@ export const logoutStudent = async (req: Request, res: Response) => {
     const { email } = req.body;
 
     // set jwt to null 
-    const loggedOut = await prisma.student.updateMany({
+    const loggedOut = await prisma.user.updateMany({
         where: {
             email: email,
         },
@@ -177,7 +186,7 @@ export const logoutStudent = async (req: Request, res: Response) => {
 
 // get all Users
 export const getAllStudents = async (req: Request, res: Response) => {
-    const allStudents = await prisma.student.findMany();
+    const allStudents = await prisma.user.findMany();
 
     res.status(200).json(allStudents);
 };
