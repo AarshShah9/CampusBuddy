@@ -64,6 +64,13 @@ To do this you will have to do the following on all of the commands.
 3. Then you can run the start script to start the application (make sure you are again in the working directory). ```./start.sh```
 
 
+### Database
+
+```
+$ npx prisma db generate // reflect model chages locally (for nodejs, backend, ORM)
+$ npx prisma db push // push model changes to remote db instance
+```
+
 
 ### IDE's
 
