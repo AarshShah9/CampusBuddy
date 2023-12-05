@@ -4,7 +4,6 @@ import {useLayoutEffect} from 'react';
 import {ThemedText} from '~/components/ThemedComponents';
 
 export default function EventDetails() {
-    
     const { setOptions: setNavigationOptions } = useNavigation();
     const { params: { eventNumber } } = useRoute<any>();
 
