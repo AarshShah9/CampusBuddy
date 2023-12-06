@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Pressable } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import useThemeContext from '~/hooks/useThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import Message from './Message';
 
 type messageObject = { 
     id: string, 
@@ -21,44 +22,88 @@ const Messages = [
         message: { type: 'text', content: 'Hello there' }
     },
     {
-        id: '22',
+        id: '12',
         senderId: '2',
         receiverId: '1',
         message: { type: 'text', content: `Hey what's up` }
     },
     {
-        id: '33',
+        id: '13',
         senderId: '1',
         receiverId: '2',
         message: { type: 'text', content: `Nothing, much was just saying hi` }
     },
     {
-        id: '44',
+        id: '14',
         senderId: '2',
         receiverId: '1',
         message: { type: 'text', content: `Oh okay` }
     },
     {
-        id: '55',
+        id: '15',
         senderId: '2',
         receiverId: '1',
-        message: { type: 'text', content: `How are you doing?` }
+        message: { type: 'text', content: `How are you doing though?` }
+    },
+    {
+        id: '16',
+        senderId: '1',
+        receiverId: '2',
+        message: { type: 'text', content: `Pretty cool, just working on a simple project` }
+    },
+    {
+        id: '17',
+        senderId: '1',
+        receiverId: '2',
+        message: { type: 'text', content: `It's been taking me quite long tho` }
+    },
+    {
+        id: '18',
+        senderId: '1',
+        receiverId: '2',
+        message: { type: 'text', content: `Been grinding for a while` }
+    },
+    {
+        id: '19',
+        senderId: '2',
+        receiverId: '1',
+        message: { type: 'text', content: `Oh damn, sorry bro` }
+    },
+    {
+        id: '20',
+        senderId: '2',
+        receiverId: '1',
+        message: { type: 'text', content: `So you not goin to the party this weekend?` }
+    },
+    {
+        id: '21',
+        senderId: '1',
+        receiverId: '2',
+        message: { type: 'text', content: `Nah I don't think so` }
+    },
+    {
+        id: '22',
+        senderId: '2',
+        receiverId: '1',
+        message: { type: 'text', content: `You serious?` }
     },
 ];
 
-type MessageProps = {
-    message: { type: string, content: string },
-    isSender: boolean
-}
-const Message = ({ message, isSender }: MessageProps) => {
-    return (
-        <View style={styles.messageContainer}>
-            <Text>Hello There</Text>
-        </View>
-    )
-}
-
 export default function ChatsComponent() {
+    let scrollViewRef = useRef<ScrollView | null>(null);
+    //let scrollViewRef = useRef<ScrollView | null>(null);
+
+    useEffect(() => {
+        // not doing anything for some reason, only works on refresh
+        /* if(scrollViewRef.current){
+            scrollViewRef.current.scrollTo({
+                x: 0,
+                y: 100,
+                animated: true
+              });
+        } */
+    }, [])
+
     const { theme, inDarkMode } = useThemeContext();
     const themedTextInputStyle = inDarkMode ? { 
         backgroundColor: 'grey',
@@ -67,6 +112,8 @@ export default function ChatsComponent() {
         backgroundColor: 'white',
         color: 'black'
     }
+
+    const currentUserId = '1';
 
     const [message, setMessage] = useState('');
 
@@ -86,15 +133,20 @@ export default function ChatsComponent() {
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={{ flex: 1 }}>
-                    <ScrollView style={styles.messagesArea}>
+                    <ScrollView style={styles.messagesArea} ref={scrollViewRef} scrollToOverflowEnabled={true}>
                         <Pressable>
-                            {Messages.map(message => (
-                                <Message 
-                                    key={message.id} 
-                                    message={message.message} 
-                                    isSender={message.senderId === '1'} 
-                                />
-                            ))}
+                            {Messages.map((message, index) => {
+                                let previousIsOwner = index === 0 ? false : Messages[index - 1].senderId === currentUserId;
+                                let currentIsOwner = message.senderId === currentUserId;                
+                                return (
+                                    <Message 
+                                        key={message.id} isLastMessage={index === Messages.length - 1}
+                                        message={message.message} 
+                                        isSender={currentIsOwner} 
+                                        consecutive={index === 0 ? false : previousIsOwner === currentIsOwner} 
+                                    />
+                                )
+                            })}
                         </Pressable>
                     </ScrollView>
                     <View style={[styles.typingArea, { backgroundColor: theme.colors.surfaceVariant }]}>
@@ -139,10 +191,5 @@ const styles = StyleSheet.create({
         borderColor: 'gray', 
         borderWidth: 1, 
         borderRadius: 14,
-    },
-    messageContainer: {
-        backgroundColor: 'red',
-        maxWidth: '50%',
-        minHeight: 50
     }
 });

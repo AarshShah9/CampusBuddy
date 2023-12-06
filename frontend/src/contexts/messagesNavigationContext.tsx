@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createContext } from 'react';
 
-type chatScreenParams = { userId: string, userName: string };
+type chatScreenParams = { userId: string, userName: string, icon: string };
 type contextObject = {
     chatActive: chatScreenParams | null,
     activateScreen: (arg: chatScreenParams) => void,

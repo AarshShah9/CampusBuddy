@@ -9,73 +9,85 @@ const chatList = [
         userId: '1',
         userName: 'Jarvis',
         lastMessage: 'Hello There, I am Jarvis',
-        newMessages: 0
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/jarvis.webp`
     },
     {
         userId: '2',
         userName: 'Tony Stark',
         lastMessage: `I guess what I'm trying to say is that: "I am Iron Man"`,
-        newMessages: 0 
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/tonystark.jpg`
     },
     {
         userId: '3',
         userName: 'Doctor Strange',
         lastMessage: 'The Fate of the multiverse is in my hands',
-        newMessages: 0 
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/doctorstrange.webp`
     },
     {
         userId: '4',
         userName: 'Hulk',
         lastMessage: 'Hulk Smaaaashhhhhhhh!',
-        newMessages: 0 
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/hulk.webp`
     },
     {
         userId: '5',
         userName: 'Reed Richards',
         lastMessage: 'I am supposed to be the smartest man alive',
-        newMessages: 0
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/reedrichards.webp`
     },
     {
         userId: '6',
-        userName: 'Tony Stark',
-        lastMessage: `I guess what I'm trying to say is that: "I am Iron Man"`,
-        newMessages: 0 
+        userName: 'Black Widow',
+        lastMessage: `She's russian, she can fight, she's also hot`,
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/blackwidow.jpg`
     },
     {
         userId: '7',
-        userName: 'Doctor Strange',
-        lastMessage: 'The Fate of the multiverse is in my hands',
-        newMessages: 0 
+        userName: 'Doctor Fate',
+        lastMessage: 'Vengeance of horus',
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/doctorfate.jpg`
     },
     {
         userId: '8',
-        userName: 'Hulk',
-        lastMessage: 'Hulk Smaaaashhhhhhhh!',
-        newMessages: 0 
+        userName: 'Moon Knight',
+        lastMessage: 'Where am I, how did I get here?',
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/moonknight.webp`
     },
     {
         userId: '9',
-        userName: 'Jarvis',
+        userName: 'Spider man',
         lastMessage: 'Hello There, I am Jarvis',
-        newMessages: 0
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/spiderman.jpg`
     },
     {
         userId: '10',
-        userName: 'Tony Stark',
-        lastMessage: `I guess what I'm trying to say is that: "I am Iron Man"`,
-        newMessages: 0 
+        userName: 'Morbius',
+        lastMessage: `It's Morbine time!`,
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/morbius.avif`
     },
     {
         userId: '11',
-        userName: 'Doctor Strange',
-        lastMessage: 'The Fate of the multiverse is in my hands',
-        newMessages: 0 
+        userName: 'Thanos',
+        lastMessage: `What I'm gonna to your little world, I'm gonna enjoy it`,
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/thanos.jpg`
     },
     {
         userId: '12',
-        userName: 'Hulk',
-        lastMessage: 'Hulk Smaaaashhhhhhhh!',
-        newMessages: 0 
+        userName: 'Captain America',
+        lastMessage: 'I can do this all day',
+        newMessages: 0,
+        icon: `https://dszszc0yvwld8.cloudfront.net/Randoms/capamerica.jpg`
     },
 ];
 
@@ -89,7 +101,7 @@ export default function Messages() {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={{ flex: 1 }}>
-            <View style={styles.searchArea}>
+            <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
                 <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
                     <AntDesign name="search1" size={20} color="grey" />
                     <TextInput 
@@ -104,7 +116,7 @@ export default function Messages() {
                 <ScrollView>
                     <Pressable style={{ alignItems: 'center' }}>
                         {chatList.map((chat, index) => (
-                            <ChatListItem key={chat.userId} userId={chat.userId}
+                            <ChatListItem key={chat.userId} userId={chat.userId} icon={chat.icon}
                                 clickHandler={() => chatListItemClickHandler(index)} 
                                 userName={chat.userName} lastMessage={chat.lastMessage}
                             />
@@ -126,7 +138,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: 'rgb(44,50,58)',
+        /* borderBottomColor: 'rgb(44,50,58)', */
     },
     searchBar: {
         flexDirection: 'row',

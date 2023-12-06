@@ -1,5 +1,5 @@
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useEffect, useCallback } from 'react';
+import { useLayoutEffect, useCallback } from 'react';
 import ChatsComponent from '~/components/ChatsComponent';
 import useMessagesNavigationContext from "~/hooks/useMessagesNavigationContext";
 
@@ -8,7 +8,7 @@ export default function Chat() {
 
     const { chatActive, deactivateScreen } = useMessagesNavigationContext();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if(chatActive)
             navigate('ChatScreen', chatActive)
     }, [])
