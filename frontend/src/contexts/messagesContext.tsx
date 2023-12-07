@@ -5,8 +5,10 @@ import {
     FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, query, orderBy, FirestoreDataConverter, WithFieldValue, QueryDocumentSnapshot, SnapshotOptions } from "firebase/firestore";
-import { FirestoreMessageObject, MessageObject } from '~/types/Chat';
+import { 
+    getFirestore, collection, query, orderBy, FirestoreDataConverter, 
+    WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, or } from "firebase/firestore";
+import { ChatListItem, FirestoreMessageObject, MessageObject } from '~/types/Chat';
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -20,7 +22,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
-type contextObject = { messages: MessageObject[] };
+type contextObject = { 
+    messages: MessageObject[],
+    chatList: ChatListItem[]
+};
 const MessagesContext = createContext<contextObject | null>(null);
 
 const messageConverter: FirestoreDataConverter<MessageObject, FirestoreMessageObject> = {
@@ -43,15 +48,49 @@ const messageConverter: FirestoreDataConverter<MessageObject, FirestoreMessageOb
     },
 };
 
+const getConversations = (messages: MessageObject[], userId: string) =>  {
+    const result = {} as ({ [key: string]: MessageObject[] });
+    messages.forEach(message => {
+        const { senderId, receiverId } = message;
+        let key = userId === senderId ? 
+        `${senderId}${receiverId}` : `${receiverId}${senderId}`;
+        if(Object.keys(result).includes(key))
+            result[key].push(message);
+        else
+            result[key] = [message];
+    });
+    return result
+}
+
 export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
+    const currentUserId = '1'; // mocked for now, but will be obtained from authContext
+
     const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
-    const orderedQuery = query(messagesRef, orderBy('createdAt', 'asc'));
+    const orderedQuery = query(
+        messagesRef, 
+        or(
+            where("senderId", "==", currentUserId),
+            where("receiverId", "==", currentUserId)
+        ), 
+        //orderBy('createdAt', 'asc')
+    );
     
     const [messages, loading, error] = useCollectionData(orderedQuery);
-    console.log('messages rendered')
+    console.log('messages', messages) 
+    const conversations = messages ? getConversations(messages, currentUserId) : {};
+    console.log('conversations', conversations)
+    const chatList = Object.keys(conversations).map(key => {
+        return ({ 
+            userId: key.replace(currentUserId, ""), 
+            lastMessage: conversations[key][conversations[key].length - 1].message.content,
+            numUnreadMessages: conversations[key].filter(message => 
+                (!message.timeRead) && (message.receiverId === currentUserId)
+            ).length
+        })
+    });
 
     return (
-        <MessagesContext.Provider value={{ messages: messages ?? [] }}>
+        <MessagesContext.Provider value={{ messages: messages ?? [], chatList }}>
             {children}
         </MessagesContext.Provider>
     )

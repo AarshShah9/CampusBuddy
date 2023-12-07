@@ -1,19 +1,29 @@
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native";
 import { ThemedText } from '~/components/ThemedComponents';
 import useMessagesNavigationContext from "~/hooks/useMessagesNavigationContext";
 import useThemeContext from "~/hooks/useThemeContext";
+import { getUserDataApi } from "~/lib/apiFunctions";
 import { limitTextToMax } from "~/lib/helperFunctions";
+import { ChatListItem } from "~/types/Chat";
 
-type Props = {
-    userId: string,
-    userName: string,
-    lastMessage: string,
-    icon: string
-}
+type Props = ChatListItem
 
-export default function ChatListItem({ userId, userName, lastMessage, icon }: Props) {
+export default function ChatListItemComponent({ userId, lastMessage, numUnreadMessages }: Props) {
     const { activateScreen } = useMessagesNavigationContext();
     const { theme } = useThemeContext();
+
+    const [fetchedData, setFetchedData] = useState({
+        userName: '', icon: '#'
+    })
+
+    const { userName, icon } = fetchedData;
+
+    useEffect(() => {
+        getUserDataApi(userId)
+        .then(({ name, icon }) => setFetchedData({ userName: name, icon }))
+        .catch(err => console.log('error occured', err))
+    }, [userId])
     
     const onPressHandler = () => {
         activateScreen({ userId, userName, icon })

@@ -3,8 +3,9 @@ import { AntDesign } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { ScrollView } from 'react-native-gesture-handler';
 import ChatListItem from "~/components/ChatListItem";
+import useMessagesContext from "~/hooks/useMessagesContext";
 
-const chatList = [
+const ChatList = [
     {
         userId: '1',
         userName: 'Jarvis',
@@ -93,6 +94,7 @@ const chatList = [
 
 export default function Messages() {
     const { theme } = useThemeContext();
+    const { chatList } = useMessagesContext();
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -111,8 +113,10 @@ export default function Messages() {
                 <ScrollView>
                     <Pressable style={{ alignItems: 'center' }}>
                         {chatList.map(chat => (
-                            <ChatListItem key={chat.userId} userId={chat.userId} icon={chat.icon}
-                                userName={chat.userName} lastMessage={chat.lastMessage}
+                            <ChatListItem 
+                                key={chat.userId} userId={chat.userId}
+                                lastMessage={chat.lastMessage}
+                                numUnreadMessages={chat.numUnreadMessages}
                             />
                         ))}
                     </Pressable>

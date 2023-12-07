@@ -15,6 +15,10 @@ export type MessageObject = {
     createdAt: {
         seconds: number,
         nanoseconds: number
+    },
+    timeRead?: {
+        seconds: number,
+        nanoseconds: number
     }
 }
 export type FirestoreMessageObject = {  
@@ -27,5 +31,14 @@ export type FirestoreMessageObject = {
     createdAt: {
         seconds: number,
         nanoseconds: number
+    },
+    timeRead?: {
+        seconds: number,
+        nanoseconds: number
     }
+}
+export type ChatListItem = {
+    userId: string,
+    lastMessage: string,
+    numUnreadMessages: number
 }
