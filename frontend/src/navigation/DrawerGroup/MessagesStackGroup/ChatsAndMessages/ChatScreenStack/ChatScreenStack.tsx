@@ -1,13 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import useThemeContext from '~/hooks/useThemeContext';
-import DrawerIcon from '../../../DrawerIcon';
-import UserIcon from '../../../UserIcon';
-import Messages from '~/screens/Messages';
+import Chat from '~/screens/Chat';
+import ChatHeader from './ChatHeader';
 
 const Stack = createNativeStackNavigator();
 
-export default function ChatListStack() {
+export default function ChatScreenStack() {
     const { theme } = useThemeContext();
+    
     return (
         <Stack.Navigator
             screenOptions={{
@@ -18,11 +18,10 @@ export default function ChatListStack() {
             }}
         >
             <Stack.Screen 
-                name="MessagesScreen" component={Messages} 
-                options={({ navigation }) => ({ 
-                    title: 'Messages',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
-                    headerRight: () => <UserIcon />,
+                name="ChatScreen" component={Chat} 
+                options={({ navigation, route }) => ({ 
+                    title: '',
+                    headerLeft: () => <ChatHeader {...{ navigation, route }} />
                 })}
             />
         </Stack.Navigator>

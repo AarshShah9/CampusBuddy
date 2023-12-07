@@ -48,6 +48,7 @@ export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.El
     const orderedQuery = query(messagesRef, orderBy('createdAt', 'asc'));
     
     const [messages, loading, error] = useCollectionData(orderedQuery);
+    console.log('messages rendered')
 
     return (
         <MessagesContext.Provider value={{ messages: messages ?? [] }}>
