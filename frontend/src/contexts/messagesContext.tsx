@@ -7,7 +7,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { initializeApp } from "firebase/app";
 import { 
     getFirestore, collection, query, orderBy, FirestoreDataConverter, 
-    WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, or } from "firebase/firestore";
+    WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, or, and } from "firebase/firestore";
 import { ChatListItem, FirestoreMessageObject, MessageObject } from '~/types/Chat';
 
 const firebaseConfig = {
@@ -67,12 +67,11 @@ export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.El
 
     const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
     const orderedQuery = query(
-        messagesRef, 
-        or(
+        messagesRef, or(
             where("senderId", "==", currentUserId),
             where("receiverId", "==", currentUserId)
-        ), 
-        //orderBy('createdAt', 'asc')
+        )
+        // where('participants', 'array-contains', currentUserId), orderBy('createdAt', 'asc')
     );
     
     const [messages, loading, error] = useCollectionData(orderedQuery);
