@@ -132,8 +132,6 @@ export default function ChatsComponent() {
                     <ScrollView style={styles.messagesArea} ref={scrollViewRef} scrollToOverflowEnabled={true}>
                         <Pressable>
                             {messages.map((message, index) => {
-                                console.log('the message', message)
-                                console.log('making sure', message.id)
                                 let previousIsOwner = index === 0 ? false : Messages[index - 1].senderId === currentUserId;
                                 let currentIsOwner = message.senderId === currentUserId;                
                                 return (
