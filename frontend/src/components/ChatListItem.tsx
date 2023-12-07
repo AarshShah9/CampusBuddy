@@ -2,13 +2,9 @@ import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native"
 import { ThemedText } from '~/components/ThemedComponents';
 import useMessagesNavigationContext from "~/hooks/useMessagesNavigationContext";
 import useThemeContext from "~/hooks/useThemeContext";
-
-const limitTextToMax = (arg: string, maxCharacters: number) => {
-    return arg.length > maxCharacters ? `${arg.slice(0, maxCharacters)}...` : arg
-}
+import { limitTextToMax } from "~/lib/helperFunctions";
 
 type Props = {
-    clickHandler: () => void,
     userId: string,
     userName: string,
     lastMessage: string,
@@ -61,7 +57,6 @@ const styles = StyleSheet.create({
         paddingRight: 20,
         flex: 0.83,
         borderBottomWidth: 1,
-        /* borderBottomColor: 'rgb(44,50,58)', */
     },
     userName: {
         fontSize: 19,

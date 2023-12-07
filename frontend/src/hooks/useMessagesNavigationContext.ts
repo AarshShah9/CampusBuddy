@@ -8,4 +8,4 @@ export default function useMessagesNavigationContext() {
     throw new Error('useMessagesNavigationContext must be used within a MessagesNavigationContextProvider');
 
   return contextValues;
-};
+}

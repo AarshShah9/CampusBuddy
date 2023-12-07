@@ -94,10 +94,6 @@ const chatList = [
 export default function Messages() {
     const { theme } = useThemeContext();
 
-    const chatListItemClickHandler = (chatIndex: number) => {
-        console.log('clicked chat: ', chatIndex)
-    }
-
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={{ flex: 1 }}>
@@ -108,16 +104,14 @@ export default function Messages() {
                         placeholder='Search Chats'
                         placeholderTextColor='grey'
                         style={styles.searchBarInput}
-                    >   
-                    </TextInput>
+                    />
                 </View>
             </View>
             <View style={styles.chatListArea}>
                 <ScrollView>
                     <Pressable style={{ alignItems: 'center' }}>
-                        {chatList.map((chat, index) => (
+                        {chatList.map(chat => (
                             <ChatListItem key={chat.userId} userId={chat.userId} icon={chat.icon}
-                                clickHandler={() => chatListItemClickHandler(index)} 
                                 userName={chat.userName} lastMessage={chat.lastMessage}
                             />
                         ))}
@@ -137,8 +131,7 @@ const styles = StyleSheet.create({
         minHeight: 80,  
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        /* borderBottomColor: 'rgb(44,50,58)', */
+        borderBottomWidth: 1
     },
     searchBar: {
         flexDirection: 'row',

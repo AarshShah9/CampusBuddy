@@ -1,19 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Pressable } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import useThemeContext from '~/hooks/useThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import Message from './Message';
+import { useNavigation } from '@react-navigation/native';
+import useMessagesNavigationContext from '~/hooks/useMessagesNavigationContext';
+import useMessagesContext from '~/hooks/useMessagesContext';
 
-type messageObject = { 
-    id: string, 
-    senderId: string, 
-    receiverId: string, 
-    message: { 
-        type: string, 
-        content: string 
-    }
-}
 const Messages = [
     {
         id: '11',
@@ -124,7 +118,9 @@ export default function ChatsComponent() {
       // Clear the input field after sending the message
       //setMessage('');
     };
-  
+
+    const { messages } = useMessagesContext();
+    
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -135,7 +131,9 @@ export default function ChatsComponent() {
                 <View style={{ flex: 1 }}>
                     <ScrollView style={styles.messagesArea} ref={scrollViewRef} scrollToOverflowEnabled={true}>
                         <Pressable>
-                            {Messages.map((message, index) => {
+                            {messages.map((message, index) => {
+                                console.log('the message', message)
+                                console.log('making sure', message.id)
                                 let previousIsOwner = index === 0 ? false : Messages[index - 1].senderId === currentUserId;
                                 let currentIsOwner = message.senderId === currentUserId;                
                                 return (

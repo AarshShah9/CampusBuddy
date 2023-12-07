@@ -5,7 +5,7 @@ export default function useThemeContext() {
   const contextValues = useContext(ThemeContext);
 
   if (!contextValues) 
-    throw new Error('useThemeContext must be used within a ThemeContextProvider wrapped around the App');
+    throw new Error('useThemeContext must be used within a ThemeContextProvider');
 
   return contextValues;
-};
+}

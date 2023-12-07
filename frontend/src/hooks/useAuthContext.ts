@@ -8,4 +8,4 @@ export default function useAuthContext() {
     throw new Error('useAuthContext must be used within a AuthContextProvider wrapped around the App');
 
   return contextValues;
-};
+}

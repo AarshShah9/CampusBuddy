@@ -1,18 +1,15 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import useThemeContext from '~/hooks/useThemeContext';
 import ChatListStack from './ChatList/ChatListStack';
 import ChatScreenGroup from './ChatScreenGroup/ChatScreenGroup';
 import { useCallback, useState } from 'react';
 import { MessagesNavigationContextProvider } from '~/contexts/messagesNavigationContext';
+import { ChatScreenParams } from '~/types/Chat';
 
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function MessagesScreenStack() {
-    const { theme } = useThemeContext();
-
-    type chatScreenParams = { userId: string, userName: string }
-    const [chatActive, setChatActive] = useState<chatScreenParams | null>(null);
-    const activateScreen = useCallback((arg: chatScreenParams) => {
+    const [chatActive, setChatActive] = useState<ChatScreenParams | null>(null);
+    const activateScreen = useCallback((arg: ChatScreenParams) => {
         setChatActive(arg)
     }, [])
     const deactivateScreen = useCallback(() => {
