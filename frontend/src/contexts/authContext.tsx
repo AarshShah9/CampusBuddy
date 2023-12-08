@@ -16,13 +16,18 @@ const getTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) => await SecureStore
 
 const deleteTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) => await SecureStore.deleteItemAsync(key.trim())
 
+type User = { 
+    id: string, 
+    name: string, 
+    email: string 
+}
 
 type userRegistrationData = {
     name: string,
     email: string
 }
 type authContext = { 
-    user: { name: string, email: string } | null, 
+    user: User | null, 
     registerUser: (arg: userRegistrationData) => Promise<void>
     signIn: (email: string) => Promise<void>
     logOut: () => Promise<void>
@@ -30,7 +35,7 @@ type authContext = {
 const AuthContext = createContext<authContext | null>(null);
 
 export const AuthContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>({ id: '1', name: '', email: ''});
 
     const registerUser = useCallback(async (data: userRegistrationData) => {
         try {

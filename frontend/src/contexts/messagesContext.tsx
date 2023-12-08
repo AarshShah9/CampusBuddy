@@ -9,6 +9,7 @@ import {
     getFirestore, collection, query, orderBy, FirestoreDataConverter, 
     WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, or, and } from "firebase/firestore";
 import { ChatListItem, FirestoreMessageObject, MessageObject } from '~/types/Chat';
+import useAuthContext from '~/hooks/useAuthContext';
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -62,9 +63,13 @@ const getConversations = (messages: MessageObject[], userId: string) =>  {
     return result
 }
 
-export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
-    const currentUserId = '1'; // mocked for now, but will be obtained from authContext
+export const MessagesContextProvider = ({ children }: PropsWithChildren) => {
+    const { user } = useAuthContext();
+    if(!user) 
+        return null
 
+    const { id : currentUserId } = user;
+    
     const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
     const orderedQuery = query(
         messagesRef, 
@@ -72,7 +77,7 @@ export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.El
             where("senderId", "==", currentUserId),
             where("receiverId", "==", currentUserId)
         ),
-        orderBy('createdAt', 'asc')
+        orderBy('createdAt', 'desc')
     );
     
     const [messages, loading, error] = useCollectionData(orderedQuery);
