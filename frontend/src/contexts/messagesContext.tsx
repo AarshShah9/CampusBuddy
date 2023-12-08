@@ -67,11 +67,12 @@ export const MessagesContextProvider = ({ children }: PropsWithChildren): JSX.El
 
     const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
     const orderedQuery = query(
-        messagesRef, or(
+        messagesRef, 
+        or(
             where("senderId", "==", currentUserId),
             where("receiverId", "==", currentUserId)
-        )
-        // where('participants', 'array-contains', currentUserId), orderBy('createdAt', 'asc')
+        ),
+        orderBy('createdAt', 'asc')
     );
     
     const [messages, loading, error] = useCollectionData(orderedQuery);
