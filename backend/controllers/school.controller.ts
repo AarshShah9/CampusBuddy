@@ -10,11 +10,12 @@ export const schoolTest = async (req: Request, res: Response) => {
 
 // create new School
 export const createNewSchool = async (req: Request, res: Response) => {
-    const { school } = req.body;
+    const { school, domain } = req.body;
     
     const newSchool = await prisma.school.create({
         data : {
             name: school,
+            domain: domain
         },
     });
     
