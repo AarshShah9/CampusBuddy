@@ -37,6 +37,33 @@ export type FirestoreMessageObject = {
         nanoseconds: number
     }
 }
+export type ConversationObject = { 
+    id: string, 
+    participants: string[] 
+    numUnreadMessages: number, 
+    lastMessage: string,
+    createdAt: {
+        seconds: number,
+        nanoseconds: number
+    },
+    updatedAt: {
+        seconds: number,
+        nanoseconds: number
+    }
+}
+export type FirestoreConversationObject = {  
+    participants: string[] 
+    numUnreadMessages: number, 
+    lastMessage: string,
+    createdAt: {
+        seconds: number,
+        nanoseconds: number
+    },
+    updatedAt: {
+        seconds: number,
+        nanoseconds: number
+    }
+}
 export type ChatListItem = {
     userId: string,
     lastMessage: string,

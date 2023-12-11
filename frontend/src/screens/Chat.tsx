@@ -22,6 +22,6 @@ export default function Chat() {
     useFocusEffect(looseFocusCallback)
 
     return (
-        <ChatsComponent />
+        <ChatsComponent otherEndUserId={chatActive ? chatActive.userId : ''} />
     )
 }

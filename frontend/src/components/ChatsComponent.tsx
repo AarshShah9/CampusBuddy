@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { 
     View, StyleSheet, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback,
     Keyboard, TouchableOpacity, FlatList } from 'react-native';
@@ -11,6 +11,8 @@ import useMessagesContext from '~/hooks/useMessagesContext';
 import useAuthContext from '~/hooks/useAuthContext';
 import { MessageObject } from '~/types/Chat';
 import ListLoader from './ListLoader';
+import { getSortedKey } from '~/lib/helperFunctions';
+import useMessagesNavigationContext from '~/hooks/useMessagesNavigationContext';
 
 const Messages = [
     {
@@ -87,49 +89,66 @@ const Messages = [
     },
 ];
 
-type Props = {
-    currentUserId: string,
-    message: MessageObject,
-    index: number
-}
-const MessageRenderItem = ({ currentUserId, index, message } : Props) => {
-    let previousIsOwner = index === 0 ? false : Messages[index - 1].senderId === currentUserId;
-    let currentIsOwner = message.senderId === currentUserId;  
-
-    return (
-        <Message 
-            isLastMessage={index === Messages.length - 1}
-            message={message.message} 
-            isSender={currentIsOwner} 
-            consecutive={index === 0 ? false : previousIsOwner === currentIsOwner} 
-        />
-    )
-}
-
-export default function ChatsComponent() {
-    const { user } = useAuthContext();
-    if(!user) 
-        return null
+const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
+    const { openedConversations, user, fetchMoreMessages } = useMessagesContext();
     
     const { id : currentUserId } = user;
 
-    const { messages } = useMessagesContext();
-    const [texts, setTexts] = useState(messages);
+    const conversation = openedConversations[getSortedKey(currentUserId, otherEndUserId)];
+    
+    if(conversation.status === 'not-opened')
+        return null
 
-    let scrollViewRef = useRef<ScrollView | null>(null);
-    //let scrollViewRef = useRef<ScrollView | null>(null);
+    const { messages } = conversation;
 
-    useEffect(() => {
-        // not doing anything for some reason, only works on refresh
-        /* if(scrollViewRef.current){
-            scrollViewRef.current.scrollTo({
-                x: 0,
-                y: 100,
-                animated: true
-              });
-        } */
+    const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
+
+    const [moreDataFetchingAllowed, setMoreDataFetchingAllowed] = useState(false);
+    const allowMoreDataFetching = useCallback(() => {
+        setMoreDataFetchingAllowed(true);
     }, [])
 
+    const getMoreMessages = () => {
+        console.log('I got called with', moreDataFetchingAllowed)
+        if(moreDataFetchingAllowed) {
+            setIsLoadingMoreData(true);
+            fetchMoreMessages(otherEndUserId).then(() => {
+                setIsLoadingMoreData(false);
+            })
+        }       
+    }
+
+    return (
+        <View style={styles.messagesArea}>
+            <View style={{ flex: 1 }}>
+                <FlashList initialScrollIndex={0} onScroll={allowMoreDataFetching}
+                    ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
+                    ListFooterComponent={() => <ListLoader isLoading={isLoadingMoreData} /> }
+                    inverted estimatedItemSize={40} 
+                    data={messages}   
+                    renderItem={({ index, item: message }) => {
+                        let previousIsOwner = index === 0 ? false : messages[index - 1].senderId === currentUserId;
+                        let currentIsOwner = message.senderId === currentUserId;  
+                    
+                        return (
+                            <Message 
+                                isLastMessage={index === Messages.length - 1}
+                                message={message.message} 
+                                isSender={currentIsOwner} 
+                                consecutive={index === 0 ? false : previousIsOwner === currentIsOwner} 
+                            />
+                        )
+                    }} 
+                    onEndReached={getMoreMessages}
+                    onEndReachedThreshold={0}
+                />  
+            </View>
+        </View> 
+    )
+}
+
+
+const TypingArea = () => {
     const { theme, inDarkMode } = useThemeContext();
     const themedTextInputStyle = inDarkMode ? { 
         backgroundColor: 'grey',
@@ -148,9 +167,26 @@ export default function ChatsComponent() {
       // Clear the input field after sending the message
       //setMessage('');
     };
-    
-    const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
 
+    return (
+        <View style={[styles.typingArea, { backgroundColor: theme.colors.surfaceVariant }]}>
+            <View style={styles.typingAreaInner}>
+                <TextInput multiline
+                    style={[styles.textInput, themedTextInputStyle]}
+                    placeholder="Type a message..."
+                    value={message}
+                    onChangeText={(text) => setMessage(text)}
+                />
+                <TouchableOpacity onPress={handleSendMessage}>
+                    <Ionicons name="send" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
+}
+
+
+export default function ChatsComponent({ otherEndUserId }: { otherEndUserId: string }) {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -159,32 +195,8 @@ export default function ChatsComponent() {
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={{ flex: 1 }}>
-                    <View style={styles.messagesArea}>
-                        <FlashList
-                            ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
-                            ListFooterComponent={() => <ListLoader isLoading={isLoadingMoreData} /> }
-                            estimatedItemSize={200} inverted
-                            data={texts}   
-                            renderItem={({ index, item }) => 
-                                <MessageRenderItem 
-                                    {...{ currentUserId, index, message: item }} 
-                                />
-                            } 
-                        />  
-                    </View>                  
-                    <View style={[styles.typingArea, { backgroundColor: theme.colors.surfaceVariant }]}>
-                        <View style={styles.typingAreaInner}>
-                            <TextInput multiline
-                                style={[styles.textInput, themedTextInputStyle]}
-                                placeholder="Type a message..."
-                                value={message}
-                                onChangeText={(text) => setMessage(text)}
-                            />
-                            <TouchableOpacity onPress={handleSendMessage}>
-                                <Ionicons name="send" size={24} color="black" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <ListArea otherEndUserId={otherEndUserId} />             
+                    <TypingArea />
                 </View>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>

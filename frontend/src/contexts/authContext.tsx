@@ -2,6 +2,7 @@ import type {PropsWithChildren} from 'react';
 import {createContext, useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { UserDataType } from '~/types/User';
 
 const setAxiosTokenHeader = (token: string) => axios.defaults.headers.common['authToken'] = `${token}`
 
@@ -16,18 +17,12 @@ const getTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) => await SecureStore
 
 const deleteTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) => await SecureStore.deleteItemAsync(key.trim())
 
-type User = { 
-    id: string, 
-    name: string, 
-    email: string 
-}
-
 type userRegistrationData = {
     name: string,
     email: string
 }
 type authContext = { 
-    user: User | null, 
+    user: UserDataType | null, 
     registerUser: (arg: userRegistrationData) => Promise<void>
     signIn: (email: string) => Promise<void>
     logOut: () => Promise<void>
@@ -35,7 +30,7 @@ type authContext = {
 const AuthContext = createContext<authContext | null>(null);
 
 export const AuthContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
-    const [user, setUser] = useState<User | null>({ id: '1', name: '', email: ''});
+    const [user, setUser] = useState<UserDataType | null>({ id: '1', name: '', email: '', icon: '#'});
 
     const registerUser = useCallback(async (data: userRegistrationData) => {
         try {

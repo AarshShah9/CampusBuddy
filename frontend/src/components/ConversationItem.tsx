@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native";
 import { ThemedText } from '~/components/ThemedComponents';
+import useMessagesContext from "~/hooks/useMessagesContext";
 import useMessagesNavigationContext from "~/hooks/useMessagesNavigationContext";
 import useThemeContext from "~/hooks/useThemeContext";
 import { getUserDataApi } from "~/lib/apiFunctions";
@@ -9,7 +10,8 @@ import { ChatListItem } from "~/types/Chat";
 
 type Props = ChatListItem
 
-export default function ChatListItemComponent({ userId, lastMessage, numUnreadMessages }: Props) {
+export default function ConversationItem({ userId, lastMessage, numUnreadMessages }: Props) {
+    const { openConversation } = useMessagesContext();
     const { activateScreen } = useMessagesNavigationContext();
     const { theme } = useThemeContext();
 
@@ -21,16 +23,17 @@ export default function ChatListItemComponent({ userId, lastMessage, numUnreadMe
 
     useEffect(() => {
         getUserDataApi(userId)
-        .then(({ name, icon }) => setFetchedData({ userName: name, icon }))
+        .then((item) => item && setFetchedData({ userName: item.name, icon: item.icon }))
         .catch(err => console.log('error occured', err))
     }, [userId])
     
     const onPressHandler = () => {
         activateScreen({ userId, userName, icon })
+        openConversation(userId);
     }
 
     return (
-        <TouchableHighlight onPress={onPressHandler}>
+        <TouchableHighlight onPress={onPressHandler} underlayColor={theme.colors.surfaceVariant} >
             <View style={styles.chatListItemContainer} >
                 <View style={styles.chatListItemPictureArea}>
                     <Image style={styles.userIcon} source={{ uri: icon }} />

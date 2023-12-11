@@ -1,9 +1,12 @@
 import { View, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
-import { ScrollView } from 'react-native-gesture-handler';
-import ChatListItem from "~/components/ChatListItem";
+import { FlashList } from "@shopify/flash-list";
+import ConversationItem from "~/components/ConversationItem";
 import useMessagesContext from "~/hooks/useMessagesContext";
+import ListLoader from "~/components/ListLoader";
+import useAuthContext from "~/hooks/useAuthContext";
+import { useState } from "react";
 
 const ChatList = [
     {
@@ -92,39 +95,53 @@ const ChatList = [
     },
 ];
 
-export default function Messages() {
-    const { theme } = useThemeContext();
-    const { chatList } = useMessagesContext();
+const CoversationsArea = () => {
+    const { conversations, user } = useMessagesContext();
+    const { id : currentUserId } = user;
 
-  return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={{ flex: 1 }}>
-            <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
-                <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
-                    <AntDesign name="search1" size={20} color="grey" />
-                    <TextInput 
-                        placeholder='Search Chats'
-                        placeholderTextColor='grey'
-                        style={styles.searchBarInput}
-                    />
-                </View>
-            </View>
-            <View style={styles.chatListArea}>
-                <ScrollView>
-                    <Pressable style={{ alignItems: 'center' }}>
-                        {chatList.map(chat => (
-                            <ChatListItem 
-                                key={chat.userId} userId={chat.userId}
-                                lastMessage={chat.lastMessage}
-                                numUnreadMessages={chat.numUnreadMessages}
-                            />
-                        ))}
-                    </Pressable>
-                </ScrollView>
+    const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
+
+    return (
+        <View style={styles.chatListArea}>
+            <View style={{ flex: 1 }}>
+                <FlashList
+                    ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
+                    ListFooterComponent={() => <ListLoader isLoading={isLoadingMoreData} /> }
+                    estimatedItemSize={200}
+                    data={conversations}   
+                    renderItem={({ item }) => 
+                        <ConversationItem
+                            userId={item.participants.filter(id => id !== currentUserId)[0]}
+                            lastMessage={item.lastMessage}
+                            numUnreadMessages={item.numUnreadMessages}
+                        />
+                    } 
+                />
             </View>
         </View>
-    </TouchableWithoutFeedback>
-  )
+    )
+}
+
+export default function Messages() {    
+    const { theme } = useThemeContext();
+
+    return (
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <View style={{ flex: 1 }}>
+                <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
+                    <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
+                        <AntDesign name="search1" size={20} color="grey" />
+                        <TextInput 
+                            placeholder='Search Chats'
+                            placeholderTextColor='grey'
+                            style={styles.searchBarInput}
+                        />
+                    </View>
+                </View>
+                <CoversationsArea />
+            </View>
+        </TouchableWithoutFeedback>
+    )
 }
 
 
@@ -155,6 +172,6 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     chatListArea: { 
-        flex: 0.99, 
+        flex: 1
     }
 });
