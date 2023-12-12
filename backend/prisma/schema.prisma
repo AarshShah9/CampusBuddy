@@ -11,6 +11,15 @@ datasource db {
   relationMode = "prisma"
 }
 
+// zod-prisma-types generator
+// Generates zod schemas from prisma models
+generator zod {
+  provider                      = "zod-prisma-types"
+  output                        = "./generated/zod" // the directory where generated zod schemas will be saved
+  createInputTypes              = false // default is true
+  // useTypeAssertions             = true // circumvent type system to fix typescript error with zod versions >3.21.1
+}
+
 model School {
   id       Int       @id @default(autoincrement())
   name     String
@@ -21,7 +30,7 @@ model School {
   @@map("school")
 }
 
-// remove this, make sure Noman's auth stuff still works
+
 model Student {
   id        Int     @id @default(autoincrement())
   school    School  @relation(fields: [schoolID], references: [id])
@@ -47,6 +56,7 @@ model User {
   pictureUrl        String?                @map("picture_url")
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
+  isVerified        Boolean                @default(false) @map("is_verified")
   school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   events            Event[]
   UserEventResponse UserEventResponse[]
@@ -64,30 +74,45 @@ model User {
   @@map("user")
 }
 
+/// @zod.refine((data) => data.endDate > data.startDate, { message: 'End date cannot be earlier than start date.', path: ['endDate'], })
 model Event {
   id             Int                 @id @default(autoincrement())
   userId         Int                 @map("user_id")
+  /// @zod.number.int()
+  organizationId Int?                @map("organization_id")
   createdAt      DateTime            @default(now()) @map("created_at")
-  title          String
-  description    String?
+  // @zod.string.min(3).max(255)
+  title          String              @db.VarChar(255)
+  /// @zod.string.max(255)
+  description    String?             @db.VarChar(255)
   location       String
-  startTime      DateTime            @map("start_time")
-  endTime        DateTime            @map("end_time")
+  /// @zod.custom.use(z.coerce.date().refine((value) => value > new Date(), { message: 'Start date must be in the future', }))
+  startDate      DateTime            @map("start_date")
+  endDate        DateTime            @map("end_date")
   mediaUrl       String?             @map("media_url")
-  user           User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublic       Boolean             @map("is_public")
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   eventTags      EventTag[]
   eventResponses UserEventResponse[]
 
   @@index([userId])
+  @@index([organizationId])
   @@map("event")
+}
+
+enum ParticipationStatus {
+  Going
+  Interested
+  NotInterested
 }
 
 model UserEventResponse {
   userId              Int    @map("user_id")
   eventId             Int    @map("event_id")
   participationStatus String @map("participation_status")
-  user                User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event               Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user                User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event               Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@id([userId, eventId])
   @@index([userId])
@@ -96,24 +121,28 @@ model UserEventResponse {
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int       @map("user_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  title     String
-  text      String?
-  mediaUrl  String?   @map("media_url")
+  id             Int            @id @default(autoincrement())
+  userId         Int            @map("user_id")
+  organizationId Int?           @map("organization_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  title          String
+  text           String?
+  mediaUrl       String?        @map("media_url")
+  public         Boolean        @default(true)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   comments  Comment[]
   postTags  PostTag[]
   @@index([userId])
+  @@index([organizationId])
   @@map("post")
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int      @map("user_id")
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int      @map("post_id")
   createdAt DateTime @default(now()) @map("created_at")
   text      String
@@ -122,14 +151,21 @@ model Comment {
   @@map("comment")
 }
 
+enum OrganizationStatus {
+  Pending
+  Verified
+}
+
 model Organization {
   id                          Int                          @id @default(autoincrement())
   organizationName            String                       @unique @map("organization_name")
   description                 String?
   createdAt                   DateTime                     @default(now()) @map("created_at")
-  status                      String
+  status                      OrganizationStatus           @default(Pending)
   userOrganizationRoles       UserOrganizationRole[]
   userOrganizationPermissions OrganizationRolePermission[]
+  events                      Event[]
+  posts                       Post[]
 
   @@map("organization")
 }
@@ -138,9 +174,9 @@ model UserOrganizationRole {
   userId         Int           @map("user_id")
   organizationId Int           @map("organization_id")
   roleId         Int           @map("role_id")
-  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, organizationId, roleId])
   @@index([userId])
@@ -149,22 +185,30 @@ model UserOrganizationRole {
   @@map("user_organization_role")
 }
 
+enum UserRole {
+  Owner
+  Admin
+  Moderator
+  Member
+}
+
 model Role {
   id                          Int                          @id @default(autoincrement())
-  roleName                    String                       @map("role_name")
+  roleName                    UserRole                     @map("role_name")
   userOrganizationRoles       UserOrganizationRole[]
   organizationRolePermissions OrganizationRolePermission[]
 
   @@map("role")
 }
 
+
 model OrganizationRolePermission {
   organizationId Int           @map("organization_id")
   roleId         Int           @map("role_id")
   permissionId   Int           @map("permission_id")
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role?         @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission     Permission?   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission     Permission    @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([organizationId, roleId, permissionId])
   @@index([organizationId])
@@ -185,8 +229,8 @@ model Enrollment {
   programId  Int      @map("program_id")
   userId     Int      @map("user_id")
   degreeType String   @map("degree_type")
-  program    Program? @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program    Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([programId, userId])
   @@index([programId])
@@ -216,8 +260,8 @@ model Topic {
 model EventTag {
   eventId Int    @map("event_id")
   topicId Int    @map("topic_id")
-  event   Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([eventId, topicId])
   @@index([eventId])
@@ -228,8 +272,8 @@ model EventTag {
 model PostTag {
   postId  Int    @map("post_id")
   topicId Int    @map("topic_id")
-  post    Post?  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([postId, topicId])
   @@index([postId])
@@ -240,46 +284,11 @@ model PostTag {
 model TopicSubscription {
   userId  Int   @map("user_id")
   topicId Int   @map("topic_id")
-  user    User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([userId, topicId])
   @@index([userId])
   @@index([topicId])
-  @@map("topic_subscription")
-}
-
-model Topic {
-  id            Int @id @default(autoincrement())
-  topicName     String @unique @map("topic_name")
-  eventTags     EventTag[]
-  posts         PostTag[]
-  subscriptions TopicSubscription[]
-}
-
-model EventTag {
-  eventId      Int        @map("event_id")
-  topicId      Int        @map("topic_id")
-  event        Event      @relation(fields: [eventId], references: [id])
-  topic        Topic      @relation(fields: [topicId], references: [id])
-  @@id([eventId, topicId])
-  @@map("event_tag")
-}
-
-model PostTag {
-  postId       Int        @map("post_id")
-  topicId      Int        @map("topic_id")
-  post         Post       @relation(fields: [postId], references: [id])
-  topic        Topic      @relation(fields: [topicId], references: [id])
-  @@id([postId, topicId])
-  @@map("post_tag")
-}
-
-model TopicSubscription {
-  userId      Int       @map("user_id")
-  topicId     Int       @map("topic_id")
-  user        User      @relation(fields: [userId], references: [id])
-  topic       Topic     @relation(fields: [topicId], references: [id])
-  @@id([userId, topicId])
   @@map("topic_subscription")
 }
