@@ -9,7 +9,7 @@ import {
     getFirestore, collection, query, orderBy, FirestoreDataConverter, getDocs,
     WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, limit, 
     FirestoreError, QuerySnapshot, DocumentData, or, onSnapshot, and, 
-    CollectionReference, Query, startAfter } from "firebase/firestore";
+    CollectionReference, Query, startAfter, Unsubscribe, updateDoc, doc, serverTimestamp, addDoc } from "firebase/firestore";
 import { ConversationObject, FirestoreConversationObject, FirestoreMessageObject, MessageObject } from '~/types/Chat';
 import useAuthContext from '~/hooks/useAuthContext';
 import { useQuery } from '@tanstack/react-query';
@@ -31,7 +31,7 @@ const firestore = getFirestore(app);
 type OpenedConversation = { 
     status: 'opened', 
     messagesQuery: Query<MessageObject, FirestoreMessageObject>,
-    listener: any,
+    listener: Unsubscribe,
     messages: MessageObject[],
     endReached: boolean
 }
@@ -46,7 +46,9 @@ type contextObject = {
     openConversation: (arg: string) => void,
     openedConversations: OpenedConversations,
     fetchMoreMessages: (arg: string) => Promise<void>,
-    conversationsAreLoading: boolean
+    conversationsAreLoading: boolean,
+    createNewMessage: (otherEndUserId: string, message: string) => Promise<void>,
+    getConversation: (otherEndUserId: string) => OpenedConversation | { status: "not-opened"; }
 };
 const MessagesContext = createContext<contextObject | null>(null);
 
@@ -99,9 +101,10 @@ type ProviderProps = PropsWithChildren<{
     user: UserDataType
     conversations: ConversationObject[],
     conversationPairs: string[],
-    fetchMoreConversations: () => void
+    fetchMoreConversations: () => void,
+    conversationsRef: CollectionReference<ConversationObject, FirestoreConversationObject>
 }>;
-const ProviderComponent = ({ children, user, conversations, conversationPairs, fetchMoreConversations, conversationsAreLoading }: ProviderProps) => {
+const ProviderComponent = ({ children, user, conversations, conversationPairs, fetchMoreConversations, conversationsAreLoading, conversationsRef }: ProviderProps) => {
     const { id : currentUserId } = user;
 
     const messagesRef = useMemo(() => collection(firestore, 'messages').withConverter(messageConverter), []);
@@ -247,11 +250,51 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
         }
     }, [currentUserId, openedConversations, setOpenedConversations])
 
+    const getConversation = useCallback((otherEndUserId: string) => {
+        return openedConversations[getSortedKey(currentUserId, otherEndUserId)];
+    }, [openedConversations])
+    
+    const createNewMessage = useCallback(async (otherEndUserId: string, message: string) => {
+        await addDoc(messagesRef, {
+            id: '',
+            senderId: currentUserId,
+            receiverId: otherEndUserId,
+            message: {
+                type: 'text',
+                content: message
+            },
+            createdAt: serverTimestamp()
+        })
+        const conversation = conversations.find(conv => {
+            return (getSortedKey(conv.participants[0], conv.participants[1]) ===
+            getSortedKey(currentUserId, otherEndUserId))
+        })
+        if(conversation) {
+            await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
+                lastMessage: message,
+                numUnreadMessages: conversation.numUnreadMessages + 1,
+                updatedAt: serverTimestamp()
+            })
+        }
+        else {
+            let timestamp = serverTimestamp();
+            await addDoc(conversationsRef, {
+                id: '',
+                numUnreadMessages: 1,
+                participants: [currentUserId, otherEndUserId],
+                lastMessage: message,
+                createdAt: timestamp,
+                updatedAt: timestamp
+            })
+        }
+    }, [conversations])
+
     return (
         <MessagesContext.Provider 
             value={{ 
                 user, conversations, fetchMoreConversations, conversationsAreLoading,
-                openConversation, openedConversations, fetchMoreMessages 
+                openConversation, openedConversations, fetchMoreMessages,
+                createNewMessage, getConversation
             }}
         >
             {children}
@@ -305,7 +348,7 @@ function AuthenticatedProvider({ children, user }: Props) {
     }, [documentsNeeded])
 
     return (
-        <ProviderComponent user={user} 
+        <ProviderComponent user={user} conversationsRef={conversationsRef}
             conversationPairs={conversations.map(conv => getSortedKey(conv.participants[0], conv.participants[1]))} 
             conversations={conversations}
             conversationsAreLoading={conversationsAreLoading}

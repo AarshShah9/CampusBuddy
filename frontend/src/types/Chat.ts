@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore"
+
 export type ChatScreenParams = { 
     userId: string, 
     userName: string, 
@@ -12,14 +14,8 @@ export type MessageObject = {
         type: string, 
         content: string 
     },
-    createdAt: {
-        seconds: number,
-        nanoseconds: number
-    },
-    timeRead?: {
-        seconds: number,
-        nanoseconds: number
-    }
+    createdAt: Timestamp,
+    timeRead?: Timestamp
 }
 export type FirestoreMessageObject = {  
     senderId: string, 
@@ -28,41 +24,23 @@ export type FirestoreMessageObject = {
         type: string, 
         content: string 
     },
-    createdAt: {
-        seconds: number,
-        nanoseconds: number
-    },
-    timeRead?: {
-        seconds: number,
-        nanoseconds: number
-    }
+    createdAt: Timestamp
+    timeRead?: Timestamp
 }
 export type ConversationObject = { 
     id: string, 
     participants: string[] 
     numUnreadMessages: number, 
     lastMessage: string,
-    createdAt: {
-        seconds: number,
-        nanoseconds: number
-    },
-    updatedAt: {
-        seconds: number,
-        nanoseconds: number
-    }
+    createdAt: Timestamp,
+    updatedAt: Timestamp
 }
 export type FirestoreConversationObject = {  
     participants: string[] 
     numUnreadMessages: number, 
     lastMessage: string,
-    createdAt: {
-        seconds: number,
-        nanoseconds: number
-    },
-    updatedAt: {
-        seconds: number,
-        nanoseconds: number
-    }
+    createdAt: Timestamp,
+    updatedAt: Timestamp
 }
 export type ChatListItem = {
     userId: string,

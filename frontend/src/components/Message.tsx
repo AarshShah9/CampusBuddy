@@ -5,15 +5,13 @@ import useThemeContext from '~/hooks/useThemeContext';
 type MessageProps = {
     message: { type: string, content: string },
     isSender: boolean,
-    consecutive: boolean,
-    isLastMessage: boolean
+    consecutive: boolean
 }
-export default function Message ({ message, isSender, consecutive, isLastMessage }: MessageProps) {
+export default function Message ({ message, isSender, consecutive }: MessageProps) {
     const { theme } = useThemeContext();
 
     const marginObject = {
-        ...(consecutive ? styles.consecutiveMargin : styles.normalMargin),
-        ...(isLastMessage ? { marginBottom: 20 } : {}) 
+        ...(consecutive ? styles.consecutiveMargin : styles.normalMargin)
     };
     const flexDirectionStyle  = isSender ? styles.rowReverseDirection : styles.rowDirection;
     const radiusStyle  = isSender ? styles.noTopRightRadius : styles.noTopLeftRadiius;
@@ -42,13 +40,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     consecutiveMargin: {
-        marginTop: 6
+        marginBottom: 6
     },
     normalMargin: {
-        marginTop: 20
+        marginBottom: 20
     },
     messageContainerInner: {
-        backgroundColor: 'blue',
         borderRadius: 12,
         maxWidth: '50%',
         minHeight: 50,

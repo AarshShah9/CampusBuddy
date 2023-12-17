@@ -1,103 +1,30 @@
-import { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { 
     View, StyleSheet, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback,
     Keyboard, TouchableOpacity, FlatList } from 'react-native';
 import { FlashList } from "@shopify/flash-list";
-import { ScrollView } from 'react-native-gesture-handler';
 import useThemeContext from '~/hooks/useThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import Message from './Message';
 import useMessagesContext from '~/hooks/useMessagesContext';
-import useAuthContext from '~/hooks/useAuthContext';
-import { MessageObject } from '~/types/Chat';
 import ListLoader from './ListLoader';
-import { getSortedKey, initialNumberOfMessages } from '~/lib/helperFunctions';
-import useMessagesNavigationContext from '~/hooks/useMessagesNavigationContext';
+import { initialNumberOfMessages } from '~/lib/helperFunctions';
+import { ActivityIndicator } from 'react-native-paper';
 
-const Messages = [
-    {
-        id: '11',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: 'Hello there' }
-    },
-    {
-        id: '12',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `Hey what's up` }
-    },
-    {
-        id: '13',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: `Nothing, much was just saying hi` }
-    },
-    {
-        id: '14',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `Oh okay` }
-    },
-    {
-        id: '15',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `How are you doing though?` }
-    },
-    {
-        id: '16',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: `Pretty cool, just working on a simple project` }
-    },
-    {
-        id: '17',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: `It's been taking me quite long tho` }
-    },
-    {
-        id: '18',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: `Been grinding for a while` }
-    },
-    {
-        id: '19',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `Oh damn, sorry bro` }
-    },
-    {
-        id: '20',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `So you not goin to the party this weekend?` }
-    },
-    {
-        id: '21',
-        senderId: '1',
-        receiverId: '2',
-        message: { type: 'text', content: `Nah I don't think so` }
-    },
-    {
-        id: '22',
-        senderId: '2',
-        receiverId: '1',
-        message: { type: 'text', content: `You serious?` }
-    },
-];
 
 const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
-    const { openedConversations, user, fetchMoreMessages } = useMessagesContext();
+    const { user, fetchMoreMessages, getConversation } = useMessagesContext();
     
     const { id : currentUserId } = user;
 
-    const conversation = openedConversations[getSortedKey(currentUserId, otherEndUserId)];
+    const conversation = getConversation(otherEndUserId)
     
     if(conversation.status === 'not-opened')
-        return null
+        return (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator size={'large'}/>
+            </View>
+        )
 
     const { messages } = conversation;
 
@@ -121,17 +48,14 @@ const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
         <View style={styles.messagesArea}>
             <View style={{ flex: 1 }}>
                 <FlashList initialScrollIndex={0} onScroll={allowMoreDataFetching}
-                    ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
                     ListFooterComponent={() => <ListLoader isLoading={isLoadingMoreData} /> }
                     inverted estimatedItemSize={40} 
                     data={messages}   
                     renderItem={({ index, item: message }) => {
                         let previousIsOwner = index === 0 ? false : messages[index - 1].senderId === currentUserId;
                         let currentIsOwner = message.senderId === currentUserId;  
-                    
                         return (
                             <Message 
-                                isLastMessage={index === Messages.length - 1}
                                 message={message.message} 
                                 isSender={currentIsOwner} 
                                 consecutive={index === 0 ? false : previousIsOwner === currentIsOwner} 
@@ -147,7 +71,7 @@ const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
 }
 
 
-const TypingArea = () => {
+const TypingArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
     const { theme, inDarkMode } = useThemeContext();
     const themedTextInputStyle = inDarkMode ? { 
         backgroundColor: 'grey',
@@ -157,14 +81,15 @@ const TypingArea = () => {
         color: 'black'
     }
 
-    const [message, setMessage] = useState('');
+    const { createNewMessage } = useMessagesContext();
 
-    const handleSendMessage = () => {
-      // Implement your logic to send the message
-      console.log('Sending message:', message);
-  
-      // Clear the input field after sending the message
-      //setMessage('');
+    const [message, setMessage] = useState('');
+    
+    const handleSendMessage = async () => {
+        setMessage('');
+        Keyboard.dismiss();
+        if(message.trim().length > 0) 
+            await createNewMessage(otherEndUserId, message)
     };
 
     return (
@@ -177,7 +102,7 @@ const TypingArea = () => {
                     onChangeText={(text) => setMessage(text)}
                 />
                 <TouchableOpacity onPress={handleSendMessage}>
-                    <Ionicons name="send" size={24} color="black" />
+                    <Ionicons name="send" size={30} color="black" />
                 </TouchableOpacity>
             </View>
         </View>
@@ -195,7 +120,7 @@ export default function ChatsComponent({ otherEndUserId }: { otherEndUserId: str
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={{ flex: 1 }}>
                     <ListArea otherEndUserId={otherEndUserId} />             
-                    <TypingArea />
+                    <TypingArea otherEndUserId={otherEndUserId} />
                 </View>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -218,12 +143,12 @@ const styles = StyleSheet.create({
     },
     textInput: { 
         fontSize: 17.6,
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
+        paddingBottom: 5,
         marginRight: 15,
         width: '80%', 
-        minHeight: 30,
         borderColor: 'gray', 
         borderWidth: 1, 
-        borderRadius: 14,
+        borderRadius: 24,
     }
 });
