@@ -11,7 +11,7 @@ import useMessagesContext from '~/hooks/useMessagesContext';
 import useAuthContext from '~/hooks/useAuthContext';
 import { MessageObject } from '~/types/Chat';
 import ListLoader from './ListLoader';
-import { getSortedKey } from '~/lib/helperFunctions';
+import { getSortedKey, initialNumberOfMessages } from '~/lib/helperFunctions';
 import useMessagesNavigationContext from '~/hooks/useMessagesNavigationContext';
 
 const Messages = [
@@ -109,8 +109,7 @@ const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
     }, [])
 
     const getMoreMessages = () => {
-        console.log('I got called with', moreDataFetchingAllowed)
-        if(moreDataFetchingAllowed) {
+        if(moreDataFetchingAllowed && (messages.length >= initialNumberOfMessages)) {
             setIsLoadingMoreData(true);
             fetchMoreMessages(otherEndUserId).then(() => {
                 setIsLoadingMoreData(false);

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { 
     FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
@@ -14,7 +14,7 @@ import { ConversationObject, FirestoreConversationObject, FirestoreMessageObject
 import useAuthContext from '~/hooks/useAuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { UserDataType } from '~/types/User';
-import { getSortedKey } from '~/lib/helperFunctions';
+import { getSortedKey, initialNumberOfConversations, initialNumberOfMessages } from '~/lib/helperFunctions';
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -31,13 +31,8 @@ const firestore = getFirestore(app);
 type OpenedConversation = { 
     status: 'opened', 
     messagesRef: CollectionReference<MessageObject, FirestoreMessageObject>,
-    queryRef: Query<MessageObject, FirestoreMessageObject>,
-    listener: /* [
-        MessageObject[] | undefined, 
-        boolean, 
-        FirestoreError | undefined, 
-        QuerySnapshot<MessageObject, DocumentData> | undefined
-    ] */ any,
+    messagesQuery: Query<MessageObject, FirestoreMessageObject>,
+    listener: any,
     messages: MessageObject[],
     endReached: boolean,
     firstRender: boolean
@@ -52,7 +47,8 @@ type contextObject = {
     fetchMoreConversations: () => void,
     openConversation: (arg: string) => void,
     openedConversations: OpenedConversations,
-    fetchMoreMessages: (arg: string) => Promise<void>
+    fetchMoreMessages: (arg: string) => Promise<void>,
+    conversationsAreLoading: boolean
 };
 const MessagesContext = createContext<contextObject | null>(null);
 
@@ -99,60 +95,80 @@ const conversationConverter: FirestoreDataConverter<ConversationObject, Firestor
     },
 };
 
-const initialNumberOfDocuments = 20;
 
-const initializeOpenedConversations = (conversations: ConversationObject[]) => {
-    let result: OpenedConversations = {};
-    conversations.forEach(conv => {
-        result[getSortedKey(conv.participants[0], conv.participants[1])] = { status: 'not-opened' }
-        
-    })
-    //console.log('gonna be', result)
-    return result;
-}
-
-
-type EmptyProviderProps = PropsWithChildren<{
+type ProviderProps = PropsWithChildren<{
+    conversationsAreLoading: boolean,
     user: UserDataType
-}>;
-const EmptyProvider = ({ children, user }: EmptyProviderProps) => {
-    const conversations: ConversationObject[] = [];
-    const fetchMoreConversations = () => {};
-    const openConversation = () => {};
-    const openedConversations = {};
-    const fetchMoreMessages = async () => {}
-
-    return (
-        <MessagesContext.Provider value={{ user, conversations, fetchMoreConversations, openConversation, openedConversations, fetchMoreMessages }}>
-            {children}
-        </MessagesContext.Provider>
-    )
-}
-
-type CompleteProviderProps = EmptyProviderProps & PropsWithChildren<{
     conversations: ConversationObject[],
+    conversationPairs: string[],
     fetchMoreConversations: () => void
 }>;
-const CompleteProvider = ({ children, user, conversations, fetchMoreConversations }: CompleteProviderProps) => {
+const ProviderComponent = ({ children, user, conversations, conversationPairs, fetchMoreConversations, conversationsAreLoading }: ProviderProps) => {
     const { id : currentUserId } = user;
 
-    const [openedConversations, setOpenedConversations] = useState(initializeOpenedConversations(conversations));
-    //console.log('openedConversations', openedConversations)
+    const [openedConversations, setOpenedConversations] = useState<OpenedConversations>({});
+
+    const updateOpenedConversations = useCallback((conversations: string[]) => {
+        let objectKeys = Object.keys(openedConversations);
+
+        let added = conversations.filter(convKey => !objectKeys.includes(convKey));
+        let deleted = objectKeys.filter(convKey => !conversations.includes(convKey));
+        let unchanged = objectKeys.filter(convKey => conversations.includes(convKey));
+
+        if(added.length > 0 || deleted.length > 0) {
+            let fullList = [...unchanged, ...added];
+
+            deleted.forEach(key => {
+                const conversation = openedConversations[key];
+                if(conversation.status === 'opened')
+                    conversation.listener();
+            })
+
+            setOpenedConversations(old => {
+                let oldObjectKeys = Object.keys(old);
+                let newObj: OpenedConversations = {};
+                fullList.forEach(key => {
+                    if(oldObjectKeys.includes(key))
+                        newObj[key] = old[key];
+                    else
+                        newObj[key] = { status: 'not-opened' }
+                })
+
+                return newObj;
+            })
+        }
+    }, [openedConversations])
+
+    useEffect(() => {
+        updateOpenedConversations(conversationPairs);
+    }, [conversationPairs])
+
+    const unsubscribeAllListeners = useCallback(() => {
+        Object.keys(openedConversations).forEach(key => {
+            const conversation = openedConversations[key];
+            if(conversation.status === 'opened')
+                conversation.listener();
+        })
+    }, [openedConversations])
+
+    useEffect(() => {
+        return () => {
+            unsubscribeAllListeners()
+        }
+    }, [])
 
     const fetchMoreMessages = useCallback(async (otherEndUserId: string) => {
         const conversationKey = getSortedKey(currentUserId, otherEndUserId);
         const conversation = openedConversations[conversationKey] as OpenedConversation;
-
-        console.log('from fetcher, old conv is', conversation.status)
 
         if(!conversation.endReached) {
             const { messages } = conversation;
 
             const results = await getDocs(
                 query(
-                    conversation.queryRef, 
+                    conversation.messagesQuery, 
                     startAfter(messages[messages.length - 1]),
-                    limit(15)
+                    limit(initialNumberOfMessages)
                 )
             )
 
@@ -164,13 +180,13 @@ const CompleteProvider = ({ children, user, conversations, fetchMoreConversation
                 let newConversationObject: OpenedConversation = {
                     status: 'opened',
                     messagesRef: oldConversationObject.messagesRef,
-                    queryRef: oldConversationObject.queryRef,
+                    messagesQuery: oldConversationObject.messagesQuery,
                     listener: oldConversationObject.listener,
                     messages: [
                         ...oldConversationObject.messages,
                         ...nextMessages
                     ],
-                    endReached: results.docs.length < 15,
+                    endReached: results.docs.length < initialNumberOfMessages,
                     firstRender: false
                 }
                 newOpenedConversations[conversationKey] = newConversationObject;
@@ -188,7 +204,7 @@ const CompleteProvider = ({ children, user, conversations, fetchMoreConversation
                 let newOpenedConversations = {...old};
                 
                 const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
-                const queryRef = query(
+                const messagesQuery = query(
                     messagesRef, 
                     or(
                         and(where("senderId", "==", currentUserId), where("receiverId", "==", otherEndUserId)),
@@ -200,9 +216,9 @@ const CompleteProvider = ({ children, user, conversations, fetchMoreConversation
                 let newConversationObject: OpenedConversation = {
                     status: 'opened',
                     messagesRef,
-                    queryRef,
+                    messagesQuery,
                     listener: onSnapshot(
-                        query(queryRef, limit(15)), 
+                        query(messagesQuery, limit(initialNumberOfMessages)), 
                         (snapshot) => {                            
                             setOpenedConversations(old => {
                                 let newOpenedConversations = {...old};
@@ -220,14 +236,14 @@ const CompleteProvider = ({ children, user, conversations, fetchMoreConversation
 
                                 newOpenedConversations[conversationKey] = {
                                     status: 'opened',
-                                    queryRef: oldConversationObject.queryRef,
+                                    messagesQuery: oldConversationObject.messagesQuery,
                                     messagesRef: oldConversationObject.messagesRef,
                                     listener: oldConversationObject.listener,
                                     messages: [
                                         ...items,
                                         ...oldConversationObject.messages
                                     ],
-                                    endReached: snapshot.docs.length < 15,
+                                    endReached: snapshot.docs.length < initialNumberOfMessages,
                                     firstRender: false
                                 };
                                 return newOpenedConversations
@@ -245,11 +261,17 @@ const CompleteProvider = ({ children, user, conversations, fetchMoreConversation
     }, [currentUserId, openedConversations, setOpenedConversations])
 
     return (
-        <MessagesContext.Provider value={{ user, conversations, fetchMoreConversations, openConversation, openedConversations, fetchMoreMessages }}>
+        <MessagesContext.Provider 
+            value={{ 
+                user, conversations, fetchMoreConversations, conversationsAreLoading,
+                openConversation, openedConversations, fetchMoreMessages 
+            }}
+        >
             {children}
         </MessagesContext.Provider>
     )
 }
+
 
 type Props = PropsWithChildren<{
     user: UserDataType
@@ -257,33 +279,67 @@ type Props = PropsWithChildren<{
 function AuthenticatedProvider({ children, user }: Props) {
     const { id : currentUserId } = user;
     
-    const [documentsNeeded, setDocumentsNeeded] = useState(initialNumberOfDocuments);
-    const fetchMoreConversations = useCallback(() => {
-        setDocumentsNeeded(documentsNeeded => documentsNeeded + initialNumberOfDocuments)
-    }, [setDocumentsNeeded])
+    const [conversationsAreLoading, setConversationsAreLoading] = useState(true);
 
-    const conversationsRef = collection(firestore, 'conversations').withConverter(conversationConverter)
-    const conversationsQuery = query(
+    const [endReached, setEndReached] = useState(false);
+    const [documentsNeeded, setDocumentsNeeded] = useState(initialNumberOfConversations);
+    const fetchMoreConversations = useCallback(() => {
+        if(!endReached) {
+            setConversationsAreLoading(true);
+            setDocumentsNeeded(documentsNeeded => {
+                return (documentsNeeded + initialNumberOfConversations);
+            })
+        }
+    }, [endReached])
+
+    const conversationsRef = useMemo(() => collection(firestore, 'conversations').withConverter(conversationConverter), []);
+    const conversationsQuery = useMemo(() => query(
         conversationsRef, 
         where("participants", "array-contains", currentUserId),
-        orderBy('updatedAt', 'desc'),
-        limit(documentsNeeded)
-    );
-    const [chats, loading, error] = useCollectionData(conversationsQuery);
-    //const conversations = chats ?? [];
+        orderBy('updatedAt', 'desc')        
+    ), []);
 
-    if(!chats)
-        return <EmptyProvider user={user} children={children} />
+    const [conversations, setConversations] = useState<ConversationObject[]>([]);
 
-    return <CompleteProvider user={user} children={children} conversations={chats} fetchMoreConversations={fetchMoreConversations} />
+    useEffect(() => {
+        let subscriber = onSnapshot(
+            query(conversationsQuery, limit(documentsNeeded)),
+            (snapshot) => {
+                let results = snapshot.docs.map(doc => doc.data());
+                setConversations(results)
+                setEndReached(results.length < documentsNeeded)
+                setConversationsAreLoading(false)
+            }
+        )
+
+        return () => {
+            subscriber()
+        }
+    }, [documentsNeeded])
+
+    return (
+        <ProviderComponent user={user} 
+            conversationPairs={conversations.map(conv => getSortedKey(conv.participants[0], conv.participants[1]))} 
+            conversations={conversations}
+            conversationsAreLoading={conversationsAreLoading}
+            fetchMoreConversations={fetchMoreConversations} 
+        >
+            {children}
+        </ProviderComponent>
+    )
 } 
+
 
 export const MessagesContextProvider = ({ children }: PropsWithChildren) => {
     const { user } = useAuthContext();
     if(!user) 
         return <>{children}</>
 
-    return <AuthenticatedProvider children={children} user={user} />
+    return (
+        <AuthenticatedProvider user={user}>
+            {children}
+        </AuthenticatedProvider>
+    )
 }
 
 export default MessagesContext;
