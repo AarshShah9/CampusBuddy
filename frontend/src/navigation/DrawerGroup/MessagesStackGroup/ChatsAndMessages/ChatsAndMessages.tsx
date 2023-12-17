@@ -4,6 +4,7 @@ import ChatScreenStack from './ChatScreenStack/ChatScreenStack';
 import { useCallback, useState } from 'react';
 import { MessagesNavigationContextProvider } from '~/contexts/messagesNavigationContext';
 import { ChatScreenParams } from '~/types/Chat';
+import { Dimensions } from 'react-native';
 
 const TopTabs = createMaterialTopTabNavigator();
 
@@ -18,7 +19,10 @@ export default function ChatsAndMessages() {
 
     return (
         <MessagesNavigationContextProvider values={{ chatActive, activateScreen, deactivateScreen }}>
-            <TopTabs.Navigator screenOptions={{ tabBarStyle: { display: 'none' } }}>
+            <TopTabs.Navigator 
+                initialLayout={{ width: Dimensions.get('window').width }}
+                screenOptions={{ tabBarStyle: { display: 'none' } }}
+            >
                 <TopTabs.Screen name="ChatListStack" component={ChatListStack} />
                 {!!chatActive && <TopTabs.Screen name="ChatScreenStack" component={ChatScreenStack} />}
             </TopTabs.Navigator>
