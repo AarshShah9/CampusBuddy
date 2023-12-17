@@ -30,12 +30,10 @@ const firestore = getFirestore(app);
 
 type OpenedConversation = { 
     status: 'opened', 
-    messagesRef: CollectionReference<MessageObject, FirestoreMessageObject>,
     messagesQuery: Query<MessageObject, FirestoreMessageObject>,
     listener: any,
     messages: MessageObject[],
-    endReached: boolean,
-    firstRender: boolean
+    endReached: boolean
 }
 type OpenedConversations = { 
     [key: string]: (OpenedConversation | { status: 'not-opened' })  
@@ -106,6 +104,8 @@ type ProviderProps = PropsWithChildren<{
 const ProviderComponent = ({ children, user, conversations, conversationPairs, fetchMoreConversations, conversationsAreLoading }: ProviderProps) => {
     const { id : currentUserId } = user;
 
+    const messagesRef = useMemo(() => collection(firestore, 'messages').withConverter(messageConverter), []);
+    
     const [openedConversations, setOpenedConversations] = useState<OpenedConversations>({});
 
     const updateOpenedConversations = useCallback((conversations: string[]) => {
@@ -163,11 +163,11 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
 
         if(!conversation.endReached) {
             const { messages } = conversation;
-
+    
             const results = await getDocs(
                 query(
                     conversation.messagesQuery, 
-                    startAfter(messages[messages.length - 1]),
+                    startAfter(messages[messages.length - 1].createdAt),
                     limit(initialNumberOfMessages)
                 )
             )
@@ -179,15 +179,13 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
 
                 let newConversationObject: OpenedConversation = {
                     status: 'opened',
-                    messagesRef: oldConversationObject.messagesRef,
                     messagesQuery: oldConversationObject.messagesQuery,
                     listener: oldConversationObject.listener,
                     messages: [
                         ...oldConversationObject.messages,
                         ...nextMessages
                     ],
-                    endReached: results.docs.length < initialNumberOfMessages,
-                    firstRender: false
+                    endReached: results.docs.length < initialNumberOfMessages
                 }
                 newOpenedConversations[conversationKey] = newConversationObject;
                 return newOpenedConversations;
@@ -203,7 +201,6 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
             setOpenedConversations(old => {
                 let newOpenedConversations = {...old};
                 
-                const messagesRef = collection(firestore, 'messages').withConverter(messageConverter);
                 const messagesQuery = query(
                     messagesRef, 
                     or(
@@ -215,7 +212,6 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
 
                 let newConversationObject: OpenedConversation = {
                     status: 'opened',
-                    messagesRef,
                     messagesQuery,
                     listener: onSnapshot(
                         query(messagesQuery, limit(initialNumberOfMessages)), 
@@ -224,35 +220,26 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                                 let newOpenedConversations = {...old};
                                 const oldConversationObject = old[conversationKey] as OpenedConversation;
                                 
-                                const items = oldConversationObject.firstRender ? 
-                                snapshot.docs.map(item => item.data()) : 
-                                snapshot.docChanges().map(item => item.doc.data());
-                                
-                                // Still in testing so these logs will be used again soon
-                                //console.log('how many docs in old conv messages', oldConversationObject.messages.length)
-                                //console.log('how many docs in snap docs', snapshot.docs.length)
-                                //console.log('how many docs in snap doc changes', snapshot.docChanges().length)
-                                //console.log('how many docs in items', items.length)
+                                const items = snapshot.docChanges()
+                                .filter(item => item.type === 'added')
+                                .map(item => item.doc.data());
 
                                 newOpenedConversations[conversationKey] = {
                                     status: 'opened',
                                     messagesQuery: oldConversationObject.messagesQuery,
-                                    messagesRef: oldConversationObject.messagesRef,
                                     listener: oldConversationObject.listener,
                                     messages: [
                                         ...items,
                                         ...oldConversationObject.messages
                                     ],
-                                    endReached: snapshot.docs.length < initialNumberOfMessages,
-                                    firstRender: false
+                                    endReached: oldConversationObject.endReached
                                 };
                                 return newOpenedConversations
                             });
                         }
                     ),
                     messages: [],
-                    endReached: false,
-                    firstRender: true
+                    endReached: false
                 };
                 newOpenedConversations[conversationKey] = newConversationObject;
                 return newOpenedConversations;

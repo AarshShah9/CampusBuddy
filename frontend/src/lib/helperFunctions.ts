@@ -6,6 +6,6 @@ export const getSortedKey = (arg1: string, arg2: string) => {
     return [arg1, arg2].sort().join('');
 }
 
-export const initialNumberOfConversations = 10;
+export const initialNumberOfConversations = 15;
 
 export const initialNumberOfMessages = 15;
