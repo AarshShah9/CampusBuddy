@@ -7,12 +7,11 @@ import useMessagesContext from "~/hooks/useMessagesContext";
 import ListLoader from "~/components/ListLoader";
 import { useCallback, useState } from "react";
 import { initialNumberOfConversations } from "~/lib/helperFunctions";
+import { ThemedTextInput } from "~/components/ThemedComponents";
 
 const CoversationsArea = () => {
     const { conversations, user, fetchMoreConversations, conversationsAreLoading } = useMessagesContext();
     const { id : currentUserId } = user;
-
-    //const [isLoadingMoreData, setIsLoadingMoreData] = useState(conversationsAreLoading);
 
     const [moreDataFetchingAllowed, setMoreDataFetchingAllowed] = useState(false);
     const allowMoreDataFetching = useCallback(() => {
@@ -56,7 +55,7 @@ export default function Messages() {
                 <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
                     <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
                         <AntDesign name="search1" size={20} color="grey" />
-                        <TextInput 
+                        <ThemedTextInput 
                             placeholder='Search Chats'
                             placeholderTextColor='grey'
                             style={styles.searchBarInput}
@@ -93,8 +92,7 @@ const styles = StyleSheet.create({
         height: '90%',
         marginLeft: 5,
         fontSize: 18,
-        flex: 0.98,
-        color: 'white'
+        flex: 0.98
     },
     chatListArea: { 
         flex: 1

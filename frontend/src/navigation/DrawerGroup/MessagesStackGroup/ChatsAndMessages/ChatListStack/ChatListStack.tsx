@@ -10,21 +10,17 @@ export default function ChatListStack() {
     const { theme } = useThemeContext();
     return (
         <Stack.Navigator
-            screenOptions={{
+            screenOptions={({ navigation }) => ({
+                title: 'Messages',
+                headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                headerRight: () => <UserIcon />,
                 headerTintColor: theme.colors.onSurfaceVariant,
                 headerStyle: {
                     backgroundColor: theme.colors.surfaceVariant
                 }
-            }}
+            })}
         >
-            <Stack.Screen 
-                name="ChatList" component={Messages} 
-                options={({ navigation }) => ({ 
-                    title: 'Messages',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
-                    headerRight: () => <UserIcon />,
-                })}
-            />
+            <Stack.Screen name="ChatList" component={Messages} />
         </Stack.Navigator>
     )
 }
