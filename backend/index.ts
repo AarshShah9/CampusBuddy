@@ -6,9 +6,11 @@ import cookieParser from 'cookie-parser';
 // importing routes
 import student from './routes/user.routes';
 import school from './routes/school.routes';
+import event from './routes/event.routes';
 
 // importing middleware
 import { verifyAuthentication } from './middleware/verifyAuth';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 const result = dotenv.config();
@@ -21,20 +23,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use((req: Request, res: Response, next: NextFunction) => {
-    res.header("Content-Type", "application/json");
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Content-Type', 'application/json');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept'
+    );
     next();
 });
 
 // routes
 app.use('/api', student);
 app.use('/api', school);
+app.use('/api/event', event);
 
 app.get('/Test', (req: Request, res: Response) => {
-    console.log("The backend is hit")
-    res.json({message: 'Hello World!'});
+    console.log('The backend is hit');
+    res.json({ message: 'Hello World!' });
 });
+
+// Global error handling middleware - Must be the last middleware
+app.use(errorHandler);
 
 // server start
 const server = app.listen(port, ip, () => {
@@ -42,4 +51,4 @@ const server = app.listen(port, ip, () => {
 });
 
 export default app;
-export {server};
+export { server };
