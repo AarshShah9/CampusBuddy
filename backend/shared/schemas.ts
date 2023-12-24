@@ -31,6 +31,19 @@ export const EventUpdateSchema = generatedSchemas.EventSchema.partial();
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 
 ///////////////////////////////
+// FILE SCHEMAS
+///////////////////////////////
+
+export const FileCreateSchema = generatedSchemas.FileSchema.omit({
+    id: true,
+    createdAt: true,
+    uploadedBy: true,
+    filePath: true, // path to cloud storage
+});
+
+export type FileCreateInput = z.infer<typeof FileCreateSchema>;
+
+///////////////////////////////
 // ORGANIZATION SCHEMAS
 ///////////////////////////////
 // Create a new schema based on OrganizationSchema, omitting id and createdAt
@@ -41,3 +54,19 @@ export const OrganizationCreateSchema =
     });
 
 export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
+
+/////////////////////////////// s
+// UTILITY SCHEMAS
+///////////////////////////////
+
+// Schema for validating an ID integer parameter
+export const IdParamSchema = z.object({
+    id: z.coerce
+        .number({
+            invalid_type_error:
+                'Invalid Id format. Must be a non-negative integer.',
+        })
+        .int()
+        .positive()
+        .safe(),
+});
