@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
+import { zodStringToNumberOrNull, BooleanSchema } from '../../../utils/utils'
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
@@ -16,13 +17,13 @@ export const SchoolScalarFieldEnumSchema = z.enum(['id','name','domain']);
 
 export const StudentScalarFieldEnumSchema = z.enum(['id','schoolID','email','username','name','password','otp','jwt','status']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','username','firstName','lastName','email','password','pictureUrl','yearOfStudy','schoolId','isVerified','otp','jwt','status']);
+export const UserScalarFieldEnumSchema = z.enum(['id','username','firstName','lastName','email','password','yearOfStudy','schoolId','isVerified','profilePicId','otp','jwt','status']);
 
-export const EventScalarFieldEnumSchema = z.enum(['id','userId','organizationId','createdAt','title','description','location','startDate','endDate','mediaUrl','isPublic']);
+export const EventScalarFieldEnumSchema = z.enum(['id','userId','organizationId','createdAt','title','description','location','startTime','endTime','isPublic','status','imageId']);
 
 export const UserEventResponseScalarFieldEnumSchema = z.enum(['userId','eventId','participationStatus']);
 
-export const PostScalarFieldEnumSchema = z.enum(['id','userId','organizationId','createdAt','title','text','mediaUrl','public']);
+export const PostScalarFieldEnumSchema = z.enum(['id','userId','imageId','organizationId','createdAt','title','text','public']);
 
 export const CommentScalarFieldEnumSchema = z.enum(['id','userId','postId','createdAt','text']);
 
@@ -48,9 +49,15 @@ export const PostTagScalarFieldEnumSchema = z.enum(['postId','topicId']);
 
 export const TopicSubscriptionScalarFieldEnumSchema = z.enum(['userId','topicId']);
 
+export const FileScalarFieldEnumSchema = z.enum(['id','uploadedBy','createdAt','fileName','fileType','fileSize','filePath']);
+
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const NullsOrderSchema = z.enum(['first','last']);
+
+export const EventStatusSchema = z.enum(['Verified','NonVerified']);
+
+export type EventStatusType = `${z.infer<typeof EventStatusSchema>}`
 
 export const ParticipationStatusSchema = z.enum(['Going','Interested','NotInterested']);
 
@@ -63,6 +70,10 @@ export type OrganizationStatusType = `${z.infer<typeof OrganizationStatusSchema>
 export const UserRoleSchema = z.enum(['Owner','Admin','Moderator','Member']);
 
 export type UserRoleType = `${z.infer<typeof UserRoleSchema>}`
+
+export const AppPermissionNameSchema = z.enum(['CREATE_EVENTS','MANAGE_EVENTS','CREATE_POSTS','MANAGE_POSTS','MANAGE_MEMBERS','APPROVE_MEMBER_REQUESTS','VIEW_ANALYTICS','MANAGE_ORGANIZATION','DELETE_ORGANIZATION']);
+
+export type AppPermissionNameType = `${z.infer<typeof AppPermissionNameSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -107,12 +118,12 @@ export const UserSchema = z.object({
   username: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  email: z.string(),
+  email: z.string().email(),
   password: z.string(),
-  pictureUrl: z.string().nullable(),
   yearOfStudy: z.number().int(),
   schoolId: z.number().int(),
   isVerified: z.boolean(),
+  profilePicId: z.number().int().nullable(),
   otp: z.string(),
   jwt: z.string(),
   status: z.boolean(),
@@ -125,17 +136,18 @@ export type User = z.infer<typeof UserSchema>
 /////////////////////////////////////////
 
 export const EventSchema = z.object({
+  status: EventStatusSchema,
   id: z.number().int(),
   userId: z.number().int(),
-  organizationId: z.number().int().nullable(),
+  organizationId: zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()).nullable(),
   createdAt: z.coerce.date(),
-  title: z.string(),
-  description: z.string().max(255).nullable(),
-  location: z.string(),
-  startDate: z.coerce.date().refine((value) => value > new Date(), { message: 'Start date must be in the future', }),
-  endDate: z.coerce.date(),
-  mediaUrl: z.string().nullable(),
-  isPublic: z.boolean(),
+  title: z.string().min(3).max(255),
+  description: z.string().min(3).max(255).nullable(),
+  location: z.string().min(3).max(255),
+  startTime: z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}).refine((value) => value > new Date(), { message: 'Start time must be in the future', }),
+  endTime: z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}),
+  isPublic: BooleanSchema,
+  imageId: z.number().int().nullable(),
 })
 
 export type Event = z.infer<typeof EventSchema>
@@ -144,7 +156,7 @@ export type Event = z.infer<typeof EventSchema>
 // EVENT CUSTOM VALIDATORS SCHEMA
 /////////////////////////////////////////
 
-export const EventCustomValidatorsSchema = EventSchema.refine((data) => data.endDate > data.startDate, { message: 'End date cannot be earlier than start date.', path: ['endDate'], })
+export const EventCustomValidatorsSchema = EventSchema
 
 export type EventCustomValidators = z.infer<typeof EventCustomValidatorsSchema>
 
@@ -167,11 +179,11 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>
 export const PostSchema = z.object({
   id: z.number().int(),
   userId: z.number().int(),
+  imageId: z.number().int().nullable(),
   organizationId: z.number().int().nullable(),
   createdAt: z.coerce.date(),
   title: z.string(),
   text: z.string().nullable(),
-  mediaUrl: z.string().nullable(),
   public: z.boolean(),
 })
 
@@ -245,8 +257,8 @@ export type OrganizationRolePermission = z.infer<typeof OrganizationRolePermissi
 /////////////////////////////////////////
 
 export const PermissionSchema = z.object({
+  permissionName: AppPermissionNameSchema,
   id: z.number().int(),
-  permissionName: z.string(),
 })
 
 export type Permission = z.infer<typeof PermissionSchema>
@@ -318,3 +330,19 @@ export const TopicSubscriptionSchema = z.object({
 })
 
 export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>
+
+/////////////////////////////////////////
+// FILE SCHEMA
+/////////////////////////////////////////
+
+export const FileSchema = z.object({
+  id: z.number().int(),
+  uploadedBy: z.number().int(),
+  createdAt: z.coerce.date(),
+  fileName: z.string(),
+  fileType: z.string(),
+  fileSize: z.number().int(),
+  filePath: z.string(),
+})
+
+export type File = z.infer<typeof FileSchema>

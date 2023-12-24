@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError';
 import { ZodError } from 'zod';
+import multer from 'multer';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export const errorHandler = (
@@ -38,6 +39,14 @@ export const errorHandler = (
         return res.status(400).json({
             message: 'Zod Validation error',
             details: formattedErrors,
+            stack,
+        });
+    }
+
+    // Handle multer errors, can occur when uploading files
+    if (error instanceof multer.MulterError) {
+        return res.status(400).json({
+            message: error.message,
             stack,
         });
     }
