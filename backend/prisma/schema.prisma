@@ -14,9 +14,10 @@ datasource db {
 // zod-prisma-types generator
 // Generates zod schemas from prisma models
 generator zod {
-  provider                      = "zod-prisma-types"
-  output                        = "./generated/zod" // the directory where generated zod schemas will be saved
-  createInputTypes              = false // default is true
+  provider         = "zod-prisma-types"
+  output           = "./generated/zod" // the directory where generated zod schemas will be saved
+  createInputTypes = false // default is true
+  coerceDate       = true
   // useTypeAssertions             = true // circumvent type system to fix typescript error with zod versions >3.21.1
 }
 
@@ -30,34 +31,39 @@ model School {
   @@map("school")
 }
 
-
 model Student {
-  id        Int     @id @default(autoincrement())
-  school    School  @relation(fields: [schoolID], references: [id])
-  schoolID  Int
-  email     String
-  username  String
-  name      String
-  password  String 
-  otp       String
-  jwt       String
-  status    Boolean
+  id       Int     @id @default(autoincrement())
+  school   School  @relation(fields: [schoolID], references: [id])
+  schoolID Int
+  email    String
+  username String
+  name     String
+  password String
+  otp      String
+  jwt      String
+  status   Boolean
 
   @@index([schoolID])
+  @@map("student")
 }
+
+// model 
 
 model User {
   id                Int                    @id @default(autoincrement())
   username          String                 @unique
   firstName         String                 @map("first_name")
   lastName          String                 @map("last_name")
+  /// @zod.custom.use(z.string().email())
   email             String                 @unique
   password          String                 @map("password")
-  pictureUrl        String?                @map("picture_url")
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
   isVerified        Boolean                @default(false) @map("is_verified")
+  profilePicId      Int?                   @unique @map("profile_pic_id")
   school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  profilePic        File?                  @relation(fields: [profilePicId], references: [id])
+  uploadedFiles     File[]                 @relation(name: "UserUploads")
   events            Event[]
   UserEventResponse UserEventResponse[]
   posts             Post[]
@@ -65,40 +71,51 @@ model User {
   organizationRoles UserOrganizationRole[]
   enrollments       Enrollment[]
   subscriptions     TopicSubscription[]
+  //   uploads           FileUpload[]
 
-  otp               String
-  jwt               String
-  status            Boolean
+  otp    String
+  jwt    String
+  status Boolean
 
   @@index([schoolId])
   @@map("user")
 }
 
-/// @zod.refine((data) => data.endDate > data.startDate, { message: 'End date cannot be earlier than start date.', path: ['endDate'], })
+/// @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '../../../utils/utils'"])
 model Event {
   id             Int                 @id @default(autoincrement())
   userId         Int                 @map("user_id")
-  /// @zod.number.int()
+  /// @zod.custom.use(zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()))
   organizationId Int?                @map("organization_id")
-  createdAt      DateTime            @default(now()) @map("created_at")
-  // @zod.string.min(3).max(255)
+  createdAt      DateTime            @unique @default(now()) @map("created_at")
+  /// @zod.string.min(3).max(255)
   title          String              @db.VarChar(255)
-  /// @zod.string.max(255)
+  /// @zod.string.min(3).max(255)
   description    String?             @db.VarChar(255)
+  /// @zod.string.min(3).max(255)
   location       String
-  /// @zod.custom.use(z.coerce.date().refine((value) => value > new Date(), { message: 'Start date must be in the future', }))
-  startDate      DateTime            @map("start_date")
-  endDate        DateTime            @map("end_date")
-  mediaUrl       String?             @map("media_url")
+  /// @zod.custom.use(z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}).refine((value) => value > new Date(), { message: 'Start time must be in the future', }))
+  startTime      DateTime            @map("start_time")
+  /// @zod.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",})
+  endTime        DateTime            @map("end_time")
+  /// @zod.custom.use(BooleanSchema)
   isPublic       Boolean             @map("is_public")
+  status         EventStatus         
+  imageId        Int?                @unique @map("image_id")
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  file           File?               @relation(fields: [imageId], references: [id])
   eventTags      EventTag[]
   eventResponses UserEventResponse[]
 
   @@index([userId])
   @@index([organizationId])
   @@map("event")
+}
+
+enum EventStatus {
+  Verified
+  NonVerified
 }
 
 enum ParticipationStatus {
@@ -121,18 +138,21 @@ model UserEventResponse {
 }
 
 model Post {
-  id             Int            @id @default(autoincrement())
-  userId         Int            @map("user_id")
-  organizationId Int?           @map("organization_id")
-  createdAt      DateTime       @default(now()) @map("created_at")
+  id             Int           @id @default(autoincrement())
+  userId         Int           @map("user_id")
+  imageId        Int?          @unique @map("image_id")
+  organizationId Int?          @map("organization_id")
+  createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
   text           String?
-  mediaUrl       String?        @map("media_url")
-  public         Boolean        @default(true)
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  comments  Comment[]
-  postTags  PostTag[]
+  public         Boolean       @default(true)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  file           File?         @relation(fields: [imageId], references: [id])
+
+  comments Comment[]
+  postTags PostTag[]
+
   @@index([userId])
   @@index([organizationId])
   @@map("post")
@@ -144,8 +164,9 @@ model Comment {
   userId    Int      @map("user_id")
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int      @map("post_id")
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @unique @default(now()) @map("created_at")
   text      String
+
   @@index([userId])
   @@index([postId])
   @@map("comment")
@@ -160,7 +181,7 @@ model Organization {
   id                          Int                          @id @default(autoincrement())
   organizationName            String                       @unique @map("organization_name")
   description                 String?
-  createdAt                   DateTime                     @default(now()) @map("created_at")
+  createdAt                   DateTime                     @unique @default(now()) @map("created_at")
   status                      OrganizationStatus           @default(Pending)
   userOrganizationRoles       UserOrganizationRole[]
   userOrganizationPermissions OrganizationRolePermission[]
@@ -171,12 +192,12 @@ model Organization {
 }
 
 model UserOrganizationRole {
-  userId         Int           @map("user_id")
-  organizationId Int           @map("organization_id")
-  roleId         Int           @map("role_id")
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  userId         Int          @map("user_id")
+  organizationId Int          @map("organization_id")
+  roleId         Int          @map("role_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, organizationId, roleId])
   @@index([userId])
@@ -201,14 +222,13 @@ model Role {
   @@map("role")
 }
 
-
 model OrganizationRolePermission {
-  organizationId Int           @map("organization_id")
-  roleId         Int           @map("role_id")
-  permissionId   Int           @map("permission_id")
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission     Permission    @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  organizationId Int          @map("organization_id")
+  roleId         Int          @map("role_id")
+  permissionId   Int          @map("permission_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission     Permission   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([organizationId, roleId, permissionId])
   @@index([organizationId])
@@ -217,20 +237,33 @@ model OrganizationRolePermission {
   @@map("organization_role_permission")
 }
 
+// many of these permissions may not apply to our application
+enum AppPermissionName {
+  CREATE_EVENTS
+  MANAGE_EVENTS // edit and cancel event
+  CREATE_POSTS
+  MANAGE_POSTS // remove user posts
+  MANAGE_MEMBERS // maybe ban/unban users?
+  APPROVE_MEMBER_REQUESTS // not sure if we need this 
+  VIEW_ANALYTICS // view details about the organization
+  MANAGE_ORGANIZATION // edit org name, description, image, permissions
+  DELETE_ORGANIZATION
+}
+
 model Permission {
   id                          Int                          @id @default(autoincrement())
-  permissionName              String                       @map("permission_name")
+  permissionName              AppPermissionName            @map("permission_name")
   organizationRolePermissions OrganizationRolePermission[]
 
   @@map("permission")
 }
 
 model Enrollment {
-  programId  Int      @map("program_id")
-  userId     Int      @map("user_id")
-  degreeType String   @map("degree_type")
-  program    Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId  Int     @map("program_id")
+  userId     Int     @map("user_id")
+  degreeType String  @map("degree_type")
+  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([programId, userId])
   @@index([programId])
@@ -258,10 +291,10 @@ model Topic {
 }
 
 model EventTag {
-  eventId Int    @map("event_id")
-  topicId Int    @map("topic_id")
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  eventId Int   @map("event_id")
+  topicId Int   @map("topic_id")
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([eventId, topicId])
   @@index([eventId])
@@ -270,10 +303,10 @@ model EventTag {
 }
 
 model PostTag {
-  postId  Int    @map("post_id")
-  topicId Int    @map("topic_id")
-  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  postId  Int   @map("post_id")
+  topicId Int   @map("topic_id")
+  post    Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([postId, topicId])
   @@index([postId])
@@ -292,3 +325,22 @@ model TopicSubscription {
   @@index([topicId])
   @@map("topic_subscription")
 }
+
+model File {
+  id         Int      @id @default(autoincrement())
+  uploadedBy Int      @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  fileName   String   @map("file_name")
+  fileType   String   @map("file_type")
+  fileSize   Int      @map("file_size") // file size in bytes
+  filePath   String   @map("file_path") // path to the stored file
+  event      Event?
+  user       User?
+  post       Post?
+  uploader   User     @relation(fields: [uploadedBy], references: [id], name: "UserUploads", onDelete: NoAction, onUpdate: NoAction) // cyclic relation to user
+
+  @@index([uploadedBy])
+  @@map("file")
+}
+
+
