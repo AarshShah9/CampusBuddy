@@ -21,7 +21,7 @@ export default function SettingsScreenStack() {
                 name="SettingsScreen" component={TopTabsGroup} 
                 options={({ navigation }) => ({ 
                     title: 'Settings',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerLeft: () => <DrawerIcon />,
                     headerRight: () => <UserIcon />,
                 })}
             />

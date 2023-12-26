@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native";
 import { ThemedText } from '~/components/ThemedComponents';
@@ -12,7 +13,7 @@ type Props = ChatListItem
 
 export default function ConversationItem({ userId, lastMessage, numUnreadMessages }: Props) {
     const { openConversation } = useMessagesContext();
-    const { activateScreen } = useMessagesNavigationContext();
+    const { navigate } = useNavigation<any>();
     const { theme } = useThemeContext();
 
     const [fetchedData, setFetchedData] = useState({
@@ -28,7 +29,7 @@ export default function ConversationItem({ userId, lastMessage, numUnreadMessage
     }, [userId])
     
     const onPressHandler = () => {
-        activateScreen({ userId, userName, icon })
+        navigate('ChatScreen', { userId, userName, icon })
         openConversation(userId);
     }
 

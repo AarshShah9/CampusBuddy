@@ -21,7 +21,7 @@ export default function HomeScreenStack() {
                 name="HomeScreen" component={Home} 
                 options={({ navigation }) => ({ 
                     title: 'Home',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerLeft: () => <DrawerIcon />,
                     headerRight: () => <UserIcon />,
                 })} 
             />
