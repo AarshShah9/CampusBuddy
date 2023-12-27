@@ -34,8 +34,8 @@ const CoversationsArea = () => {
                     renderItem={({ item }) => 
                         <ConversationItem
                             userId={item.participants.filter(id => id !== currentUserId)[0]}
-                            lastMessage={item.lastMessage}
-                            numUnreadMessages={item.numUnreadMessages}
+                            lastMessage={item.lastMessage} timeUpdated={item.updatedAt}
+                            unreadMessages={item.unreadMessages}
                         />
                     } 
                     onEndReached={getMoreConversations}
@@ -46,22 +46,34 @@ const CoversationsArea = () => {
     )
 }
 
-export default function Messages() {    
+
+const SearchArea = () => {
     const { theme } = useThemeContext();
 
+    const { filterWord, setFilterWord } = useMessagesContext();
+
+    return (
+        <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
+            <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
+                <AntDesign name="search1" size={20} color="grey" />
+                <ThemedTextInput 
+                    placeholder='Search Chats'
+                    placeholderTextColor='grey'
+                    style={styles.searchBarInput}
+                    value={filterWord}
+                    onChangeText={(text) => setFilterWord(text)}
+                />
+            </View>
+        </View>
+    )
+}
+
+
+export default function Chats() {    
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={{ flex: 1 }}>
-                <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
-                    <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
-                        <AntDesign name="search1" size={20} color="grey" />
-                        <ThemedTextInput 
-                            placeholder='Search Chats'
-                            placeholderTextColor='grey'
-                            style={styles.searchBarInput}
-                        />
-                    </View>
-                </View>
+                <SearchArea />
                 <CoversationsArea />
             </View>
         </TouchableWithoutFeedback>

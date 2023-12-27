@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { 
     View, StyleSheet, TextInput, KeyboardAvoidingView, Platform,
     Keyboard, TouchableOpacity, FlatList } from 'react-native';
@@ -13,8 +13,8 @@ import { ActivityIndicator } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 
 
-const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
-    const { user, fetchMoreMessages, getConversation } = useMessagesContext();
+function ListArea ({ otherEndUserId }: { otherEndUserId: string }) {
+    const { user, fetchMoreMessages, getConversation, updateMessagesReadStatus } = useMessagesContext();
     
     const { id : currentUserId } = user;
 
@@ -22,12 +22,16 @@ const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
     
     if(conversation.status === 'not-opened')
         return (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <ActivityIndicator size={'large'}/>
             </View>
         )
 
     const { messages } = conversation;
+
+    useEffect(() => {
+        updateMessagesReadStatus(otherEndUserId)
+    }, [messages])
 
     const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
 
@@ -72,7 +76,7 @@ const ListArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
 }
 
 
-const TypingArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
+function TypingArea ({ otherEndUserId }: { otherEndUserId: string }) {
     const { theme, inDarkMode } = useThemeContext();
     const themedTextInputStyle = inDarkMode ? { 
         backgroundColor: 'grey',
@@ -111,9 +115,7 @@ const TypingArea = ({ otherEndUserId }: { otherEndUserId: string }) => {
 }
 
 
-export default function ChatsComponent() {
-    const { params: { userId } } = useRoute<any>();
-    
+function ChatComponent({ otherEndUserId }: { otherEndUserId: string }) {    
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -122,12 +124,22 @@ export default function ChatsComponent() {
         >
             
                 <View style={{ flex: 1 }}>
-                    <ListArea otherEndUserId={userId} />             
-                    <TypingArea otherEndUserId={userId} />
+                    <ListArea otherEndUserId={otherEndUserId} />             
+                    <TypingArea otherEndUserId={otherEndUserId} />
                 </View>
             
         </KeyboardAvoidingView>
     );
+}
+
+
+export default function ChatScreen() {
+    const { params } = useRoute<any>();
+
+    if(params && params.userId)
+        return <ChatComponent otherEndUserId={params.userId} />;
+
+    return null
 }
 
 

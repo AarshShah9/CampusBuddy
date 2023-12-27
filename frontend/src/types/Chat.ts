@@ -15,7 +15,7 @@ export type MessageObject = {
         content: string 
     },
     createdAt: Timestamp,
-    timeRead?: Timestamp
+    timeRead: Timestamp | null
 }
 export type FirestoreMessageObject = {  
     senderId: string, 
@@ -25,25 +25,26 @@ export type FirestoreMessageObject = {
         content: string 
     },
     createdAt: Timestamp
-    timeRead?: Timestamp
+    timeRead: Timestamp | null
 }
 export type ConversationObject = { 
     id: string, 
-    participants: string[] 
-    numUnreadMessages: number, 
+    participants: string[],
     lastMessage: string,
+    unreadMessages: {
+        firstParticipant: number,
+        secondParticipant: number
+    },
     createdAt: Timestamp,
     updatedAt: Timestamp
 }
 export type FirestoreConversationObject = {  
-    participants: string[] 
-    numUnreadMessages: number, 
+    participants: string[],
     lastMessage: string,
+    unreadMessages: {
+        firstParticipant: number,
+        secondParticipant: number
+    },
     createdAt: Timestamp,
     updatedAt: Timestamp
-}
-export type ChatListItem = {
-    userId: string,
-    lastMessage: string,
-    numUnreadMessages: number
 }

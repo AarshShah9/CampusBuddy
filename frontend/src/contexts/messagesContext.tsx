@@ -3,18 +3,18 @@ import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { 
     FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { initializeApp } from "firebase/app";
 import { 
     getFirestore, collection, query, orderBy, FirestoreDataConverter, getDocs,
     WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, limit, 
-    FirestoreError, QuerySnapshot, DocumentData, or, onSnapshot, and, 
-    CollectionReference, Query, startAfter, Unsubscribe, updateDoc, doc, serverTimestamp, addDoc } from "firebase/firestore";
+    or, onSnapshot, and, CollectionReference, Query, startAfter, 
+    Unsubscribe, updateDoc, doc, serverTimestamp, addDoc, Timestamp, getCountFromServer } from "firebase/firestore";
 import { ConversationObject, FirestoreConversationObject, FirestoreMessageObject, MessageObject } from '~/types/Chat';
 import useAuthContext from '~/hooks/useAuthContext';
-import { useQuery } from '@tanstack/react-query';
 import { UserDataType } from '~/types/User';
-import { getSortedKey, initialNumberOfConversations, initialNumberOfMessages } from '~/lib/helperFunctions';
+import { getSortedArray, initialNumberOfConversations, initialNumberOfMessages } from '~/lib/helperFunctions';
+
+const getSortedKey = (arg1: string, arg2: string) => getSortedArray(arg1, arg2).join('')
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -28,6 +28,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
+type UnopenedConversation = { status: 'not-opened' }
+
 type OpenedConversation = { 
     status: 'opened', 
     messagesQuery: Query<MessageObject, FirestoreMessageObject>,
@@ -35,20 +37,24 @@ type OpenedConversation = {
     messages: MessageObject[],
     endReached: boolean
 }
-type OpenedConversations = { 
-    [key: string]: (OpenedConversation | { status: 'not-opened' })  
+
+type ConversationsCache = { 
+    [key: string]: (OpenedConversation | UnopenedConversation)  
 }
 
 type contextObject = { 
+    filterWord: string,
+    setFilterWord: (arg: string) => void,
     user: UserDataType,
     conversations: ConversationObject[],
     fetchMoreConversations: () => void,
     openConversation: (arg: string) => void,
-    openedConversations: OpenedConversations,
     fetchMoreMessages: (arg: string) => Promise<void>,
     conversationsAreLoading: boolean,
     createNewMessage: (otherEndUserId: string, message: string) => Promise<void>,
-    getConversation: (otherEndUserId: string) => OpenedConversation | { status: "not-opened"; }
+    getConversation: (otherEndUserId: string) => OpenedConversation | UnopenedConversation,
+    updateMessagesReadStatus: (arg: string) => void,
+    getNumberOfUnreadMessages: (arg1: string, arg2: { firstParticipant: number, secondParticipant: number }) => number
 };
 const MessagesContext = createContext<contextObject | null>(null);
 
@@ -62,13 +68,14 @@ const messageConverter: FirestoreDataConverter<MessageObject, FirestoreMessageOb
       options: SnapshotOptions
     ) {
         const data = snapshot.data(options);
-        const { senderId, receiverId, message, createdAt } = data;
+        const { senderId, receiverId, message, createdAt, timeRead } = data;
         return {
             id: snapshot.id,
             senderId, 
             receiverId,
             message,
-            createdAt
+            createdAt,
+            timeRead,
         };
     },
 };
@@ -83,11 +90,11 @@ const conversationConverter: FirestoreDataConverter<ConversationObject, Firestor
       options: SnapshotOptions
     ) {
         const data = snapshot.data(options);
-        const { participants, numUnreadMessages, lastMessage, createdAt, updatedAt } = data;
+        const { participants, unreadMessages, lastMessage, createdAt, updatedAt } = data;
         return {
             id: snapshot.id,
             participants,
-            numUnreadMessages, 
+            unreadMessages, 
             lastMessage,
             createdAt,
             updatedAt
@@ -95,6 +102,10 @@ const conversationConverter: FirestoreDataConverter<ConversationObject, Firestor
     },
 };
 
+const currentIsFirstParticipant = (currentUserId: string, otherEndUserId: string) => {
+    let result = getSortedArray(currentUserId, otherEndUserId)[0];
+    return (result === currentUserId)
+}
 
 type ProviderProps = PropsWithChildren<{
     conversationsAreLoading: boolean,
@@ -104,15 +115,16 @@ type ProviderProps = PropsWithChildren<{
     fetchMoreConversations: () => void,
     conversationsRef: CollectionReference<ConversationObject, FirestoreConversationObject>
 }>;
-const ProviderComponent = ({ children, user, conversations, conversationPairs, fetchMoreConversations, conversationsAreLoading, conversationsRef }: ProviderProps) => {
+const ProviderComponent = (props: ProviderProps) => {
+    const { user } = props;
     const { id : currentUserId } = user;
 
     const messagesRef = useMemo(() => collection(firestore, 'messages').withConverter(messageConverter), []);
     
-    const [openedConversations, setOpenedConversations] = useState<OpenedConversations>({});
+    const [conversationsCache, setConversationsCache] = useState<ConversationsCache>({});
 
-    const updateOpenedConversations = useCallback((conversations: string[]) => {
-        let objectKeys = Object.keys(openedConversations);
+    const updateConversationsCache = useCallback((conversations: string[]) => {
+        let objectKeys = Object.keys(conversationsCache);
 
         let added = conversations.filter(convKey => !objectKeys.includes(convKey));
         let deleted = objectKeys.filter(convKey => !conversations.includes(convKey));
@@ -122,14 +134,14 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
             let fullList = [...unchanged, ...added];
 
             deleted.forEach(key => {
-                const conversation = openedConversations[key];
+                const conversation = conversationsCache[key];
                 if(conversation.status === 'opened')
                     conversation.listener();
             })
 
-            setOpenedConversations(old => {
+            setConversationsCache(old => {
                 let oldObjectKeys = Object.keys(old);
-                let newObj: OpenedConversations = {};
+                let newObj: ConversationsCache = {};
                 fullList.forEach(key => {
                     if(oldObjectKeys.includes(key))
                         newObj[key] = old[key];
@@ -140,19 +152,21 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                 return newObj;
             })
         }
-    }, [openedConversations])
+    }, [conversationsCache])
+
+    const { conversationPairs } = props;
 
     useEffect(() => {
-        updateOpenedConversations(conversationPairs);
+        updateConversationsCache(conversationPairs);
     }, [conversationPairs])
 
     const unsubscribeAllListeners = useCallback(() => {
-        Object.keys(openedConversations).forEach(key => {
-            const conversation = openedConversations[key];
+        Object.keys(conversationsCache).forEach(key => {
+            const conversation = conversationsCache[key];
             if(conversation.status === 'opened')
                 conversation.listener();
         })
-    }, [openedConversations])
+    }, [conversationsCache])
 
     useEffect(() => {
         return () => {
@@ -162,7 +176,7 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
 
     const fetchMoreMessages = useCallback(async (otherEndUserId: string) => {
         const conversationKey = getSortedKey(currentUserId, otherEndUserId);
-        const conversation = openedConversations[conversationKey] as OpenedConversation;
+        const conversation = conversationsCache[conversationKey] as OpenedConversation;
 
         if(!conversation.endReached) {
             const { messages } = conversation;
@@ -176,8 +190,8 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
             )
 
             const nextMessages = results.docs.map(doc => doc.data());
-            setOpenedConversations(old => {
-                let newOpenedConversations = {...old};
+            setConversationsCache(old => {
+                let newConversationsCache = {...old};
                 const oldConversationObject = old[conversationKey] as OpenedConversation;
 
                 let newConversationObject: OpenedConversation = {
@@ -190,19 +204,19 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                     ],
                     endReached: results.docs.length < initialNumberOfMessages
                 }
-                newOpenedConversations[conversationKey] = newConversationObject;
-                return newOpenedConversations;
+                newConversationsCache[conversationKey] = newConversationObject;
+                return newConversationsCache;
             })
         }
-    }, [currentUserId, openedConversations, setOpenedConversations])
+    }, [currentUserId, conversationsCache, setConversationsCache])
 
     const openConversation = useCallback((otherEndUserId: string) => {
         const conversationKey = getSortedKey(currentUserId, otherEndUserId);
-        const conversation = openedConversations[conversationKey];
+        const conversation = conversationsCache[conversationKey];
         
         if(conversation.status === 'not-opened') {
-            setOpenedConversations(old => {
-                let newOpenedConversations = {...old};
+            setConversationsCache(old => {
+                let newConversationsCache = {...old};
                 
                 const messagesQuery = query(
                     messagesRef, 
@@ -219,15 +233,15 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                     listener: onSnapshot(
                         query(messagesQuery, limit(initialNumberOfMessages)), 
                         (snapshot) => {                            
-                            setOpenedConversations(old => {
-                                let newOpenedConversations = {...old};
+                            setConversationsCache(old => {
+                                let newConversationsCache = {...old};
                                 const oldConversationObject = old[conversationKey] as OpenedConversation;
                                 
                                 const items = snapshot.docChanges()
                                 .filter(item => item.type === 'added')
                                 .map(item => item.doc.data());
 
-                                newOpenedConversations[conversationKey] = {
+                                newConversationsCache[conversationKey] = {
                                     status: 'opened',
                                     messagesQuery: oldConversationObject.messagesQuery,
                                     listener: oldConversationObject.listener,
@@ -237,23 +251,25 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                                     ],
                                     endReached: oldConversationObject.endReached
                                 };
-                                return newOpenedConversations
+                                return newConversationsCache
                             });
                         }
                     ),
                     messages: [],
                     endReached: false
                 };
-                newOpenedConversations[conversationKey] = newConversationObject;
-                return newOpenedConversations;
+                newConversationsCache[conversationKey] = newConversationObject;
+                return newConversationsCache;
             })
         }
-    }, [currentUserId, openedConversations, setOpenedConversations])
+    }, [currentUserId, conversationsCache, setConversationsCache])
 
     const getConversation = useCallback((otherEndUserId: string) => {
-        return openedConversations[getSortedKey(currentUserId, otherEndUserId)];
-    }, [openedConversations])
+        return conversationsCache[getSortedKey(currentUserId, otherEndUserId)];
+    }, [conversationsCache])
     
+    const { conversations, conversationsRef } = props;
+
     const createNewMessage = useCallback(async (otherEndUserId: string, message: string) => {
         await addDoc(messagesRef, {
             id: '',
@@ -263,38 +279,120 @@ const ProviderComponent = ({ children, user, conversations, conversationPairs, f
                 type: 'text',
                 content: message
             },
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            timeRead: null
         })
         const conversation = conversations.find(conv => {
             return (getSortedKey(conv.participants[0], conv.participants[1]) ===
             getSortedKey(currentUserId, otherEndUserId))
         })
-        if(conversation) {
-            await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
-                lastMessage: message,
-                numUnreadMessages: conversation.numUnreadMessages + 1,
-                updatedAt: serverTimestamp()
-            })
+        if(conversation) {                
+            if(currentIsFirstParticipant(currentUserId, otherEndUserId))
+                await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
+                    lastMessage: message,
+                    "unreadMessages.secondParticipant": conversation.unreadMessages.secondParticipant + 1,
+                    updatedAt: serverTimestamp()
+                })
+            else
+                await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
+                    lastMessage: message,
+                    "unreadMessages.firstParticipant": conversation.unreadMessages.firstParticipant + 1,
+                    updatedAt: serverTimestamp()
+                })
         }
         else {
             let timestamp = serverTimestamp();
-            await addDoc(conversationsRef, {
-                id: '',
-                numUnreadMessages: 1,
-                participants: [currentUserId, otherEndUserId],
-                lastMessage: message,
-                createdAt: timestamp,
-                updatedAt: timestamp
-            })
+            if(currentIsFirstParticipant(currentUserId, otherEndUserId))
+                await addDoc(conversationsRef, {
+                    id: '',
+                    unreadMessages: {
+                        firstParticipant: 0,
+                        secondParticipant: 1
+                    },
+                    participants: [currentUserId, otherEndUserId],
+                    lastMessage: message,
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                })
+            else
+                await addDoc(conversationsRef, {
+                    id: '',
+                    unreadMessages: {
+                        firstParticipant: 1,
+                        secondParticipant: 0
+                    },
+                    participants: [currentUserId, otherEndUserId],
+                    lastMessage: message,
+                    createdAt: timestamp,
+                    updatedAt: timestamp
+                })
         }
     }, [conversations])
+
+    const updateMessagesReadStatus = useCallback(async (otherEndUserId: string) => {
+        const currentTime = Timestamp.now();
+        const promises = (await getDocs(
+            query(
+                messagesRef, 
+                and(
+                    and(where("senderId", "==", otherEndUserId), where("receiverId", "==", currentUserId)),
+                    where("timeRead", '==', null)
+                )
+            )
+        )).docs.map(doc => doc.data()).map(message => 
+            updateDoc(doc(firestore, 'messages', message.id).withConverter(messageConverter), {
+                timeRead: currentTime
+            })
+        )
+
+        await Promise.all(promises).catch(err => console.error('an error occured while updating messages read status', err))
+
+        const conversation = conversations.find(conv => {
+            return (getSortedKey(conv.participants[0], conv.participants[1]) ===
+            getSortedKey(currentUserId, otherEndUserId))
+        })
+
+        if(conversation) {
+            if(currentIsFirstParticipant(currentUserId, otherEndUserId)) {
+                (conversation.unreadMessages.firstParticipant !== 0) &&
+                await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
+                    "unreadMessages.firstParticipant": 0
+                })
+            }
+            else {
+                (conversation.unreadMessages.secondParticipant !== 0) &&
+                await updateDoc(doc(firestore, 'conversations', conversation.id).withConverter(conversationConverter), {
+                    "unreadMessages.secondParticipant": 0
+                })
+            }
+        }
+    }, [currentUserId, conversations])
+
+    const getNumberOfUnreadMessages = useCallback((
+        otherEndUserId: string, 
+        unreadMessages: {
+            firstParticipant: number,
+            secondParticipant: number
+        }) => {
+            if(currentIsFirstParticipant(currentUserId, otherEndUserId))
+                return unreadMessages.firstParticipant
+            return unreadMessages.secondParticipant
+    }, [currentUserId])
+
+    const [filterWord, setFilterWord] = useState('');
+    const updateFilterWord = useCallback((arg: string) => {
+        setFilterWord(arg)
+    }, [])
+
+    const { children, fetchMoreConversations, conversationsAreLoading } = props;  
 
     return (
         <MessagesContext.Provider 
             value={{ 
                 user, conversations, fetchMoreConversations, conversationsAreLoading,
-                openConversation, openedConversations, fetchMoreMessages,
-                createNewMessage, getConversation
+                openConversation, fetchMoreMessages, updateMessagesReadStatus,
+                createNewMessage, getConversation, getNumberOfUnreadMessages,
+                filterWord, setFilterWord: updateFilterWord
             }}
         >
             {children}
