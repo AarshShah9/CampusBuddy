@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
-import bodyParser from 'body-parser';
+// import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-
+import path from 'path';
 // importing routes
 import student from './routes/user.routes';
 import school from './routes/school.routes';
@@ -19,8 +19,9 @@ const port = 3000;
 const ip = process.env.IP_ADDRESS ?? 'localhost';
 
 // middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.header('Content-Type', 'application/json');
@@ -31,11 +32,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     );
     next();
 });
+app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // file upload path
 
 // routes
 app.use('/api', student);
 app.use('/api', school);
-app.use('/api/event', event);
+app.use('/api/events', event);
 
 app.get('/Test', (req: Request, res: Response) => {
     console.log('The backend is hit');
