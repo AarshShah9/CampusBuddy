@@ -5,7 +5,7 @@ export default function useLoadingContext() {
   const contextValues = useContext(LoadingContext);
 
   if (!contextValues) 
-    throw new Error('useLoadingContext must be used within a LoadingContextProvider wrapped around the App');
+    throw new Error('useLoadingContext must be used within a LoadingContextProvider');
 
   return contextValues;
-};
+}

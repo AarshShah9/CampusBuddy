@@ -24,7 +24,7 @@ export default function Home() {
     const { navigate } = useNavigation<any>();
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
             <Button title={"Test"} onPress={testCallback} />
             <View style={styles.mockEventsContainer}>
@@ -49,7 +49,7 @@ export default function Home() {
                     </Card.Content>
                 </Card>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 

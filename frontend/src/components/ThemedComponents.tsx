@@ -1,12 +1,28 @@
-import {StyleProp, TextStyle} from 'react-native';
-import type {PropsWithChildren} from 'react';
-import {Text} from 'react-native-paper';
+import { Text, TextProps, TextInput, TextInputProps, StyleProp, TextStyle } from 'react-native';
+import useThemeContext from '~/hooks/useThemeContext';
 
-type themedText = PropsWithChildren<{
-    style?: StyleProp<TextStyle>
-}>;
-export const ThemedText = ({ style, children }: themedText) => {
+export const ThemedText = ({ style, ...props }: TextProps) => {
+    const { theme } = useThemeContext();
+
+    const stylesList: StyleProp<TextStyle> = [{ color: theme.colors.text }, style];
+
     return (
-        <Text style={style}>{children}</Text>
+        <Text 
+            {...props} 
+            style={stylesList}
+        />
+    )
+}
+
+export const ThemedTextInput = ({ style, ...props }: TextInputProps) => {
+    const { theme } = useThemeContext();
+    
+    const stylesList: StyleProp<TextStyle> = [{ color: theme.colors.text }, style];
+
+    return (
+        <TextInput
+            {...props} 
+            style={stylesList}
+        />
     )
 }

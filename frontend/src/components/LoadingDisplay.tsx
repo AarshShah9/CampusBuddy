@@ -1,4 +1,4 @@
-import {ActivityIndicator, Modal, SafeAreaView} from 'react-native';
+import {ActivityIndicator, Modal, View} from 'react-native';
 
 type Props = {
     isLoading: boolean
@@ -6,14 +6,14 @@ type Props = {
 export default function LoadingDisplay({ isLoading }: Props) {
     return (
         <Modal transparent animationType="fade" visible={isLoading}>
-            <SafeAreaView 
+            <View 
                 style={{ 
                     flex: 1, justifyContent: 'center', 
                     alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' 
                 }}
             >
                 <ActivityIndicator />
-            </SafeAreaView>
+            </View>
         </Modal>
     )
 }

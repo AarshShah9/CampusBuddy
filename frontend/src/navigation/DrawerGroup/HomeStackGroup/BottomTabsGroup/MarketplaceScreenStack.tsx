@@ -21,7 +21,7 @@ export default function MarketplaceScreenStack() {
                 name="MarketplaceScreen" component={Marketplace} 
                 options={({ navigation }) => ({ 
                     title: 'Marketplace',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerLeft: () => <DrawerIcon />,
                     headerRight: () => <UserIcon />,
                 })}
             />
