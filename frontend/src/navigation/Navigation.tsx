@@ -7,7 +7,7 @@ export default function Navigation() {
     const { theme } = useThemeContext();
     
     return (
-        <NavigationContainer theme={theme}>
+        <NavigationContainer theme={theme}> 
             <StatusBar style="auto" />
             <DrawerGroup />
         </NavigationContainer>
