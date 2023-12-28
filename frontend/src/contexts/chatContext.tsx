@@ -1,35 +1,24 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { 
-    FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET,
-    FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID } from '@env';
-import { initializeApp } from "firebase/app";
-import { 
-    getFirestore, collection, query, orderBy, FirestoreDataConverter, getDocs,
-    WithFieldValue, QueryDocumentSnapshot, SnapshotOptions, where, limit, 
-    or, onSnapshot, and, CollectionReference, Query, startAfter, 
-    Unsubscribe, updateDoc, doc, serverTimestamp, addDoc, Timestamp, getCountFromServer } from "firebase/firestore";
-import { ConversationObject, FirestoreConversationObject, FirestoreMessageObject, MessageObject } from '~/types/Chat';
-import useAuthContext from '~/hooks/useAuthContext';
+    collection, query, orderBy, getDocs, where, limit, 
+    or, onSnapshot, and, Query, startAfter, Unsubscribe, 
+    updateDoc, doc, serverTimestamp, addDoc, Timestamp
+} from "firebase/firestore";
+import { FirestoreMessageObject, MessageObject } from '~/types/Chat';
 import { UserDataType } from '~/types/User';
-import { getSortedArray, initialNumberOfConversations, initialNumberOfMessages } from '~/lib/helperFunctions';
+import { getSortedArray,  initialNumberOfMessages } from '~/lib/helperFunctions';
+import useChatsContext from '~/hooks/useChatsContext';
+import { conversationConverter, firestore, messageConverter } from '~/lib/firestoreConfig';
 
 const getSortedKey = (arg1: string, arg2: string) => getSortedArray(arg1, arg2).join('')
 
-const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
+const currentIsFirstParticipant = (currentUserId: string, otherEndUserId: string) => {
+    let result = getSortedArray(currentUserId, otherEndUserId)[0];
+    return (result === currentUserId)
+}
 
 type UnopenedConversation = { status: 'not-opened' }
-
 type OpenedConversation = { 
     status: 'opened', 
     messagesQuery: Query<MessageObject, FirestoreMessageObject>,
@@ -37,86 +26,23 @@ type OpenedConversation = {
     messages: MessageObject[],
     endReached: boolean
 }
-
-type ConversationsCache = { 
-    [key: string]: (OpenedConversation | UnopenedConversation)  
-}
+type ConversationsCache = { [key: string]: OpenedConversation | UnopenedConversation }
 
 type contextObject = { 
-    filterWord: string,
-    setFilterWord: (arg: string) => void,
     user: UserDataType,
-    conversations: ConversationObject[],
-    fetchMoreConversations: () => void,
     openConversation: (arg: string) => void,
     fetchMoreMessages: (arg: string) => Promise<void>,
-    conversationsAreLoading: boolean,
     createNewMessage: (otherEndUserId: string, message: string) => Promise<void>,
     getConversation: (otherEndUserId: string) => OpenedConversation | UnopenedConversation,
     updateMessagesReadStatus: (arg: string) => void,
     getNumberOfUnreadMessages: (arg1: string, arg2: { firstParticipant: number, secondParticipant: number }) => number
 };
-const MessagesContext = createContext<contextObject | null>(null);
+const ChatContext = createContext<contextObject | null>(null);
 
-const messageConverter: FirestoreDataConverter<MessageObject, FirestoreMessageObject> = {
-    toFirestore(doc: WithFieldValue<MessageObject>) {
-        const { id, ...payLoad } = doc as MessageObject;
-        return payLoad;
-    },
-    fromFirestore(
-      snapshot: QueryDocumentSnapshot<MessageObject, FirestoreMessageObject>,
-      options: SnapshotOptions
-    ) {
-        const data = snapshot.data(options);
-        const { senderId, receiverId, message, createdAt, timeRead } = data;
-        return {
-            id: snapshot.id,
-            senderId, 
-            receiverId,
-            message,
-            createdAt,
-            timeRead,
-        };
-    },
-};
+export const ChatContextProvider = ({ children }: PropsWithChildren) => {
+    const { user, conversations, conversationsRef } = useChatsContext();
+    const conversationPairs = conversations.map(conv => getSortedKey(conv.participants[0], conv.participants[1]));
 
-const conversationConverter: FirestoreDataConverter<ConversationObject, FirestoreConversationObject> = {
-    toFirestore(doc: WithFieldValue<ConversationObject>) {
-        const { id, ...payLoad } = doc as ConversationObject;
-        return payLoad;
-    },
-    fromFirestore(
-      snapshot: QueryDocumentSnapshot<ConversationObject, FirestoreConversationObject>,
-      options: SnapshotOptions
-    ) {
-        const data = snapshot.data(options);
-        const { participants, unreadMessages, lastMessage, createdAt, updatedAt } = data;
-        return {
-            id: snapshot.id,
-            participants,
-            unreadMessages, 
-            lastMessage,
-            createdAt,
-            updatedAt
-        };
-    },
-};
-
-const currentIsFirstParticipant = (currentUserId: string, otherEndUserId: string) => {
-    let result = getSortedArray(currentUserId, otherEndUserId)[0];
-    return (result === currentUserId)
-}
-
-type ProviderProps = PropsWithChildren<{
-    conversationsAreLoading: boolean,
-    user: UserDataType
-    conversations: ConversationObject[],
-    conversationPairs: string[],
-    fetchMoreConversations: () => void,
-    conversationsRef: CollectionReference<ConversationObject, FirestoreConversationObject>
-}>;
-const ProviderComponent = (props: ProviderProps) => {
-    const { user } = props;
     const { id : currentUserId } = user;
 
     const messagesRef = useMemo(() => collection(firestore, 'messages').withConverter(messageConverter), []);
@@ -153,8 +79,6 @@ const ProviderComponent = (props: ProviderProps) => {
             })
         }
     }, [conversationsCache])
-
-    const { conversationPairs } = props;
 
     useEffect(() => {
         updateConversationsCache(conversationPairs);
@@ -267,8 +191,6 @@ const ProviderComponent = (props: ProviderProps) => {
     const getConversation = useCallback((otherEndUserId: string) => {
         return conversationsCache[getSortedKey(currentUserId, otherEndUserId)];
     }, [conversationsCache])
-    
-    const { conversations, conversationsRef } = props;
 
     const createNewMessage = useCallback(async (otherEndUserId: string, message: string) => {
         await addDoc(messagesRef, {
@@ -379,95 +301,16 @@ const ProviderComponent = (props: ProviderProps) => {
             return unreadMessages.secondParticipant
     }, [currentUserId])
 
-    const [filterWord, setFilterWord] = useState('');
-    const updateFilterWord = useCallback((arg: string) => {
-        setFilterWord(arg)
-    }, [])
-
-    const { children, fetchMoreConversations, conversationsAreLoading } = props;  
-
     return (
-        <MessagesContext.Provider 
+        <ChatContext.Provider 
             value={{ 
-                user, conversations, fetchMoreConversations, conversationsAreLoading,
-                openConversation, fetchMoreMessages, updateMessagesReadStatus,
-                createNewMessage, getConversation, getNumberOfUnreadMessages,
-                filterWord, setFilterWord: updateFilterWord
+                user, openConversation, fetchMoreMessages, updateMessagesReadStatus,
+                createNewMessage, getConversation, getNumberOfUnreadMessages
             }}
         >
             {children}
-        </MessagesContext.Provider>
+        </ChatContext.Provider>
     )
 }
 
-
-type Props = PropsWithChildren<{
-    user: UserDataType
-}>;
-function AuthenticatedProvider({ children, user }: Props) {
-    const { id : currentUserId } = user;
-    
-    const [conversationsAreLoading, setConversationsAreLoading] = useState(true);
-
-    const [endReached, setEndReached] = useState(false);
-    const [documentsNeeded, setDocumentsNeeded] = useState(initialNumberOfConversations);
-    const fetchMoreConversations = useCallback(() => {
-        if(!endReached) {
-            setConversationsAreLoading(true);
-            setDocumentsNeeded(documentsNeeded => {
-                return (documentsNeeded + initialNumberOfConversations);
-            })
-        }
-    }, [endReached])
-
-    const conversationsRef = useMemo(() => collection(firestore, 'conversations').withConverter(conversationConverter), []);
-    const conversationsQuery = useMemo(() => query(
-        conversationsRef, 
-        where("participants", "array-contains", currentUserId),
-        orderBy('updatedAt', 'desc')        
-    ), []);
-
-    const [conversations, setConversations] = useState<ConversationObject[]>([]);
-
-    useEffect(() => {
-        let subscriber = onSnapshot(
-            query(conversationsQuery, limit(documentsNeeded)),
-            (snapshot) => {
-                let results = snapshot.docs.map(doc => doc.data());
-                setConversations(results)
-                setEndReached(results.length < documentsNeeded)
-                setConversationsAreLoading(false)
-            }
-        )
-
-        return () => {
-            subscriber()
-        }
-    }, [documentsNeeded])
-
-    return (
-        <ProviderComponent user={user} conversationsRef={conversationsRef}
-            conversationPairs={conversations.map(conv => getSortedKey(conv.participants[0], conv.participants[1]))} 
-            conversations={conversations}
-            conversationsAreLoading={conversationsAreLoading}
-            fetchMoreConversations={fetchMoreConversations} 
-        >
-            {children}
-        </ProviderComponent>
-    )
-} 
-
-
-export const MessagesContextProvider = ({ children }: PropsWithChildren) => {
-    const { user } = useAuthContext();
-    if(!user) 
-        return <>{children}</>
-
-    return (
-        <AuthenticatedProvider user={user}>
-            {children}
-        </AuthenticatedProvider>
-    )
-}
-
-export default MessagesContext;
+export default ChatContext;

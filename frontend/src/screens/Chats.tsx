@@ -3,14 +3,17 @@ import { AntDesign } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { FlashList } from "@shopify/flash-list";
 import ConversationItem from "~/components/ConversationItem";
-import useMessagesContext from "~/hooks/useMessagesContext";
 import ListLoader from "~/components/ListLoader";
 import { useCallback, useState } from "react";
 import { initialNumberOfConversations } from "~/lib/helperFunctions";
 import { ThemedTextInput } from "~/components/ThemedComponents";
+import useChatsSearchContext from "~/hooks/useChatsSearchContext";
+import useChatsContext from "~/hooks/useChatsContext";
+import { ChatsSearchContextProvider } from "~/contexts/chatsSearchContext";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CoversationsArea = () => {
-    const { conversations, user, fetchMoreConversations, conversationsAreLoading } = useMessagesContext();
+    const { conversations, user, fetchMoreConversations, conversationsAreLoading } = useChatsContext();
     const { id : currentUserId } = user;
 
     const [moreDataFetchingAllowed, setMoreDataFetchingAllowed] = useState(false);
@@ -50,12 +53,14 @@ const CoversationsArea = () => {
 const SearchArea = () => {
     const { theme } = useThemeContext();
 
-    const { filterWord, setFilterWord } = useMessagesContext();
+    const { filterWord, setFilterWord, clearSearchArea } = useChatsSearchContext();
 
     return (
         <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
             <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
-                <AntDesign name="search1" size={20} color="grey" />
+                <TouchableOpacity onPress={() => Keyboard.dismiss()}>
+                    <AntDesign name="search1" size={20} color="grey" />
+                </TouchableOpacity>
                 <ThemedTextInput 
                     placeholder='Search Chats'
                     placeholderTextColor='grey'
@@ -63,6 +68,11 @@ const SearchArea = () => {
                     value={filterWord}
                     onChangeText={(text) => setFilterWord(text)}
                 />
+                {(filterWord !== '') && 
+                    <TouchableOpacity onPress={clearSearchArea}>
+                        <AntDesign name="closecircle" size={15} color="grey" />
+                    </TouchableOpacity>
+                }
             </View>
         </View>
     )
@@ -73,8 +83,10 @@ export default function Chats() {
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={{ flex: 1 }}>
-                <SearchArea />
-                <CoversationsArea />
+                <ChatsSearchContextProvider>
+                    <SearchArea />
+                    <CoversationsArea />
+                </ChatsSearchContextProvider>
             </View>
         </TouchableWithoutFeedback>
     )
@@ -98,11 +110,11 @@ const styles = StyleSheet.create({
         minHeight: 34,
         borderRadius: 10,
         color: 'black',
-        paddingHorizontal: 6 
+        paddingLeft: 6 
     },
     searchBarInput: {
         height: '90%',
-        marginLeft: 5,
+        marginHorizontal: 5,
         fontSize: 18,
         flex: 0.98
     },

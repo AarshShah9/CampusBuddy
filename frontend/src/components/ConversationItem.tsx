@@ -3,7 +3,8 @@ import { Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native";
 import { ThemedText } from '~/components/ThemedComponents';
-import useMessagesContext from "~/hooks/useMessagesContext";
+import useChatContext from "~/hooks/useChatContext";
+import useChatsSearchContext from "~/hooks/useChatsSearchContext";
 import useThemeContext from "~/hooks/useThemeContext";
 import { getUserDataApi } from "~/lib/apiFunctions";
 import { passesFilterCondition, getProperTimeUpdated, limitTextToMax } from "~/lib/helperFunctions";
@@ -19,14 +20,14 @@ type Props = {
 }
 
 export default function ConversationItem({ userId, lastMessage, unreadMessages, timeUpdated }: Props) {
-    const { openConversation, getNumberOfUnreadMessages } = useMessagesContext();
+    const { openConversation, getNumberOfUnreadMessages } = useChatContext();
     const { navigate } = useNavigation<any>();
     const { theme } = useThemeContext();
 
     const [fetchedData, setFetchedData] = useState({
         userName: '', icon: '#'
     })
-
+    
     const { userName, icon } = fetchedData;
 
     useEffect(() => {
@@ -42,7 +43,7 @@ export default function ConversationItem({ userId, lastMessage, unreadMessages, 
 
     const numUnreadMessages = getNumberOfUnreadMessages(userId, unreadMessages);
     
-    const { filterWord } = useMessagesContext();
+    const { filterWord } = useChatsSearchContext();
 
     if(!passesFilterCondition(userName, filterWord))
         return null

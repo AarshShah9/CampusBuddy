@@ -6,15 +6,15 @@ import { FlashList } from "@shopify/flash-list";
 import useThemeContext from '~/hooks/useThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import Message from '../components/Message';
-import useMessagesContext from '~/hooks/useMessagesContext';
 import ListLoader from '../components/ListLoader';
 import { initialNumberOfMessages } from '~/lib/helperFunctions';
 import { ActivityIndicator } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
+import useChatContext from '~/hooks/useChatContext';
 
 
 function ListArea ({ otherEndUserId }: { otherEndUserId: string }) {
-    const { user, fetchMoreMessages, getConversation, updateMessagesReadStatus } = useMessagesContext();
+    const { user, fetchMoreMessages, getConversation, updateMessagesReadStatus } = useChatContext();
     
     const { id : currentUserId } = user;
 
@@ -86,7 +86,7 @@ function TypingArea ({ otherEndUserId }: { otherEndUserId: string }) {
         color: 'black'
     }
 
-    const { createNewMessage } = useMessagesContext();
+    const { createNewMessage } = useChatContext();
 
     const [message, setMessage] = useState('');
     
