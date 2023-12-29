@@ -5,6 +5,7 @@ import DrawerGroup from './DrawerGroup/DrawerGroup';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from '~/screens/SplashScreen';
+import Login from '~/screens/Login';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ export default function Navigation() {
                 <StatusBar style="auto" />
                 <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
                     <Stack.Screen name="SplashScreen" component={SplashScreen}/>
+                    <Stack.Screen name="Login" component={Login}/>
                     <Stack.Screen name="DrawerGroup" component={DrawerGroup}/>
                 </Stack.Navigator>  
             </NavigationContainer>
