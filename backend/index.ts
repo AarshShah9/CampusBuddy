@@ -7,6 +7,7 @@ import path from 'path';
 import student from './routes/user.routes';
 import school from './routes/school.routes';
 import event from './routes/event.routes';
+import organization from './routes/organization.routes';
 
 // importing middleware
 import { verifyAuthentication } from './middleware/verifyAuth';
@@ -39,6 +40,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // file up
 app.use('/api', student);
 app.use('/api', school);
 app.use('/api/events', event);
+app.use('/api/organizations', organization);
 
 app.get('/Test', (req: Request, res: Response) => {
     console.log('The backend is hit');
