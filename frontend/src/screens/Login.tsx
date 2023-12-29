@@ -1,23 +1,24 @@
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from "react-native";
 import { Button } from "react-native-paper";
 import InputField from "~/components/InputField";
-
-
+import useThemeContext from "~/hooks/useThemeContext";
+ 
 export default function Login() {
+    const {theme} = useThemeContext(); 
   return (
-    <View style={styles.main_container}>
+    <View style={[styles.main_container,{backgroundColor:theme.colors.primary}]}>
       <View style={styles.logo_container}>
         <Image
           style={{ marginTop: 42 }}
           source={require("../../assets/Campus_Buddy_Logo.png")}
         />
       </View>
-      <View style={styles.layover_container}>
+      <View style={[styles.layover_container,{backgroundColor:theme.colors.tertiary}]}>
         <Text style={styles.header}>{"Login"}</Text>
         <InputField name="Email" placeholder="Email" />
         <InputField name="Password" placeholder="Password" />
         <Button
-          style={styles.button}
+          style={[styles.button,{backgroundColor:theme.colors.primary}]}
           mode="contained"
           onPress={() => console.log("Pressed")}
         >
@@ -26,7 +27,7 @@ export default function Login() {
         <Text style={styles.signUpText}>
         {"Don't have any account? "}
         <TouchableOpacity onPress={()=>{}}>
-          <Text style={{ color: '3A86FF'}}>
+          <Text style={{ color:theme.colors.primary}}>
             Sign up
           </Text>
         </TouchableOpacity>
@@ -39,7 +40,7 @@ export default function Login() {
 const styles = StyleSheet.create({
   main_container: {
     height: "100%",
-    backgroundColor: "#3A86FF",
+   
   },
   logo_container: {
     height: "28%",
@@ -49,7 +50,6 @@ const styles = StyleSheet.create({
   layover_container: {
     height: "74%",
     width: "100%",
-    backgroundColor: "white",
     borderTopLeftRadius: 76,
   },
 
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     justifyContent:'center',
-    backgroundColor:"#3A86FF"
+
   },
   signUpText:{
     marginLeft:"auto",
