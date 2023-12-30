@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-// import this instance of prisma whereever we need
-const prisma = new PrismaClient();
+// Import this single instance of prisma and re-use across the application
+// The prisma object is cached the first time it is created
+let prisma = new PrismaClient();
 
 export default prisma;
