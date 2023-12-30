@@ -1,11 +1,12 @@
 import { TextInput } from "react-native-paper";
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
-export default function InputField(props:{name:string,placeholder:string}) {
+
+export default function InputField(props:{name:string,placeholder?:string,function?:any, value?:string}) {
     return(
         <View style={styles.container} >
             <Text style={styles.header2}>{props.name}</Text>
-            <TextInput style={styles.input} placeholder={props.placeholder}/>
+            <TextInput onChangeText={props.function} style={styles.input} placeholder={props.placeholder}/>
         </View>
     )
 }

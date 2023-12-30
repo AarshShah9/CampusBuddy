@@ -10,6 +10,46 @@ export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
+  const [personInfo, setPersonInfo] = useState({
+    email: "",
+    uniName: "",
+    fName: "",
+    lName: "",
+    password: "",
+  });
+
+  const emailHandler = (e: string) => {
+    setPersonInfo({
+      ...personInfo,
+      email: e,
+    });
+  };
+  const uniNameHandler = (e: string) => {
+    setPersonInfo({
+      ...personInfo,
+      uniName: e,
+    });
+  };
+  const fNameHandler = (e: string) => {
+    setPersonInfo({
+      ...personInfo,
+      fName: e,
+    });
+  };
+  const lNameHandler = (e: string) => {
+    setPersonInfo({
+      ...personInfo,
+      fName: e,
+    });
+  };
+  const passwordHandler = (e: string) => {
+    setPersonInfo({
+      ...personInfo,
+      password: e,
+    });
+  };
+
+
   return (
     <MainContainer>
       <HeaderContainer>
@@ -30,16 +70,17 @@ export default function StudentSignUp() {
             <InputField
               name="Institution Email"
               placeholder="example@ucalgary.com"
+              function={emailHandler}
             />
             <InputField
               name="Institution Name"
               placeholder="Institution Name"
+              function={uniNameHandler}
+              value={personInfo.uniName}
             />
-            <InputField name="First Name" placeholder="" />
-            <InputField name="Last Name" placeholder="" />
             <StyledButton
               mode="contained"
-              onPress={() => setValid(true)} // Will need to implment a verification of proper info
+              onPress={() => {}} // Will need to implment a verification of proper info
             >
               <Text
                 style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
@@ -61,8 +102,10 @@ export default function StudentSignUp() {
             </ClickLink>
           </FormContainer>
         )}
-        {valid &&
+        {valid && (
           <FormContainer>
+            <InputField name="First Name" placeholder="" />
+            <InputField name="Last Name" placeholder="" />
             <InputField name="Password" placeholder="" />
             <InputField name="Re-enter Password" placeholder="" />
             <StyledButton
@@ -76,7 +119,7 @@ export default function StudentSignUp() {
               </Text>
             </StyledButton>
           </FormContainer>
-        }
+        )}
       </OverlayContainer>
     </MainContainer>
   );
@@ -110,7 +153,7 @@ const HeaderText = styled(Text)<{ $textColor: string }>`
 
 const FormContainer = styled(View)`
   margin-top: 8%;
-  height:100%;
+  height: 100%;
 `;
 const StyledButton = styled(Button)`
   width: 84%;
