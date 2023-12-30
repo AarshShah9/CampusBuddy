@@ -3,36 +3,80 @@ import { Button } from "react-native-paper";
 import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
+import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
+  const navigation = useNavigation<any>();
+  const [valid, setValid] = useState(false);
   return (
     <MainContainer>
       <HeaderContainer>
+        <Text
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+        >
+          BACK
+        </Text>
         <HeaderText $textColor={theme.colors.tertiary}>
           Student Sign Up
         </HeaderText>
       </HeaderContainer>
       <OverlayContainer $color={theme.colors.tertiary}>
-        <FormContainer>
-          <InputField
-            name="Institution Email"
-            placeholder="example@ucalgary.com"
-          />
-          <InputField name="Institution Name" placeholder="Institution Name" />
-          <InputField name="First Name" placeholder="" />
-          <InputField name="Last Name" placeholder="" />
-          <StyledButton mode="contained" onPress={() => console.log("Pressed")}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-              Next
-            </Text>
-          </StyledButton>
-          <ClickLink $color={theme.colors.primary}>
-            Sign up as an Organization 
-            <Text onPress={()=>{console.log("Pressed")}} style={{ color: theme.colors.primary,fontSize:16}}> here </Text>
-          </ClickLink>
-           
-        </FormContainer>
+        {!valid && (
+          <FormContainer>
+            <InputField
+              name="Institution Email"
+              placeholder="example@ucalgary.com"
+            />
+            <InputField
+              name="Institution Name"
+              placeholder="Institution Name"
+            />
+            <InputField name="First Name" placeholder="" />
+            <InputField name="Last Name" placeholder="" />
+            <StyledButton
+              mode="contained"
+              onPress={() => setValid(true)} // Will need to implment a verification of proper info
+            >
+              <Text
+                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
+              >
+                Next
+              </Text>
+            </StyledButton>
+            <ClickLink $color={theme.colors.primary}>
+              Sign up as an Organization
+              <Text
+                onPress={() => {
+                  console.log("Pressed");
+                }}
+                style={{ color: theme.colors.primary, fontSize: 16 }}
+              >
+                {" "}
+                here{" "}
+              </Text>
+            </ClickLink>
+          </FormContainer>
+        )}
+        {valid &&
+          <FormContainer>
+            <InputField name="Password" placeholder="" />
+            <InputField name="Re-enter Password" placeholder="" />
+            <StyledButton
+              mode="contained"
+              onPress={() => {}} // Will need to implment a verification of proper info
+            >
+              <Text
+                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
+              >
+                Agree and Continue
+              </Text>
+            </StyledButton>
+          </FormContainer>
+        }
       </OverlayContainer>
     </MainContainer>
   );
@@ -63,14 +107,10 @@ const HeaderText = styled(Text)<{ $textColor: string }>`
   font-size: 28px;
   font-weight: bold;
 `;
-const GoBackText = styled(Text)<{ $textColor: string }>`
-  margin: 32px 0 0 0;
-  font-size: 30px;
-  font-weight: bold;
-  color: ${(props) => props.$textColor};
-`;
+
 const FormContainer = styled(View)`
   margin-top: 8%;
+  height:100%;
 `;
 const StyledButton = styled(Button)`
   width: 84%;
@@ -87,7 +127,6 @@ const ClickLink = styled(Text)<{ $color: string }>`
   margin-right: auto;
   margin-top: 16px;
   font-size: 16px;
-  justify-content:center;
-  align-items:center;
-  
+  justify-content: center;
+  align-items: center;
 `;
