@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from '~/screens/SplashScreen';
 import Login from '~/screens/Login';
+import StudentSignUp from '~/screens/StudentSignUp';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ export default function Navigation() {
                 <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
                     <Stack.Screen name="SplashScreen" component={SplashScreen}/>
                     <Stack.Screen name="Login" component={Login}/>
+                    <Stack.Screen name= "StudentSignUp" component={StudentSignUp}/>
                     <Stack.Screen name="DrawerGroup" component={DrawerGroup}/>
                 </Stack.Navigator>  
             </NavigationContainer>

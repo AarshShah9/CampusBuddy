@@ -4,7 +4,7 @@ import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 
-export default function SignUp() {
+export default function StudentSignUp() {
     const {theme} = useThemeContext();
     return(
         <MainContainer>
@@ -13,8 +13,7 @@ export default function SignUp() {
     ) 
 }
 
-// Components
-
+// Component
 const MainContainer = styled(View)`
     height:100%;
     background-color: #3A86FF;

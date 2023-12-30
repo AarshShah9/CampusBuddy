@@ -4,8 +4,12 @@ import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
+import { useNavigation } from "@react-navigation/native";
+
 export default function Login() {
   const { theme } = useThemeContext();
+  const navigation = useNavigation<any>();
+
   return (
     <MainContainer $primary={theme.colors.primary}>
       <LogoContainer>
@@ -25,7 +29,7 @@ export default function Login() {
         </StyledButton>
         <ClickLink $color={theme.colors.primary}>
           {"Don't have any account? "}
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {navigation.navigate("StudentSignUp")}}>
             <Text style={{ color: theme.colors.primary }}>Sign up</Text>
           </TouchableOpacity>
         </ClickLink>
