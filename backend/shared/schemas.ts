@@ -63,6 +63,27 @@ export const OrganizationCreateSchema =
 export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
 
 /////////////////////////////// s
+// PAGINATION SCHEMAS
+///////////////////////////////
+
+const PAGINATION_DEFAULT_PAGE_SIZE = 10;
+
+export const CursorPaginationSchema = z.object({
+    cursor: z.string().optional(),
+    pageSize: z.coerce.number().default(PAGINATION_DEFAULT_PAGE_SIZE),
+});
+
+export type CursorPaginationParams = z.infer<typeof CursorPaginationSchema>;
+
+export const CursorPaginationDatetimeSchema = CursorPaginationSchema.extend({
+    cursor: z.string().datetime().optional(), // overwrites cursor to add .datetime() constraint
+});
+
+export type CursorPaginationDatetimeParams = z.infer<
+    typeof CursorPaginationDatetimeSchema
+>;
+
+/////////////////////////////// s
 // UTILITY SCHEMAS
 ///////////////////////////////
 
