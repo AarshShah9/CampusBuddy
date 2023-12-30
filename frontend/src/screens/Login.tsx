@@ -24,14 +24,12 @@ export default function Login() {
         <InputField name="Password" placeholder="Password" />
         <StyledButton mode="contained" onPress={() => console.log("Pressed")}>
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-            {"Login"}
+            Login
           </Text>
         </StyledButton>
         <ClickLink $color={theme.colors.primary}>
-          {"Don't have any account? "}
-          <TouchableOpacity onPress={() => {navigation.navigate("StudentSignUp")}}>
-            <Text style={{ color: theme.colors.primary }}>Sign up</Text>
-          </TouchableOpacity>
+        Don't have any account?  
+        <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary }}> Sign up</Text>
         </ClickLink>
       </OverlayContainer>
     </MainContainer>
@@ -65,10 +63,11 @@ const Header = styled(Text)`
 `;
 const StyledButton = styled(Button)`
   width: 84%;
-  height: 8%;
+  height: 10%;
   font-size: 25px;
   font-weight: bold;
   margin-left: auto;
   margin-right: auto;
+  margin-top:2%;
   justify-content: center;
 `;
