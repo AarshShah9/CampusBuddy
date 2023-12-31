@@ -5,7 +5,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
@@ -20,17 +20,19 @@ export default function StudentSignUp() {
     password: "",
     rePassword: "",
   });
-
+  // Creates Errors for input field
   const errorHandler = (errorMsg: string | null, errorType: string) => {
     setErrors((prevState) => ({ ...prevState, [errorType]: errorMsg }));
   };
+  // Update input states based on changes to text
   const onChangeHandler = (text: string, input: string) => {
     setInputs((prevState) => ({ ...prevState, [input]: text }));
   };
-
+  // Validate if email entered is of a university
   const emailValidate = () => {
     Keyboard.dismiss();
   };
+  // Validate if password meets certain defined criterias
   const passwordValidator = () => {
     if (!inputs.password) {
       errorHandler("Please enter a password", "password");
@@ -42,7 +44,13 @@ export default function StudentSignUp() {
   return (
     <MainContainer>
       <HeaderContainer>
-        <AntDesign style={{marginTop:"10%",marginLeft:"3%"}}  name="caretleft" size={24} color="white" onPress={()=>navigation.navigate("Login")} />
+        <AntDesign
+          style={{ marginTop: "10%", marginLeft: "3%" }}
+          name="caretleft"
+          size={24}
+          color="white"
+          onPress={() => navigation.navigate("Login")}
+        />
         <HeaderText $textColor={theme.colors.tertiary}>
           Student Sign Up
         </HeaderText>
@@ -136,7 +144,6 @@ const HeaderContainer = styled(View)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  
 `;
 const HeaderText = styled(Text)<{ $textColor: string }>`
   margin: 32px auto 0px auto;
