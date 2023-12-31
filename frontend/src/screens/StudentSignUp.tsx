@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, Keyboard } from "react-native";
 import { Button } from "react-native-paper";
 import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -10,7 +10,8 @@ export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
-  const [personInfo, setPersonInfo] = useState({
+
+  const [inputs, setInputs] = useState({
     email: "",
     uniName: "",
     fName: "",
@@ -18,37 +19,13 @@ export default function StudentSignUp() {
     password: "",
   });
 
-  const emailHandler = (e: string) => {
-    setPersonInfo({
-      ...personInfo,
-      email: e,
-    });
-  };
-  const uniNameHandler = (e: string) => {
-    setPersonInfo({
-      ...personInfo,
-      uniName: e,
-    });
-  };
-  const fNameHandler = (e: string) => {
-    setPersonInfo({
-      ...personInfo,
-      fName: e,
-    });
-  };
-  const lNameHandler = (e: string) => {
-    setPersonInfo({
-      ...personInfo,
-      fName: e,
-    });
-  };
-  const passwordHandler = (e: string) => {
-    setPersonInfo({
-      ...personInfo,
-      password: e,
-    });
+  const onChangeHandler = (text: string, input: string) => {
+    setInputs((prevState) => ({ ...prevState, [input]: text }));
   };
 
+  const emailValidate = () => {
+    Keyboard.dismiss();
+  };
 
   return (
     <MainContainer>
@@ -70,13 +47,14 @@ export default function StudentSignUp() {
             <InputField
               name="Institution Email"
               placeholder="example@ucalgary.com"
-              function={emailHandler}
+              onChangeText={(text: string) => onChangeHandler(text, "email")}
+              value={inputs.email}
             />
             <InputField
               name="Institution Name"
               placeholder="Institution Name"
-              function={uniNameHandler}
-              value={personInfo.uniName}
+              onChangeText={(text: string) => onChangeHandler(text, "uniName")}
+              value={inputs.uniName}
             />
             <StyledButton
               mode="contained"

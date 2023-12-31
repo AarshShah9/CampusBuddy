@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Keyboard } from "react-native";
 import { Button } from "react-native-paper";
 import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -9,6 +9,10 @@ import { useNavigation } from "@react-navigation/native";
 export default function Login() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
+  const validate = () => {
+    Keyboard.dismiss();
+    
+  }
 
   return (
     <MainContainer $primary={theme.colors.primary}>
@@ -20,9 +24,9 @@ export default function Login() {
       </LogoContainer>
       <OverlayContainer $color={theme.colors.tertiary}>
         <Header>{"Login"}</Header>
-        <InputField name="Email" placeholder="Email" />
-        <InputField name="Password" placeholder="Password" />
-        <StyledButton mode="contained" onPress={() => console.log("Pressed")}>
+        <InputField  name="Email" placeholder="Email" />
+        <InputField password={true} name="Password" placeholder="Password" />
+        <StyledButton mode="contained" onPress={() => {validate}}>
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
             Login
           </Text>
@@ -45,6 +49,7 @@ const OverlayContainer = styled(View)<{ $color: string }>`
   height: 74%;
   width: 100%;
   border-top-left-radius: 76px;
+  border-width:0s;
   background-color: ${(props) => props.$color};
 `;
 const ClickLink = styled(Text)<{ $color: string }>`
