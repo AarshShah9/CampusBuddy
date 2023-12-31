@@ -5,6 +5,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
+import { AntDesign } from '@expo/vector-icons';
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
@@ -41,13 +42,7 @@ export default function StudentSignUp() {
   return (
     <MainContainer>
       <HeaderContainer>
-        <Text
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
-        >
-          BACK
-        </Text>
+        <AntDesign style={{marginTop:"10%",marginLeft:"3%"}}  name="caretleft" size={24} color="white" onPress={()=>navigation.navigate("Login")} />
         <HeaderText $textColor={theme.colors.tertiary}>
           Student Sign Up
         </HeaderText>
@@ -137,10 +132,11 @@ const OverlayContainer = styled(View)<{ $color: string }>`
 const HeaderContainer = styled(View)`
   width: 100%;
   height: 15%;
-  display: flex;
+
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  
 `;
 const HeaderText = styled(Text)<{ $textColor: string }>`
   margin: 32px auto 0px auto;
