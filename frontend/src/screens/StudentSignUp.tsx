@@ -10,21 +10,32 @@ export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
-
+  const [errors, setErrors] = useState({ password: null });
   const [inputs, setInputs] = useState({
     email: "",
     uniName: "",
     fName: "",
     lName: "",
     password: "",
+    rePassword: "",
   });
 
+  const errorHandler = (errorMsg: string | null, errorType: string) => {
+    setErrors((prevState) => ({ ...prevState, [errorType]: errorMsg }));
+  };
   const onChangeHandler = (text: string, input: string) => {
     setInputs((prevState) => ({ ...prevState, [input]: text }));
   };
 
   const emailValidate = () => {
     Keyboard.dismiss();
+  };
+  const passwordValidator = () => {
+    if (!inputs.password) {
+      errorHandler("Please enter a password", "password");
+    } else if (inputs.password.length < 8) {
+      errorHandler("Minimum length must be 8 characters", "password");
+    }
   };
 
   return (
@@ -58,7 +69,9 @@ export default function StudentSignUp() {
             />
             <StyledButton
               mode="contained"
-              onPress={() => {}} // Will need to implment a verification of proper info
+              onPress={() => {
+                setValid(true);
+              }} // Will need to implment a verification of proper info
             >
               <Text
                 style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
@@ -82,14 +95,21 @@ export default function StudentSignUp() {
         )}
         {valid && (
           <FormContainer>
-            <InputField name="First Name" placeholder="" />
-            <InputField name="Last Name" placeholder="" />
-            <InputField name="Password" placeholder="" />
-            <InputField name="Re-enter Password" placeholder="" />
-            <StyledButton
-              mode="contained"
-              onPress={() => {}} // Will need to implment a verification of proper info
-            >
+            <InputField name="First Name" />
+            <InputField name="Last Name" />
+            <InputField
+              name="Password"
+              onChangeText={(text: string) => onChangeHandler(text, "password")}
+              focus={errorHandler}
+              error={errors.password}
+            />
+            <InputField
+              name="Re-enter Password"
+              onChangeText={(text: string) =>
+                onChangeHandler(text, "rePassword")
+              }
+            />
+            <StyledButton mode="contained" onPress={passwordValidator}>
               <Text
                 style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
               >

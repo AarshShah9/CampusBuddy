@@ -8,6 +8,7 @@ export default function InputField({   error,...props }: any) {
   const [isFocused, setFocused] = useState(false);
   const[hidePassword,setHidePassword] = useState(props.password);
   const {theme} = useThemeContext();
+  
   return (
     <View style={styles.container}>
       <Text style={styles.header2}>{props.name}</Text>
@@ -15,17 +16,19 @@ export default function InputField({   error,...props }: any) {
         <TextInput
             secureTextEntry={hidePassword}
             underlineColorAndroid="transparent"
-            style={[styles.input,{borderColor: isFocused ? theme.colors.primary: 'grey'}]}
+            style={[styles.input,{borderColor: error? "red": isFocused ? theme.colors.primary: "grey"}]}
             {...props}
             onFocus={() => {
+            props.focus(null,"password")
             setFocused(true);
+
             }}
             onBlur={()=>{
                 setFocused(false);
             }}
         />
      
-      {error && <Text style={styles.errorMsg}>{"Error"}</Text>}
+      {error && <Text style={styles.errorMsg}>{error}</Text>}
     </View>
   );
 }
@@ -55,6 +58,9 @@ const styles = StyleSheet.create({
   },
   errorMsg: {
     color:'red',
+    marginRight:"auto",
+    marginLeft:"auto",
+    marginBottom:"2%"
 
   }
 });
