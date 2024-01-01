@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { OrganizationCreateSchema } from '../shared/schemas';
+import { OrganizationCreateSchema } from '@shared/schemas';
 import { createOrganizationWithDefaults } from '../services/organization.service';
 import { AppError, AppErrorName } from '../utils/AppError';
 

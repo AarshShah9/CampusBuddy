@@ -5,7 +5,7 @@ import {
     AppPermissionName,
 } from '@prisma/client';
 import prisma from '../prisma/client';
-import { OrganizationCreateInput } from '../shared/schemas';
+import { OrganizationCreateInput } from '@shared/schemas';
 import { defaultRolePermissions } from '../constants';
 import { AppError, AppErrorName } from '../utils/AppError';
 

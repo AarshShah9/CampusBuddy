@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
-import { zodStringToNumberOrNull, BooleanSchema } from '../../../utils/utils'
+import { zodStringToNumberOrNull, BooleanSchema } from '@shared/utils'
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
@@ -118,7 +118,7 @@ export const UserSchema = z.object({
   username: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  email: z.string().email(),
+  email: z.string().email({ message: "Invalid email address" }).min(5),
   password: z.string(),
   yearOfStudy: z.number().int(),
   schoolId: z.number().int(),

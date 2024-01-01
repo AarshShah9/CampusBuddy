@@ -1,7 +1,7 @@
 import { File } from '@prisma/client';
 import prisma from '../prisma/client';
 
-import { FileCreateInput } from '../shared/schemas';
+import { FileCreateInput } from '@shared/schemas';
 import { AppError, AppErrorName } from '../utils/AppError';
 
 // Create a file
