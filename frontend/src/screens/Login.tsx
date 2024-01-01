@@ -5,13 +5,23 @@ import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 export default function Login() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
-  const validate = () => {
-    Keyboard.dismiss();
-    
+
+  // Testing If Could Reach EndPoints
+  const port = 3000;
+  const ip = process.env.IP_ADDRESS ?? 'localhost';
+  const validate = async () => {
+    try{
+      console.log('clicked')
+      const response = await axios(`http://${ip}:${port}/api/studentTest`)
+      console.log(response.data)
+    }catch{
+      console.log("error")
+    }
   }
 
   return (
@@ -26,7 +36,7 @@ export default function Login() {
         <Header>{"Login"}</Header>
         <InputField  name="Email" placeholder="Email" />
         <InputField password={true} name="Password" placeholder="Password" />
-        <StyledButton mode="contained" onPress={() => {validate}}>
+        <StyledButton mode="contained" onPress={() => {validate()}}>
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
             Login
           </Text>
