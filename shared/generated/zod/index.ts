@@ -141,7 +141,7 @@ export const EventSchema = z.object({
   userId: z.number().int(),
   organizationId: zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()).nullable(),
   createdAt: z.coerce.date(),
-  title: z.string().min(3).max(255),
+  title: z.string({ required_error: "Title is required", invalid_type_error: "Title must be a string"}).min(3, { message: "Title must contain 3 or more characters" }).max(255),
   description: z.string().min(3).max(255).nullable(),
   location: z.string().min(3).max(255),
   startTime: z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}).refine((value) => value > new Date(), { message: 'Start time must be in the future', }),

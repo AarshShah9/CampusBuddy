@@ -78,7 +78,6 @@ model User {
   @@map("user")
 }
 
-//TODO: remove. @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '../../../utils/utils'"]) 
 /// @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '@shared/utils'"])
 model Event {
   id             Int                 @id @default(autoincrement())
@@ -86,7 +85,7 @@ model Event {
   /// @zod.custom.use(zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()))
   organizationId Int?                @map("organization_id")
   createdAt      DateTime            @unique @default(now()) @map("created_at")
-  /// @zod.string.min(3).max(255)
+  /// @zod.string({ required_error: "Title is required", invalid_type_error: "Title must be a string"}).min(3, { message: "Title must contain 3 or more characters" }).max(255)
   title          String              @db.VarChar(255)
   /// @zod.string.min(3).max(255)
   description    String?             @db.VarChar(255)
