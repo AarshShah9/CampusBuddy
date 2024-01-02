@@ -23,7 +23,7 @@ export const createFile = async (
         });
         if (!newFile) {
             throw new AppError(
-                AppErrorName.PRISMA_ERROR,
+                AppErrorName.EMPTY_RESULT_ERROR,
                 `Error saving file to database: File creation returned empty result.`,
                 500,
                 true

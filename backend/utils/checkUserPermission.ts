@@ -2,13 +2,7 @@ import { AppPermissionName } from '@prisma/client';
 import prisma from '../prisma/client';
 import { AppError, AppErrorName } from './AppError';
 
-class PermissionError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'PermissionError';
-    }
-}
-
+// Utility function for checking if the user has the required permissions for an organization
 export const checkUserPermission = async (
     userId: number,
     organizationId: number,
@@ -42,7 +36,7 @@ export const checkUserPermission = async (
     } catch (error: any) {
         throw new AppError(
             AppErrorName.PRISMA_ERROR,
-            `Error saving file to database: ${error.message}`,
+            `Error checking user permission: ${error.message}`,
             500,
             true
         );

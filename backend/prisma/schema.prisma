@@ -12,7 +12,8 @@ datasource db {
 }
 
 // zod-prisma-types generator
-// Generates zod schemas from prisma models
+// Generates zod schemas from the prisma models
+// Zod validators can be added to fields using rich comments (use /// instead of //)
 generator zod {
   provider         = "zod-prisma-types"
   output           = "../../shared/generated/zod" // the directory where generated zod schemas will be saved

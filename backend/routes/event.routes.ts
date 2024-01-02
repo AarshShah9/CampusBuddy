@@ -1,7 +1,6 @@
 import express from 'express';
-// const { upload } = require("../utils/fileUpload");
 import { upload } from '../utils/fileUpload';
-// import { verifyAuthentication } from '../middleware/verifyAuth';
+import { verifyAuthentication } from '../middleware/verifyAuth';
 import {
     createNewEvent,
     createNewVerifiedEvent,
