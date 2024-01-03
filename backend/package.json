@@ -11,7 +11,8 @@
     "clearJest": "jest --clearCache",
     "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/backend/index.js\")",
     "build": "tsc && tsc-alias",
-    "start": "node dist/backend/index.js"
+    "start": "node dist/backend/index.js",
+    "genSchemas": "npx prisma generate && npx prettier --write ../lib/generated/zod/index.ts"
   },
   "keywords": [],
   "author": "",
