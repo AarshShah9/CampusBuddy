@@ -10,7 +10,7 @@ import {
     EventUpdateSchema,
     FileCreateSchema,
     IdParamSchema,
-} from '@shared/schemas';
+} from '@lib/schemas';
 import { checkUserPermission } from '../utils/checkUserPermission';
 import { AppPermissionName, Event, EventStatus, File } from '@prisma/client';
 import { createFile } from '../services/file.service';

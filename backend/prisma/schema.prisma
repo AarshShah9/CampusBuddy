@@ -16,7 +16,7 @@ datasource db {
 // Zod validators can be added to fields using rich comments (use /// instead of //)
 generator zod {
   provider         = "zod-prisma-types"
-  output           = "../../shared/generated/zod" // the directory where generated zod schemas will be saved
+  output           = "../../lib/generated/zod" // the directory where generated zod schemas will be saved
   createInputTypes = false // default is true
   coerceDate       = true
   // useTypeAssertions             = true // circumvent type system to fix typescript error with zod versions >3.21.1
@@ -79,7 +79,7 @@ model User {
   @@map("user")
 }
 
-/// @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '@shared/utils'"])
+/// @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '@lib/utils'"])
 model Event {
   id             Int                 @id @default(autoincrement())
   userId         Int                 @map("user_id")

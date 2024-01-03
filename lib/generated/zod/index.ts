@@ -1,79 +1,191 @@
-import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
-import { zodStringToNumberOrNull, BooleanSchema } from '@shared/utils'
+import { BooleanSchema, zodStringToNumberOrNull } from "@lib/utils";
+import { z } from "zod";
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
 /////////////////////////////////////////
 
-
 /////////////////////////////////////////
 // ENUMS
 /////////////////////////////////////////
 
-export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
+export const TransactionIsolationLevelSchema = z.enum([
+  "ReadUncommitted",
+  "ReadCommitted",
+  "RepeatableRead",
+  "Serializable",
+]);
 
-export const SchoolScalarFieldEnumSchema = z.enum(['id','name','domain']);
+export const SchoolScalarFieldEnumSchema = z.enum(["id", "name", "domain"]);
 
-export const StudentScalarFieldEnumSchema = z.enum(['id','schoolID','email','username','name','password','otp','jwt','status']);
+export const StudentScalarFieldEnumSchema = z.enum([
+  "id",
+  "schoolID",
+  "email",
+  "username",
+  "name",
+  "password",
+  "otp",
+  "jwt",
+  "status",
+]);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','username','firstName','lastName','email','password','yearOfStudy','schoolId','isVerified','profilePicId','otp','jwt','status']);
+export const UserScalarFieldEnumSchema = z.enum([
+  "id",
+  "username",
+  "firstName",
+  "lastName",
+  "email",
+  "password",
+  "yearOfStudy",
+  "schoolId",
+  "isVerified",
+  "profilePicId",
+  "otp",
+  "jwt",
+  "status",
+]);
 
-export const EventScalarFieldEnumSchema = z.enum(['id','userId','organizationId','createdAt','title','description','location','startTime','endTime','isPublic','status','imageId']);
+export const EventScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "organizationId",
+  "createdAt",
+  "title",
+  "description",
+  "location",
+  "startTime",
+  "endTime",
+  "isPublic",
+  "status",
+  "imageId",
+]);
 
-export const UserEventResponseScalarFieldEnumSchema = z.enum(['userId','eventId','participationStatus']);
+export const UserEventResponseScalarFieldEnumSchema = z.enum([
+  "userId",
+  "eventId",
+  "participationStatus",
+]);
 
-export const PostScalarFieldEnumSchema = z.enum(['id','userId','imageId','organizationId','createdAt','title','text','public']);
+export const PostScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "imageId",
+  "organizationId",
+  "createdAt",
+  "title",
+  "text",
+  "public",
+]);
 
-export const CommentScalarFieldEnumSchema = z.enum(['id','userId','postId','createdAt','text']);
+export const CommentScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "postId",
+  "createdAt",
+  "text",
+]);
 
-export const OrganizationScalarFieldEnumSchema = z.enum(['id','organizationName','description','createdAt','status']);
+export const OrganizationScalarFieldEnumSchema = z.enum([
+  "id",
+  "organizationName",
+  "description",
+  "createdAt",
+  "status",
+]);
 
-export const UserOrganizationRoleScalarFieldEnumSchema = z.enum(['userId','organizationId','roleId']);
+export const UserOrganizationRoleScalarFieldEnumSchema = z.enum([
+  "userId",
+  "organizationId",
+  "roleId",
+]);
 
-export const RoleScalarFieldEnumSchema = z.enum(['id','roleName']);
+export const RoleScalarFieldEnumSchema = z.enum(["id", "roleName"]);
 
-export const OrganizationRolePermissionScalarFieldEnumSchema = z.enum(['organizationId','roleId','permissionId']);
+export const OrganizationRolePermissionScalarFieldEnumSchema = z.enum([
+  "organizationId",
+  "roleId",
+  "permissionId",
+]);
 
-export const PermissionScalarFieldEnumSchema = z.enum(['id','permissionName']);
+export const PermissionScalarFieldEnumSchema = z.enum(["id", "permissionName"]);
 
-export const EnrollmentScalarFieldEnumSchema = z.enum(['programId','userId','degreeType']);
+export const EnrollmentScalarFieldEnumSchema = z.enum([
+  "programId",
+  "userId",
+  "degreeType",
+]);
 
-export const ProgramScalarFieldEnumSchema = z.enum(['id','programName','department']);
+export const ProgramScalarFieldEnumSchema = z.enum([
+  "id",
+  "programName",
+  "department",
+]);
 
-export const TopicScalarFieldEnumSchema = z.enum(['id','topicName']);
+export const TopicScalarFieldEnumSchema = z.enum(["id", "topicName"]);
 
-export const EventTagScalarFieldEnumSchema = z.enum(['eventId','topicId']);
+export const EventTagScalarFieldEnumSchema = z.enum(["eventId", "topicId"]);
 
-export const PostTagScalarFieldEnumSchema = z.enum(['postId','topicId']);
+export const PostTagScalarFieldEnumSchema = z.enum(["postId", "topicId"]);
 
-export const TopicSubscriptionScalarFieldEnumSchema = z.enum(['userId','topicId']);
+export const TopicSubscriptionScalarFieldEnumSchema = z.enum([
+  "userId",
+  "topicId",
+]);
 
-export const FileScalarFieldEnumSchema = z.enum(['id','uploadedBy','createdAt','fileName','fileType','fileSize','filePath']);
+export const FileScalarFieldEnumSchema = z.enum([
+  "id",
+  "uploadedBy",
+  "createdAt",
+  "fileName",
+  "fileType",
+  "fileSize",
+  "filePath",
+]);
 
-export const SortOrderSchema = z.enum(['asc','desc']);
+export const SortOrderSchema = z.enum(["asc", "desc"]);
 
-export const NullsOrderSchema = z.enum(['first','last']);
+export const NullsOrderSchema = z.enum(["first", "last"]);
 
-export const EventStatusSchema = z.enum(['Verified','NonVerified']);
+export const EventStatusSchema = z.enum(["Verified", "NonVerified"]);
 
-export type EventStatusType = `${z.infer<typeof EventStatusSchema>}`
+export type EventStatusType = `${z.infer<typeof EventStatusSchema>}`;
 
-export const ParticipationStatusSchema = z.enum(['Going','Interested','NotInterested']);
+export const ParticipationStatusSchema = z.enum([
+  "Going",
+  "Interested",
+  "NotInterested",
+]);
 
-export type ParticipationStatusType = `${z.infer<typeof ParticipationStatusSchema>}`
+export type ParticipationStatusType = `${z.infer<
+  typeof ParticipationStatusSchema
+>}`;
 
-export const OrganizationStatusSchema = z.enum(['Pending','Verified']);
+export const OrganizationStatusSchema = z.enum(["Pending", "Verified"]);
 
-export type OrganizationStatusType = `${z.infer<typeof OrganizationStatusSchema>}`
+export type OrganizationStatusType = `${z.infer<
+  typeof OrganizationStatusSchema
+>}`;
 
-export const UserRoleSchema = z.enum(['Owner','Admin','Moderator','Member']);
+export const UserRoleSchema = z.enum(["Owner", "Admin", "Moderator", "Member"]);
 
-export type UserRoleType = `${z.infer<typeof UserRoleSchema>}`
+export type UserRoleType = `${z.infer<typeof UserRoleSchema>}`;
 
-export const AppPermissionNameSchema = z.enum(['CREATE_EVENTS','MANAGE_EVENTS','CREATE_POSTS','MANAGE_POSTS','MANAGE_MEMBERS','APPROVE_MEMBER_REQUESTS','VIEW_ANALYTICS','MANAGE_ORGANIZATION','DELETE_ORGANIZATION']);
+export const AppPermissionNameSchema = z.enum([
+  "CREATE_EVENTS",
+  "MANAGE_EVENTS",
+  "CREATE_POSTS",
+  "MANAGE_POSTS",
+  "MANAGE_MEMBERS",
+  "APPROVE_MEMBER_REQUESTS",
+  "VIEW_ANALYTICS",
+  "MANAGE_ORGANIZATION",
+  "DELETE_ORGANIZATION",
+]);
 
-export type AppPermissionNameType = `${z.infer<typeof AppPermissionNameSchema>}`
+export type AppPermissionNameType = `${z.infer<
+  typeof AppPermissionNameSchema
+>}`;
 
 /////////////////////////////////////////
 // MODELS
@@ -87,9 +199,9 @@ export const SchoolSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   domain: z.string(),
-})
+});
 
-export type School = z.infer<typeof SchoolSchema>
+export type School = z.infer<typeof SchoolSchema>;
 
 /////////////////////////////////////////
 // STUDENT SCHEMA
@@ -105,9 +217,9 @@ export const StudentSchema = z.object({
   otp: z.string(),
   jwt: z.string(),
   status: z.boolean(),
-})
+});
 
-export type Student = z.infer<typeof StudentSchema>
+export type Student = z.infer<typeof StudentSchema>;
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -127,9 +239,9 @@ export const UserSchema = z.object({
   otp: z.string(),
   jwt: z.string(),
   status: z.boolean(),
-})
+});
 
-export type User = z.infer<typeof UserSchema>
+export type User = z.infer<typeof UserSchema>;
 
 /////////////////////////////////////////
 // EVENT SCHEMA
@@ -139,26 +251,44 @@ export const EventSchema = z.object({
   status: EventStatusSchema,
   id: z.number().int(),
   userId: z.number().int(),
-  organizationId: zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()).nullable(),
+  organizationId: zodStringToNumberOrNull
+    .pipe(z.number().int().positive().nullable())
+    .nullable(),
   createdAt: z.coerce.date(),
-  title: z.string({ required_error: "Title is required", invalid_type_error: "Title must be a string"}).min(3, { message: "Title must contain 3 or more characters" }).max(255),
+  title: z
+    .string({
+      required_error: "Title is required",
+      invalid_type_error: "Title must be a string",
+    })
+    .min(3, { message: "Title must contain 3 or more characters" })
+    .max(255),
   description: z.string().min(3).max(255).nullable(),
   location: z.string().min(3).max(255),
-  startTime: z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}).refine((value) => value > new Date(), { message: 'Start time must be in the future', }),
-  endTime: z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}),
+  startTime: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
+  endTime: z.coerce.date({
+    required_error: "Please select a date and time",
+    invalid_type_error: "Invalid datetime string",
+  }),
   isPublic: BooleanSchema,
   imageId: z.number().int().nullable(),
-})
+});
 
-export type Event = z.infer<typeof EventSchema>
+export type Event = z.infer<typeof EventSchema>;
 
 /////////////////////////////////////////
 // EVENT CUSTOM VALIDATORS SCHEMA
 /////////////////////////////////////////
 
-export const EventCustomValidatorsSchema = EventSchema
+export const EventCustomValidatorsSchema = EventSchema;
 
-export type EventCustomValidators = z.infer<typeof EventCustomValidatorsSchema>
+export type EventCustomValidators = z.infer<typeof EventCustomValidatorsSchema>;
 
 /////////////////////////////////////////
 // USER EVENT RESPONSE SCHEMA
@@ -168,9 +298,9 @@ export const UserEventResponseSchema = z.object({
   userId: z.number().int(),
   eventId: z.number().int(),
   participationStatus: z.string(),
-})
+});
 
-export type UserEventResponse = z.infer<typeof UserEventResponseSchema>
+export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 
 /////////////////////////////////////////
 // POST SCHEMA
@@ -185,9 +315,9 @@ export const PostSchema = z.object({
   title: z.string(),
   text: z.string().nullable(),
   public: z.boolean(),
-})
+});
 
-export type Post = z.infer<typeof PostSchema>
+export type Post = z.infer<typeof PostSchema>;
 
 /////////////////////////////////////////
 // COMMENT SCHEMA
@@ -199,9 +329,9 @@ export const CommentSchema = z.object({
   postId: z.number().int(),
   createdAt: z.coerce.date(),
   text: z.string(),
-})
+});
 
-export type Comment = z.infer<typeof CommentSchema>
+export type Comment = z.infer<typeof CommentSchema>;
 
 /////////////////////////////////////////
 // ORGANIZATION SCHEMA
@@ -213,9 +343,9 @@ export const OrganizationSchema = z.object({
   organizationName: z.string(),
   description: z.string().nullable(),
   createdAt: z.coerce.date(),
-})
+});
 
-export type Organization = z.infer<typeof OrganizationSchema>
+export type Organization = z.infer<typeof OrganizationSchema>;
 
 /////////////////////////////////////////
 // USER ORGANIZATION ROLE SCHEMA
@@ -225,9 +355,9 @@ export const UserOrganizationRoleSchema = z.object({
   userId: z.number().int(),
   organizationId: z.number().int(),
   roleId: z.number().int(),
-})
+});
 
-export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>
+export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>;
 
 /////////////////////////////////////////
 // ROLE SCHEMA
@@ -236,9 +366,9 @@ export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>
 export const RoleSchema = z.object({
   roleName: UserRoleSchema,
   id: z.number().int(),
-})
+});
 
-export type Role = z.infer<typeof RoleSchema>
+export type Role = z.infer<typeof RoleSchema>;
 
 /////////////////////////////////////////
 // ORGANIZATION ROLE PERMISSION SCHEMA
@@ -248,9 +378,11 @@ export const OrganizationRolePermissionSchema = z.object({
   organizationId: z.number().int(),
   roleId: z.number().int(),
   permissionId: z.number().int(),
-})
+});
 
-export type OrganizationRolePermission = z.infer<typeof OrganizationRolePermissionSchema>
+export type OrganizationRolePermission = z.infer<
+  typeof OrganizationRolePermissionSchema
+>;
 
 /////////////////////////////////////////
 // PERMISSION SCHEMA
@@ -259,9 +391,9 @@ export type OrganizationRolePermission = z.infer<typeof OrganizationRolePermissi
 export const PermissionSchema = z.object({
   permissionName: AppPermissionNameSchema,
   id: z.number().int(),
-})
+});
 
-export type Permission = z.infer<typeof PermissionSchema>
+export type Permission = z.infer<typeof PermissionSchema>;
 
 /////////////////////////////////////////
 // ENROLLMENT SCHEMA
@@ -271,9 +403,9 @@ export const EnrollmentSchema = z.object({
   programId: z.number().int(),
   userId: z.number().int(),
   degreeType: z.string(),
-})
+});
 
-export type Enrollment = z.infer<typeof EnrollmentSchema>
+export type Enrollment = z.infer<typeof EnrollmentSchema>;
 
 /////////////////////////////////////////
 // PROGRAM SCHEMA
@@ -283,9 +415,9 @@ export const ProgramSchema = z.object({
   id: z.number().int(),
   programName: z.string(),
   department: z.string(),
-})
+});
 
-export type Program = z.infer<typeof ProgramSchema>
+export type Program = z.infer<typeof ProgramSchema>;
 
 /////////////////////////////////////////
 // TOPIC SCHEMA
@@ -294,9 +426,9 @@ export type Program = z.infer<typeof ProgramSchema>
 export const TopicSchema = z.object({
   id: z.number().int(),
   topicName: z.string(),
-})
+});
 
-export type Topic = z.infer<typeof TopicSchema>
+export type Topic = z.infer<typeof TopicSchema>;
 
 /////////////////////////////////////////
 // EVENT TAG SCHEMA
@@ -305,9 +437,9 @@ export type Topic = z.infer<typeof TopicSchema>
 export const EventTagSchema = z.object({
   eventId: z.number().int(),
   topicId: z.number().int(),
-})
+});
 
-export type EventTag = z.infer<typeof EventTagSchema>
+export type EventTag = z.infer<typeof EventTagSchema>;
 
 /////////////////////////////////////////
 // POST TAG SCHEMA
@@ -316,9 +448,9 @@ export type EventTag = z.infer<typeof EventTagSchema>
 export const PostTagSchema = z.object({
   postId: z.number().int(),
   topicId: z.number().int(),
-})
+});
 
-export type PostTag = z.infer<typeof PostTagSchema>
+export type PostTag = z.infer<typeof PostTagSchema>;
 
 /////////////////////////////////////////
 // TOPIC SUBSCRIPTION SCHEMA
@@ -327,9 +459,9 @@ export type PostTag = z.infer<typeof PostTagSchema>
 export const TopicSubscriptionSchema = z.object({
   userId: z.number().int(),
   topicId: z.number().int(),
-})
+});
 
-export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>
+export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 
 /////////////////////////////////////////
 // FILE SCHEMA
@@ -343,6 +475,6 @@ export const FileSchema = z.object({
   fileType: z.string(),
   fileSize: z.number().int(),
   filePath: z.string(),
-})
+});
 
-export type File = z.infer<typeof FileSchema>
+export type File = z.infer<typeof FileSchema>;
