@@ -21,7 +21,7 @@ export default function Navigation() {
                     <Stack.Screen name="SplashScreen" component={SplashScreen}/>
                     <Stack.Screen name="Login" component={Login} options={{gestureEnabled:false}}/>
                     <Stack.Screen name= "StudentSignUp" component={StudentSignUp} options={{gestureEnabled:false}}/>
-                    <Stack.Screen name="DrawerGroup" component={DrawerGroup}/>
+                    <Stack.Screen name="DrawerGroup" component={DrawerGroup} options={{gestureEnabled:false}}/>
                 </Stack.Navigator>  
             </NavigationContainer>
         </SafeAreaProvider>

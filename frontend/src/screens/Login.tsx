@@ -19,8 +19,12 @@ export default function Login() {
       console.log('clicked')
       const response = await axios(`http://${ip}:${port}/api/studentTest`)
       console.log(response.data)
+      
     }catch{
       console.log("error")
+    }
+    finally{
+      navigation.navigate("DrawerGroup")
     }
   }
 
