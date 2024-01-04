@@ -40,18 +40,28 @@ type contextObject = {
 const ChatContext = createContext<contextObject | null>(null);
 
 export const ChatContextProvider = ({ children }: PropsWithChildren) => {
+    // Getting the user from chats context since it wraps this context
     const { user, conversations, conversationsRef } = useChatsContext();
+
+    // An array of strings which represents conversations, for example: ['user1-user2', 'user2-user5']
     const conversationPairs = conversations.map(conv => getSortedKey(conv.participants[0], conv.participants[1]));
 
     const { id : currentUserId } = user;
 
+    // memoizing the reference to the messages collection
     const messagesRef = useMemo(() => collection(firestore, 'messages').withConverter(messageConverter), []);
     
+    // This is a custom cache which keeps track of opened chats so as to prevent recreating the realtime listeners
     const [conversationsCache, setConversationsCache] = useState<ConversationsCache>({});
 
+    /**
+     * Function to add, or delete an entry from the conversations cache
+     * It takes in the conversations pairs as an argument because it's easier to detect conversation changes from it 
+     */
     const updateConversationsCache = useCallback((conversations: string[]) => {
         let objectKeys = Object.keys(conversationsCache);
 
+        // Splitting the changes into added, deleted and unchanged conversations
         let added = conversations.filter(convKey => !objectKeys.includes(convKey));
         let deleted = objectKeys.filter(convKey => !conversations.includes(convKey));
         let unchanged = objectKeys.filter(convKey => conversations.includes(convKey));
@@ -59,6 +69,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         if(added.length > 0 || deleted.length > 0) {
             let fullList = [...unchanged, ...added];
 
+            // If we are removing entries then we have to deactivate the listeners associated with the entries
             deleted.forEach(key => {
                 const conversation = conversationsCache[key];
                 if(conversation.status === 'opened')
@@ -98,10 +109,15 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         }
     }, [])
 
+    /**
+     * Function to fetch more messages of a certain conversation
+     */
     const fetchMoreMessages = useCallback(async (otherEndUserId: string) => {
         const conversationKey = getSortedKey(currentUserId, otherEndUserId);
         const conversation = conversationsCache[conversationKey] as OpenedConversation;
 
+        // Only retrieve more documents if there are any more to be retrieved
+        // Doing this prevents an infinite cycle since without this firestore will circle back to beginning
         if(!conversation.endReached) {
             const { messages } = conversation;
     
@@ -134,6 +150,9 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         }
     }, [currentUserId, conversationsCache, setConversationsCache])
 
+    /**
+     * Function to set up a realtime listener and register it into the conversations cache
+     */
     const openConversation = useCallback((otherEndUserId: string) => {
         const conversationKey = getSortedKey(currentUserId, otherEndUserId);
         const conversation = conversationsCache[conversationKey];
@@ -188,10 +207,16 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         }
     }, [currentUserId, conversationsCache, setConversationsCache])
 
+    /**
+     * Function to retrieve a conversation cache entry 
+     */
     const getConversation = useCallback((otherEndUserId: string) => {
         return conversationsCache[getSortedKey(currentUserId, otherEndUserId)];
     }, [conversationsCache])
 
+    /**
+     * Function to create a new message and create/update the conversation object associated to it
+     */
     const createNewMessage = useCallback(async (otherEndUserId: string, message: string) => {
         await addDoc(messagesRef, {
             id: '',
@@ -251,6 +276,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         }
     }, [conversations])
 
+    /**
+     * Function to update messages read status
+     * Iterates through all messages that have not been read and updates them
+     * Also updates the conversation object associated
+     */
     const updateMessagesReadStatus = useCallback(async (otherEndUserId: string) => {
         const currentTime = Timestamp.now();
         const promises = (await getDocs(
@@ -290,6 +320,9 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         }
     }, [currentUserId, conversations])
 
+    /**
+     * Function which computes the number of unread messages for the current user
+     */
     const getNumberOfUnreadMessages = useCallback((
         otherEndUserId: string, 
         unreadMessages: {
