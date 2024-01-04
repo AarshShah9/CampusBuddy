@@ -21,7 +21,7 @@ export default function CarpoolScreenStack() {
                 name="CarpoolScreen" component={Carpool} 
                 options={({ navigation }) => ({ 
                     title: 'Carpool',
-                    headerLeft: () => <DrawerIcon {...{ navigation }} />,
+                    headerLeft: () => <DrawerIcon />,
                     headerRight: () => <UserIcon />,
                 })}
             />
