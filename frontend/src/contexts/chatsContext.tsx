@@ -25,21 +25,32 @@ type Props = PropsWithChildren<{
 function AuthenticatedProvider({ children, user }: Props) {
     const { id : currentUserId } = user;
     
+    // memoizing the reference to the conversations collection
     const conversationsRef = useMemo(() => collection(firestore, 'conversations').withConverter(conversationConverter), []);
     
+    // memoizing the query main query used to obtain a user's conversations
     const conversationsQuery = useMemo(() => query(
         conversationsRef, 
         where("participants", "array-contains", currentUserId),
         orderBy('updatedAt', 'desc')        
     ), []);
 
+    // A loading state for when more collection data is being retrieved
     const [conversationsAreLoading, setConversationsAreLoading] = useState(true);
 
+    // A state to help determine if there is any more collection data to retrieve
     const [endReached, setEndReached] = useState(false);
 
+    // A state to control the limit of documents to retrieve
+    // The approach here is that if someone scrolls to the end, then the limit is increased so that more documents are retrieved 
     const [documentsNeeded, setDocumentsNeeded] = useState(initialNumberOfConversations);
 
+    /**
+     * Function to fetch more collection documents when user has scrolled to the end
+     */
     const fetchMoreConversations = useCallback(() => {
+        // Only retrieve more documents if there are any more to be retrieved
+        // Doing this prevents an infinite cycle since without this firestore will circle back to beginning
         if(!endReached) {
             setConversationsAreLoading(true);
             setDocumentsNeeded(documentsNeeded => {
@@ -50,6 +61,7 @@ function AuthenticatedProvider({ children, user }: Props) {
 
     const [conversations, setConversations] = useState<ConversationObject[]>([]);
 
+    // A useEffect to set up a new query listener when the number of docs needed changes
     useEffect(() => {
         let subscriber = onSnapshot(
             query(conversationsQuery, limit(documentsNeeded)),
@@ -80,8 +92,11 @@ function AuthenticatedProvider({ children, user }: Props) {
 
 export const ChatsContextProvider = ({ children }: PropsWithChildren) => {
     const { user } = useAuthContext();
+    // Since this context is wrapped around the messaging screen stack
+    // If a user is not authenticated then currently we are returning null
+    // This is assuming that the user can still access certain parts of the app without being signed in
     if(!user) 
-        return null // ... to be decided, If not authenticated we can render something like a login screen 
+        return null
 
     return (
         <AuthenticatedProvider user={user}>
