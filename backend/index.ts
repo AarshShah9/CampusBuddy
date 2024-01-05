@@ -39,16 +39,14 @@ app.get('/Test', (req: Request, res: Response) => {
     res.json({ message: 'Hello World!' });
 });
 
-app.post('/upload', upload.single('file'), async (req: Request, res: Response) => {
+app.post('/api/upload', upload.single('file'), async (req: Request, res: Response) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }
 
     try {
-        // The 'path' should be a unique identifier for your file (like a filename)
+        console.log(req.file.originalname);
         const path = `your/path/${req.file.originalname}`;
-
-        // Call your function to upload to S3
         await UploadToS3(req.file, path);
 
         res.status(200).send('File uploaded successfully');
