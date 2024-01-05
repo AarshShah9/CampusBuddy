@@ -73,6 +73,7 @@ export default function Home() {
                 console.log(err);
                 alert("Something went wrong in the Upload Function!");
         }
+
     }
 
     return (
