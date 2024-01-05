@@ -30,7 +30,8 @@ export default function InputField({ error, ...props }: any) {
         ]}
         {...props}
         onFocus={() => {
-          props.focus(null, "password");
+          // currently not working
+          // props.focus(null, "password");
           setFocused(true);
         }}
         onBlur={() => {
