@@ -33,7 +33,8 @@
     "os": "^0.1.2",
     "otp-generator": "^4.0.1",
     "prisma": "^5.5.2",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",

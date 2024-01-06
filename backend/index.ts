@@ -1,21 +1,27 @@
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 // import multer from 'multer';
-import { upload } from "./utils/fileUpload";
-
 import cookieParser from "cookie-parser";
-// importing routes
 import path from "path";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
+import { upload } from "./utils/fileUpload";
+import { env, validateEnv } from "./utils/validateEnv";
 
 const app = express();
 // const upload = multer({ dest: 'uploads/' });
 const result = dotenv.config();
 
+try {
+  // Validates the Env file
+  validateEnv(process.env);
+} catch (error) {
+  throw new Error("Failed to validate environment variables");
+}
+
 const port = 3000;
-const ip = process.env.IP_ADDRESS ?? "localhost";
+const ip = env.IP_ADDRESS;
 
 // middleware
 app.use(express.json()); // parsing JSON in the request body
