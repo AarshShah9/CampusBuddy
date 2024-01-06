@@ -1,16 +1,16 @@
 import dotenv from 'dotenv';
 import express, {NextFunction, Request, Response} from 'express';
-import multer from 'multer';
-
+// import multer from 'multer';
+import {upload} from "./utils/fileUpload";
 
 import cookieParser from 'cookie-parser';
 // importing routes
 import student from './routes/user.routes';
 import school from './routes/school.routes';
-import UploadToS3 from "./util/S3Uploader";
+import UploadToS3 from "./utils/S3Uploader";
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+// const upload = multer({ dest: 'uploads/' });
 const result = dotenv.config();
 
 const port = 3000;
