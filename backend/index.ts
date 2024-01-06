@@ -1,12 +1,13 @@
-import dotenv from 'dotenv';
-import express, {NextFunction, Request, Response} from 'express';
+import dotenv from "dotenv";
+import express, { NextFunction, Request, Response } from "express";
 // import multer from 'multer';
-import {upload} from "./utils/fileUpload";
+import { upload } from "./utils/fileUpload";
 
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 // importing routes
-import student from './routes/user.routes';
-import school from './routes/school.routes';
+import path from "path";
+import school from "./routes/school.routes";
+import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 
 const app = express();
@@ -14,51 +15,56 @@ const app = express();
 const result = dotenv.config();
 
 const port = 3000;
-const ip = process.env.IP_ADDRESS ?? 'localhost';
+const ip = process.env.IP_ADDRESS ?? "localhost";
 
 // middleware
 app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
 app.use((req: Request, res: Response, next: NextFunction) => {
-    res.header('Content-Type', 'application/json');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept'
-    );
-    next();
+  res.header("Content-Type", "application/json");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept",
+  );
+  next();
 });
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
+app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
 
 // routes
-app.use('/api', student);
-app.use('/api', school);
+app.use("/api", student);
+app.use("/api", school);
 
-app.get('/Test', (req: Request, res: Response) => {
-    console.log('The backend is hit');
-    res.json({ message: 'Hello World!' });
+app.get("/Test", (req: Request, res: Response) => {
+  console.log("The backend is hit");
+  res.json({ message: "Hello World!" });
 });
 
-app.post('/api/upload', upload.single('file'), async (req: Request, res: Response) => {
+app.post(
+  "/api/upload",
+  upload.single("file"),
+  async (req: Request, res: Response) => {
     if (!req.file) {
-        return res.status(400).send('No file uploaded.');
+      return res.status(400).send("No file uploaded.");
     }
 
     try {
-        console.log(req.file.originalname);
-        const path = `your/path/${req.file.originalname}`;
-        await UploadToS3(req.file, path);
+      console.log(req.file.originalname);
+      const path = `your/path/${req.file.originalname}`;
+      await UploadToS3(req.file, path);
 
-        res.status(200).send('File uploaded successfully');
+      res.status(200).send("File uploaded successfully");
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error uploading the file');
+      console.error(error);
+      res.status(500).send("Error uploading the file");
     }
-});
+  },
+);
 
 // server start
 const server = app.listen(port, ip, () => {
-    console.log(`Example app listening at http://${ip}:${port}`);
+  console.log(`App listening at http://${ip}:${port}`);
 });
 
 export default app;
