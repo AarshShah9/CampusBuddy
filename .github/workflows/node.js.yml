@@ -28,6 +28,15 @@ jobs:
           cache-dependency-path: backend/package-lock.json
 
       # Change directory to backend before running npm commands
+      - run: | 
+          cd backend
+          touch .env
+          echo IP_ADDRESS=$IP_ADDRESS >> .env
+          echo DATABASE_URL=$DATABASE_URL >> .env
+          echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> .env
+          echo AWS_SECRET_ACCESS_KEY=$DATABASE_URL >> .env
+          echo AWS_REGION=$AWS_REGION >> .env
+          echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
       - run: cd backend && npm ci
       - run: cd backend && npm run build --if-present
       - run: cd backend && npm test
