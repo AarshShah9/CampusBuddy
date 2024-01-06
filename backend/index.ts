@@ -69,7 +69,7 @@ app.post(
 );
 
 // server start
-const server = app.listen(port, ip, () => {
+const server = app.listen(parseInt(port), ip, () => {
   console.log(`App listening at http://${ip}:${port}`);
 });
 
