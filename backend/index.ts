@@ -20,7 +20,7 @@ try {
   throw new Error("Failed to validate environment variables");
 }
 
-const port = 3000;
+const port = env.PORT;
 const ip = env.IP_ADDRESS;
 
 // middleware

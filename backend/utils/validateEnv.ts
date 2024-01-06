@@ -7,6 +7,7 @@ const envSchema = z.object({
   AWS_SECRET_ACCESS_KEY: z.string(),
   AWS_REGION: z.string(),
   AWS_BUCKET_NAME: z.string(),
+  PORT: z.string(),
   // Add more environment variables as needed
 });
 
@@ -18,6 +19,11 @@ const validateEnv = (config: Record<string, unknown>): EnvType => {
 
 const env = {
   IP_ADDRESS: process.env.IP_ADDRESS!,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID!,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
+  AWS_REGION: process.env.AWS_REGION!,
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
+  PORT: process.env.PORT!,
 };
 
 export { env, validateEnv };
