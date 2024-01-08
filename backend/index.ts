@@ -1,13 +1,12 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
+import multer from "multer";
 import path from "path";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
-// import { upload } from "./utils/fileUpload";
-import multer from "multer";
 import { env, validateEnv } from "./utils/validateEnv";
 
 const app = express();
@@ -38,6 +37,15 @@ app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
 app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Content-Type", "application/json");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept",
+  );
+  next();
+});
 
 // routes
 app.use("/api", student);
@@ -58,9 +66,10 @@ app.post(
 
     try {
       console.log(req.file.originalname);
+
+      // Would need to generate a proper path here
       const path = `new/path/${req.file.originalname}`;
       await UploadToS3(req.file, path);
-      console.log("Success HERE");
       res.status(200).send("File uploaded successfully");
     } catch (error) {
       console.error(error);

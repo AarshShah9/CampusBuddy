@@ -11,7 +11,7 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
   const [image, setImage] = useState<string>();
-  let url = "https://cuddly-shirts-talk.loca.lt";
+  let url = "https://funny-fans-punch.loca.lt/";
 
   const testCallback = async () => {
     fetch(url + "/Test")

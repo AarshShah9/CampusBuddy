@@ -37,7 +37,7 @@ jobs:
           echo AWS_SECRET_ACCESS_KEY=$DATABASE_URL >> .env
           echo AWS_REGION=$AWS_REGION >> .env
           echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
-          echo PORT=3002 >> .env
+          echo PORT=3003 >> .env
       - run: cd backend && npm ci
       - run: cd backend && npm run build --if-present
       - run: cd backend && npm test
