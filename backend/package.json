@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest",
     "clearJest": "jest --clearCache",
-    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/backend/index.js\")",
+    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/index.js\")",
     "build": "tsc && tsc-alias",
-    "start": "node dist/backend/index.js",
+    "start": "node dist/index.js",
     "genSchemas": "npx prisma generate && npx prettier --write ../shared/src/generated/zod/index.ts"
   },
   "keywords": [],
