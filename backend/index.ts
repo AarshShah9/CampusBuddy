@@ -22,7 +22,7 @@ try {
 }
 
 const port = env.PORT;
-const ip = "192.168.56.1";
+const ip = env.IP_ADDRESS ?? "localhost";
 
 // middleware
 app.use(
