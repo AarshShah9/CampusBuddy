@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 // import multer from 'multer';
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import path from "path";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
@@ -21,20 +22,28 @@ try {
 }
 
 const port = env.PORT;
-const ip = env.IP_ADDRESS;
+const ip = "192.168.56.1";
 
 // middleware
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Authorization",
+  }),
+);
+
 app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header("Content-Type", "application/json");
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept",
-  );
-  next();
-});
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   res.header("Content-Type", "application/json");
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept",
+//   );
+//   next();
+// });
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
 app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
 
