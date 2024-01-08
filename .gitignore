@@ -46,6 +46,7 @@ backend/dist
 
 backend/coverage
 backend/coverage/*
+backend/uploads
 
 frontend/%ProgramData%
 

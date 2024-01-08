@@ -1,4 +1,3 @@
-import { IP_ADDRESS } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
@@ -12,10 +11,10 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
   const [image, setImage] = useState<string>();
+  let url = "https://cuddly-shirts-talk.loca.lt";
 
   const testCallback = async () => {
-    let url = `http://${IP_ADDRESS}:3000/Test`;
-    fetch(url)
+    fetch(url + "/Test")
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -52,23 +51,15 @@ export default function Home() {
     const ext = match?.[1];
     const type = match ? `image/${match[1]}` : `image`;
     const formData = new FormData();
-    formData.append("image", {
+    formData.append("file", {
       uri,
       name: `image.${ext}`,
       type,
     } as any);
     try {
-      const { data } = await axios.post(
-        `${IP_ADDRESS}:3000/api/upload`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
-      if (!data.isSuccess) {
-        alert("Image upload failed!");
-        return;
-      }
+      const { data } = await axios.post(`${url}/api/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       alert("Image Uploaded");
     } catch (err) {
       console.log(err);

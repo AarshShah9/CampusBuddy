@@ -1,22 +1,23 @@
-import dotenv from "dotenv";
-import express, { Request, Response } from "express";
-// import multer from 'multer';
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv";
+import express, { Request, Response } from "express";
 import path from "path";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
-import { upload } from "./utils/fileUpload";
+// import { upload } from "./utils/fileUpload";
+import multer from "multer";
 import { env, validateEnv } from "./utils/validateEnv";
 
 const app = express();
-// const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: "uploads/" });
 const result = dotenv.config();
 
 try {
   // Validates the Env file
   validateEnv(process.env);
+  console.log("ENV FILE: ", env);
 } catch (error) {
   throw new Error("Failed to validate environment variables");
 }
@@ -35,15 +36,6 @@ app.use(
 
 app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
-// app.use((req: Request, res: Response, next: NextFunction) => {
-//   res.header("Content-Type", "application/json");
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept",
-//   );
-//   next();
-// });
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
 app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
 
@@ -66,9 +58,9 @@ app.post(
 
     try {
       console.log(req.file.originalname);
-      const path = `your/path/${req.file.originalname}`;
+      const path = `new/path/${req.file.originalname}`;
       await UploadToS3(req.file, path);
-
+      console.log("Success HERE");
       res.status(200).send("File uploaded successfully");
     } catch (error) {
       console.error(error);
@@ -78,8 +70,8 @@ app.post(
 );
 
 // server start
-const server = app.listen(parseInt(port), ip, () => {
-  console.log(`App listening at http://${ip}:${port}`);
+const server = app.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`);
 });
 
 export default app;
