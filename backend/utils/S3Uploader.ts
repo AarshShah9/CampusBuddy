@@ -30,7 +30,7 @@ const UploadToS3 = async (file: Express.Multer.File, path: string) => {
       },
     });
   } catch (error) {
-    console.log("Error has occured in the S3 Uploade", error);
+    console.log("Error has occured in the S3 Uploader", error);
   }
 };
 

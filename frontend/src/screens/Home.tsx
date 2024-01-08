@@ -14,13 +14,11 @@ export default function Home() {
   const [image, setImage] = useState<string>();
 
   const testCallback = async () => {
-    // startLoading();
     let url = `http://${IP_ADDRESS}:3000/Test`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        // stopLoading()
       })
       .catch((err) => console.log(err));
   };
