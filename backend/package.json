@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "clearJest": "jest --clearCache",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
     "build": "tsc",

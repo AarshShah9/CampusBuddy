@@ -23,7 +23,8 @@ const env = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
   AWS_REGION: process.env.AWS_REGION!,
   AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
-  PORT: process.env.PORT!,
+  PORT: process.env.PORT ?? "3000",
+  ENV: process.env.ENV ?? "dev",
 };
 
 export { env, validateEnv };
