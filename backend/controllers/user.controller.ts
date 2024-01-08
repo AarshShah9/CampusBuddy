@@ -60,7 +60,7 @@ export const createNewStudent = async (req: Request, res: Response) => {
         }
     })
 
-    // if student doesnt exist
+    // if student doesn't exist
     if (!studentExists) {
         // if schoolName is valid
         if (schoolID) {
@@ -351,4 +351,40 @@ export const getAllStudents = async (req: Request, res: Response) => {
     const allStudents = await prisma.user.findMany();
 
     res.status(200).json(allStudents);
+};
+
+//update User Information
+export const updateUser = async (
+    req:Request,
+    res:Response,
+    //next: NextFunction
+)=> {
+    const userId  : number = parseInt(req.params.userId, 10);
+    const {username, firstName, lastName, yearOfStudy} = req.body;
+
+    //validation checks
+    if (yearOfStudy < 0 || yearOfStudy > 8){
+        return res.status(400).json({error: 'Invalid Year of Study'});
+    }
+
+    try{
+        const userExists = await prisma.user.findUnique({ where: { username } });
+        if (userExists && userExists.id !== userId) {
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+        const updatedUser = await prisma.user.update({
+            where: {id: userId},
+            data:{
+                username,
+                firstName,
+                lastName,
+                yearOfStudy
+            }
+        });
+        res.json(updatedUser)
+    }
+    catch(error){
+        console.log(error);
+        return res.sendStatus(400);
+    }
 };
