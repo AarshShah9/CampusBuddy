@@ -59,10 +59,8 @@ model User {
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
   isVerified        Boolean                @default(false) @map("is_verified")
-  profilePicId      Int?                   @unique @map("profile_pic_id")
+  profilePic        String?                @unique @map("profile_pic")
   school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  profilePic        File?                  @relation(fields: [profilePicId], references: [id])
-  uploadedFiles     File[]                 @relation(name: "UserUploads")
   events            Event[]
   UserEventResponse UserEventResponse[]
   posts             Post[]
@@ -99,10 +97,9 @@ model Event {
   /// @zod.custom.use(BooleanSchema)
   isPublic       Boolean             @map("is_public")
   status         EventStatus         
-  imageId        Int?                @unique @map("image_id")
+  image          String?             
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  file           File?               @relation(fields: [imageId], references: [id])
   eventTags      EventTag[]
   eventResponses UserEventResponse[]
 
@@ -138,7 +135,7 @@ model UserEventResponse {
 model Post {
   id             Int           @id @default(autoincrement())
   userId         Int           @map("user_id")
-  imageId        Int?          @unique @map("image_id")
+  image          String?      
   organizationId Int?          @map("organization_id")
   createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
@@ -146,7 +143,6 @@ model Post {
   public         Boolean       @default(true)
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  file           File?         @relation(fields: [imageId], references: [id])
 
   comments Comment[]
   postTags PostTag[]
@@ -324,21 +320,5 @@ model TopicSubscription {
   @@map("topic_subscription")
 }
 
-model File {
-  id         Int      @id @default(autoincrement())
-  uploadedBy Int      @map("uploaded_by")
-  createdAt  DateTime @default(now()) @map("created_at")
-  fileName   String   @map("file_name")
-  fileType   String   @map("file_type")
-  fileSize   Int      @map("file_size") // file size in bytes
-  filePath   String   @map("file_path") // path to the stored file
-  event      Event?
-  user       User?
-  post       Post?
-  uploader   User     @relation(fields: [uploadedBy], references: [id], name: "UserUploads", onDelete: NoAction, onUpdate: NoAction) // cyclic relation to user
-
-  @@index([uploadedBy])
-  @@map("file")
-}
 
 
