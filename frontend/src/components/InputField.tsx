@@ -6,7 +6,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 
 /* Custom Component which display text of what info is required and sets a input box with specified primary theme */
 
-export default function InputField({ error, ...props }: any) {
+export default function InputField({ ...props }: any) {
   const [isFocused, setFocused] = useState(false);
   const [hidePassword, setHidePassword] = useState(props.password);
   const { theme } = useThemeContext();
@@ -21,25 +21,17 @@ export default function InputField({ error, ...props }: any) {
         style={[
           styles.input,
           {
-            borderColor: error
-              ? "red"
-              : isFocused
-              ? theme.colors.primary
-              : "grey",
+            borderColor: isFocused ? theme.colors.primary : "grey",
           },
         ]}
         {...props}
         onFocus={() => {
-          // currently not working
-          // props.focus(null, "password");
           setFocused(true);
         }}
         onBlur={() => {
           setFocused(false);
         }}
       />
-
-      {error && <Text style={styles.errorMsg}>{error}</Text>}
     </View>
   );
 }
@@ -65,11 +57,5 @@ const styles = StyleSheet.create({
     marginLeft: "8%",
     fontSize: 16,
     marginBottom: "1%",
-  },
-  errorMsg: {
-    color: "red",
-    marginRight: "auto",
-    marginLeft: "auto",
-    marginBottom: "2%",
   },
 });
