@@ -6,9 +6,10 @@
   "scripts": {
     "test": "jest --detectOpenHandles",
     "clearJest": "jest --clearCache",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/index.js\")",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "genSchemas": "npx prisma generate && npx prettier --write ../shared/src/generated/zod/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +35,9 @@
     "otp-generator": "^4.0.1",
     "prisma": "^5.5.2",
     "ts-node": "^10.9.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zod-prisma-types": "^3.1.6",
+    "shared": "file:../shared"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
@@ -56,6 +59,7 @@
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.2.2"
   }
 }

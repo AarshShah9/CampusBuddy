@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"],
+      "@prisma/client": ["./node_modules/@prisma/client"]
+    }
+  }
+}
