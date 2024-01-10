@@ -26,6 +26,19 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
+          
+      # Change directory to backend before running npm commands
+      - run: | 
+          cd backend
+          touch .env
+          echo IP_ADDRESS=localhost >> .env
+          echo DATABASE_URL=$DATABASE_URL >> .env
+          echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> .env
+          echo AWS_SECRET_ACCESS_KEY=$DATABASE_URL >> .env
+          echo AWS_REGION=$AWS_REGION >> .env
+          echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
+          echo PORT=3000 >> .env
+          echo ENV=GA >> .env
 
       - name: Install Shared Dependencies
         run: cd shared && npm ci
