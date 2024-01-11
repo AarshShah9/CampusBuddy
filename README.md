@@ -77,6 +77,11 @@ $ npx prisma db push // push model changes to remote db instance
 - JetBrain's Webstorm
 - VSCode
 
+### Code Formatting
+
+The project uses a common Prettier config file to maintain consistent code formatting. Install the Prettier extension and configure your IDE to use Prettier as your default code formatter and set it to format on save.
+
+
 ### Git
 
 - To streamline new branch creation you can use this command to automatically set up an upstream

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { schools,
+import {
+    schools,
     users,
     events,
     userEventResponses,
@@ -15,61 +16,64 @@ import { schools,
     topics,
     eventTags,
     postTags,
-    topicSubscriptions } from './data';
+    topicSubscriptions,
+} from './data';
 const prisma = new PrismaClient();
 
 const load = async () => {
     try {
         await prisma.school.deleteMany();
-        console.log('Deleted records in the School table')
+        console.log('Deleted records in the School table');
 
         await prisma.user.deleteMany();
-        console.log('Deleted records in the User table')
+        console.log('Deleted records in the User table');
 
         await prisma.event.deleteMany();
-        console.log('Deleted records in the Event table')
+        console.log('Deleted records in the Event table');
 
         await prisma.userEventResponse.deleteMany();
-        console.log('Deleted records in the User Event Response table')
+        console.log('Deleted records in the User Event Response table');
 
         await prisma.post.deleteMany();
-        console.log('Deleted records in the Post table')
+        console.log('Deleted records in the Post table');
 
         await prisma.comment.deleteMany();
-        console.log('Deleted records in the Comment table')
+        console.log('Deleted records in the Comment table');
 
         await prisma.organization.deleteMany();
-        console.log('Deleted records in the Organization table')
+        console.log('Deleted records in the Organization table');
 
         await prisma.userOrganizationRole.deleteMany();
-        console.log('Deleted records in the User Organization Role table')
+        console.log('Deleted records in the User Organization Role table');
 
         await prisma.role.deleteMany();
-        console.log('Deleted records in the Role table')
+        console.log('Deleted records in the Role table');
 
         await prisma.organizationRolePermission.deleteMany();
-        console.log('Deleted records in the Organization Role Permission table')
+        console.log(
+            'Deleted records in the Organization Role Permission table'
+        );
 
         await prisma.permission.deleteMany();
-        console.log('Deleted records in the Permission table')
+        console.log('Deleted records in the Permission table');
 
         await prisma.enrollment.deleteMany();
-        console.log('Deleted records in the Enrollment table')
+        console.log('Deleted records in the Enrollment table');
 
         await prisma.program.deleteMany();
-        console.log('Deleted records in the Program table')
+        console.log('Deleted records in the Program table');
 
         await prisma.topic.deleteMany();
-        console.log('Deleted records in the Topic table')
+        console.log('Deleted records in the Topic table');
 
         await prisma.eventTag.deleteMany();
-        console.log('Deleted records in the Event Tag table')
+        console.log('Deleted records in the Event Tag table');
 
         await prisma.postTag.deleteMany();
-        console.log('Deleted records in the Post Tag table')
+        console.log('Deleted records in the Post Tag table');
 
         await prisma.topicSubscription.deleteMany();
-        console.log('Deleted records in the Topic Subscription table')
+        console.log('Deleted records in the Topic Subscription table');
 
         await prisma.$queryRaw`ALTER TABLE school AUTO_INCREMENT = 1`;
         console.log('reset School auto increment to 1');
@@ -136,15 +140,20 @@ const load = async () => {
         });
         console.log('Added Organization data');
 
+        await prisma.role.createMany({
+            data: roles,
+        });
+        console.log('Added Role data');
+
         await prisma.userOrganizationRole.createMany({
             data: userOrganizationRoles,
         });
         console.log('Added User Organization Roles data');
 
-        await prisma.role.createMany({
-            data: roles,
-        });
-        console.log('Added Role data');
+        // await prisma.role.createMany({
+        //     data: roles,
+        // });
+        // console.log('Added Role data');
 
         await prisma.organizationRolePermission.createMany({
             data: organizationRolePermissions,
@@ -185,13 +194,11 @@ const load = async () => {
             data: topicSubscriptions,
         });
         console.log('Added Topic Subscription data');
-
-
     } catch (e) {
-        console.error(e)
-        process.exit(1)
+        console.error(e);
+        process.exit(1);
     } finally {
-        await prisma.$disconnect()
+        await prisma.$disconnect();
     }
 };
 load();
