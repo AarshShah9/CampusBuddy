@@ -6,11 +6,11 @@ import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import { useFonts } from "expo-font";
 
 export default function Login() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
-
   // Testing If Could Reach EndPoints
   const port = 3000;
   const ip = process.env.IP_ADDRESS ?? 'localhost';
@@ -41,13 +41,13 @@ export default function Login() {
         <InputField  name="Email" placeholder="Email" />
         <InputField password={true} name="Password" placeholder="Password" />
         <StyledButton mode="contained" onPress={() => {validate()}}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
             Login
           </Text>
         </StyledButton>
         <ClickLink $color={theme.colors.primary}>
         Don't have any account?  
-        <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary }}> Sign up</Text>
+        <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary, fontFamily:"Roboto-Reg" }}> Sign up</Text>
         </ClickLink>
       </OverlayContainer>
     </MainContainer>
@@ -71,6 +71,7 @@ const ClickLink = styled(Text)<{ $color: string }>`
   margin-right: auto;
   margin-top: 64px;
   font-size: 16px;
+  fontFamily:"Roboto-Reg"
 `;
 const Header = styled(Text)`
   font-size: 40px;
@@ -79,6 +80,7 @@ const Header = styled(Text)`
   margin-bottom: 32px;
   margin-left: auto;
   margin-right: auto;
+  font-family: Nunito-Bold
 `;
 const StyledButton = styled(Button)`
   width: 84%;
@@ -89,4 +91,5 @@ const StyledButton = styled(Button)`
   margin-right: auto;
   margin-top:2%;
   justify-content: center;
+  
 `;

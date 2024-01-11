@@ -52,10 +52,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     outlineStyle: "none",
     overflow: "hidden",
+    fontFamily:"Roboto-Reg"
   },
   header2: {
     marginLeft: "8%",
     fontSize: 16,
     marginBottom: "1%",
+    fontFamily:"Roboto-Reg"
   },
 });

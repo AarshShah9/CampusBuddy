@@ -73,7 +73,7 @@ export default function StudentSignUp() {
                 onPress={() => {
                   console.log("Pressed");
                 }}
-                style={{ color: theme.colors.primary, fontSize: 16 }}
+                style={{ color: theme.colors.primary, fontSize: 16, fontFamily:"Roboto-Reg" }}
               >
                 {" "}
                 here{" "}
@@ -97,7 +97,7 @@ export default function StudentSignUp() {
             />
             <StyledButton mode="contained" onPress={()=>{}}>
               <Text
-                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
+                style={{ fontSize: 20, fontWeight: "bold", color: "white",  fontFamily:"Nunito-Bold" }}
               >
                 Agree and Continue
               </Text>
@@ -133,6 +133,7 @@ const HeaderText = styled(Text)<{ $textColor: string }>`
   color: ${(props) => props.$textColor};
   font-size: 28px;
   font-weight: bold;
+  fontFamily:"Nunito-Bold"
 `;
 
 const FormContainer = styled(View)`
@@ -148,6 +149,7 @@ const StyledButton = styled(Button)`
   margin-right: auto;
   margin-top: 16%;
   justify-content: center;
+  
 `;
 const ClickLink = styled(Text)<{ $color: string }>`
   margin-left: auto;
