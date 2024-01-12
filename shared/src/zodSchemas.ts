@@ -37,19 +37,6 @@ export const EventUpdateSchema = generatedSchemas.EventSchema.partial();
 
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 
-///////////////////////////////
-// FILE SCHEMAS
-///////////////////////////////
-
-export const FileCreateSchema = generatedSchemas.FileSchema.omit({
-  id: true,
-  createdAt: true,
-  uploadedBy: true,
-  filePath: true, // path to cloud storage
-});
-
-export type FileCreateInput = z.infer<typeof FileCreateSchema>;
-
 /////////////////////////////// s
 // ORGANIZATION SCHEMAS
 ///////////////////////////////
