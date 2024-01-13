@@ -7,6 +7,7 @@ Schemas are stored in `./zodSchemas.ts`. Here we can import the schemas generate
 
 Additional constraints on fields and other custom validators can be applied to the models in the `backend/prisma/schema.prisma` with rich comments (triple slashes `///`). Refer to the [zod-prisma-types docs](https://github.com/chrishoermann/zod-prisma-types#field-validators) for more info.
 
+Types can be inferred from schemas using z.infer, eg: `type TmySchema = z.infer<typeof mySchema>`
 
 ## Updating Schemas
 
