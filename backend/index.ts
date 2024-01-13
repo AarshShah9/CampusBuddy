@@ -8,6 +8,7 @@ import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -77,6 +78,9 @@ app.post(
     }
   },
 );
+
+// // Global error handling middleware - Must be the last middleware
+app.use(errorHandler);
 
 // server start
 const server = app.listen(port, () => {
