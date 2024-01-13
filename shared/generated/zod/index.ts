@@ -1,4 +1,4 @@
-import { BooleanSchema, zodStringToNumberOrNull } from "@shared/src/utils";
+import { BooleanSchema, zodStringToNumberOrNull } from "@shared/utils";
 import { z } from "zod";
 
 /////////////////////////////////////////
