@@ -352,7 +352,7 @@ export const getAllStudents = async (req: Request, res: Response) => {
 
     res.status(200).json(allStudents);
 };
-
+ 
 //update User Information
 export const updateUser = async (
     req:Request,

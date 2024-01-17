@@ -40,7 +40,7 @@ export const UserScalarFieldEnumSchema = z.enum([
   "yearOfStudy",
   "schoolId",
   "isVerified",
-  "profilePicId",
+  "profilePic",
   "otp",
   "jwt",
   "status",
@@ -58,7 +58,7 @@ export const EventScalarFieldEnumSchema = z.enum([
   "endTime",
   "isPublic",
   "status",
-  "imageId",
+  "image",
 ]);
 
 export const UserEventResponseScalarFieldEnumSchema = z.enum([
@@ -70,7 +70,7 @@ export const UserEventResponseScalarFieldEnumSchema = z.enum([
 export const PostScalarFieldEnumSchema = z.enum([
   "id",
   "userId",
-  "imageId",
+  "image",
   "organizationId",
   "createdAt",
   "title",
@@ -131,16 +131,6 @@ export const PostTagScalarFieldEnumSchema = z.enum(["postId", "topicId"]);
 export const TopicSubscriptionScalarFieldEnumSchema = z.enum([
   "userId",
   "topicId",
-]);
-
-export const FileScalarFieldEnumSchema = z.enum([
-  "id",
-  "uploadedBy",
-  "createdAt",
-  "fileName",
-  "fileType",
-  "fileSize",
-  "filePath",
 ]);
 
 export const SortOrderSchema = z.enum(["asc", "desc"]);
@@ -235,7 +225,7 @@ export const UserSchema = z.object({
   yearOfStudy: z.number().int(),
   schoolId: z.number().int(),
   isVerified: z.boolean(),
-  profilePicId: z.number().int().nullable(),
+  profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),
   status: z.boolean(),
@@ -277,7 +267,7 @@ export const EventSchema = z.object({
     invalid_type_error: "Invalid datetime string",
   }),
   isPublic: BooleanSchema,
-  imageId: z.number().int().nullable(),
+  image: z.string().nullable(),
 });
 
 export type Event = z.infer<typeof EventSchema>;
@@ -309,7 +299,7 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 export const PostSchema = z.object({
   id: z.number().int(),
   userId: z.number().int(),
-  imageId: z.number().int().nullable(),
+  image: z.string().nullable(),
   organizationId: z.number().int().nullable(),
   createdAt: z.coerce.date(),
   title: z.string(),
@@ -462,19 +452,3 @@ export const TopicSubscriptionSchema = z.object({
 });
 
 export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
-
-/////////////////////////////////////////
-// FILE SCHEMA
-/////////////////////////////////////////
-
-export const FileSchema = z.object({
-  id: z.number().int(),
-  uploadedBy: z.number().int(),
-  createdAt: z.coerce.date(),
-  fileName: z.string(),
-  fileType: z.string(),
-  fileSize: z.number().int(),
-  filePath: z.string(),
-});
-
-export type File = z.infer<typeof FileSchema>;
