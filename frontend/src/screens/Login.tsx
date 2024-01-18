@@ -18,23 +18,7 @@ type loginForm = {
 export default function Login() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
-  // Testing If Could Reach EndPoints
-  const port = 3000;
-  const ip = process.env.IP_ADDRESS ?? 'localhost';
-  const validate = async () => {
-    try{
-      console.log('clicked')
-      const response = await axios(`http://${ip}:${port}/api/studentTest`)
-      console.log(response.data)
-      
-    }catch{
-      console.log("error")
-    }
-    finally{
-      navigation.navigate("DrawerGroup")
-    }
-  }
-
+  
   const schema = zod.object({
     email: zod.string(),
     password: zod.string()
