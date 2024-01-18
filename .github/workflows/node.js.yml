@@ -26,8 +26,31 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
-
+          
       # Change directory to backend before running npm commands
-      - run: cd backend && npm ci
-      - run: cd backend && npm run build --if-present
-      - run: cd backend && npm test
+      - run: | 
+          cd backend
+          touch .env
+          echo IP_ADDRESS=localhost >> .env
+          echo DATABASE_URL=$DATABASE_URL >> .env
+          echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> .env
+          echo AWS_SECRET_ACCESS_KEY=$DATABASE_URL >> .env
+          echo AWS_REGION=$AWS_REGION >> .env
+          echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
+          echo PORT=3000 >> .env
+          echo ENV=GA >> .env
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Install Backend Dependencies
+        run: cd backend && npm ci
+      
+      - name: Remove unused Prisma Import from shared folder
+        run: npx prettier --write ./shared/generated/zod/index.ts
+
+      - name: Build Backend (if applicable)
+        run: cd backend && npm run build --if-present
+
+      - name: Test Backend
+        run: cd backend && npm test
