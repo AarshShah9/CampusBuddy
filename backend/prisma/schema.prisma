@@ -50,14 +50,20 @@ model Student {
 
 model User {
   id                Int                    @id @default(autoincrement())
+  /// @zod.string.min(3).max(20)
   username          String                 @unique
+  /// @zod.string.min(3).max(20)
   firstName         String                 @map("first_name")
+  /// @zod.string.min(3).max(20)
   lastName          String                 @map("last_name")
   /// @zod.custom.use(z.string().email({ message: "Invalid email address" }).min(5))
   email             String                 @unique
+  /// @zod.string.min(8, { message: 'Password must be greater than 8 characters long'})
   password          String                 @map("password")
+  /// @zod.number.int.min(1,{ message: 'Year of Study must be greater than 0'}).max(10, { message: 'Year of Study must be less than 11'})
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
+  /// @zod.custom.use(BooleanSchema)
   isVerified        Boolean                @default(false) @map("is_verified")
   profilePic        String?                @unique @map("profile_pic")
   school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
@@ -96,8 +102,8 @@ model Event {
   endTime        DateTime            @map("end_time")
   /// @zod.custom.use(BooleanSchema)
   isPublic       Boolean             @map("is_public")
-  status         EventStatus         
-  image          String?             
+  status         EventStatus
+  image          String?
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   eventTags      EventTag[]
@@ -135,7 +141,7 @@ model UserEventResponse {
 model Post {
   id             Int           @id @default(autoincrement())
   userId         Int           @map("user_id")
-  image          String?      
+  image          String?
   organizationId Int?          @map("organization_id")
   createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
@@ -319,6 +325,3 @@ model TopicSubscription {
   @@index([topicId])
   @@map("topic_subscription")
 }
-
-
-

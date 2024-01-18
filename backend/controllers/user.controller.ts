@@ -1,6 +1,11 @@
 import dotenv from 'dotenv';
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
+import{
+    IdParamSchema,
+    UserUpdateSchema
+} from "@shared/src/zodSchemas";
+import { PrismaClient, User } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -357,34 +362,46 @@ export const getAllStudents = async (req: Request, res: Response) => {
 export const updateUser = async (
     req:Request,
     res:Response,
-    //next: NextFunction
+    next: NextFunction
 )=> {
-    const userId  : number = parseInt(req.params.userId, 10);
-    const {username, firstName, lastName, yearOfStudy} = req.body;
+    try {
+        const userId = IdParamSchema.parse(req.params).id;
 
-    //validation checks
-    if (yearOfStudy < 0 || yearOfStudy > 8){
-        return res.status(400).json({error: 'Invalid Year of Study'});
-    }
+        //Validated user data
+        const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
 
-    try{
-        const userExists = await prisma.user.findUnique({ where: { username } });
-        if (userExists && userExists.id !== userId) {
-            return res.status(400).json({ error: 'Username already exists' });
-        }
-        const updatedUser = await prisma.user.update({
-            where: {id: userId},
-            data:{
-                username,
-                firstName,
-                lastName,
-                yearOfStudy
-            }
+        //validation checks
+        // get the user from the database
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
         });
-        res.json(updatedUser)
+        if (!existingUser) {
+            return res.status(404);
+        }
+
+        // Update the user
+        let updatedUser: User;
+
+        updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...validatedUpdateUserData,
+            },
+        });
+        // send back the updated user
+        if (updatedUser) {
+            // Event created successfully
+            res.status(200).json({
+                message: 'User updated successfully',
+                data: updatedUser,
+         });
+        }else{
+            return res.status(400).json({error: 'User could not be updated'});
+        }
     }
-    catch(error){
-        console.log(error);
-        return res.sendStatus(400);
+    catch(error:any){
+        next(error);
     }
 };
