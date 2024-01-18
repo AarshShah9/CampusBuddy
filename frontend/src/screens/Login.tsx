@@ -1,12 +1,19 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Keyboard } from "react-native";
-import { Button } from "react-native-paper";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Button, TextInput } from "react-native-paper";
 import InputField from "~/components/InputField";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { useFonts } from "expo-font";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as zod from 'zod';
+
+type loginForm = {
+    email: string,
+    password: string
+}
 
 export default function Login() {
   const { theme } = useThemeContext();
@@ -28,7 +35,27 @@ export default function Login() {
     }
   }
 
+  const schema = zod.object({
+    email: zod.string(),
+    password: zod.string()
+  });
+
+  const { control, handleSubmit, formState: { errors } } = useForm<loginForm>({
+    defaultValues: {
+        email: '',
+        password: ''
+    },
+    resolver: zodResolver(schema)
+  })
+
+  const onSubmit = (data: loginForm) => {
+    console.log(data)
+    //validate()
+  }
+
   return (
+    
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <MainContainer $primary={theme.colors.primary}>
       <LogoContainer>
         <Image
@@ -38,9 +65,43 @@ export default function Login() {
       </LogoContainer>
       <OverlayContainer $color={theme.colors.tertiary}>
         <Header>{"Login"}</Header>
-        <InputField  name="Email" placeholder="Email" />
-        <InputField password={true} name="Password" placeholder="Password" />
-        <StyledButton mode="contained" onPress={() => {validate()}}>
+        <Controller
+            control={control}
+            rules={{
+                required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+                placeholder="Email"
+                label="Email"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+            />
+            )}
+            name="email"
+        />
+        {errors.email && <Text>Email is required.</Text>}
+        <Controller
+            control={control}
+            rules={{
+                required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+                placeholder="Password"
+                label="Password"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+            />
+            )}
+            name="password"
+        />
+        {errors.password && <Text>Password is required.</Text>}
+        {/* <InputField  name="Email" placeholder="Email" />
+        <InputField password={true} name="Password" placeholder="Password" /> */}
+        <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
             Login
           </Text>
@@ -51,6 +112,7 @@ export default function Login() {
         </ClickLink>
       </OverlayContainer>
     </MainContainer>
+    </TouchableWithoutFeedback>
   );
 }
 
