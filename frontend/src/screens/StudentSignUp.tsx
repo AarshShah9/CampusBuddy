@@ -90,7 +90,7 @@ export default function StudentSignUp() {
                         <StyledButton
                             mode="contained"
                             onPress={() => {
-                                setValid(true);
+                                navigation.navigate("StudentSignUpInfo");
                             }}
                         >
                             <Text
