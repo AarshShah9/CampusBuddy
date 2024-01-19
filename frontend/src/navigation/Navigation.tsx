@@ -22,7 +22,6 @@ export default function Navigation() {
                     <Stack.Screen name="SplashScreen" component={SplashScreen}/>
                     <Stack.Screen name="Login" component={Login} options={{gestureEnabled:false}}/>
                     <Stack.Screen name= "StudentSignUp" component={StudentSignUp} options={{gestureEnabled:false}}/>
-                    /** Info screen here to test navigation and looks, will have to rework */
                     <Stack.Screen name= "StudentSignUpInfo" component={StudentSignUpInfo} options={{gestureEnabled:false}}/>
                     <Stack.Screen name="DrawerGroup" component={DrawerGroup} options={{gestureEnabled:false}}/>
                 </Stack.Navigator>  
