@@ -17,14 +17,14 @@ import * as generatedSchemas from "./generated/zod/index";
  * so we apply refine constraint to enforce endTime later than startTime here
  */
 export const EventCreateSchema = generatedSchemas.EventSchema.omit({
-  id: true, // Default value autoincrement
-  userId: true, // get from authtoken
-  createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
-  organizationId: true, // get from req.params if creating verified event
+	id: true, // Default value autoincrement
+	userId: true, // get from authtoken
+	createdAt: true, // default value is current date, handled by the db
+	image: true, // Update value after image is created
+	organizationId: true, // get from req.params if creating verified event
 }).refine((data) => data.endTime > data.startTime, {
-  message: "End time must be later than start time.",
-  path: ["endTime"],
+	message: "End time must be later than start time.",
+	path: ["endTime"],
 });
 
 export type EventCreateInput = z.infer<typeof EventCreateSchema>;
@@ -43,10 +43,10 @@ export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 
 // Create a new schema based on OrganizationSchema, omitting id and createdAt
 export const OrganizationCreateSchema =
-  generatedSchemas.OrganizationSchema.omit({
-    id: true,
-    createdAt: true,
-  });
+	generatedSchemas.OrganizationSchema.omit({
+		id: true,
+		createdAt: true,
+	});
 
 export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
 
@@ -57,18 +57,18 @@ export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
 const PAGINATION_DEFAULT_PAGE_SIZE = 10;
 
 export const CursorPaginationSchema = z.object({
-  cursor: z.string().optional(),
-  pageSize: z.coerce.number().default(PAGINATION_DEFAULT_PAGE_SIZE),
+	cursor: z.string().optional(),
+	pageSize: z.coerce.number().default(PAGINATION_DEFAULT_PAGE_SIZE),
 });
 
 export type CursorPaginationParams = z.infer<typeof CursorPaginationSchema>;
 
 export const CursorPaginationDatetimeSchema = CursorPaginationSchema.extend({
-  cursor: z.string().datetime().optional(), // overwrites cursor to add .datetime() constraint
+	cursor: z.string().datetime().optional(), // overwrites cursor to add .datetime() constraint
 });
 
 export type CursorPaginationDatetimeParams = z.infer<
-  typeof CursorPaginationDatetimeSchema
+	typeof CursorPaginationDatetimeSchema
 >;
 
 /////////////////////////////// s
@@ -77,26 +77,26 @@ export type CursorPaginationDatetimeParams = z.infer<
 
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
-  id: z.coerce
-    .number({
-      invalid_type_error: "Invalid Id format. Must be a non-negative integer.",
-    })
-    .int()
-    .positive()
-    .safe(),
+	id: z.coerce
+		.number({
+			invalid_type_error: "Invalid Id format. Must be a non-negative integer.",
+		})
+		.int()
+		.positive()
+		.safe(),
 });
 
 // TODO: remove later
 // Example schema to test using zod schema in frontend with react-hook-form and the zod resolver
 export const signUpSchema = z
-  .object({
-    email: z.string().email(),
-    password: z.string().min(10, "Password must be at least 10 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
-    path: ["confirmPassword"],
-  });
+	.object({
+		email: z.string().email(),
+		password: z.string().min(10, "Password must be at least 10 characters"),
+		confirmPassword: z.string(),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords must match",
+		path: ["confirmPassword"],
+	});
 
 export type TSignUpSchema = z.infer<typeof signUpSchema>;
