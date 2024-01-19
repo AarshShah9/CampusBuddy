@@ -181,9 +181,10 @@ const FormContainer = styled(View)`
 
 const InputField = styled(TextInput)`
     width: 100%;
-    height: 50px;
-    margin-bottom: 35px;
+    height: 56px;
+    margin-bottom: 30px;
     border-radius: 8px 8px 0 0;
+    font-family: Roboto-Reg
 `;
 
 const StyledButton = styled(Button)`

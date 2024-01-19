@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { Button, TextInput } from "react-native-paper";
-import InputField from "~/components/InputField";
+
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
@@ -49,51 +49,50 @@ export default function Login() {
       </LogoContainer>
       <OverlayContainer $color={theme.colors.tertiary}>
         <Header>{"Login"}</Header>
-        <Controller
-            control={control}
-            rules={{
-                required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-                placeholder="Email"
-                label="Email"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
+        <FormContainer>
+            <Controller
+                control={control}
+                rules={{
+                    required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                    placeholder="Email"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                />
+                )}
+                name="email"
             />
-            )}
-            name="email"
-        />
-        {errors.email && <Text>Email is required.</Text>}
-        <Controller
-            control={control}
-            rules={{
-                required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-                placeholder="Password"
-                label="Password"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
+            {errors.email && <Text>Email is required.</Text>}
+            <Controller
+                control={control}
+                rules={{
+                    required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                    placeholder="Password"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                />
+                )}
+                name="password"
             />
-            )}
-            name="password"
-        />
-        {errors.password && <Text>Password is required.</Text>}
-        {/* <InputField  name="Email" placeholder="Email" />
-        <InputField password={true} name="Password" placeholder="Password" /> */}
-        <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
-            Login
-          </Text>
-        </StyledButton>
-        <ClickLink $color={theme.colors.primary}>
-        Don't have any account?  
-        <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary, fontFamily:"Roboto-Reg" }}> Sign up</Text>
-        </ClickLink>
+            {errors.password && <Text>Password is required.</Text>}
+            
+            <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
+                Login
+            </Text>
+            </StyledButton>
+            <ClickLink $color={theme.colors.primary}>
+            Don't have any account?  
+            <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary, fontFamily:"Roboto-Reg" }}> Sign up</Text>
+            </ClickLink>
+        </FormContainer>
       </OverlayContainer>
     </MainContainer>
     </TouchableWithoutFeedback>
@@ -111,13 +110,24 @@ const OverlayContainer = styled(View)<{ $color: string }>`
   border-top-left-radius: 76px;
   border-width:0s;
   background-color: ${(props) => props.$color};
+  justifyContent:center;
+  align-item:center;
 `;
+
+const FormContainer = styled(View)`
+    width: 90%;
+    margin-top: 8%;
+    height: 500px;
+    margin-left:auto;
+    margin-right:auto;
+`;
+
 const ClickLink = styled(Text)<{ $color: string }>`
   margin-left: auto;
   margin-right: auto;
   margin-top: 64px;
   font-size: 16px;
-  fontFamily:"Roboto-Reg"
+  font-family: Roboto-Reg
 `;
 const Header = styled(Text)`
   font-size: 40px;
@@ -127,6 +137,13 @@ const Header = styled(Text)`
   margin-left: auto;
   margin-right: auto;
   font-family: Nunito-Bold
+`;
+const InputField = styled(TextInput)`
+    width: 100%;
+    height: 56px;
+    margin-bottom: 30px;
+    border-radius: 8px 8px 0 0;
+    font-family: Roboto-Reg
 `;
 const StyledButton = styled(Button)`
   width: 84%;
