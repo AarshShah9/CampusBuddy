@@ -1,14 +1,15 @@
+import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import path from "path";
+import { errorHandler } from "./middleware/errorHandler";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
-import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -86,6 +87,15 @@ app.use(errorHandler);
 const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
+
+ngrok
+  .forward({
+    addr: port,
+    authtoken: process.env.NGROK_AUTHTOKEN,
+    domain: "epic-seahorse-relevant.ngrok-free.app",
+    schemes: ["http"],
+  })
+  .then((listener) => console.log(`Ingress established at: ${listener.url()}`));
 
 export default app;
 export { server };
