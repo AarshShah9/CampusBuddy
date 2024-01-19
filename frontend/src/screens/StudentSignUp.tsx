@@ -94,7 +94,7 @@ export default function StudentSignUp() {
                             }}
                         >
                             <Text
-                                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
+                                style={{lineHeight:30, fontSize: 24, fontWeight: "bold", color: "white" ,fontFamily:"Nunito-Bold" }}
                             >
                                 Next
                             </Text>

@@ -132,7 +132,7 @@ export default function StudentSignUpInfo() {
                             }}
                         >
                             <Text
-                                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
+                                style={{lineHeight:30,fontSize: 24, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold" }}
                             >
                                 Agree and Continue
                             </Text>

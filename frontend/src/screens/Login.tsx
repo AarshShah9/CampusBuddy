@@ -84,7 +84,7 @@ export default function Login() {
             {errors.password && <Text>Password is required.</Text>}
             
             <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
+            <Text style={{lineHeight:30, fontSize: 24, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
                 Login
             </Text>
             </StyledButton>
@@ -146,13 +146,14 @@ const InputField = styled(TextInput)`
     font-family: Roboto-Reg
 `;
 const StyledButton = styled(Button)`
-  width: 84%;
-  height: 10%;
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top:2%;
-  justify-content: center;
+    border-radius: 8px;
+    width: 100%;
+    height: 48px;
+    font-size: 25px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    justify-content: center;
   
 `;
