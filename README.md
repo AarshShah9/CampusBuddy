@@ -31,7 +31,20 @@ This repo houses the CampusBuddy Tech Start project. We're aiming to build an ap
 - Testing
 - Production Release
 
+
+### Expo Tips
+- If you can't see the QR code in the terminal, simply press 'c'.
+
 ## Setup
+
+### Accounts
+- ngrok (https://ngrok.com/signup) - used for local development.
+1. Create an account. 
+2. Go to the dashboard and copy the auth token from https://dashboard.ngrok.com/get-started/your-authtoken.
+3. Also make a custom domain from https://dashboard.ngrok.com/cloud-edge/domains
+4. now go set these in the environment variables in the .env file as NGROK_AUTHTOKEN and URL respectively.
+5. Also set the custom domain in the frontend .env file as URL.
+
 
 ### Installations
 - Node.js (https://nodejs.org/en/download/)
@@ -46,7 +59,7 @@ npm install -g expo-cli
 ### USER NOTES
 
 Windows
-- Should simply be able to run to run the entire application
+- Should simply be able to run the entire application
 ```
 ./start.sh
 ```
@@ -55,8 +68,6 @@ Linux/ Mac OS (UNIX)
 The same command as windows should still work as separate scripts are used depending on the OS however you will have to give execution permissions to the following scripts:
 - start.sh
 - /scripts/install.sh
-- /scripts/ipscript.sh
-- /scripts/ipscriptUNIX.sh
 
 To do this you will have to do the following on all of the commands.
 1. Ensure you are in the working directory of the script. For instance, you may have to run ```cd scripts``` for all of the scripts that are in the folder

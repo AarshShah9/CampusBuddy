@@ -18,13 +18,11 @@ const result = dotenv.config();
 try {
   // Validates the Env file
   validateEnv(process.env);
-  console.log("ENV FILE: ", env);
 } catch (error) {
   throw new Error("Failed to validate environment variables");
 }
 
 const port = env.PORT;
-const ip = env.IP_ADDRESS ?? "localhost";
 
 // middleware
 app.use(
@@ -80,7 +78,7 @@ app.post(
   },
 );
 
-// // Global error handling middleware - Must be the last middleware
+// Global error handling middleware - Must be the last middleware
 app.use(errorHandler);
 
 // server start
@@ -91,8 +89,8 @@ const server = app.listen(port, () => {
 ngrok
   .forward({
     addr: port,
-    authtoken: process.env.NGROK_AUTHTOKEN,
-    domain: "epic-seahorse-relevant.ngrok-free.app",
+    authtoken: env.NGROK_AUTHTOKEN,
+    domain: env.URL,
     schemes: ["http"],
   })
   .then((listener) => console.log(`Ingress established at: ${listener.url()}`));
