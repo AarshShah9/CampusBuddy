@@ -9,10 +9,9 @@
   "scripts": {
     "test": "jest --detectOpenHandles",
     "clearJest": "jest --clearCache",
-    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/backend/index.js\")",
-    "build": "tsc && tsc-alias",
-    "start": "node dist/backend/index.js",
-    "genSchemas": "npx prisma generate && npx prettier --write ../shared/generated/zod/index.ts"
+    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
+    "build": "tsc",
+    "start": "node dist/backend/index.js"
   },
   "keywords": [],
   "author": "",
@@ -61,7 +60,6 @@
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
-    "tsc-alias": "^1.8.8",
     "typescript": "^5.2.2"
   }
 }
