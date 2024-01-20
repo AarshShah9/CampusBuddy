@@ -32,7 +32,7 @@ export const EventCreateSchema = generatedSchemas.EventSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  imageId: true, // Update value after image is created
+  image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified event
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
@@ -48,7 +48,6 @@ export type EventCreateInput = z.infer<typeof EventCreateSchema>;
 export const EventUpdateSchema = generatedSchemas.EventSchema.partial();
 
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
-
 
 /////////////////////////////// s
 // ORGANIZATION SCHEMAS

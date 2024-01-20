@@ -1,4 +1,4 @@
-import { BooleanSchema, zodStringToNumberOrNull } from "@shared/src/utils";
+import { BooleanSchema, zodStringToNumberOrNull } from "@shared/utils";
 import { z } from "zod";
 
 /////////////////////////////////////////
@@ -229,7 +229,7 @@ export const UserSchema = z.object({
     .min(1, { message: "Year of Study must be greater than 0" })
     .max(10, { message: "Year of Study must be less than 11" }),
   schoolId: z.number().int(),
-  isVerified: BooleanSchema,
+  isVerified: z.boolean(),
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),

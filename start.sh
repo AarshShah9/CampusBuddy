@@ -42,4 +42,5 @@ nvm use 18.13.0 || :
 npm install
 fi
 
+npx prettier --write ./shared/generated/zod/index.ts
 npm run start
