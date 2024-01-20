@@ -19,7 +19,7 @@ try {
   // Validates the Env file
   validateEnv(process.env);
 } catch (error) {
-  throw new Error("Failed to validate environment variables");
+  throw new Error("Failed to validate environment variables", error);
 }
 
 const port = env.PORT;
