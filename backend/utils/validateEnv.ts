@@ -26,7 +26,7 @@ const env = {
   AWS_REGION: process.env.AWS_REGION!,
   AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
   PORT: process.env.PORT ?? "3000",
-  ENV: process.env.ENV ?? "dev",
+  ENV: process.env.ENV!,
   NGROK_AUTHTOKEN: process.env.NGROK_AUTHTOKEN!,
 };
 
