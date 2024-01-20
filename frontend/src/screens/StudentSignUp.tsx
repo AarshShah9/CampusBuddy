@@ -11,7 +11,11 @@ import * as zod from 'zod';
 
 type signUpSchool = {
     uniEmail: string,
-    uniName: string
+    uniName: string,
+    fName: string,
+    lName: string,
+    password: string,
+    rePassword:string,
 }
 
 export default function StudentSignUp() {
@@ -21,13 +25,21 @@ export default function StudentSignUp() {
 
     const schema = zod.object({
         uniEmail: zod.string(),
-        uniName: zod.string()
+        uniName: zod.string(),
+        fName: zod.string(),
+        lName: zod.string(),
+        password: zod.string(),
+        rePassword: zod.string()
     });
 
     const { control, handleSubmit, formState: { errors } } = useForm<signUpSchool>({
         defaultValues: {
             uniEmail: '',
-            uniName: ''
+            uniName: '',
+            fName: '',
+            lName: '',
+            password: '',
+            rePassword: ''
         },
         resolver: zodResolver(schema)
     })
@@ -62,7 +74,7 @@ export default function StudentSignUp() {
                             }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <InputField
-                                    placeholder="Institution Email"
+                                    label="Institution Email"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
@@ -78,7 +90,7 @@ export default function StudentSignUp() {
                             }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <InputField
-                                    placeholder="Institution Name"
+                                    label="Institution Name"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
@@ -87,10 +99,74 @@ export default function StudentSignUp() {
                             name="uniName"
                         />
                         {errors.uniName && <Text>Institution Name is required.</Text>}
+                        <Controller
+                            control={control}
+                            rules={{
+                                required: true,
+                            }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <InputField
+                                    label="First Name"
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                />
+                            )}
+                            name="fName"
+                        />
+                        {errors.fName && <Text>Institution Name is required.</Text>}
+                        <Controller
+                            control={control}
+                            rules={{
+                                required: true,
+                            }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <InputField
+                                    label="Last Name"
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                />
+                            )}
+                            name="lName"
+                        />
+                        {errors.lName && <Text>Institution Name is required.</Text>}
+                        <Controller
+                            control={control}
+                            rules={{
+                                required: true,
+                            }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <InputField
+                                    label="Password"
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                />
+                            )}
+                            name="password"
+                        />
+                        {errors.password && <Text>Institution Name is required.</Text>}
+                        <Controller
+                            control={control}
+                            rules={{
+                                required: true,
+                            }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <InputField
+                                    label="Retype Password"
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    value={value}
+                                />
+                            )}
+                            name="rePassword"
+                        />
+                        {errors.rePassword && <Text>Institution Name is required.</Text>}
                         <StyledButton
                             mode="contained"
                             onPress={() => {
-                                navigation.navigate("StudentSignUpInfo");
+                                console.log("Pressed")
                             }}
                         >
                             <Text
@@ -125,7 +201,6 @@ const MainContainer = styled(View)`
 `;
 const OverlayContainer = styled(View) <{ $color: string }>`
     alignItems: center;
-    justifyContent: center;
     height: 85%;
     width: 100%;
     border-top-left-radius: 76px;
@@ -134,7 +209,6 @@ const OverlayContainer = styled(View) <{ $color: string }>`
 const HeaderContainer = styled(View)`
   width: 100%;
   height: 15%;
-
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -149,14 +223,14 @@ const HeaderText = styled(Text) <{ $textColor: string }>`
 
 const FormContainer = styled(View)`
     width: 90%;
-    margin-top: 8%;
+    margin-top: 15%;
     height: 500px;
 `;
 
 const InputField = styled(TextInput)`
     width: 100%;
     height: 56px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     border-radius: 8px 8px 0 0;
     font-family: Roboto-Reg
 `;
