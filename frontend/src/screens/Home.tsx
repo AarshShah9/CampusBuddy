@@ -1,3 +1,4 @@
+import { URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
@@ -11,10 +12,9 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
   const [image, setImage] = useState<string>();
-  let url = "https://funny-fans-punch.loca.lt/";
 
   const testCallback = async () => {
-    fetch(url + "/Test")
+    fetch(URL + "/Test")
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -57,7 +57,7 @@ export default function Home() {
       type,
     } as any);
     try {
-      const { data } = await axios.post(`${url}/api/upload`, formData, {
+      const { data } = await axios.post(`${URL}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Image Uploaded");
