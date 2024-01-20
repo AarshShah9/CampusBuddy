@@ -9,6 +9,7 @@ const envSchema = z.object({
   AWS_BUCKET_NAME: z.string(),
   PORT: z.string(),
   NGROK_AUTHTOKEN: z.string(),
+  ENV: z.string(),
   // Add more environment variables as needed
 });
 

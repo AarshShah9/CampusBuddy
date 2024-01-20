@@ -86,14 +86,17 @@ const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-ngrok
-  .forward({
-    addr: port,
-    authtoken: env.NGROK_AUTHTOKEN,
-    domain: env.URL,
-    schemes: ["http", "https"],
-  })
-  .then((listener) => console.log(`Ingress established at: ${listener.url()}`));
-
+if (env.ENV === "dev") {
+  ngrok
+    .forward({
+      addr: port,
+      authtoken: env.NGROK_AUTHTOKEN,
+      domain: env.URL,
+      schemes: ["http", "https"],
+    })
+    .then((listener) =>
+      console.log(`Ingress established at: ${listener.url()}`),
+    );
+}
 export default app;
 export { server };

@@ -39,6 +39,7 @@ jobs:
           echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
           echo PORT=3000 >> .env
           echo ENV=GA >> .env
+          echo NGROK_AUTHTOKEN=$NGROK_AUTHTOKEN >> .env
 
       - name: Install Root Dependencies
         run: npm ci
