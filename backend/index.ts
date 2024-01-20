@@ -1,14 +1,15 @@
+import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import path from "path";
+import { errorHandler } from "./middleware/errorHandler";
 import school from "./routes/school.routes";
 import student from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
-import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -17,13 +18,11 @@ const result = dotenv.config();
 try {
   // Validates the Env file
   validateEnv(process.env);
-  console.log("ENV FILE: ", env);
 } catch (error) {
-  throw new Error("Failed to validate environment variables");
+  throw new Error("Failed to validate environment variables" + error);
 }
 
 const port = env.PORT;
-const ip = env.IP_ADDRESS ?? "localhost";
 
 // middleware
 app.use(
@@ -79,7 +78,7 @@ app.post(
   },
 );
 
-// // Global error handling middleware - Must be the last middleware
+// Global error handling middleware - Must be the last middleware
 app.use(errorHandler);
 
 // server start
@@ -87,5 +86,17 @@ const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
+if (env.ENV === "dev") {
+  ngrok
+    .forward({
+      addr: port,
+      authtoken: env.NGROK_AUTHTOKEN,
+      domain: env.URL,
+      schemes: ["http", "https"],
+    })
+    .then((listener) =>
+      console.log(`Ingress established at: ${listener.url()}`),
+    );
+}
 export default app;
 export { server };
