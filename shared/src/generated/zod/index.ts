@@ -217,14 +217,19 @@ export type Student = z.infer<typeof StudentSchema>;
 
 export const UserSchema = z.object({
   id: z.number().int(),
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
+  username: z.string().min(3).max(20),
+  firstName: z.string().min(3).max(20),
+  lastName: z.string().min(3).max(20),
   email: z.string().email({ message: "Invalid email address" }).min(5),
-  password: z.string(),
-  yearOfStudy: z.number().int(),
+  password: z
+    .string()
+    .min(8, { message: "Password must be greater than 8 characters long" }),
+  yearOfStudy: z
+    .number()
+    .min(1, { message: "Year of Study must be greater than 0" })
+    .max(10, { message: "Year of Study must be less than 11" }),
   schoolId: z.number().int(),
-  isVerified: z.boolean(),
+  isVerified: BooleanSchema,
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),

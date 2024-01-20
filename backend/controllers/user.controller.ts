@@ -392,7 +392,7 @@ export const updateUser = async (
         });
         // send back the updated user
         if (updatedUser) {
-            // Event created successfully
+            // User updated successfully
             res.status(200).json({
                 message: 'User updated successfully',
                 data: updatedUser,

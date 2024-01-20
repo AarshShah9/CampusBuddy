@@ -60,7 +60,7 @@ model User {
   email             String                 @unique
   /// @zod.string.min(8, { message: 'Password must be greater than 8 characters long'})
   password          String                 @map("password")
-  /// @zod.number.int.min(1,{ message: 'Year of Study must be greater than 0'}).max(10, { message: 'Year of Study must be less than 11'})
+  /// @zod.number.min(1,{ message: 'Year of Study must be greater than 0'}).max(10, { message: 'Year of Study must be less than 11'})
   yearOfStudy       Int                    @map("year_of_study")
   schoolId          Int                    @map("school_id")
   /// @zod.custom.use(BooleanSchema)

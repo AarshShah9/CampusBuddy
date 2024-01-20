@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "test": "jest --detectOpenHandles",
     "clearJest": "jest --clearCache",
-    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/index.js\")",
+    "dev": "tsc && (concurrently \"tsc --watch\" \"tsc-alias -w\" \"nodemon -q dist/backend/index.js\")",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "genSchemas": "npx prisma generate && npx prettier --write ../shared/src/generated/zod/index.ts"
