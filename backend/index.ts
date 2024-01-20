@@ -91,7 +91,7 @@ ngrok
     addr: port,
     authtoken: env.NGROK_AUTHTOKEN,
     domain: env.URL,
-    schemes: ["http"],
+    schemes: ["http", "https"],
   })
   .then((listener) => console.log(`Ingress established at: ${listener.url()}`));
 
