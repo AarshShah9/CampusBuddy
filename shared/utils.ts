@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-/////////////////////////////// s
+///////////////////////////////
 // UTILITY SCHEMAS
-// Useful for validating form data
+// Schemas and functions used by other schemas
 ///////////////////////////////
 
 /**
@@ -23,8 +23,8 @@ import { z } from 'zod';
  * ```
  */
 export const BooleanSchema = z
-    .union([z.boolean(), z.literal('true'), z.literal('false')])
-    .transform((value) => value === true || value === 'true');
+  .union([z.boolean(), z.literal("true"), z.literal("false")])
+  .transform((value) => value === true || value === "true");
 
 /**
  * Utility schema for wrapping optional number field when it may recieve a value as a string, such as from form data.
@@ -33,10 +33,10 @@ export const BooleanSchema = z
  * sage: const mySchema = zodInputStringPipe(z.number().positive('Number must be positive').nullable());
  */
 export const zodStringToNumberOrNull = z
-    .string()
-    .transform((value) => (value === '' ? null : value.trim())) // transform empty string to null or remove whitespace
-    .nullable()
-    .refine((value) => value === null || !isNaN(Number(value)), {
-        message: 'Invalid Number',
-    })
-    .transform((value) => (value === null ? null : Number(value)));
+  .string()
+  .transform((value) => (value === "" ? null : value.trim())) // transform empty string to null or remove whitespace
+  .nullable()
+  .refine((value) => value === null || !isNaN(Number(value)), {
+    message: "Invalid Number",
+  })
+  .transform((value) => (value === null ? null : Number(value)));
