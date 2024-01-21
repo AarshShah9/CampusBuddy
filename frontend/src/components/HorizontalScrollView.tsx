@@ -26,7 +26,6 @@ export default function HorizontalScrollView({ scrollTitle, children }: Props){
 const styles = StyleSheet.create({
     contentContainer:{
         flex: 1,
-        backgroundColor:'red',
     },
 })
 
