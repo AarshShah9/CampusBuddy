@@ -4,7 +4,7 @@ import { z } from 'zod';
 import{
     IdParamSchema,
     UserUpdateSchema
-} from "@shared/zodSchemas";
+} from "../../shared/zodSchemas";
 import { PrismaClient, User } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import jwt from 'jsonwebtoken';

@@ -30,18 +30,6 @@ export const AppPermissionNameSchema = z.enum([
 ]);
 
 ///////////////////////////////
-// USER SCHEMAS
-///////////////////////////////
-
-/**
- * Update User Schema
- * partial makes all fields optional, useful for update (patch request)
- */
-export const UserUpdateSchema = generatedSchemas.UserSchema.partial();
-
-export type UserUpdateInput = z.infer<typeof UserUpdateSchema>;
-
-///////////////////////////////
 // EVENT SCHEMAS
 ///////////////////////////////
 

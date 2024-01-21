@@ -22,6 +22,6 @@ router.post('/loginStudent', loginStudent);
 router.post('/logoutStudent', verifyAuthentication, logoutStudent);
 router.post('/resetPassword', resetPassword);
 router.get('/getAllStudents', getAllStudents);
-router.patch('/updateUser/:id', updateUser);
+router.patch('/updateUser/:id', verifyAuthentication, updateUser);
 
 export default router;
