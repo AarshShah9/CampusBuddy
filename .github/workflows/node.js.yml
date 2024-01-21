@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -24,11 +24,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: backend/package-lock.json
-          
+
       # Change directory to backend before running npm commands
-      - run: | 
+      - run: |
           cd backend
           touch .env
           echo IP_ADDRESS=localhost >> .env
@@ -39,15 +39,14 @@ jobs:
           echo AWS_BUCKET_NAME=$AWS_BUCKET_NAME >> .env
           echo PORT=3000 >> .env
           echo ENV=GA >> .env
+          echo NGROK_AUTHTOKEN=NA >> .env
+          echo URL=NA >> .env
 
       - name: Install Root Dependencies
         run: npm ci
 
       - name: Install Backend Dependencies
         run: cd backend && npm ci
-      
-      - name: Remove unused Prisma Import from shared folder
-        run: npx prettier --write ./shared/generated/zod/index.ts
 
       - name: Build Backend (if applicable)
         run: cd backend && npm run build --if-present

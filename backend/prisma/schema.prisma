@@ -11,17 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-// zod-prisma-types generator
-// Generates zod schemas from the prisma models
-// Zod validators can be added to fields using rich comments (use /// instead of //)
-generator zod {
-  provider         = "zod-prisma-types"
-  output           = "../../shared/generated/zod" // the directory where generated zod schemas will be saved
-  createInputTypes = false // default is true
-  coerceDate       = true
-  // useTypeAssertions             = true // circumvent type system to fix typescript error with zod versions >3.21.1
-}
-
 model School {
   id       Int       @id @default(autoincrement())
   name     String
@@ -56,7 +45,6 @@ model User {
   firstName         String                 @map("first_name")
   /// @zod.string.min(3).max(20)
   lastName          String                 @map("last_name")
-  /// @zod.custom.use(z.string().email({ message: "Invalid email address" }).min(5))
   email             String                 @unique
   /// @zod.string.min(8, { message: 'Password must be greater than 8 characters long'})
   password          String                 @map("password")
@@ -83,24 +71,16 @@ model User {
   @@map("user")
 }
 
-/// @zod.import(["import { zodStringToNumberOrNull, BooleanSchema } from '@shared/utils'"])
 model Event {
   id             Int                 @id @default(autoincrement())
   userId         Int                 @map("user_id")
-  /// @zod.custom.use(zodStringToNumberOrNull.pipe(z.number().int().positive().nullable()))
   organizationId Int?                @map("organization_id")
   createdAt      DateTime            @unique @default(now()) @map("created_at")
-  /// @zod.string({ required_error: "Title is required", invalid_type_error: "Title must be a string"}).min(3, { message: "Title must contain 3 or more characters" }).max(255)
   title          String              @db.VarChar(255)
-  /// @zod.string.min(3).max(255)
   description    String?             @db.VarChar(255)
-  /// @zod.string.min(3).max(255)
   location       String
-  /// @zod.custom.use(z.coerce.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",}).refine((value) => value > new Date(), { message: 'Start time must be in the future', }))
   startTime      DateTime            @map("start_time")
-  /// @zod.date({required_error: "Please select a date and time", invalid_type_error: "Invalid datetime string",})
   endTime        DateTime            @map("end_time")
-  /// @zod.custom.use(BooleanSchema)
   isPublic       Boolean             @map("is_public")
   status         EventStatus
   image          String?
