@@ -1,5 +1,5 @@
-import { IdParamSchema } from "@shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
+import { IdParamSchema } from "../../shared/zodSchemas";
 import prisma from "../prisma/client"; // import the singleton prisma instance
 import { AppError, AppErrorName } from "../utils/AppError";
 
