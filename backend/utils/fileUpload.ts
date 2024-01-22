@@ -1,6 +1,7 @@
 import { Request } from "express";
 import multer from "multer";
 import path from "path";
+import { AppError, AppErrorName } from "./AppError";
 
 // Configure the file storage
 const storage = multer.diskStorage({
@@ -24,6 +25,9 @@ const storage = multer.diskStorage({
     }
   },
 });
+
+// If we temporarily store uploads in memory buffer instead of saving to disk
+// const storage = multer.memoryStorage();
 
 // Configure file size limits
 const limits = {
@@ -52,7 +56,6 @@ const fileFilter = (req: Request, file: any, cb: any) => {
       cb(null, true);
     } else {
       // reject the file
-      // cb(null, false); // reject without an error
       cb(
         new Error(
           "Invalid file format. Please upload a valid JPEG or PNG file.",
@@ -108,4 +111,22 @@ const convertBytesToSize = (
   ).toString();
 };
 
-export { fileSizeFormatter, upload };
+const generateUniqueFileName = function (fileName: string): string {
+  const maxFilenameSize = 100;
+  const testing = "wow";
+  if (fileName.length > maxFilenameSize) {
+    // const error = new Error("Filename too long");
+    throw new AppError(
+      AppErrorName.FILE_UPLOAD_ERROR,
+      `Error generating unique file name: too long, must be fewer than ${maxFilenameSize} characters`,
+      400,
+      true,
+    );
+  } else {
+    // Generate the filename by adding date string to original name. "2024-01-16T12-34-56.789Z-example.png"
+    const generatedFilename =
+      new Date().toISOString().replace(/:/g, "-") + "_" + fileName;
+    return generatedFilename;
+  }
+};
+export { fileSizeFormatter, generateUniqueFileName, upload };
