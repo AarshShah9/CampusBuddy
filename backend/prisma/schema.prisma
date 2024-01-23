@@ -37,6 +37,17 @@ enum ParticipationStatus {
     NotInterested
 }
 
+enum ProgramType {
+    Bachelors
+    Masters
+}
+
+enum DepartmentName {
+    Science
+    Arts
+    Schulich
+}
+
 //
 //
 // CORE MODELS
@@ -46,8 +57,6 @@ model Institution {
     id     String @id @default(uuid())
     name   String
     domain String
-
-    students User[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -68,7 +77,7 @@ model User {
 
     email    String @unique
     /// @zod.custom.use(z.string().password({ message: "Password is too short"}).min(8))
-    password String 
+    password String
 
     otp        String             @default("")
     jwt        String             @default("")
@@ -78,34 +87,32 @@ model User {
 
     enrollments Enrollment[]
 
+
     events            Event[]
     UserEventResponse UserEventResponse[]
     posts             Post[]
     comments          Comment[]
     subscriptions     TopicSubscription[]
 
-    @@index([institutionID])
     @@map("user")
 }
 
 model Enrollment {
-    programId  Int     @map("program_id")
-    userId     Int     @map("user_id")
-    degreeType String  @map("degree_type")
-    program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-    user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id String @id @default(uuid())
 
-    @@id([programId, userId])
-    @@index([programId])
-    @@index([userId])
+    user   User   @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID String
+
+    program   Program @relation(fields: [programID], references: [id], onDelete: Cascade)
+    programID String
+
     @@map("enrollment")
 }
 
 model Program {
-    id          Int          @id @default(autoincrement())
-    programName String
-    department  String
-    enrollments Enrollment[]
+    id         String         @id @default(uuid())
+    program    ProgramType
+    department DepartmentName
 
     @@map("program")
 }
@@ -273,7 +280,6 @@ model Permission {
 
     @@map("permission")
 }
-
 
 model Topic {
     id            Int                 @id @default(autoincrement())
