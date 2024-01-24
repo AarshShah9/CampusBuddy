@@ -176,15 +176,14 @@ export default function StudentSignUp() {
                             </Text>
                         </StyledButton>
                         <ClickLink $color={theme.colors.primary}>
-                            Sign up as an Organization
+                            <Text>Sign up as an Organization </Text>
                             <Text
                                 onPress={() => {
                                     console.log("Pressed");
                                 }}
                                 style={{ color: theme.colors.primary, fontSize: 16, fontFamily: "Roboto-Reg" }}
                             >
-                                {" "}
-                                here{" "}
+                                here
                             </Text>
                         </ClickLink>
                     </FormContainer>
@@ -223,7 +222,7 @@ const HeaderText = styled(Text) <{ $textColor: string }>`
 
 const FormContainer = styled(View)`
     width: 90%;
-    margin-top: 15%;
+    margin-top: 18%;
     height: 500px;
 `;
 
