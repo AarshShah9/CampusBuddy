@@ -76,8 +76,8 @@ model Event {
   startTime      DateTime            @map("start_time")
   endTime        DateTime            @map("end_time")
   isPublic       Boolean             @map("is_public")
-  status         EventStatus         
-  image          String?             
+  status         EventStatus
+  image          String?
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   eventTags      EventTag[]
@@ -115,7 +115,7 @@ model UserEventResponse {
 model Post {
   id             Int           @id @default(autoincrement())
   userId         Int           @map("user_id")
-  image          String?      
+  image          String?
   organizationId Int?          @map("organization_id")
   createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
@@ -299,6 +299,3 @@ model TopicSubscription {
   @@index([topicId])
   @@map("topic_subscription")
 }
-
-
-

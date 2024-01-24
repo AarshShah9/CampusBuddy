@@ -7,7 +7,8 @@ import {
     loginStudent,
     logoutStudent,
     resetPassword,
-    getAllStudents
+    getAllStudents,
+    updateUser
 } from '../controllers/user.controller';
 import { verifyAuthentication } from '../middleware/verifyAuth';
 
@@ -21,5 +22,6 @@ router.post('/loginStudent', loginStudent);
 router.post('/logoutStudent', verifyAuthentication, logoutStudent);
 router.post('/resetPassword', resetPassword);
 router.get('/getAllStudents', getAllStudents);
+router.patch('/updateUser/:id', verifyAuthentication, updateUser);
 
 export default router;
