@@ -122,6 +122,17 @@ export const UserSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 
 /**
+ * Create User Schema
+ * Validation for partial fields
+ */
+export const UserCreateSchema = UserSchema.omit({
+  id: true, // Default value autoincrement
+  isVerified: true, // get from authtoken
+})
+
+export type UserCreateInput = z.infer<typeof UserCreateSchema>;
+
+/**
  * Update User Schema
  * partial makes all fields optional, useful for update (patch request)
  */
@@ -162,6 +173,15 @@ export const SchoolSchema = z.object({
 });
 
 export type School = z.infer<typeof SchoolSchema>;
+
+/**
+ * Create School Schema
+ */
+export const SchoolCreateSchema = SchoolSchema.omit({
+  id: true, // Default value autoincrement
+});
+
+export type SchoolCreateInput = z.infer<typeof SchoolCreateSchema>;
 
 /////////////////////////////////////////
 // USER EVENT RESPONSE SCHEMAS
@@ -336,6 +356,14 @@ export const IdParamSchema = z.object({
     .positive()
     .safe(),
 });
+
+export const EmailBodySchema = z.object({
+  email: z
+      .string()
+      .email("This is not a valid email")
+      .min(5, {message: "This field has to be filled"})
+});
+
 
 ///////////////////////////////
 // PAGINATION SCHEMAS
