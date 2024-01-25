@@ -4,26 +4,29 @@ import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import path from "path";
-import school from "./routes/school.routes";
-import student from "./routes/user.routes";
+import institution from "./routes/institution.routes";
+import user from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
-import { errorHandler } from "./middleware/errorHandler";
+//import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
 const result = dotenv.config();
 
-try {
-  // Validates the Env file
-  validateEnv(process.env);
-  console.log("ENV FILE: ", env);
-} catch (error) {
-  throw new Error("Failed to validate environment variables");
-}
+// commenting for testing purposes
+// try {
+//   // Validates the Env file
+//   validateEnv(process.env);
+//   console.log("ENV FILE: ", env);
+// } catch (error) {
+//   throw new Error("Failed to validate environment variables");
+// }
 
-const port = env.PORT;
-const ip = env.IP_ADDRESS ?? "localhost";
+// const port = env.PORT;
+// const ip = env.IP_ADDRESS ?? "localhost";
+const port = 3000;
+
 
 // middleware
 app.use(
@@ -37,7 +40,9 @@ app.use(
 app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
+
 app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Content-Type", "application/json");
   res.header("Access-Control-Allow-Origin", "*");
@@ -49,8 +54,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // routes
-app.use("/api", student);
-app.use("/api", school);
+app.use("/api", user);
+app.use("/api", institution);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
@@ -80,7 +85,7 @@ app.post(
 );
 
 // // Global error handling middleware - Must be the last middleware
-app.use(errorHandler);
+//app.use(errorHandler);
 
 // server start
 const server = app.listen(port, () => {
