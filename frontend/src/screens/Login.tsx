@@ -89,8 +89,8 @@ export default function Login() {
             </Text>
             </StyledButton>
             <ClickLink $color={theme.colors.primary}>
-            Don't have any account?  
-            <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary, fontFamily:"Roboto-Reg" }}> Sign up</Text>
+           <Text>Don't have any account? </Text>
+            <Text onPress={()=>{navigation.navigate("StudentSignUp")}} style={{ color: theme.colors.primary, fontFamily:"Roboto-Reg" }}>Sign up</Text>
             </ClickLink>
         </FormContainer>
       </OverlayContainer>
