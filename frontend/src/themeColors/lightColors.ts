@@ -1,6 +1,6 @@
 const lightColors = {
     "colors": {
-      "primary": "rgb(0, 97, 164)",
+      "primary": "rgb(58, 134, 255)",
       "onPrimary": "rgb(255, 255, 255)",
       "primaryContainer": "rgb(209, 228, 255)",
       "onPrimaryContainer": "rgb(0, 29, 54)",
@@ -8,7 +8,7 @@ const lightColors = {
       "onSecondary": "rgb(255, 255, 255)",
       "secondaryContainer": "rgb(214, 227, 255)",
       "onSecondaryContainer": "rgb(0, 27, 61)",
-      "tertiary": "rgb(0, 101, 144)",
+      "tertiary": "rgb(255, 255, 255)",
       "onTertiary": "rgb(255, 255, 255)",
       "tertiaryContainer": "rgb(200, 230, 255)",
       "onTertiaryContainer": "rgb(0, 30, 47)",
