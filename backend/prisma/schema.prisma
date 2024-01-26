@@ -11,35 +11,38 @@ datasource db {
   relationMode = "prisma"
 }
 
-//
-//
 // ENUMS
-//
-//
-// FOR USE IN USER, ORGANIZATION, EVENT
-
-// FOR USE IN PARTICIPATION
-enum ParticipationStatus {
-  Going
-  Interested
-  NotInterested
-}
-
-enum ProgramType {
-  Bachelors
-  Masters
-}
-
 enum EventStatus {
   Verified
   NonVerified
 }
 
-//
-//
+enum UserRole {
+  Owner
+  Admin
+  Moderator
+  Member
+}
+
+enum OrganizationStatus {
+  Pending
+  Verified
+}
+
+// many of these permissions may not apply to our application
+enum AppPermissionName {
+  CREATE_EVENTS
+  MANAGE_EVENTS // edit and cancel event
+  CREATE_POSTS
+  MANAGE_POSTS // remove user posts
+  MANAGE_MEMBERS // maybe ban/unban users?
+  APPROVE_MEMBER_REQUESTS // not sure if we need this
+  VIEW_ANALYTICS // view details about the organization
+  MANAGE_ORGANIZATION // edit org name, description, image, permissions
+  DELETE_ORGANIZATION
+}
+
 // CORE MODELS
-//
-//
 model Institution {
   id     String @id @default(uuid())
   name   String
@@ -122,7 +125,6 @@ model Event {
   startTime      DateTime            @map("start_time")
   endTime        DateTime            @map("end_time")
   isPublic       Boolean             @map("is_public")
-  // participationStatus ParticipationStatus
   status         EventStatus
   image          String?
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -182,11 +184,6 @@ model Comment {
   @@map("comment")
 }
 
-enum OrganizationStatus {
-  Pending
-  Verified
-}
-
 model Organization {
   id                          String                       @id @default(uuid())
   organizationName            String                       @unique @map("organization_name")
@@ -216,13 +213,6 @@ model UserOrganizationRole {
   @@map("user_organization_role")
 }
 
-enum UserRole {
-  Owner
-  Admin
-  Moderator
-  Member
-}
-
 model Role {
   id                          String                       @id @default(uuid())
   roleName                    UserRole                     @map("role_name")
@@ -245,19 +235,6 @@ model OrganizationRolePermission {
   @@index([roleId])
   @@index([permissionId])
   @@map("organization_role_permission")
-}
-
-// many of these permissions may not apply to our application
-enum AppPermissionName {
-  CREATE_EVENTS
-  MANAGE_EVENTS // edit and cancel event
-  CREATE_POSTS
-  MANAGE_POSTS // remove user posts
-  MANAGE_MEMBERS // maybe ban/unban users?
-  APPROVE_MEMBER_REQUESTS // not sure if we need this
-  VIEW_ANALYTICS // view details about the organization
-  MANAGE_ORGANIZATION // edit org name, description, image, permissions
-  DELETE_ORGANIZATION
 }
 
 model Permission {
