@@ -1,6 +1,11 @@
 import dotenv from 'dotenv';
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
+import{
+    IdParamSchema,
+    UserUpdateSchema
+} from "../../shared/zodSchemas";
+import { PrismaClient, User } from '@prisma/client';
 import otpGenerator from 'otp-generator';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -60,7 +65,7 @@ export const createNewStudent = async (req: Request, res: Response) => {
         }
     })
 
-    // if student doesnt exist
+    // if student doesn't exist
     if (!studentExists) {
         // if schoolName is valid
         if (schoolID) {
@@ -351,4 +356,52 @@ export const getAllStudents = async (req: Request, res: Response) => {
     const allStudents = await prisma.user.findMany();
 
     res.status(200).json(allStudents);
+};
+ 
+//update User Information
+export const updateUser = async (
+    req:Request,
+    res:Response,
+    next: NextFunction
+)=> {
+    try {
+        const userId = IdParamSchema.parse(req.params).id;
+
+        //Validated user data
+        const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
+
+        //validation checks
+        // get the user from the database
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        });
+        if (!existingUser) {
+            return res.status(404);
+        }
+
+        // Update the user
+        let updatedUser: User;
+
+        updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...validatedUpdateUserData,
+            },
+        });
+        // send back the updated user
+        if (updatedUser) {
+            // User updated successfully
+            res.status(200).json({
+                message: 'User updated successfully',
+                data: updatedUser,
+         });
+        }else{
+            return res.status(400).json({error: 'User could not be updated'});
+        }
+    }
+    catch(error:any){
+        next(error);
+    }
 };
