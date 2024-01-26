@@ -391,6 +391,7 @@ export const createUserSchema = z.object({
   lastName: z.string(),
   email: z.string().email(),
   password: z.string(),
+  yearOfStudy: z.number(),
 });
 
 export const otpRequestSchema = z

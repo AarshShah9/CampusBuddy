@@ -33,8 +33,15 @@ export const createNewUser = async (
       );
     }
 
-    const { institutionName, username, firstName, lastName, email, password } =
-      req.body;
+    const {
+      institutionName,
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      yearOfStudy,
+    } = req.body;
 
     const domain = email.slice(email.indexOf("@") + 1);
 
@@ -110,6 +117,8 @@ export const createNewUser = async (
         otp: otp,
         isVerified: false,
         institutionId: institution.id,
+        status: false,
+        yearOfStudy: yearOfStudy,
       },
     });
 
