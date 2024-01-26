@@ -4,8 +4,8 @@ import { AppError, AppErrorName } from "./AppError";
 
 // Utility function for checking if the user has the required permissions for an organization
 export const checkUserPermission = async (
-  userId: String,
-  organizationId: String,
+  userId: string,
+  organizationId: string,
   requiredPermission: AppPermissionName,
 ): Promise<boolean> => {
   try {

@@ -40,6 +40,11 @@ enum FacultyName {
   Schulich
 }
 
+enum EventStatus {
+  Verified
+  NonVerified
+}
+
 //
 //
 // CORE MODELS
@@ -118,22 +123,23 @@ model Program {
 }
 
 model Event {
-  id             String              @id @default(uuid())
-  userId         String              @map("user_id")
-  organizationId String?             @map("organization_id")
-  createdAt      DateTime            @unique @default(now()) @map("created_at")
-  title          String              @db.VarChar(255)
-  description    String?             @db.VarChar(255)
-  location       String
-  startTime      DateTime            @map("start_time")
-  endTime        DateTime            @map("end_time")
-  isPublic       Boolean             @map("is_public")
-  status         ParticipationStatus
-  image          String?
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventTags      EventTag[]
-  eventResponses UserEventResponse[]
+  id                  String              @id @default(uuid())
+  userId              String              @map("user_id")
+  organizationId      String?             @map("organization_id")
+  createdAt           DateTime            @unique @default(now()) @map("created_at")
+  title               String              @db.VarChar(255)
+  description         String?             @db.VarChar(255)
+  location            String
+  startTime           DateTime            @map("start_time")
+  endTime             DateTime            @map("end_time")
+  isPublic            Boolean             @map("is_public")
+  participationStatus ParticipationStatus
+  status              EventStatus
+  image               String?
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization        Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventTags           EventTag[]
+  eventResponses      UserEventResponse[]
 
   @@index([userId])
   @@index([organizationId])
