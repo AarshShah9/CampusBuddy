@@ -70,12 +70,12 @@ model User {
 
   otp        String? @default("")
   jwt        String? @default("")
-  isVerified Boolean @default(false)
+  isVerified Boolean @default(false) @map("is_verified")
 
-  profilePic String? @unique
+  profilePic String? @unique @map("profile_pic")
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String
+  institutionId String      @map("institution_id")
 
   enrollments Enrollment[]
 
