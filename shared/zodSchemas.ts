@@ -113,6 +113,7 @@ export const UserSchema = z.object({
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),
+  status: BooleanSchema,
 });
 
 export type User = z.infer<typeof UserSchema>;
