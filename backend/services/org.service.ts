@@ -1,8 +1,8 @@
 import {
-  UserRole,
+  AppPermissionName,
   Organization,
   Permission,
-  AppPermissionName,
+  UserRole,
 } from "@prisma/client";
 import prisma from "../prisma/client";
 import { OrganizationCreateInput } from "../../shared/zodSchemas";
@@ -13,7 +13,7 @@ import { AppError, AppErrorName } from "../utils/AppError";
 // This messy but it works for now
 export const createOrganizationWithDefaults = async (
   organizationData: OrganizationCreateInput,
-  userId: number,
+  userId: string,
 ): Promise<Organization | undefined> => {
   let newOrganization: Organization | undefined;
 
