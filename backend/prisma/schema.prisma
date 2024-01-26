@@ -50,57 +50,77 @@ model Institution {
   name   String
   domain String
 
-  @@map("school")
-}
+  user User[]
 
-model Student {
-  id       Int     @id @default(autoincrement())
-  school   School  @relation(fields: [schoolID], references: [id])
-  schoolID Int
-  email    String
-  username String
-  name     String
-  password String
-  otp      String
-  jwt      String
-  status   Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([schoolID])
-  @@map("student")
+  @@map("institution")
 }
 
 model User {
-  id                Int                    @id @default(autoincrement())
-  username          String                 @unique
-  firstName         String                 @map("first_name")
-  lastName          String                 @map("last_name")
-  email             String                 @unique
-  password          String                 @map("password")
-  yearOfStudy       Int                    @map("year_of_study")
-  schoolId          Int                    @map("school_id")
-  isVerified        Boolean                @default(false) @map("is_verified")
-  profilePic        String?                @unique @map("profile_pic")
-  school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+
+  username  String @unique
+  firstName String
+  lastName  String
+
+  email    String @unique
+  password String
+
+  otp        String?            @default("")
+  jwt        String?            @default("")
+  isVerified VerificationStatus @default(Pending)
+
+  profilePic String? @unique
+
+  institution   Institution @relation(fields: [institutionID], references: [id], onDelete: Cascade)
+  institutionID String
+
+  enrollments Enrollment[]
+
+  posts    Post[]
+  comments Comment[]
+
   events            Event[]
   UserEventResponse UserEventResponse[]
-  posts             Post[]
-  comments          Comment[]
-  organizationRoles UserOrganizationRole[]
-  enrollments       Enrollment[]
-  subscriptions     TopicSubscription[]
 
-  otp    String
-  jwt    String
-  status Boolean
+  subscriptions        TopicSubscription[]
+  UserOrganizationRole UserOrganizationRole[]
 
-  @@index([schoolId])
+  @@index([email])
+  @@index([institutionID])
   @@map("user")
 }
 
+model Enrollment {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID String
+
+  program   Program @relation(fields: [programID], references: [id], onDelete: Cascade)
+  programID String
+
+  @@index([userID])
+  @@index([programID])
+  @@map("enrollment")
+}
+
+model Program {
+  id         String      @id @default(uuid())
+  program    ProgramType
+  department FacultyName
+
+  Enrollment Enrollment[]
+
+  @@map("program")
+}
+
 model Event {
-  id             Int                 @id @default(autoincrement())
-  userId         Int                 @map("user_id")
-  organizationId Int?                @map("organization_id")
+  id             String              @id @default(uuid())
+  userId         String              @map("user_id")
+  organizationId String?             @map("organization_id")
   createdAt      DateTime            @unique @default(now()) @map("created_at")
   title          String              @db.VarChar(255)
   description    String?             @db.VarChar(255)
@@ -108,7 +128,7 @@ model Event {
   startTime      DateTime            @map("start_time")
   endTime        DateTime            @map("end_time")
   isPublic       Boolean             @map("is_public")
-  status         EventStatus
+  status         ParticipationStatus
   image          String?
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -118,17 +138,6 @@ model Event {
   @@index([userId])
   @@index([organizationId])
   @@map("event")
-}
-
-enum EventStatus {
-  Verified
-  NonVerified
-}
-
-enum ParticipationStatus {
-  Going
-  Interested
-  NotInterested
 }
 
 model UserEventResponse {
@@ -262,28 +271,6 @@ model Permission {
   organizationRolePermissions OrganizationRolePermission[]
 
   @@map("permission")
-}
-
-model Enrollment {
-  programId  Int     @map("program_id")
-  userId     Int     @map("user_id")
-  degreeType String  @map("degree_type")
-  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([programId, userId])
-  @@index([programId])
-  @@index([userId])
-  @@map("enrollment")
-}
-
-model Program {
-  id          Int          @id @default(autoincrement())
-  programName String
-  department  String
-  enrollments Enrollment[]
-
-  @@map("program")
 }
 
 model Topic {

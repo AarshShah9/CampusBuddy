@@ -34,7 +34,7 @@ export const AppPermissionNameSchema = z.enum([
 ///////////////////////////////
 
 export const EventSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   userId: z.number().int(),
   organizationId: zodStringToNumberOrNull
     .pipe(z.number().int().positive().nullable())
@@ -98,7 +98,7 @@ export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 ///////////////////////////////
 
 export const UserSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   username: z.string().min(3).max(20),
   firstName: z.string().min(3).max(20),
   lastName: z.string().min(3).max(20),
@@ -328,12 +328,11 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
   id: z.coerce
-    .number({
-      invalid_type_error: "Invalid Id format. Must be a non-negative integer.",
-    })
-    .int()
-    .positive()
-    .safe(),
+    .string()
+    .uuid()
+    .refine((data) => data.length > 0, {
+      message: "ID is invalid",
+    }),
 });
 
 ///////////////////////////////
@@ -356,3 +355,61 @@ export const CursorPaginationDatetimeSchema = CursorPaginationSchema.extend({
 export type CursorPaginationDatetimeParams = z.infer<
   typeof CursorPaginationDatetimeSchema
 >;
+
+///////////////////////////////
+// INSTITUTION SCHEMAS
+///////////////////////////////
+export const createInstitutionSchema = z.object({
+  institutionName: z.string(),
+  institutionDomain: z.string(),
+});
+
+export const institutionNameSchema = z
+  .string()
+  .refine((data) => data.length > 0, {
+    message: "Institution name cannot be null",
+  });
+
+export const institutionDomainSchema = z
+  .string()
+  .refine((data) => data.length > 0, {
+    message: "Institution domain cannot be null",
+  });
+
+export const institutionIDSchema = z
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
+///////////////////////////////
+// USER SCHEMAS
+///////////////////////////////
+export const createUserSchema = z.object({
+  institutionName: z.string(),
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export const otpRequestSchema = z
+  .string()
+  .email()
+  .refine((data) => data.length > 0, {
+    message: "Email to send OTP to cannot be null",
+  });
+
+export const otpVerifySchema = z
+  .string()
+  .length(6)
+  .refine((data) => data.length === 6, {
+    message: "OTP is invalid",
+  });
+
+export const loginSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+});

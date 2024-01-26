@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 
 export interface RequestExtended extends Request {
   userID?: string;
+}
+
+interface MyJwtPayload extends JwtPayload {
+  ID?: string; // Ensure this matches the actual property in your JWT
 }
 
 export const verifyAuthentication = async (
@@ -14,14 +18,15 @@ export const verifyAuthentication = async (
   const authToken = req.cookies.authToken ?? null;
   const secret = env.JWT_SECRET;
 
-  jwt.verify(authToken, secret, (err: any, decoded: any) => {
-    try {
-      const decoded = jwt.verify(authToken, secret);
-      const ID = decoded.ID;
-
-      req.userID = ID;
-    } catch (error) {
-      res.status(403).send("Invalid JWT");
+  try {
+    const decoded = jwt.verify(authToken, secret) as MyJwtPayload;
+    if (decoded.ID) {
+      req.userID = decoded.ID;
+      next();
+    } else {
+      res.status(403).send("Invalid JWT: ID not found");
     }
-  });
+  } catch (error) {
+    res.status(403).send("Invalid JWT");
+  }
 };

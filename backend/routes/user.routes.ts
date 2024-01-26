@@ -1,25 +1,27 @@
-import express from 'express';
+import express from "express";
 import {
-    createNewUser,
-    resendOTP,
-    verifyOTP,
-    loginUser,
-    logoutUser,
-    resetPassword,
-    removeUserByID,
-    getAllUsers
-} from '../controllers/user.controller';
-import { verifyAuthentication } from '../middleware/verifyAuth';
+  createNewUser,
+  getAllUsers,
+  loginUser,
+  logoutUser,
+  removeUserByID,
+  resendOTP,
+  resetPassword,
+  updateUser,
+  verifyOTP,
+} from "../controllers/user.controller";
+import { verifyAuthentication } from "../middleware/verifyAuth";
 
 const router = express.Router();
 
-router.post('/createNewUser', createNewUser);
-router.post('/resendOTP', resendOTP);
-router.post('/verifyOTP', verifyOTP);
-router.post('/loginStudent', loginUser);
-router.post('/logoutStudent', verifyAuthentication, logoutUser);
-router.post('/resetPassword', resetPassword);
-router.delete('/removeUserByID', removeUserByID);
-router.get('/getAllStudents', getAllUsers);
+router.post("/createNewUser", createNewUser);
+router.post("/resendOTP", resendOTP);
+router.post("/verifyOTP", verifyOTP);
+router.post("/loginStudent", loginUser);
+router.post("/logoutStudent", verifyAuthentication, logoutUser);
+router.post("/resetPassword", resetPassword);
+router.delete("/removeUserByID", removeUserByID);
+router.get("/getAllStudents", getAllUsers);
+router.patch("/updateUser/:id", verifyAuthentication, updateUser);
 
 export default router;
