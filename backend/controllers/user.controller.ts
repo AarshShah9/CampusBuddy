@@ -67,14 +67,14 @@ export const createNewUser = async (
     });
 
     if (studentExists) {
-      if (studentExists.isVerified === "Verified") {
+      if (studentExists.isVerified) {
         throw new AppError(
           AppErrorName.RECORD_EXISTS_ERROR,
           "User already exists",
           400,
           true,
         );
-      } else if (studentExists.isVerified === "Pending") {
+      } else if (studentExists.isVerified === false) {
         await prisma.user.update({
           where: {
             email: email,
@@ -108,8 +108,8 @@ export const createNewUser = async (
         email: email,
         password: password,
         otp: otp,
-        isVerified: "Pending",
-        institutionID: institution.id,
+        isVerified: false,
+        institutionId: institution.id,
       },
     });
 
@@ -233,7 +233,7 @@ export const verifyOTP = async (
         },
         data: {
           jwt: token,
-          isVerified: "Verified",
+          isVerified: false,
         },
       });
 
@@ -280,7 +280,7 @@ export const loginUser = async (
     });
 
     if (existingUser) {
-      if (existingUser.isVerified === "Pending") {
+      if (existingUser.isVerified === false) {
         const otp = otpGenerator.generate(6, {
           upperCaseAlphabets: false,
           lowerCaseAlphabets: false,
@@ -310,7 +310,7 @@ export const loginUser = async (
           success: false,
           message: "User not verified, otp sent",
         });
-      } else if (existingUser.isVerified === "Verified") {
+      } else if (existingUser.isVerified) {
         const token = jwt.sign(
           { ID: existingUser.id },
           process.env.JWT_SECRET ?? "testSecret",
