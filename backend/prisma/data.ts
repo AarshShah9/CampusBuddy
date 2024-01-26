@@ -7,6 +7,7 @@ import {
 
 export const institutes = [
   {
+    id: "1",
     name: "University of Calgary",
     domain: "ucalgary.ca",
   },
@@ -14,6 +15,7 @@ export const institutes = [
 
 export const users = [
   {
+    id: "1",
     username: "john_doe",
     firstName: "John",
     lastName: "Doe",
@@ -27,6 +29,7 @@ export const users = [
     status: true,
   },
   {
+    id: "2",
     username: "jane_smith",
     firstName: "Jane",
     lastName: "Smith",
@@ -40,6 +43,7 @@ export const users = [
     status: true,
   },
   {
+    id: "3",
     username: "tom_dee",
     firstName: "Tom",
     lastName: "Dee",
@@ -53,6 +57,7 @@ export const users = [
     status: true,
   },
   {
+    id: "4",
     username: "tiffany_smalls",
     firstName: "Tiffany",
     lastName: "Smalls",
@@ -69,6 +74,7 @@ export const users = [
 
 export const events = [
   {
+    id: "1",
     userId: "3",
     title: "Event 1",
     description: "First event description.",
@@ -81,6 +87,7 @@ export const events = [
     // Other event details
   },
   {
+    id: "2",
     userId: "1",
     title: "Event 2",
     description: "Second event description.",
@@ -92,6 +99,7 @@ export const events = [
     status: EventStatus.NonVerified,
   },
   {
+    id: "3",
     userId: "4",
     title: "Event 3",
     description: "Third event description.",
@@ -103,6 +111,7 @@ export const events = [
     status: EventStatus.NonVerified,
   },
   {
+    id: "4",
     userId: "1",
     title: "Event 4, Verified",
     organizationId: "1",
@@ -181,6 +190,7 @@ export const userEventResponses = [
 
 export const posts = [
   {
+    id: "1",
     userId: "3",
     title: "First Post",
     text: "This is the first post!",
@@ -188,6 +198,7 @@ export const posts = [
     // Other post details
   },
   {
+    id: "2",
     userId: "4",
     title: "Second Post",
     text: "Another post here!",
@@ -215,12 +226,14 @@ export const comments = [
 
 export const organizations = [
   {
+    id: "1",
     organizationName: "Group A",
     description: "Description for Group A.",
     createdAt: "2023-06-11T02:00:00Z",
     status: OrganizationStatus.Verified,
   },
   {
+    id: "2",
     organizationName: "Group B",
     description: "Description for Group B.",
     createdAt: "2023-07-03T14:30:00Z",
@@ -253,15 +266,19 @@ export const userOrganizationRoles = [
 
 export const roles = [
   {
+    id: "1",
     roleName: UserRole.Admin,
   },
   {
+    id: "2",
     roleName: UserRole.Owner,
   },
   {
+    id: "3",
     roleName: UserRole.Moderator,
   },
   {
+    id: "4",
     roleName: UserRole.Member,
   },
 ];
@@ -282,8 +299,9 @@ export const organizationRolePermissions = [
 ];
 
 export const permissions = Object.values(AppPermissionName).map(
-  (permissionName) => ({
+  (permissionName, key) => ({
     permissionName,
+    id: key.toString(),
   }),
 );
 
@@ -315,21 +333,25 @@ export const enrollments = [
 
 export const programs = [
   {
+    id: "1",
     programName: "Computer Science",
     department: "Science Department",
     // Other program details
   },
   {
+    id: "2",
     programName: "Business Administration",
     department: "Business Department",
     // Other program details
   },
   {
+    id: "3",
     programName: "Engineering",
     department: "Engineering Department",
     // Other program details
   },
   {
+    id: "4",
     programName: "Education",
     department: "Education Department",
   },
@@ -337,15 +359,19 @@ export const programs = [
 
 export const topics = [
   {
+    id: "1",
     topicName: "computer",
   },
   {
+    id: "2",
     topicName: "business",
   },
   {
+    id: "3",
     topicName: "engineer",
   },
   {
+    id: "4",
     topicName: "teacher",
   },
 ];
