@@ -9,16 +9,15 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 
-type signUpSchool = {
-    uniEmail: string,
-    uniName: string,
-    fName: string,
-    lName: string,
+type organizationInformation = {
+    orgEmail: string,
+    orgName: string,
+    address: string,
     password: string,
     rePassword:string,
 }
 
-export default function StudentSignUp() {
+export default function OrganizationSignUp() {
     const { theme } = useThemeContext();
     const navigation = useNavigation<any>();
     const [valid, setValid] = useState(false);
@@ -32,21 +31,20 @@ export default function StudentSignUp() {
         rePassword: zod.string()
     });
 
-    const { control, handleSubmit, formState: { errors } } = useForm<signUpSchool>({
+    const { control, handleSubmit, formState: { errors } } = useForm<organizationInformation>({
         defaultValues: {
-            uniEmail: '',
-            uniName: '',
-            fName: '',
-            lName: '',
+            orgEmail: '',
+            orgName: '',
+            address: '',
             password: '',
             rePassword: ''
         },
         resolver: zodResolver(schema)
     })
 
-    const onSubmit = (data: signUpSchool) => {
+    const onSubmit = (data: organizationInformation) => {
         console.log(data)
-        navigation.navigate("StudentSignUpInfo")
+        //navigation.navigate("StudentSignUpInfo")
         //validate()
     }
 
@@ -62,7 +60,7 @@ export default function StudentSignUp() {
                         onPress={() => navigation.navigate("Login")}
                     />
                     <HeaderText $textColor={theme.colors.tertiary}>
-                        Student Sign Up
+                        Organization Sign Up
                     </HeaderText>
                 </HeaderContainer>
                 <OverlayContainer $color={theme.colors.tertiary}>
@@ -74,15 +72,15 @@ export default function StudentSignUp() {
                             }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <InputField
-                                    label="Institution Email"
+                                    label="Organization Email"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
                                 />
                             )}
-                            name="uniEmail"
+                            name="orgName"
                         />
-                        {errors.uniEmail && <Text>University Email is required.</Text>}
+                        {errors.orgEmail && <Text>An Email is required.</Text>}
                         <Controller
                             control={control}
                             rules={{
@@ -90,47 +88,15 @@ export default function StudentSignUp() {
                             }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <InputField
-                                    label="Institution Name"
+                                    label="Organization Name"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
                                 />
                             )}
-                            name="uniName"
+                            name="orgName"
                         />
-                        {errors.uniName && <Text>Institution Name is required.</Text>}
-                        <Controller
-                            control={control}
-                            rules={{
-                                required: true,
-                            }}
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <InputField
-                                    label="First Name"
-                                    onBlur={onBlur}
-                                    onChangeText={onChange}
-                                    value={value}
-                                />
-                            )}
-                            name="fName"
-                        />
-                        {errors.fName && <Text>Institution Name is required.</Text>}
-                        <Controller
-                            control={control}
-                            rules={{
-                                required: true,
-                            }}
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <InputField
-                                    label="Last Name"
-                                    onBlur={onBlur}
-                                    onChangeText={onChange}
-                                    value={value}
-                                />
-                            )}
-                            name="lName"
-                        />
-                        {errors.lName && <Text>Institution Name is required.</Text>}
+                        {errors.orgName && <Text>Institution Name is required.</Text>}
                         <Controller
                             control={control}
                             rules={{
@@ -146,7 +112,7 @@ export default function StudentSignUp() {
                             )}
                             name="password"
                         />
-                        {errors.password && <Text>Institution Name is required.</Text>}
+                        {errors.password && <Text>Password is required.</Text>}
                         <Controller
                             control={control}
                             rules={{
@@ -162,7 +128,8 @@ export default function StudentSignUp() {
                             )}
                             name="rePassword"
                         />
-                        {errors.rePassword && <Text>Institution Name is required.</Text>}
+                        {errors.rePassword && <Text>Retype your password.</Text>}
+                       
                         <StyledButton
                             mode="contained"
                             onPress={() => {
@@ -176,10 +143,10 @@ export default function StudentSignUp() {
                             </Text>
                         </StyledButton>
                         <ClickLink $color={theme.colors.primary}>
-                            <Text>Sign up as an Organization </Text>
+                            <Text>Sign up as an Student </Text>
                             <Text
                                 onPress={() => {
-                                    navigation.navigate("OrgSignUp");
+                                    navigation.navigate("StudentSignUp")
                                 }}
                                 style={{ color: theme.colors.primary, fontSize: 16, fontFamily: "Roboto-Reg" }}
                             >
