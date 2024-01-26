@@ -34,7 +34,6 @@ export const AppPermissionNameSchema = z.enum([
 ///////////////////////////////
 
 export const EventSchema = z.object({
-  status: EventStatusSchema,
   id: z.number().int(),
   userId: z.number().int(),
   organizationId: zodStringToNumberOrNull

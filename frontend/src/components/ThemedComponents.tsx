@@ -1,4 +1,5 @@
-import { Text, TextProps, TextInput, TextInputProps, StyleProp, TextStyle } from 'react-native';
+import { View,Text, TextProps, TextInput, TextInputProps, StyleProp, TextStyle } from 'react-native';
+import styled from 'styled-components';
 import useThemeContext from '~/hooks/useThemeContext';
 
 export const ThemedText = ({ style, ...props }: TextProps) => {
@@ -26,3 +27,7 @@ export const ThemedTextInput = ({ style, ...props }: TextInputProps) => {
         />
     )
 }
+export const MainContainer = styled(View)<{$primary:string}>`
+    height:100%;
+    background-color: ${props=>props.$primary};
+`

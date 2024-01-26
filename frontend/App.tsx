@@ -4,7 +4,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ThemeContextProvider } from './src/contexts/themeContext';
 import { AuthContextProvider } from './src/contexts/authContext';
 import { LoadingContextProvider } from './src/contexts/loadingContext';
-import Navigation from './src/navigation/Navigation';
+import Navigation from './src/navigation';
 
 export default function App() {
     const [queryClient] = useState(() => new QueryClient());
