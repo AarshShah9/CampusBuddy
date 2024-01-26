@@ -17,10 +17,6 @@ datasource db {
 //
 //
 // FOR USE IN USER, ORGANIZATION, EVENT
-enum VerificationStatus {
-  Pending
-  Verified
-}
 
 // FOR USE IN PARTICIPATION
 enum ParticipationStatus {
@@ -32,12 +28,6 @@ enum ParticipationStatus {
 enum ProgramType {
   Bachelors
   Masters
-}
-
-enum FacultyName {
-  Science
-  Arts
-  Schulich
 }
 
 enum EventStatus {
@@ -73,14 +63,14 @@ model User {
   email    String @unique
   password String
 
-  otp        String?            @default("")
-  jwt        String?            @default("")
-  isVerified VerificationStatus @default(Pending)
+  otp        String? @default("")
+  jwt        String? @default("")
+  isVerified Boolean @default(false)
 
   profilePic String? @unique
 
-  institution   Institution @relation(fields: [institutionID], references: [id], onDelete: Cascade)
-  institutionID String
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
 
   enrollments Enrollment[]
 
@@ -94,52 +84,51 @@ model User {
   UserOrganizationRole UserOrganizationRole[]
 
   @@index([email])
-  @@index([institutionID])
+  @@index([institutionId])
   @@map("user")
 }
 
 model Enrollment {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userID], references: [id], onDelete: Cascade)
-  userID String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
-  program   Program @relation(fields: [programID], references: [id], onDelete: Cascade)
-  programID String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  programId String
 
-  @@index([userID])
-  @@index([programID])
+  @@index([userId])
+  @@index([programId])
   @@map("enrollment")
 }
 
 model Program {
-  id         String      @id @default(uuid())
-  program    ProgramType
-  department FacultyName
-
-  Enrollment Enrollment[]
+  id          String       @id @default(uuid())
+  programName String
+  department  String
+  enrollments Enrollment[]
 
   @@map("program")
 }
 
 model Event {
-  id                  String              @id @default(uuid())
-  userId              String              @map("user_id")
-  organizationId      String?             @map("organization_id")
-  createdAt           DateTime            @unique @default(now()) @map("created_at")
-  title               String              @db.VarChar(255)
-  description         String?             @db.VarChar(255)
-  location            String
-  startTime           DateTime            @map("start_time")
-  endTime             DateTime            @map("end_time")
-  isPublic            Boolean             @map("is_public")
-  participationStatus ParticipationStatus
-  status              EventStatus
-  image               String?
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization        Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventTags           EventTag[]
-  eventResponses      UserEventResponse[]
+  id             String              @id @default(uuid())
+  userId         String              @map("user_id")
+  organizationId String?             @map("organization_id")
+  createdAt      DateTime            @unique @default(now()) @map("created_at")
+  title          String              @db.VarChar(255)
+  description    String?             @db.VarChar(255)
+  location       String
+  startTime      DateTime            @map("start_time")
+  endTime        DateTime            @map("end_time")
+  isPublic       Boolean             @map("is_public")
+  // participationStatus ParticipationStatus
+  status         EventStatus
+  image          String?
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventTags      EventTag[]
+  eventResponses UserEventResponse[]
 
   @@index([userId])
   @@index([organizationId])

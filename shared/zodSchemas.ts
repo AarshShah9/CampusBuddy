@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BooleanSchema, zodStringToNumberOrNull } from "./utils";
+import { BooleanSchema } from "./utils";
 
 /////////////////////////////////////////
 // ENUMS
@@ -35,10 +35,8 @@ export const AppPermissionNameSchema = z.enum([
 
 export const EventSchema = z.object({
   id: z.string().uuid(),
-  userId: z.number().int(),
-  organizationId: zodStringToNumberOrNull
-    .pipe(z.number().int().positive().nullable())
-    .nullable(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid().nullable(),
   createdAt: z.coerce.date(),
   title: z
     .string({
@@ -111,7 +109,7 @@ export const UserSchema = z.object({
     .min(1, { message: "Year of Study must be greater than 0" })
     .max(10, { message: "Year of Study must be less than 11" }),
   schoolId: z.number().int(),
-  isVerified: z.enum(["Pending", "Verified"]),
+  isVerified: z.boolean(),
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),
