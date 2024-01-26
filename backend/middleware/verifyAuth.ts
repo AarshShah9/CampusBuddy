@@ -7,7 +7,7 @@ export interface RequestExtended extends Request {
 }
 
 interface MyJwtPayload extends JwtPayload {
-  ID?: string; // Ensure this matches the actual property in your JWT
+  ID?: string;
 }
 
 export const verifyAuthentication = async (
