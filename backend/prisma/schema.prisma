@@ -11,12 +11,44 @@ datasource db {
   relationMode = "prisma"
 }
 
-model School {
-  id       Int       @id @default(autoincrement())
-  name     String
-  domain   String
-  students Student[]
-  users    User[]
+//
+//
+// ENUMS
+//
+//
+// FOR USE IN USER, ORGANIZATION, EVENT
+enum VerificationStatus {
+  Pending
+  Verified
+}
+
+// FOR USE IN PARTICIPATION
+enum ParticipationStatus {
+  Going
+  Interested
+  NotInterested
+}
+
+enum ProgramType {
+  Bachelors
+  Masters
+}
+
+enum FacultyName {
+  Science
+  Arts
+  Schulich
+}
+
+//
+//
+// CORE MODELS
+//
+//
+model Institution {
+  id     String @id @default(uuid())
+  name   String
+  domain String
 
   @@map("school")
 }
@@ -100,8 +132,8 @@ enum ParticipationStatus {
 }
 
 model UserEventResponse {
-  userId              Int    @map("user_id")
-  eventId             Int    @map("event_id")
+  userId              String @map("user_id")
+  eventId             String @map("event_id")
   participationStatus String @map("participation_status")
   user                User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   event               Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -113,10 +145,10 @@ model UserEventResponse {
 }
 
 model Post {
-  id             Int           @id @default(autoincrement())
-  userId         Int           @map("user_id")
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
   image          String?
-  organizationId Int?          @map("organization_id")
+  organizationId String?       @map("organization_id")
   createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
   text           String?
@@ -133,11 +165,11 @@ model Post {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @map("user_id")
+  userId    String   @map("user_id")
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int      @map("post_id")
+  postId    String   @map("post_id")
   createdAt DateTime @unique @default(now()) @map("created_at")
   text      String
 
@@ -152,7 +184,7 @@ enum OrganizationStatus {
 }
 
 model Organization {
-  id                          Int                          @id @default(autoincrement())
+  id                          String                       @id @default(uuid())
   organizationName            String                       @unique @map("organization_name")
   description                 String?
   createdAt                   DateTime                     @unique @default(now()) @map("created_at")
@@ -166,9 +198,9 @@ model Organization {
 }
 
 model UserOrganizationRole {
-  userId         Int          @map("user_id")
-  organizationId Int          @map("organization_id")
-  roleId         Int          @map("role_id")
+  userId         String       @map("user_id")
+  organizationId String       @map("organization_id")
+  roleId         String       @map("role_id")
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
@@ -188,7 +220,7 @@ enum UserRole {
 }
 
 model Role {
-  id                          Int                          @id @default(autoincrement())
+  id                          String                       @id @default(uuid())
   roleName                    UserRole                     @map("role_name")
   userOrganizationRoles       UserOrganizationRole[]
   organizationRolePermissions OrganizationRolePermission[]
@@ -197,9 +229,9 @@ model Role {
 }
 
 model OrganizationRolePermission {
-  organizationId Int          @map("organization_id")
-  roleId         Int          @map("role_id")
-  permissionId   Int          @map("permission_id")
+  organizationId String       @map("organization_id")
+  roleId         String       @map("role_id")
+  permissionId   String       @map("permission_id")
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission     Permission   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
@@ -218,14 +250,14 @@ enum AppPermissionName {
   CREATE_POSTS
   MANAGE_POSTS // remove user posts
   MANAGE_MEMBERS // maybe ban/unban users?
-  APPROVE_MEMBER_REQUESTS // not sure if we need this 
+  APPROVE_MEMBER_REQUESTS // not sure if we need this
   VIEW_ANALYTICS // view details about the organization
   MANAGE_ORGANIZATION // edit org name, description, image, permissions
   DELETE_ORGANIZATION
 }
 
 model Permission {
-  id                          Int                          @id @default(autoincrement())
+  id                          String                       @id @default(uuid())
   permissionName              AppPermissionName            @map("permission_name")
   organizationRolePermissions OrganizationRolePermission[]
 
@@ -255,7 +287,7 @@ model Program {
 }
 
 model Topic {
-  id            Int                 @id @default(autoincrement())
+  id            String              @id @default(uuid())
   topicName     String              @unique @map("topic_name")
   eventTags     EventTag[]
   posts         PostTag[]
@@ -265,10 +297,10 @@ model Topic {
 }
 
 model EventTag {
-  eventId Int   @map("event_id")
-  topicId Int   @map("topic_id")
-  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  eventId String @map("event_id")
+  topicId String @map("topic_id")
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([eventId, topicId])
   @@index([eventId])
@@ -277,10 +309,10 @@ model EventTag {
 }
 
 model PostTag {
-  postId  Int   @map("post_id")
-  topicId Int   @map("topic_id")
-  post    Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  postId  String @map("post_id")
+  topicId String @map("topic_id")
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([postId, topicId])
   @@index([postId])
@@ -289,10 +321,10 @@ model PostTag {
 }
 
 model TopicSubscription {
-  userId  Int   @map("user_id")
-  topicId Int   @map("topic_id")
-  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId  String @map("user_id")
+  topicId String @map("topic_id")
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([userId, topicId])
   @@index([userId])

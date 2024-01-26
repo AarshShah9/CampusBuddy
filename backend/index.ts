@@ -7,9 +7,8 @@ import multer from "multer";
 import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
 import event from "./routes/event.routes";
-import org from "./routes/org.routes";
-import school from "./routes/school.routes";
-import student from "./routes/user.routes";
+import institution from "./routes/institution.routes";
+import user from "./routes/user.routes";
 import UploadToS3 from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
 
@@ -50,10 +49,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // routes
-app.use("/api", student);
-app.use("/api", school);
+app.use("/api/user", user);
+app.use("/api/institution", institution);
 app.use("/api/events", event);
-app.use("/api/orgs", org);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
