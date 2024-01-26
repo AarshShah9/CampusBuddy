@@ -59,12 +59,14 @@ model Institution {
 model User {
   id String @id @default(uuid())
 
-  username  String @unique
-  firstName String
-  lastName  String
+  username String @unique
 
-  email    String @unique
-  password String
+  firstName String @map("first_name")
+  lastName  String @map("last_name")
+
+  email       String @unique
+  password    String @map("password")
+  yearOfStudy Int    @map("year_of_study")
 
   otp        String? @default("")
   jwt        String? @default("")
@@ -92,16 +94,15 @@ model User {
 }
 
 model Enrollment {
-  id String @id @default(uuid())
+  programId  String  @map("program_id")
+  userId     String  @map("user_id")
+  degreeType String  @map("degree_type")
+  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  programId String
-
-  @@index([userId])
+  @@id([programId, userId])
   @@index([programId])
+  @@index([userId])
   @@map("enrollment")
 }
 

@@ -74,8 +74,8 @@ const load = async () => {
     await prisma.topicSubscription.deleteMany();
     console.log("Deleted records in the Topic Subscription table");
 
-    await prisma.$queryRaw`ALTER TABLE school AUTO_INCREMENT = 1`;
-    console.log("reset School auto increment to 1");
+    await prisma.$queryRaw`ALTER TABLE institution AUTO_INCREMENT = 1`;
+    console.log("reset Institute auto increment to 1");
 
     await prisma.$queryRaw`ALTER TABLE user AUTO_INCREMENT = 1`;
     console.log("reset User auto increment to 1");
@@ -107,7 +107,7 @@ const load = async () => {
     await prisma.institution.createMany({
       data: institutes,
     });
-    console.log("Added School data");
+    console.log("Added institution data");
 
     await prisma.user.createMany({
       data: users,
