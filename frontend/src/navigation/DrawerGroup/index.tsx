@@ -1,8 +1,8 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import useThemeContext from '~/hooks/useThemeContext';
-import HomeStackGroup from './HomeStackGroup/HomeStackGroup';
+import HomeStackGroup from './HomeStackGroup';
 import CarpoolScreenStack from './CarpoolScreenStack';
-import MessagesStackGroup from './MessagesStackGroup/MessagesStackGroup';
+import MessagesStackGroup from './MessagesStackGroup';
 
 const Drawer = createDrawerNavigator();
 

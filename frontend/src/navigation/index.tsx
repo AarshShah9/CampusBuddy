@@ -1,7 +1,7 @@
 import useThemeContext from '~/hooks/useThemeContext';
 import {NavigationContainer} from "@react-navigation/native"
 import {StatusBar} from 'expo-status-bar';
-import DrawerGroup from './DrawerGroup/DrawerGroup';
+import DrawerGroup from './DrawerGroup';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from '~/screens/SplashScreen';
