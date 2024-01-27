@@ -108,12 +108,11 @@ export const UserSchema = z.object({
     .number()
     .min(1, { message: "Year of Study must be greater than 0" })
     .max(10, { message: "Year of Study must be less than 11" }),
-  schoolId: z.number().int(),
+  institutionId: z.string().uuid(),
   isVerified: BooleanSchema,
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),
-  status: BooleanSchema,
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -357,9 +356,22 @@ export type CursorPaginationDatetimeParams = z.infer<
 ///////////////////////////////
 // INSTITUTION SCHEMAS
 ///////////////////////////////
-export const createInstitutionSchema = z.object({
-  institutionName: z.string(),
-  institutionDomain: z.string(),
+export const InstitutionSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  name: z
+    .string()
+    .min(3, { message: "Institution name must at least 3 characters " }),
+  domain: z
+    .string()
+    .min(3, { message: "Institution domain must at least 3 characters " }),
+});
+
+export const createInstitutionSchema = InstitutionSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const institutionNameSchema = z
@@ -384,22 +396,17 @@ export const institutionIDSchema = z
 ///////////////////////////////
 // USER SCHEMAS
 ///////////////////////////////
-export const createUserSchema = z.object({
-  institutionName: z.string(),
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  password: z.string(),
-  yearOfStudy: z.number(),
+export const createUserSchema = UserSchema.omit({
+  id: true,
+  isVerified: true,
+  otp: true,
+  jwt: true,
 });
 
 export const otpRequestSchema = z
   .string()
   .email()
-  .refine((data) => data.length > 0, {
-    message: "Email to send OTP to cannot be null",
-  });
+  .min(1, { message: "Invalid OTP" });
 
 export const otpVerifySchema = z
   .string()
