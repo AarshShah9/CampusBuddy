@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createUserSchema,
+  deleteSchema,
   IdParamSchema,
   loginSchema,
   otpRequestSchema,
@@ -215,7 +216,7 @@ export const verifyOTP = async (
     if (!validOTP.success) {
       throw new AppError(
         AppErrorName.INVALID_INPUT_ERROR,
-        "Email cannot be null",
+        "OTP cannot be null",
         400,
         true,
       );
@@ -378,6 +379,17 @@ export const resetPassword = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const validReset = loginSchema.safeParse(req.body);
+
+  if (!validReset.success) {
+    throw new AppError(
+      AppErrorName.INVALID_INPUT_ERROR,
+      "Email cannot be null",
+      400,
+      true,
+    );
+  }
+
   const { email, password } = req.body;
 
   await prisma.user.update({
@@ -396,11 +408,22 @@ export const removeUserByID = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { userID } = req.body;
+  const validUserId = deleteSchema.safeParse(req.body);
+
+  if (!validUserId.success) {
+    throw new AppError(
+      AppErrorName.INVALID_INPUT_ERROR,
+      "User Id cannot be null",
+      400,
+      true,
+    );
+  }
+
+  const { userId } = req.body;
 
   const deletedUser = await prisma.user.delete({
     where: {
-      id: userID,
+      id: userId,
     },
   });
 
