@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BooleanSchema, zodStringToNumberOrNull } from "./utils";
+import { BooleanSchema } from "./utils";
 
 /////////////////////////////////////////
 // ENUMS
@@ -34,11 +34,9 @@ export const AppPermissionNameSchema = z.enum([
 ///////////////////////////////
 
 export const EventSchema = z.object({
-  id: z.number().int(),
-  userId: z.number().int(),
-  organizationId: zodStringToNumberOrNull
-    .pipe(z.number().int().positive().nullable())
-    .nullable(),
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid().nullable(),
   createdAt: z.coerce.date(),
   title: z
     .string({
@@ -98,7 +96,7 @@ export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 ///////////////////////////////
 
 export const UserSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   username: z.string().min(3).max(20),
   firstName: z.string().min(3).max(20),
   lastName: z.string().min(3).max(20),
@@ -328,12 +326,11 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
   id: z.coerce
-    .number({
-      invalid_type_error: "Invalid Id format. Must be a non-negative integer.",
-    })
-    .int()
-    .positive()
-    .safe(),
+    .string()
+    .uuid()
+    .refine((data) => data.length > 0, {
+      message: "ID is invalid",
+    }),
 });
 
 ///////////////////////////////
@@ -356,3 +353,70 @@ export const CursorPaginationDatetimeSchema = CursorPaginationSchema.extend({
 export type CursorPaginationDatetimeParams = z.infer<
   typeof CursorPaginationDatetimeSchema
 >;
+
+///////////////////////////////
+// INSTITUTION SCHEMAS
+///////////////////////////////
+export const InstitutionSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  name: z
+    .string()
+    .min(3, { message: "Institution name must at least 3 characters " }),
+  domain: z
+    .string()
+    .min(3, { message: "Institution domain must at least 3 characters " }),
+});
+
+export const createInstitutionSchema = InstitutionSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const institutionNameSchema = z
+  .string()
+  .refine((data) => data.length > 0, {
+    message: "Institution name cannot be null",
+  });
+
+export const institutionDomainSchema = z
+  .string()
+  .refine((data) => data.length > 0, {
+    message: "Institution domain cannot be null",
+  });
+
+export const institutionIDSchema = z
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
+///////////////////////////////
+// USER SCHEMAS
+///////////////////////////////
+export const createUserSchema = UserSchema.omit({
+  id: true,
+  isVerified: true,
+  otp: true,
+  jwt: true,
+});
+
+export const otpRequestSchema = z
+  .string()
+  .email()
+  .min(1, { message: "Invalid OTP" });
+
+export const otpVerifySchema = z
+  .string()
+  .length(6)
+  .refine((data) => data.length === 6, {
+    message: "OTP is invalid",
+  });
+
+export const loginSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+});

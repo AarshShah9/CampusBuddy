@@ -1,31 +1,32 @@
-import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from '@prisma/client';
+import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { env } from "../utils/validateEnv";
 
-const prisma = new PrismaClient();
-
-export const verifyAuthentication = async (req: Request, res: Response, next: NextFunction) => {
-    const authToken = req.cookies.authToken;
-
-    // check if token exists in headers
-    if (authToken) {
-
-        const status = await prisma.student.findMany({
-            where: {
-                jwt: authToken
-            }
-        });
-
-        // jwt is valid
-        if (status) {
-            next();
-        }
-        else {
-            res.status(401).send("Authentication token invalid");
-        }
-
-        
-    }
-    else {
-        res.status(401).send("Authentication token not found");
-    }
+export interface RequestExtended extends Request {
+  userID?: string;
 }
+
+interface MyJwtPayload extends JwtPayload {
+  ID?: string;
+}
+
+export const verifyAuthentication = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  const authToken = req.cookies.authToken ?? null;
+  const secret = env.JWT_SECRET;
+
+  try {
+    const decoded = jwt.verify(authToken, secret) as MyJwtPayload;
+    if (decoded.ID) {
+      req.userID = decoded.ID;
+      next();
+    } else {
+      res.status(403).send("Invalid JWT: ID not found");
+    }
+  } catch (error) {
+    res.status(403).send("Invalid JWT");
+  }
+};

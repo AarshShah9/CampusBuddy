@@ -4,8 +4,8 @@ import { AppError, AppErrorName } from "./AppError";
 
 // Utility function for checking if the user has the required permissions for an organization
 export const checkUserPermission = async (
-  userId: number,
-  organizationId: number,
+  userId: string,
+  organizationId: string,
   requiredPermission: AppPermissionName,
 ): Promise<boolean> => {
   try {
@@ -26,12 +26,10 @@ export const checkUserPermission = async (
     });
 
     // Check if the required permission matches any of the role permissions
-    const hasPermission = rolePermissions.some(
+    return rolePermissions.some(
       (rolePermission) =>
         rolePermission.permission.permissionName === requiredPermission,
     );
-
-    return hasPermission;
   } catch (error: any) {
     throw new AppError(
       AppErrorName.PRISMA_ERROR,

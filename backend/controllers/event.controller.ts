@@ -11,7 +11,7 @@ import prisma from "../prisma/client"; // import the singleton prisma instance
 import { AppError, AppErrorName } from "../utils/AppError";
 import { checkUserPermission } from "../utils/checkUserPermission";
 
-const userId = 3; // Placeholder for testing
+const userId = "3"; // Placeholder for testing
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {

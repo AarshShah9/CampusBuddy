@@ -16,7 +16,7 @@ export const createNewOrganization = async (
 ) => {
   try {
     // const userId = req.userId; // get userId from the request
-    const userId = 3; // NOTE: Placeholder, remove later
+    const userId = "3"; // NOTE: Placeholder, remove later
     // Validate the organization data
     const validatedOrganization = OrganizationCreateSchema.parse(req.body);
 
