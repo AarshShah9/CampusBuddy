@@ -1,4 +1,3 @@
-import { URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
@@ -8,14 +7,15 @@ import { Button, Platform, StyleSheet, View } from "react-native";
 import { Card } from "react-native-paper";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import { getRequest } from "~/lib/CBRequest";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
   const [image, setImage] = useState<string>();
 
   const testCallback = async () => {
-    fetch(URL + "/Test")
-      .then((response) => response.json())
+    await getRequest("/Test", {})
+      .then((response) => response)
       .then((data) => {
         console.log(data);
       })

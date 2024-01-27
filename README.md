@@ -78,8 +78,9 @@ To do this you will have to do the following on all of the commands.
 ### Database
 
 ```
-$ npx prisma db generate // reflect model chages locally (for nodejs, backend, ORM)
+$ npx prisma generate // reflect model chages locally (for nodejs, backend, ORM)
 $ npx prisma db push // push model changes to remote db instance
+$ npx prisma db seed // seed the database with data
 ```
 
 
