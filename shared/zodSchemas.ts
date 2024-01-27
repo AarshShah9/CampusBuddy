@@ -108,11 +108,12 @@ export const UserSchema = z.object({
     .number()
     .min(1, { message: "Year of Study must be greater than 0" })
     .max(10, { message: "Year of Study must be less than 11" }),
-  institutionId: z.string().uuid(),
+  schoolId: z.number().int(),
   isVerified: BooleanSchema,
   profilePic: z.string().nullable(),
   otp: z.string(),
   jwt: z.string(),
+  status: BooleanSchema,
 });
 
 export type User = z.infer<typeof UserSchema>;
