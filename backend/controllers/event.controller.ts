@@ -33,7 +33,8 @@ export const createVerifiedEvent = async (
     console.log("req.body - we made it here atleast", req.body);
 
     // Validate the Event data with zod schema
-    const validatedEventData = EventCreateSchema.parse(req.body.data);
+    // const validatedEventData = EventCreateSchema.parse(req.body.data);
+    const validatedEventData = JSON.parse(req.body.data);
 
     // Check if the user has permission to create an event
     // const hasPermission = await checkUserPermission(
