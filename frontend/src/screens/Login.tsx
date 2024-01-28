@@ -83,7 +83,11 @@ export default function Login() {
             />
             {errors.password && <Text>Password is required.</Text>}
             
-            <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
+            <StyledButton mode="contained" onPress={()=>{
+              
+              navigation.navigate("EventDetail")
+
+            }}>
             <Text style={{lineHeight:30, fontSize: 24, fontWeight: "bold", color: "white", fontFamily:"Nunito-Bold"}}>
                 Login
             </Text>
