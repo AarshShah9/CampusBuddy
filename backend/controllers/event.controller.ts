@@ -10,6 +10,7 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client"; // import the singleton prisma instance
 import { AppError, AppErrorName } from "../utils/AppError";
 import { checkUserPermission } from "../utils/checkUserPermission";
+import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
 
 const userId = "3"; // Placeholder for testing
 
@@ -27,79 +28,86 @@ export const createVerifiedEvent = async (
   next: NextFunction,
 ) => {
   try {
-    // Get userId
-    // const userId = req.user.id; // get userId from the request -> should set in auth middleware
     // Validate request id param
-    const organizationId = IdParamSchema.parse(req.params).id;
+    // const organizationId = IdParamSchema.parse(req.params).id;
+    console.log("req.body - we made it here atleast", req.body);
 
     // Validate the Event data with zod schema
-    const validatedEventData = EventCreateSchema.parse(req.body);
-    let newEvent: Event;
+    const validatedEventData = EventCreateSchema.parse(req.body.data);
 
-    // check if the user has permission to create an event
-    const hasPermission = await checkUserPermission(
-      userId,
-      organizationId,
-      AppPermissionName.CREATE_EVENTS,
-    );
-    if (hasPermission) {
+    // Check if the user has permission to create an event
+    // const hasPermission = await checkUserPermission(
+    //   userId, // Assuming you've got the userId from somewhere, like req.user.id
+    //   organizationId,
+    //   AppPermissionName.CREATE_EVENTS,
+    // );
+    // if (!hasPermission) {
+    //   throw new AppError(
+    //     AppErrorName.PERMISSION_ERROR,
+    //     `User does not have permission to create event`,
+    //     403,
+    //     true,
+    //   );
+    // }
+
+    if (!req.file) {
+      throw new AppError(
+        AppErrorName.FILE_UPLOAD_ERROR,
+        "No file uploaded.",
+        400,
+        true,
+      );
+    }
+
+    // Start a transaction
+    const newEvent = await prisma.$transaction(async (prisma) => {
       // Create a verified event for an organization
-      newEvent = await prisma.event.create({
+      const event = await prisma.event.create({
         data: {
           ...validatedEventData,
-          organizationId,
+          // organizationId,
           userId,
           status: EventStatus.Verified,
         },
       });
 
-      // TODO: Upload image
-      if (req.file) {
-        // const uniqueFileName = generateUniqueFileName(req.file.originalname);
-        // // idk maybe make the path something like:
-        // // images/events/<eventId>-<timestamp>_<originalname>
-        // // images/events/123_2024-01-16T12-34-56.789Z_example.png
-        // const path = `images/events/${newEvent.id}_${uniqueFileName}`;
-        // await UploadToS3(req.file, path);
-        // // console.log("File uploaded successfully");
-        // // update event record with image path
-        // newEvent = await prisma.event.update({
-        //   where: { id: newEvent.id },
-        //   data: {
-        //     image: path,
-        //   },
-        // });
-      }
-    } else {
-      throw new AppError(
-        AppErrorName.PERMISSION_ERROR,
-        `User does not have permission to create event`,
-        403,
-        true,
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        event.id,
       );
-    }
+      const path = `images/events/${uniqueFileName}`;
 
-    if (newEvent) {
-      // Event created successfully
-      res.status(201).json({
-        message: "Event created successfully",
-        data: newEvent,
+      try {
+        await UploadToS3(req.file!, path);
+      } catch (uploadError) {
+        // If upload fails, throw error to trigger rollback
+        throw new AppError(
+          AppErrorName.FILE_UPLOAD_ERROR,
+          "Error uploading file to S3.",
+          500,
+          true,
+        );
+      }
+
+      // Update event with image path after successful upload
+      return prisma.event.update({
+        where: { id: event.id },
+        data: {
+          image: path,
+        },
       });
-    } else {
-      // Throw an error if the event creation returned an empty result
-      throw new AppError(
-        AppErrorName.EMPTY_RESULT_ERROR,
-        "Event creation returned empty result.",
-        500,
-        true,
-      );
-    }
+    });
+
+    // Event created successfully
+    res.status(201).json({
+      message: "Event created successfully",
+      data: newEvent,
+    });
   } catch (error: any) {
     // hand error over to error handling middleware
     next(error);
   }
 };
-
 // Create new Event
 export const createEvent = async (
   req: Request,

@@ -113,7 +113,6 @@ const convertBytesToSize = (
 
 const generateUniqueFileName = function (fileName: string): string {
   const maxFilenameSize = 100;
-  const testing = "wow";
   if (fileName.length > maxFilenameSize) {
     // const error = new Error("Filename too long");
     throw new AppError(

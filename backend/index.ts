@@ -69,8 +69,6 @@ app.post(
     }
 
     try {
-      console.log(req.file.originalname);
-
       // Would need to generate a proper path here
       const path = `new/path/${req.file.originalname}`;
       await UploadToS3(req.file, path);

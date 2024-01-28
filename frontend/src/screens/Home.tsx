@@ -8,6 +8,8 @@ import { Card } from "react-native-paper";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { getRequest } from "~/lib/CBRequest";
+import { EventCreateSchema } from "../../../shared/zodSchemas";
+import { z } from "zod";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -34,14 +36,29 @@ export default function Home() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      await UploadImage(result.assets[0]);
+
+      type EventCreateType = z.infer<typeof EventCreateSchema>;
+
+      const data: EventCreateType = {
+        title: "Test Event",
+        description: "Test Description",
+        location: "Test Location",
+        startTime: new Date(),
+        endTime: new Date(),
+        isPublic: true,
+      };
+
+      await UploadImage(result.assets[0], data);
 
       return;
     }
     console.log(result);
   };
 
-  const UploadImage = async (selectedImage: ImagePickerAsset) => {
+  const UploadImage = async (
+    selectedImage: ImagePickerAsset,
+    data: Record<string, any>,
+  ) => {
     const uri =
       Platform.OS === "android"
         ? selectedImage.uri
@@ -56,15 +73,25 @@ export default function Home() {
       name: `image.${ext}`,
       type,
     } as any);
-    try {
-      const { data } = await axios.post(`${URL}/api/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+
+    formData.append("data", JSON.stringify(data));
+
+    await axios
+      .post(
+        `https://cuddly-ladybug-innocent.ngrok-free.app/api/events/organization/1`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      )
+      .then((response) => {
+        console.log(response);
+        alert("Image Uploaded Successfully!");
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Something went wrong in the Upload Function!");
       });
-      alert("Image Uploaded");
-    } catch (err) {
-      console.log(err);
-      alert("Something went wrong in the Upload Function!");
-    }
   };
 
   return (

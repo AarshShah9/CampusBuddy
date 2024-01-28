@@ -3,6 +3,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs";
 import { promisify } from "util";
 import { env } from "./validateEnv";
+import { AppError, AppErrorName } from "./AppError";
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -47,4 +48,20 @@ const UploadToS3 = async (file: Express.Multer.File, path: string) => {
   }
 };
 
+const generateUniqueFileName = (originalName: string, id: string) => {
+  if (originalName.length > 100) {
+    originalName = originalName.substring(0, 100);
+  }
+
+  // Create a timestamp
+  const timestamp = new Date().toISOString().replace(/:/g, "-");
+
+  // Extract the file extension
+  const extension = originalName.split(".").pop();
+
+  // Construct the unique file name
+  return `${id}-${timestamp}_${originalName}`;
+};
+
 export default UploadToS3;
+export { generateUniqueFileName };
