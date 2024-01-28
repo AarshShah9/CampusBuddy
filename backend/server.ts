@@ -87,7 +87,7 @@ app.use(errorHandler);
 
 // server start
 const server = app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+  console.log(`App listening at http://localhost:${port} !!`);
 });
 
 if (env.ENV === "dev") {
