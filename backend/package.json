@@ -2,16 +2,16 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
     "test": "jest --detectOpenHandles",
     "clearJest": "jest --clearCache",
-    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
+    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/backend/server.js\"",
     "build": "tsc",
-    "start": "node dist/backend/index.js"
+    "start": "node dist/backend/server.js"
   },
   "keywords": [],
   "author": "",

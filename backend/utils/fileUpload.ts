@@ -6,7 +6,7 @@ import { AppError, AppErrorName } from "./AppError";
 // Configure the file storage
 const storage = multer.diskStorage({
   destination: (req: Request, file, cb) => {
-    cb(null, "uploads"); // 'uploads' specified in index.ts
+    cb(null, "uploads"); // 'uploads' specified in server.ts
   },
   // concatenate hyphenated date string to ensure unique file name
   filename: (req: Request, file, cb) => {

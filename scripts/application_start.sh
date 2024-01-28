@@ -15,7 +15,7 @@ export NVM_DIR="$HOME/.nvm"
 npm install
 
 #start our node app in the background
-# First we need to build the index.ts file to index.js and put it in the build folder
+# First we need to build the server.ts file to index.js and put it in the build folder
 # Then we can run the index.js file
 npm run build
 npm start > app.out.log 2> app.err.log < /dev/null &
