@@ -86,7 +86,7 @@ app.post(
 app.use(errorHandler);
 
 // server start
-const server = app.listen(8080, () => {
+const server = app.listen(8080, "127.0.0.1", () => {
   console.log(`App listening at http://localhost:${port} !`);
 });
 
