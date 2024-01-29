@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {ThemedText} from '~/components/ThemedComponents';
-import {Card, Text } from 'react-native-paper';
+import {Card} from 'react-native-paper';
 import LocationChip from './LocationChip';
 import styled from "styled-components"
 import { View } from 'react-native';
