@@ -6,9 +6,29 @@ import { Platform } from "react-native";
 // Define the array of allowed endpoints
 const allowedEndpoints = [
   "/Test",
-  "/api/events/organization/:id",
+  "/api/upload",
+  "/api/events/test",
   "/api/events/",
+  "/api/events/verified",
+  "/api/events/organization/:id",
+  "/api/events/recent/",
   "/api/events/:id",
+  "/api/institution/createInstitution",
+  "/api/institution/getInstitutionByID",
+  "/api/institution/getInstitutionByName",
+  "/api/institution/removeInstitutionByID",
+  "/api/institution/getAllInstitutions",
+  "/api/orgs/test",
+  "/api/orgs/",
+  "/api/user/createNewUser",
+  "/api/user/resendOTP",
+  "/api/user/verifyOTP",
+  "/api/user/loginUser",
+  "/api/user/logoutUser",
+  "/api/user/resetPassword",
+  "/api/user/removeUser/:id",
+  "/api/user/getAllUsers",
+  "/api/user/updateUser/:id",
 ] as const;
 type AllowedEndpoints = (typeof allowedEndpoints)[number];
 
@@ -63,43 +83,6 @@ const getRequest = async (endpoint: AllowedEndpoints, options: RequestArgs) => {
 
   const response = await axios.get(url, { headers });
   return response.data;
-};
-
-const _UploadImagePost = async (
-  endpoint: AllowedEndpoints,
-  selectedImage: ImagePickerAsset,
-  data: Record<string, any>,
-  options: RequestArgs,
-) => {
-  const uri =
-    Platform.OS === "android"
-      ? selectedImage.uri
-      : selectedImage.uri.replace("file://", "");
-  const filename = selectedImage.uri.split("/").pop();
-  const match = /\.(\w+)$/.exec(filename as string);
-  const ext = match?.[1];
-  const type = match ? `image/${match[1]}` : `image`;
-  const formData = new FormData();
-  formData.append("file", {
-    uri,
-    name: `image.${ext}`,
-    type,
-  } as any);
-
-  formData.append("data", JSON.stringify(data));
-  const url = generateUrl(endpoint, options.params);
-  await axios
-    .post(url, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-    .then((response) => {
-      alert("Image Uploaded Successfully!");
-      return response;
-    })
-    .catch((err) => {
-      console.log(err);
-      alert("Something went wrong in the Upload Function!");
-    });
 };
 
 const prepareImageData = (
