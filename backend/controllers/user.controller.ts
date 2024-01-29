@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createUserSchema,
+  deleteSchema,
+  emailSchema,
   IdParamSchema,
   loginSchema,
   otpRequestSchema,
@@ -22,26 +24,15 @@ export const createNewUser = async (
   next: NextFunction,
 ) => {
   try {
-    const validUser = createUserSchema.safeParse(req.body);
-
-    if (!validUser.success) {
-      throw new AppError(
-        AppErrorName.INVALID_INPUT_ERROR,
-        "Input data shape is invalid",
-        400,
-        true,
-      );
-    }
-
     const {
-      institutionName,
+      institutionId,
       username,
       firstName,
       lastName,
       email,
       password,
       yearOfStudy,
-    } = req.body;
+    } = createUserSchema.parse(req.body);
 
     const domain = email.slice(email.indexOf("@") + 1);
 
@@ -53,7 +44,7 @@ export const createNewUser = async (
 
     const institution = await prisma.institution.findFirst({
       where: {
-        name: institutionName,
+        id: institutionId,
         domain: domain,
       },
     });
@@ -147,18 +138,7 @@ export const resendOTP = async (
   next: NextFunction,
 ) => {
   try {
-    const validEmail = otpRequestSchema.safeParse(req.body);
-
-    if (!validEmail.success) {
-      throw new AppError(
-        AppErrorName.INVALID_INPUT_ERROR,
-        "Email cannot be null",
-        400,
-        true,
-      );
-    }
-
-    const { email } = req.body;
+    const { email } = otpRequestSchema.parse(req.body);
 
     const otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
@@ -200,28 +180,7 @@ export const verifyOTP = async (
   next: NextFunction,
 ) => {
   try {
-    const validEmail = otpRequestSchema.safeParse(req.body.email);
-    const validOTP = otpVerifySchema.safeParse(req.body.otp);
-
-    if (!validEmail.success) {
-      throw new AppError(
-        AppErrorName.INVALID_INPUT_ERROR,
-        "Email cannot be null",
-        400,
-        true,
-      );
-    }
-
-    if (!validOTP.success) {
-      throw new AppError(
-        AppErrorName.INVALID_INPUT_ERROR,
-        "Email cannot be null",
-        400,
-        true,
-      );
-    }
-
-    const { email, otp } = req.body;
+    const { email, otp } = otpVerifySchema.parse(req.body);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -268,18 +227,7 @@ export const loginUser = async (
   next: NextFunction,
 ) => {
   try {
-    const validLogin = loginSchema.safeParse(req.body);
-
-    if (!validLogin.success) {
-      throw new AppError(
-        AppErrorName.INVALID_INPUT_ERROR,
-        "Email cannot be null",
-        400,
-        true,
-      );
-    }
-
-    const { email, password } = req.body;
+    const { email, password } = loginSchema.parse(req.body);
 
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -354,7 +302,7 @@ export const loginUser = async (
 
 // logout Student -> protected route
 export const logoutUser = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { email } = emailSchema.parse(req.body);
 
   await prisma.user.updateMany({
     where: {
@@ -378,7 +326,7 @@ export const resetPassword = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, password } = req.body;
+  const { email, password } = loginSchema.parse(req.body);
 
   await prisma.user.update({
     where: {
@@ -391,16 +339,16 @@ export const resetPassword = async (
 };
 
 // remove User
-export const removeUserByID = async (
+export const removeUserById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { userID } = req.body;
+  const userId = IdParamSchema.parse(req.params).id;
 
   const deletedUser = await prisma.user.delete({
     where: {
-      id: userID,
+      id: userId,
     },
   });
 
