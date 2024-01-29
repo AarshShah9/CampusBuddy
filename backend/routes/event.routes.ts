@@ -25,8 +25,8 @@ router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
-router.post("/", upload.single("image"), createEvent);
-router.patch("/:id", upload.single("image"), updateEvent);
+router.post("/", upload.single("file"), createEvent);
+router.patch("/:id", upload.single("file"), updateEvent);
 router.delete("/:id", deleteEvent);
 
 export default router;

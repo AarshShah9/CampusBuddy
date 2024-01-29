@@ -4,12 +4,13 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Platform } from "react-native";
 
 // Define the array of allowed endpoints
-const allowedEndpoints = ["/Test"] as const;
+const allowedEndpoints = ["/Test", "/api/events/organization"] as const;
 type AllowedEndpoints = (typeof allowedEndpoints)[number];
 
 interface RequestArgs {
   body?: any;
   headers?: Record<string, string>;
+  params?: Record<string, string | number>;
 }
 
 const postRequest = async (
@@ -46,6 +47,7 @@ const getRequest = async (endpoint: AllowedEndpoints, options: RequestArgs) => {
 };
 
 const UploadImageRequest = async (
+  endpoint: AllowedEndpoints,
   selectedImage: ImagePickerAsset,
   data: Record<string, any>,
 ) => {
@@ -65,15 +67,11 @@ const UploadImageRequest = async (
   } as any);
 
   formData.append("data", JSON.stringify(data));
-
+  const url = `${BACKEND_URL}${endpoint}`;
   await axios
-    .post(
-      `https://cuddly-ladybug-innocent.ngrok-free.app/api/events/organization/1`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-    )
+    .post(url, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
     .then((response) => {
       console.log(response);
       alert("Image Uploaded Successfully!");

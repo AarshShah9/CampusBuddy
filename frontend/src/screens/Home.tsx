@@ -44,7 +44,11 @@ export default function Home() {
       endTime: new Date(),
       isPublic: true,
     };
-    await UploadImageRequest(result.assets[0], data);
+    await UploadImageRequest(
+      "/api/events/organization",
+      result.assets[0],
+      data,
+    );
   };
 
   return (
