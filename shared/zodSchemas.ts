@@ -404,21 +404,27 @@ export const createUserSchema = UserSchema.omit({
   jwt: true,
 });
 
-export const otpRequestSchema = z
-  .string()
-  .email()
-  .min(1, { message: "Invalid OTP" });
+export const otpRequestSchema = z.object({
+  email: z.string().email().min(1, { message: "Invalid OTP" }),
+});
 
-export const otpVerifySchema = z
-  .string()
-  .length(6)
-  .refine((data) => data.length === 6, {
-    message: "OTP is invalid",
-  });
+export const otpVerifySchema = z.object({
+  otp: z
+    .string()
+    .length(6)
+    .refine((data) => data.length === 6, {
+      message: "OTP is invalid",
+    }),
+  email: z.string().email().min(1, { message: "Invalid OTP" }),
+});
 
 export const loginSchema = z.object({
   email: z.string(),
   password: z.string(),
+});
+
+export const emailSchema = z.object({
+  email: z.string(),
 });
 
 export const deleteSchema = z.object({
