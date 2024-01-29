@@ -4,7 +4,12 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Platform } from "react-native";
 
 // Define the array of allowed endpoints
-const allowedEndpoints = ["/Test", "/api/events/organization/:id"] as const;
+const allowedEndpoints = [
+  "/Test",
+  "/api/events/organization/:id",
+  "/api/events/",
+  "/api/events/:id",
+] as const;
 type AllowedEndpoints = (typeof allowedEndpoints)[number];
 
 interface RequestArgs {
@@ -60,7 +65,7 @@ const getRequest = async (endpoint: AllowedEndpoints, options: RequestArgs) => {
   return response.data;
 };
 
-const UploadImageRequest = async (
+const _UploadImagePost = async (
   endpoint: AllowedEndpoints,
   selectedImage: ImagePickerAsset,
   data: Record<string, any>,
@@ -97,4 +102,50 @@ const UploadImageRequest = async (
     });
 };
 
-export { postRequest, getRequest, UploadImageRequest };
+const prepareImageData = (
+  selectedImage: ImagePickerAsset,
+  data: Record<string, any>,
+): FormData => {
+  const uri =
+    Platform.OS === "android"
+      ? selectedImage.uri
+      : selectedImage.uri.replace("file://", "");
+  const filename = selectedImage.uri.split("/").pop();
+  const match = /\.(\w+)$/.exec(filename as string);
+  const ext = match?.[1] ?? "";
+  const type = `image/${ext}`;
+
+  const formData = new FormData();
+  formData.append("file", { uri, name: `image.${ext}`, type } as any);
+  formData.append("data", JSON.stringify(data));
+
+  return formData;
+};
+
+const uploadImageRequest = async (
+  method: "post" | "patch",
+  endpoint: AllowedEndpoints,
+  selectedImage: ImagePickerAsset,
+  data: Record<string, any>,
+  options: RequestArgs,
+) => {
+  try {
+    const formData = prepareImageData(selectedImage, data);
+    const url = generateUrl(endpoint, options.params);
+
+    const response = await axios({
+      method,
+      url,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    alert("Image Uploaded Successfully!");
+    return response;
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong in the Upload Function!");
+  }
+};
+
+export { postRequest, getRequest, uploadImageRequest };

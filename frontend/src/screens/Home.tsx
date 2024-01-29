@@ -7,7 +7,7 @@ import { Button, Platform, StyleSheet, View } from "react-native";
 import { Card } from "react-native-paper";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
-import { getRequest, UploadImageRequest } from "~/lib/CBRequest";
+import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
@@ -37,18 +37,21 @@ export default function Home() {
     type EventCreateType = z.infer<typeof EventCreateSchema>;
 
     const data: EventCreateType = {
-      title: "Test Event",
+      title: "Test Event UPDATED",
       description: "Test Description",
       location: "Test Location",
       startTime: new Date(2025, 1, 2024, 1),
       endTime: new Date(2025, 1, 2024, 4),
       isPublic: true,
     };
-    await UploadImageRequest(
-      "/api/events/organization/:id",
+    await uploadImageRequest(
+      "patch",
+      "/api/events/:id",
       result.assets[0],
       data,
-      { params: { id: "3" } },
+      {
+        params: { id: "1a43fb53-eaf4-4f07-baa7-676ec682cd09" },
+      },
     );
   };
 
