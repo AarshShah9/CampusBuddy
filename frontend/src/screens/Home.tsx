@@ -40,14 +40,15 @@ export default function Home() {
       title: "Test Event",
       description: "Test Description",
       location: "Test Location",
-      startTime: new Date(),
-      endTime: new Date(),
+      startTime: new Date(2025, 1, 2024, 1),
+      endTime: new Date(2025, 1, 2024, 4),
       isPublic: true,
     };
     await UploadImageRequest(
-      "/api/events/organization",
+      "/api/events/organization/:id",
       result.assets[0],
       data,
+      { params: { id: "3" } },
     );
   };
 

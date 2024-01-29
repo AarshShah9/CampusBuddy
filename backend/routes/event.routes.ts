@@ -11,7 +11,7 @@ import {
   getRecentEvents,
   updateEvent,
 } from "../controllers/event.controller";
-import { upload } from "../utils/fileUpload";
+import { upload } from "../utils/S3Uploader";
 
 const router = express.Router();
 

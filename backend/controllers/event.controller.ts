@@ -29,27 +29,28 @@ export const createVerifiedEvent = async (
 ) => {
   try {
     // Validate request id param
-    // const organizationId = IdParamSchema.parse(req.params).id;
-    console.log("req.body - we made it here atleast", req.body);
+    const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate the Event data with zod schema
-    // const validatedEventData = EventCreateSchema.parse(req.body.data);
-    const validatedEventData = JSON.parse(req.body.data);
+    // Note we are expecting form data on anything that includes a file upload, thus we must parse the data
+    const validatedEventData = EventCreateSchema.parse(
+      JSON.parse(req.body.data),
+    );
 
     // Check if the user has permission to create an event
-    // const hasPermission = await checkUserPermission(
-    //   userId, // Assuming you've got the userId from somewhere, like req.user.id
-    //   organizationId,
-    //   AppPermissionName.CREATE_EVENTS,
-    // );
-    // if (!hasPermission) {
-    //   throw new AppError(
-    //     AppErrorName.PERMISSION_ERROR,
-    //     `User does not have permission to create event`,
-    //     403,
-    //     true,
-    //   );
-    // }
+    const hasPermission = await checkUserPermission(
+      userId, // Assuming you've got the userId from somewhere, like req.user.id
+      organizationId,
+      AppPermissionName.CREATE_EVENTS,
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to create event`,
+        403,
+        true,
+      );
+    }
 
     if (!req.file) {
       throw new AppError(
@@ -66,7 +67,7 @@ export const createVerifiedEvent = async (
       const event = await prisma.event.create({
         data: {
           ...validatedEventData,
-          // organizationId,
+          organizationId,
           userId,
           status: EventStatus.Verified,
         },

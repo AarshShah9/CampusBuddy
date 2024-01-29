@@ -327,7 +327,7 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 export const IdParamSchema = z.object({
   id: z.coerce
     .string()
-    .uuid()
+    // .uuid()
     .refine((data) => data.length > 0, {
       message: "ID is invalid",
     }),

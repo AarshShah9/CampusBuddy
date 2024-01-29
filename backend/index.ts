@@ -10,11 +10,10 @@ import event from "./routes/event.routes";
 import institution from "./routes/institution.routes";
 import user from "./routes/user.routes";
 import org from "./routes/org.routes";
-import UploadToS3 from "./utils/S3Uploader";
+import UploadToS3, { upload } from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
 const result = dotenv.config();
 
 try {

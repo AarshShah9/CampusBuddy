@@ -4,6 +4,7 @@ import fs from "fs";
 import { promisify } from "util";
 import { env } from "./validateEnv";
 import { AppError, AppErrorName } from "./AppError";
+import multer from "multer";
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -63,5 +64,7 @@ const generateUniqueFileName = (originalName: string, id: string) => {
   return `${id}-${timestamp}_${originalName}`;
 };
 
+const upload = multer({ dest: "uploads/" });
+
 export default UploadToS3;
-export { generateUniqueFileName };
+export { generateUniqueFileName, upload };

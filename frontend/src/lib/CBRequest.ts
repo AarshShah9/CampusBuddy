@@ -4,7 +4,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Platform } from "react-native";
 
 // Define the array of allowed endpoints
-const allowedEndpoints = ["/Test", "/api/events/organization"] as const;
+const allowedEndpoints = ["/Test", "/api/events/organization/:id"] as const;
 type AllowedEndpoints = (typeof allowedEndpoints)[number];
 
 interface RequestArgs {
@@ -13,19 +13,33 @@ interface RequestArgs {
   params?: Record<string, string | number>;
 }
 
+const generateUrl = (
+  endpoint: AllowedEndpoints,
+  params?: Record<string, string | number>,
+): string => {
+  let url = `${BACKEND_URL}${endpoint}`;
+
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      url = url.replace(`:${key}`, encodeURIComponent(value.toString()));
+    }
+  }
+
+  return url;
+};
+
 const postRequest = async (
   endpoint: AllowedEndpoints,
   options: RequestArgs,
 ) => {
-  if (ENV === "dev") {
+  if (ENV === "dev" && options) {
     options.headers = {
       ...options.headers,
       "ngrok-skip-browser-warning": "skip",
     };
   }
 
-  const url = `${BACKEND_URL}${endpoint}`;
-
+  const url = generateUrl(endpoint, options.params);
   const { body, headers } = options;
   const response = await axios.post(url, body, { headers });
   return response.data;
@@ -39,7 +53,7 @@ const getRequest = async (endpoint: AllowedEndpoints, options: RequestArgs) => {
     };
   }
 
-  const url = `${BACKEND_URL}${endpoint}`;
+  const url = generateUrl(endpoint, options.params);
   const { headers } = options;
 
   const response = await axios.get(url, { headers });
@@ -50,6 +64,7 @@ const UploadImageRequest = async (
   endpoint: AllowedEndpoints,
   selectedImage: ImagePickerAsset,
   data: Record<string, any>,
+  options: RequestArgs,
 ) => {
   const uri =
     Platform.OS === "android"
@@ -67,14 +82,14 @@ const UploadImageRequest = async (
   } as any);
 
   formData.append("data", JSON.stringify(data));
-  const url = `${BACKEND_URL}${endpoint}`;
+  const url = generateUrl(endpoint, options.params);
   await axios
     .post(url, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     })
     .then((response) => {
-      console.log(response);
       alert("Image Uploaded Successfully!");
+      return response;
     })
     .catch((err) => {
       console.log(err);
