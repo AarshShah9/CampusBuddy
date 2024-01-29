@@ -5,15 +5,19 @@ import LocationChip from './LocationChip';
 import styled from "styled-components"
 import { View } from 'react-native';
 
-export default function EventHomeCard() {  
+type EventHomeCardProps = {
+  eventData: { title: string; time: string; location: string; image: string };
+};
+
+export default function EventHomeCard({eventData}: EventHomeCardProps) {  
     return (
       <CardContainer>
         <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{width: 159, height:84}}/>
         <Card.Content>
-          <ThemedText>Card title</ThemedText>
+          <ThemedText>{eventData.title}</ThemedText>
           <EventDetailsContainer>
-            <ThemedText>Event Date</ThemedText>
-            <LocationChip></LocationChip>
+            <ThemedText>{eventData.time}</ThemedText>
+            <LocationChip location = {eventData.location}></LocationChip>
           </EventDetailsContainer>
         </Card.Content>
       </CardContainer>
@@ -21,11 +25,12 @@ export default function EventHomeCard() {
   };
 
   const CardContainer = styled(Card)`
-  marginLeft: 16;
-  marginRight:16;
-  width:159;
-  height:130;
-  `;
+  margin-left: 16px;
+  margin-right: 16px;
+  width: 159px;
+  height: 130px;
+`;
+
 
   const EventDetailsContainer = styled(View)`
     flexDirection:'row';
