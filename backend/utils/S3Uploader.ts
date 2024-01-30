@@ -103,7 +103,7 @@ const generateUniqueFileName = (originalName: string, id: string) => {
   const extension = originalName.split(".").pop();
 
   // Construct the unique file name
-  return `${id}-${timestamp}_${originalName}`;
+  return `${id}_${timestamp}_${originalName}`;
 };
 
 const upload = multer({ dest: "uploads/" });
