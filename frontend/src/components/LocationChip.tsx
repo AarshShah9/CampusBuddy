@@ -9,7 +9,7 @@ type LocationChipProps ={
   location: string;
 }
 
-export default function LocationChip({location}: LocationChipProps){
+export default function LocationChip({location}: Readonly<LocationChipProps>){
   return (
     <StyledChip>
       <ChipContentContainer style={{}}>
@@ -24,7 +24,7 @@ export default function LocationChip({location}: LocationChipProps){
 const StyledChip = styled(Chip)`
   border-radius: 29px;
   height: 28px;
-  width: auto; /* Adjust as needed */
+  width: auto;
 `;
 
 const ChipContentContainer = styled(View)`

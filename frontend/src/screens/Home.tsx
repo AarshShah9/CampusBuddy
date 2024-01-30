@@ -5,9 +5,113 @@ import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import React, { useState } from "react";
 import { Button, Platform, StyleSheet, View } from "react-native";
-import { Card } from "react-native-paper";
+import { ScrollView } from "react-native-gesture-handler";
+import { Card, Chip } from "react-native-paper";
+import HorizontalScrollView from "~/components/HorizontalScrollView";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
+
+const sampleEventData = [
+  {
+    title: 'Attending',
+    items: [
+      {
+        title: 'Crowchild Classic',
+        time: 'Jan 27',
+        location: 'Saddledome',
+        image: ''
+      }
+    ]
+  },
+  {
+    title: 'Upcoming Events From Following',
+    items: [
+      {
+        title: 'Weekly Bouldering',
+        time: 'Jan 4',
+        location: 'UofC Kines Block',
+        image: ''
+      },
+      {
+        title: 'Volleyball Tournament',
+        time: 'Jan 14',
+        location: 'UofC Kines Block',
+        image: ''
+      },
+      {
+        title: 'Networking Night',
+        time: 'Jan 15',
+        location: 'MacHall',
+        image: ''
+      }
+    ]
+  },
+  {
+    title: 'Trending Events',
+    items: [
+      {
+        title: 'Law School Info Night',
+        time: 'Jan 1',
+        location: 'Virtual',
+        image: ''
+      },
+      {
+        title: 'Spikeball 4 Cause',
+        time: 'Jan 14',
+        location: 'Confederation Park',
+        image: ''
+      },
+      {
+        title: 'Career Fair',
+        time: 'Jan 20',
+        location: 'MacHall',
+        image: ''
+      }
+    ]
+  },
+  {
+    title: 'Happening Today',
+    items: [
+      {
+        title: 'Cowboys - DJ Event',
+        host: 'Cowboys Club and Casino',
+        location: 'Cowboys Calgary',
+        image: ''
+      },
+      {
+        title: 'Bake Sale',
+        host: 'Charity Club',
+        location: 'Earth Sciences',
+        image: ''
+      },
+      {
+        title: 'CS Winter Opener',
+        host: 'CSUS',
+        location: 'Math Science',
+        image: ''
+      }
+    ]
+  },
+  {
+    title: 'Explore Verified Organizations',
+    items: [
+      {
+        title: 'Cowboys Calgary',
+        image: ''
+      },
+      {
+        title: 'TechStart',
+        image: ''
+      },
+      {
+        title: 'Bouldering Club',
+        image: ''
+      }
+    ]
+  }
+];
+
+
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -68,8 +172,12 @@ export default function Home() {
   };
 
   return (
+    <ScrollView>
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
+      <View style={{height:214, width:326, backgroundColor:'red', margin:14}}>
+        
+      </View>
+      {/* <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       <Button title={"Test"} onPress={testCallback} />
       <View style={styles.mockEventsContainer}>
@@ -95,14 +203,21 @@ export default function Home() {
             <ThemedText>Mock Event 2</ThemedText>
           </Card.Content>
         </Card>
+      </View> */}
+
+      <View>
+        <HorizontalScrollView eventData={sampleEventData}>
+        </HorizontalScrollView>
+        
       </View>
     </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   mockEventsContainer: {
-    marginTop: 30,
+    marginTop: 16,
     display: "flex",
     flexDirection: "row",
     width: "95%",
@@ -115,4 +230,11 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: "center",
   },
+  ScrollContainer: {
+    paddingTop: 16,
+    paddingBottom: 16,
+}, 
+scrollHeader: {
+    textAlign:'left',
+},
 });
