@@ -1,4 +1,4 @@
-import { AppPermissionName, Event, EventStatus } from "@prisma/client";
+import { AppPermissionName, EventStatus } from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
   CursorPaginationDatetimeSchema,
@@ -218,24 +218,31 @@ export const updateEvent = async (
       );
     }
 
-    let updatedEvent: Event;
-    if (hasPermission || isCreatedByUser) {
-      if (req.file) {
-        if (existingEvent?.image) {
-          await deleteFromS3(existingEvent.image);
-        }
-        const uniqueFileName = generateUniqueFileName(
-          req.file!.originalname,
-          eventId,
-        );
-        const path = `images/events/${uniqueFileName}`;
-        await UploadToS3(req.file!, path);
-        validatedUpdateEventData.image = path;
+    if (!hasPermission && !isCreatedByUser) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to update event`,
+        403,
+        true,
+      );
+    }
+
+    if (req.file) {
+      // update the file
+      if (existingEvent?.image) {
+        await deleteFromS3(existingEvent.image);
       }
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        eventId,
+      );
+      const path = `images/events/${uniqueFileName}`;
+      await UploadToS3(req.file!, path);
+      validatedUpdateEventData.image = path;
     }
 
     // Update the event
-    updatedEvent = await prisma.event.update({
+    const updatedEvent = await prisma.event.update({
       where: { id: eventId },
       data: {
         ...validatedUpdateEventData,
@@ -243,16 +250,16 @@ export const updateEvent = async (
     });
     // send back the updated event
     if (updatedEvent) {
-      // Event created successfully
+      // Event updated successfully
       res.status(200).json({
         message: "Event updated successfully",
         data: updatedEvent,
       });
     } else {
       throw new AppError(
-        AppErrorName.PERMISSION_ERROR,
-        `User does not have permission to update event`,
-        403,
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Event update returned empty result.",
+        500,
         true,
       );
     }
