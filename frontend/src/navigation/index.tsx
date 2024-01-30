@@ -25,7 +25,7 @@ export default function Navigation() {
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen
             name="Login"
-            component={Login}
+            component={Home}
             options={{ gestureEnabled: false }}
           />
           <Stack.Screen

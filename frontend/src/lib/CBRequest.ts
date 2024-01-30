@@ -100,7 +100,15 @@ const prepareImageData = (
 
   const formData = new FormData();
   formData.append("file", { uri, name: `image.${ext}`, type } as any);
-  formData.append("data", JSON.stringify(data));
+  Object.entries(data).forEach(([key, value]) => {
+    // if the value is a date object than convert it to a string
+    if (value instanceof Date) {
+      value = value.toISOString();
+    }
+    formData.append(key, value);
+  });
+  console.log("OUTGOING", formData);
+  // formData.append("data", JSON.stringify(data));
 
   return formData;
 };

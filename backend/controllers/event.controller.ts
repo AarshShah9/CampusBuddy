@@ -113,9 +113,7 @@ export const createEvent = async (
     // const userId = req.user.id; // get userId from the request -> set in auth middleware
 
     // Validate the Event data
-    const validatedEventData = EventCreateSchema.parse(
-      JSON.parse(req.body.data),
-    );
+    const validatedEventData = EventCreateSchema.parse(req.body);
 
     if (!req.file) {
       throw new AppError(

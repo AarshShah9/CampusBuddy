@@ -37,7 +37,7 @@ export default function Home() {
     type EventCreateType = z.infer<typeof EventCreateSchema>;
 
     const data: EventCreateType = {
-      title: "Test Event UPDATED",
+      title: "Test Event NEW",
       description: "Test Description",
       location: "Test Location",
       startTime: new Date(2025, 1, 2024, 1),
@@ -45,13 +45,11 @@ export default function Home() {
       isPublic: true,
     };
     await uploadImageRequest(
-      "patch",
-      "/api/events/:id",
+      "post",
+      "/api/events/",
       result.assets[0],
       data,
-      {
-        params: { id: "1a43fb53-eaf4-4f07-baa7-676ec682cd09" },
-      },
+      {},
     );
   };
 
