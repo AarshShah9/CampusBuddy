@@ -107,9 +107,6 @@ const prepareImageData = (
     }
     formData.append(key, value);
   });
-  console.log("OUTGOING", formData);
-  // formData.append("data", JSON.stringify(data));
-
   return formData;
 };
 

@@ -36,9 +36,7 @@ export const createVerifiedEvent = async (
 
     // Validate the Event data with zod schema
     // Note we are expecting form data on anything that includes a file upload, thus we must parse the data
-    const validatedEventData = EventCreateSchema.parse(
-      JSON.parse(req.body.data),
-    );
+    const validatedEventData = EventCreateSchema.parse(req.body);
 
     // Check if the user has permission to create an event
     const hasPermission = await checkUserPermission(
@@ -185,9 +183,7 @@ export const updateEvent = async (
     // const userId = req.userId; // get userId from the request
 
     // Validate event data
-    const validatedUpdateEventData = EventUpdateSchema.parse(
-      JSON.parse(req.body.data),
-    );
+    const validatedUpdateEventData = EventUpdateSchema.parse(req.body);
 
     // get the event from the database
     const existingEvent = await prisma.event.findUnique({
