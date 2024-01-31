@@ -4,7 +4,7 @@ import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +34,9 @@ export default function Login() {
 
   const onSubmit = (data: loginForm) => {
     console.log(data)
-    //validate()
+    navigation.dispatch(
+      StackActions.replace('LandingGroup')
+    );
   }
 
   return (

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Dimensions } from "react-native";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 
 export default function SplashScreen() {
@@ -30,7 +30,9 @@ export default function SplashScreen() {
     if (!loading) {
       // On state change to loading, indicate ready to switch pages
       console.log("Finished Loading move to new page");
-      navigation.navigate("Login");
+      navigation.dispatch(
+        StackActions.replace('Login')
+      );
     }
   }, [loading]);
 
