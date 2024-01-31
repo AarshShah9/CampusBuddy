@@ -108,7 +108,7 @@ export const UserSchema = z.object({
     .number()
     .min(1, { message: "Year of Study must be greater than 0" })
     .max(10, { message: "Year of Study must be less than 11" }),
-  schoolId: z.number().int(),
+  institutionId: z.string().uuid(),
   isVerified: BooleanSchema,
   profilePic: z.string().nullable(),
   otp: z.string(),
@@ -132,7 +132,7 @@ export type UserUpdateInput = z.infer<typeof UserUpdateSchema>;
 
 export const OrganizationSchema = z.object({
   status: OrganizationStatusSchema,
-  id: z.number().int(),
+  id: z.string().uuid(),
   organizationName: z.string(),
   description: z.string().nullable(),
   createdAt: z.coerce.date(),
@@ -153,7 +153,7 @@ export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
 /////////////////////////////////////////
 
 export const SchoolSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   name: z.string(),
   domain: z.string(),
 });
@@ -165,8 +165,8 @@ export type School = z.infer<typeof SchoolSchema>;
 /////////////////////////////////////////
 
 export const UserEventResponseSchema = z.object({
-  userId: z.number().int(),
-  eventId: z.number().int(),
+  userId: z.string().uuid(),
+  eventId: z.string().uuid(),
   participationStatus: z.string(),
 });
 
@@ -177,10 +177,10 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 /////////////////////////////////////////
 
 export const PostSchema = z.object({
-  id: z.number().int(),
-  userId: z.number().int(),
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
   image: z.string().nullable(),
-  organizationId: z.number().int().nullable(),
+  organizationId: z.string().uuid().nullable(),
   createdAt: z.coerce.date(),
   title: z.string(),
   text: z.string().nullable(),
@@ -194,9 +194,9 @@ export type Post = z.infer<typeof PostSchema>;
 /////////////////////////////////////////
 
 export const CommentSchema = z.object({
-  id: z.number().int(),
-  userId: z.number().int(),
-  postId: z.number().int(),
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  postId: z.string().uuid(),
   createdAt: z.coerce.date(),
   text: z.string(),
 });
@@ -208,9 +208,9 @@ export type Comment = z.infer<typeof CommentSchema>;
 /////////////////////////////////////////
 
 export const UserOrganizationRoleSchema = z.object({
-  userId: z.number().int(),
-  organizationId: z.number().int(),
-  roleId: z.number().int(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  roleId: z.string().uuid(),
 });
 
 export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>;
@@ -221,7 +221,7 @@ export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>;
 
 export const RoleSchema = z.object({
   roleName: UserRoleSchema,
-  id: z.number().int(),
+  id: z.string().uuid(),
 });
 
 export type Role = z.infer<typeof RoleSchema>;
@@ -231,9 +231,9 @@ export type Role = z.infer<typeof RoleSchema>;
 /////////////////////////////////////////
 
 export const OrganizationRolePermissionSchema = z.object({
-  organizationId: z.number().int(),
-  roleId: z.number().int(),
-  permissionId: z.number().int(),
+  organizationId: z.string().uuid(),
+  roleId: z.string().uuid(),
+  permissionId: z.string().uuid(),
 });
 
 export type OrganizationRolePermission = z.infer<
@@ -246,7 +246,7 @@ export type OrganizationRolePermission = z.infer<
 
 export const PermissionSchema = z.object({
   permissionName: AppPermissionNameSchema,
-  id: z.number().int(),
+  id: z.string().uuid(),
 });
 
 export type Permission = z.infer<typeof PermissionSchema>;
@@ -256,8 +256,8 @@ export type Permission = z.infer<typeof PermissionSchema>;
 /////////////////////////////////////////
 
 export const EnrollmentSchema = z.object({
-  programId: z.number().int(),
-  userId: z.number().int(),
+  programId: z.string().uuid(),
+  userId: z.string().uuid(),
   degreeType: z.string(),
 });
 
@@ -268,7 +268,7 @@ export type Enrollment = z.infer<typeof EnrollmentSchema>;
 /////////////////////////////////////////
 
 export const ProgramSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   programName: z.string(),
   department: z.string(),
 });
@@ -280,7 +280,7 @@ export type Program = z.infer<typeof ProgramSchema>;
 /////////////////////////////////////////
 
 export const TopicSchema = z.object({
-  id: z.number().int(),
+  id: z.string().uuid(),
   topicName: z.string(),
 });
 
@@ -291,8 +291,8 @@ export type Topic = z.infer<typeof TopicSchema>;
 /////////////////////////////////////////
 
 export const EventTagSchema = z.object({
-  eventId: z.number().int(),
-  topicId: z.number().int(),
+  eventId: z.string().uuid(),
+  topicId: z.string().uuid(),
 });
 
 export type EventTag = z.infer<typeof EventTagSchema>;
@@ -302,8 +302,8 @@ export type EventTag = z.infer<typeof EventTagSchema>;
 /////////////////////////////////////////
 
 export const PostTagSchema = z.object({
-  postId: z.number().int(),
-  topicId: z.number().int(),
+  postId: z.string().uuid(),
+  topicId: z.string().uuid(),
 });
 
 export type PostTag = z.infer<typeof PostTagSchema>;
@@ -313,8 +313,8 @@ export type PostTag = z.infer<typeof PostTagSchema>;
 /////////////////////////////////////////
 
 export const TopicSubscriptionSchema = z.object({
-  userId: z.number().int(),
-  topicId: z.number().int(),
+  userId: z.string().uuid(),
+  topicId: z.string().uuid(),
 });
 
 export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
@@ -404,19 +404,29 @@ export const createUserSchema = UserSchema.omit({
   jwt: true,
 });
 
-export const otpRequestSchema = z
-  .string()
-  .email()
-  .min(1, { message: "Invalid OTP" });
+export const otpRequestSchema = z.object({
+  email: z.string().email().min(1, { message: "Invalid OTP" }),
+});
 
-export const otpVerifySchema = z
-  .string()
-  .length(6)
-  .refine((data) => data.length === 6, {
-    message: "OTP is invalid",
-  });
+export const otpVerifySchema = z.object({
+  otp: z
+    .string()
+    .length(6)
+    .refine((data) => data.length === 6, {
+      message: "OTP is invalid",
+    }),
+  email: z.string().email().min(1, { message: "Invalid OTP" }),
+});
 
 export const loginSchema = z.object({
   email: z.string(),
   password: z.string(),
+});
+
+export const emailSchema = z.object({
+  email: z.string(),
+});
+
+export const deleteSchema = z.object({
+  userId: z.string().uuid(),
 });
