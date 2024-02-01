@@ -13,9 +13,15 @@ import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
 
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import { User } from "@prisma/client";
+
+// In-Memory database for JWT verification
+// One holds the JWT and the other holds the associated OTP
+// Redis was a good idea apparently...oh well, this'll do for now
+const inMemoryJWT = new Map();
+const inMemoryOTP = new Map();
 
 // create new User
 export const createNewUser = async (
@@ -24,15 +30,8 @@ export const createNewUser = async (
   next: NextFunction,
 ) => {
   try {
-    const {
-      institutionId,
-      username,
-      firstName,
-      lastName,
-      email,
-      password,
-      yearOfStudy,
-    } = createUserSchema.parse(req.body);
+    const { institutionId, username, firstName, lastName, email, password } =
+      createUserSchema.parse(req.body);
 
     const domain = email.slice(email.indexOf("@") + 1);
 
@@ -98,20 +97,25 @@ export const createNewUser = async (
       }
     }
 
-    const newUser = await prisma.user.create({
-      data: {
+    // sign jwt
+    const token = jwt.sign(
+      {
+        institutionID: institutionId,
         username: username,
         firstName: firstName,
         lastName: lastName,
         email: email,
         password: password,
-        otp: otp,
-        isVerified: false,
-        institutionId: institution.id,
-        status: false,
-        yearOfStudy: yearOfStudy,
       },
-    });
+      process.env.JWT_SECRET ?? "testSecret",
+      {
+        expiresIn: "2d",
+        mutatePayload: false,
+      },
+    );
+
+    inMemoryJWT.set(email, token);
+    inMemoryOTP.set(email, otp);
 
     const message = {
       from: "nomansanjari2001@gmail.com",
@@ -124,7 +128,7 @@ export const createNewUser = async (
 
     res.status(200).json({
       success: true,
-      message: "User created",
+      message: "User created, awaiting verification",
     });
   } catch (error) {
     next(error);
@@ -140,20 +144,29 @@ export const resendOTP = async (
   try {
     const { email } = otpRequestSchema.parse(req.body);
 
+    if (!inMemoryOTP.has(email)) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "User record doesn't exist",
+        400,
+        true,
+      );
+    }
+
     const otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
     });
 
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        otp: otp,
-      },
-    });
+    // await prisma.user.update({
+    //   where: {
+    //     email: email,
+    //   },
+    //   data: {
+    //     otp: otp,
+    //   },
+    // });
 
     const message = {
       from: "nomansanjari2001@gmail.com",
@@ -182,38 +195,63 @@ export const verifyOTP = async (
   try {
     const { email, otp } = otpVerifySchema.parse(req.body);
 
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-        otp: otp,
-      },
-    });
+    // verify if record exits
+    if (!inMemoryOTP.has(email)) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "User record does not exist",
+        404,
+        true,
+      );
+    }
 
-    if (user) {
-      const token = jwt.sign(
-        { ID: user.id },
+    try {
+      const payload: string | JwtPayload = jwt.verify(
+        inMemoryJWT.get(email),
         process.env.JWT_SECRET ?? "testSecret",
       );
 
-      await prisma.user.update({
+      const user = await prisma.user.findUnique({
         where: {
-          id: user.id,
-        },
-        data: {
-          jwt: token,
-          isVerified: false,
+          email: email,
+          isVerified: "Verified",
         },
       });
 
-      res.status(200).json({
-        success: true,
-        message: "User verified",
-      });
-    } else {
-      res.status(400).json({
-        success: true,
-        message: "Wrong otp",
-      });
+      if (user) {
+        res.status(400).json({
+          success: true,
+          message: "User already verified",
+        });
+      }
+
+      if (
+        typeof payload === "object" &&
+        payload !== null &&
+        "username" in payload &&
+        "firstName" in payload &&
+        "lastName" in payload &&
+        "email" in payload &&
+        "password" in payload &&
+        "institutionID" in payload
+      ) {
+        const newUser = await prisma.user.create({
+          data: {
+            username: payload.username,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            email: payload.email,
+            password: payload.password,
+            isVerified: "Verified",
+            institutionID: payload.institutionID,
+          },
+        });
+
+        inMemoryJWT.delete(email);
+        inMemoryOTP.delete(email);
+      }
+    } catch (error) {
+      next(error);
     }
   } catch (error) {
     next(error);
