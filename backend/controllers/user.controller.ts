@@ -12,16 +12,8 @@ import {
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
-
 import jwt, { JwtPayload } from "jsonwebtoken";
-import otpGenerator from "otp-generator";
 import { User } from "@prisma/client";
-
-// In-Memory database for JWT verification
-// One holds the JWT and the other holds the associated OTP
-// Redis was a good idea apparently...oh well, this'll do for now
-const inMemoryJWT = new Map();
-const inMemoryOTP = new Map();
 
 // create new User
 export const createNewUser = async (
@@ -35,12 +27,6 @@ export const createNewUser = async (
 
     const domain = email.slice(email.indexOf("@") + 1);
 
-    const otp = otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
-
     const institution = await prisma.institution.findFirst({
       where: {
         id: institutionId,
@@ -49,6 +35,11 @@ export const createNewUser = async (
     });
 
     if (!institution) {
+      res.status(400).json({
+        success: false,
+        message: "Institution doesn't exist",
+      });
+
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         "Institution does not exist",
@@ -64,40 +55,12 @@ export const createNewUser = async (
     });
 
     if (studentExists) {
-      if (studentExists.isVerified) {
-        throw new AppError(
-          AppErrorName.RECORD_EXISTS_ERROR,
-          "User already exists",
-          400,
-          true,
-        );
-      } else if (studentExists.isVerified === false) {
-        await prisma.user.update({
-          where: {
-            email: email,
-          },
-          data: {
-            otp: otp,
-          },
-        });
-
-        const message = {
-          from: "nomansanjari2001@gmail.com",
-          to: email,
-          subject: "Verify OTP - CampusBuddy",
-          html: `<b>${otp}</b>`,
-        };
-
-        await transporter.sendMail(message);
-
-        res.status(100).json({
-          success: false,
-          message: "User not verified, otp sent",
-        });
-      }
+      res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
     }
 
-    // sign jwt
     const token = jwt.sign(
       {
         institutionID: institutionId,
@@ -109,19 +72,16 @@ export const createNewUser = async (
       },
       process.env.JWT_SECRET ?? "testSecret",
       {
-        expiresIn: "2d",
+        expiresIn: "5m",
         mutatePayload: false,
       },
     );
 
-    inMemoryJWT.set(email, token);
-    inMemoryOTP.set(email, otp);
-
     const message = {
       from: "nomansanjari2001@gmail.com",
       to: email,
-      subject: "Verify OTP - CampusBuddy",
-      html: `<b>${otp}</b>`,
+      subject: "Verify your account - CampusBuddy",
+      html: `<b>192.168.1.72:3000/api/verify/${token}</b>`,
     };
 
     await transporter.sendMail(message);
@@ -135,95 +95,20 @@ export const createNewUser = async (
   }
 };
 
-// send new OTP
-export const resendOTP = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { email } = otpRequestSchema.parse(req.body);
-
-    if (!inMemoryOTP.has(email)) {
-      throw new AppError(
-        AppErrorName.EMPTY_RESULT_ERROR,
-        "User record doesn't exist",
-        400,
-        true,
-      );
-    }
-
-    const otp = otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
-
-    // await prisma.user.update({
-    //   where: {
-    //     email: email,
-    //   },
-    //   data: {
-    //     otp: otp,
-    //   },
-    // });
-
-    const message = {
-      from: "nomansanjari2001@gmail.com",
-      to: email,
-      subject: "Verify OTP - CampusBuddy",
-      html: `<b>${otp}</b>`,
-    };
-
-    await transporter.sendMail(message);
-
-    res.status(200).json({
-      success: true,
-      message: "New OTP sent",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 // verify OTP
-export const verifyOTP = async (
+export const verifyAccount = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { email, otp } = otpVerifySchema.parse(req.body);
-
-    // verify if record exits
-    if (!inMemoryOTP.has(email)) {
-      throw new AppError(
-        AppErrorName.EMPTY_RESULT_ERROR,
-        "User record does not exist",
-        404,
-        true,
-      );
-    }
+    const token = req.params.token;
 
     try {
       const payload: string | JwtPayload = jwt.verify(
-        inMemoryJWT.get(email),
+        token,
         process.env.JWT_SECRET ?? "testSecret",
       );
-
-      const user = await prisma.user.findUnique({
-        where: {
-          email: email,
-          isVerified: "Verified",
-        },
-      });
-
-      if (user) {
-        res.status(400).json({
-          success: true,
-          message: "User already verified",
-        });
-      }
 
       if (
         typeof payload === "object" &&
@@ -235,6 +120,24 @@ export const verifyOTP = async (
         "password" in payload &&
         "institutionID" in payload
       ) {
+        const institution = await prisma.institution.findUnique({
+          where: {
+            id: payload.institutionID,
+          },
+        });
+
+        if (institution) {
+          const newUser = await prisma.user.create({
+            data: {
+              username: payload.username,
+              firstName: payload.firstName,
+              lastName: payload.lastName,
+              email: payload.email,
+              password: payload.password,
+              institutionId: payload.institutionID,
+            },
+          });
+        }
         const newUser = await prisma.user.create({
           data: {
             username: payload.username,
@@ -242,15 +145,20 @@ export const verifyOTP = async (
             lastName: payload.lastName,
             email: payload.email,
             password: payload.password,
-            isVerified: "Verified",
-            institutionID: payload.institutionID,
+            institution: institution,
+            institutionId: payload.institutionID,
           },
         });
 
-        inMemoryJWT.delete(email);
-        inMemoryOTP.delete(email);
+        res.status(200).json({
+          html: '<img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Beijing_bouddhist_monk_2009_IMG_1486.JPG" alt="Word bruh word...">',
+        });
       }
     } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: "JWT timed out",
+      });
       next(error);
     }
   } catch (error) {
@@ -274,63 +182,28 @@ export const loginUser = async (
       },
     });
 
-    if (existingUser) {
-      if (existingUser.isVerified === false) {
-        const otp = otpGenerator.generate(6, {
-          upperCaseAlphabets: false,
-          lowerCaseAlphabets: false,
-          specialChars: false,
-        });
-
-        await prisma.user.update({
-          where: {
-            email: email,
-          },
-          data: {
-            otp: otp,
-          },
-        });
-
-        // send user an email with new otp
-        const message = {
-          from: "nomansanjari2001@gmail.com",
-          to: email,
-          subject: "Verify OTP - CampusBuddy",
-          html: `<b>${otp}</b>`,
-        };
-
-        await transporter.sendMail(message);
-
-        res.status(100).json({
-          success: false,
-          message: "User not verified, otp sent",
-        });
-      } else if (existingUser.isVerified) {
-        const token = jwt.sign(
-          { ID: existingUser.id },
-          process.env.JWT_SECRET ?? "testSecret",
-        );
-
-        await prisma.user.update({
-          where: {
-            email: email,
-            password: password,
-          },
-          data: {
-            jwt: token,
-          },
-        });
-
-        // send jwt to client
-        res.status(200).cookie("authToken", token).json({
-          success: true,
-          message: "JWT set",
-        });
-      }
-    } else {
+    if (!existingUser) {
       res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User doesn't exist",
+      });
+    } else {
+      const token = jwt.sign(
+        {
+          ID: existingUser.id,
+          institutionID: existingUser.institutionID,
+          username: existingUser.username,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          email: existingUser.email,
+          password: existingUser.password,
+        },
+        process.env.JWT_SECRET ?? "testSecret",
+      );
+
+      res.status(200).cookie("token", token).json({
+        success: true,
+        message: "Login successful",
       });
     }
   } catch (error) {
@@ -338,20 +211,9 @@ export const loginUser = async (
   }
 };
 
-// logout Student -> protected route
+// logout Student
 export const logoutUser = async (req: Request, res: Response) => {
-  const { email } = emailSchema.parse(req.body);
-
-  await prisma.user.updateMany({
-    where: {
-      email: email,
-    },
-    data: {
-      jwt: "",
-    },
-  });
-
-  res.status(200).cookie("authToken", null).json({
+  res.status(200).cookie("token", null).json({
     success: true,
     message: "User logged out",
   });
