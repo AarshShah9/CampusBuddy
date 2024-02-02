@@ -1,12 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createUserSchema,
-  deleteSchema,
-  emailSchema,
   IdParamSchema,
   loginSchema,
-  otpRequestSchema,
-  otpVerifySchema,
   UserUpdateSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
@@ -22,14 +18,14 @@ export const createNewUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionName, username, firstName, lastName, email, password } =
       createUserSchema.parse(req.body);
 
     const domain = email.slice(email.indexOf("@") + 1);
 
     const institution = await prisma.institution.findFirst({
       where: {
-        id: institutionId,
+        name: institutionName,
         domain: domain,
       },
     });

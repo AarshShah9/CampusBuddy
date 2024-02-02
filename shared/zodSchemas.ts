@@ -104,16 +104,7 @@ export const UserSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be greater than 8 characters long" }),
-  yearOfStudy: z.coerce
-    .number()
-    .min(1, { message: "Year of Study must be greater than 0" })
-    .max(10, { message: "Year of Study must be less than 11" }),
-  institutionId: z.string().uuid(),
-  isVerified: BooleanSchema,
-  profilePic: z.string().nullable(),
-  otp: z.string(),
-  jwt: z.string(),
-  status: BooleanSchema,
+  institutionName: z.string(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -369,11 +360,7 @@ export const InstitutionSchema = z.object({
     .min(3, { message: "Institution domain must at least 3 characters " }),
 });
 
-export const createInstitutionSchema = InstitutionSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const createInstitutionSchema = InstitutionSchema.partial();
 
 export const institutionNameSchema = z
   .string()
