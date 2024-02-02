@@ -4,8 +4,32 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ThemedText } from '~/components/ThemedComponents';
 import { AntDesign, Feather  } from "@expo/vector-icons";
 import styled from 'styled-components';
+import Animated,{ interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
 
+const IMG_HEIGHT = 300;
 export default function EventDetails() {
+    const scrollRef = useAnimatedRef<Animated.ScrollView>();
+    const scrollOffSet = useScrollViewOffset(scrollRef);
+    const imageAnimatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+            {
+                translateY: interpolate(
+                    scrollOffSet.value,
+                    [-IMG_HEIGHT,0, IMG_HEIGHT],
+                    [-IMG_HEIGHT / 2,0, IMG_HEIGHT * 0.75]
+                )
+            },
+            {
+                scale: interpolate(
+                    scrollOffSet.value,
+                    [-IMG_HEIGHT,0, IMG_HEIGHT],
+                    [3, 1, 1]
+                )
+            }
+            ]
+        }
+    })
     // const { setOptions: setNavigationOptions } = useNavigation();
     // const { params: { eventNumber } } = useRoute<any>();
     const [eventData,setEventData] = useState({
@@ -45,36 +69,38 @@ export default function EventDetails() {
                         onPress={() => {navigation.navigate("Login")}}
                     />
             </HeaderContainer>
-            <OverlayContainer>
-                <Image
-                    style={{height: "35%", width: "100%", backgroundColor:"red"}}
-                    source={require("../../assets/Campus_Buddy_Logo.png")}
-                />
-                <View style={{height: "15%", width: "100%", backgroundColor:"white", flexDirection:'row', justifyContent:"space-between" }}>
-                    <EDetails>
-                        <Text style={{fontFamily:"Roboto-Medium", fontSize:16, marginBottom:5}}>{eventData.title}</Text>
-                        <Text style={{fontFamily:"Roboto-Medium", fontSize:16, marginBottom:5}}>{eventData.date}</Text>
-                        <TagContainer>
-                            <Feather name="map-pin" size={12} color="black" style={{marginRight:5}}/>
-                            <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>{eventData.location}</Text>
-                        </TagContainer>
-                        
-                    </EDetails>
-                    <EClubDetails>
-                        <Image 
-                            style={{height: 30, width:30, backgroundColor:"red", borderRadius:90,marginBottom:5}}
-                            source={require("../../assets/Campus_Buddy_Logo.png")}
-                        />
-                        <Text style={{fontFamily:"Roboto-Medium", fontSize:18}}>{eventData.clubName}</Text>
-                    </EClubDetails>
-                </View>
-                <ScrollView style={{backgroundColor:"white", borderTopWidth:1, width:"95%", borderTopColor:"#B0CFFF", marginBottom:20}}>
-                    <Text style={{marginTop:10, fontFamily:"Roboto-Reg",fontSize:16}}>
-                        {eventData.detail}
-                    </Text>
-                </ScrollView>
-            </OverlayContainer>
+            <Animated.ScrollView showsVerticalScrollIndicator={false} ref={scrollRef} style={{height:"100%", backgroundColor:"white"}} scrollEventThrottle={16}>
+                    
+                    <Animated.Image
+                        style={[{height:250, width: "100%", backgroundColor:"red"},imageAnimatedStyle]}
+                        source={require("../../assets/Campus_Buddy_Logo.png")}
+                    />
 
+                    <View style={{height: "10%", width: "100%", backgroundColor:"white", flexDirection:'row', justifyContent:"space-between" }}>
+                        <EDetails>
+                            <Text style={{fontFamily:"Roboto-Medium", fontSize:16, marginBottom:5}}>{eventData.title}</Text>
+                            <Text style={{fontFamily:"Roboto-Medium", fontSize:16, marginBottom:5}}>{eventData.date}</Text>
+                            <TagContainer>
+                                <Feather name="map-pin" size={12} color="black" style={{marginRight:5}}/>
+                                <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>{eventData.location}</Text>
+                            </TagContainer>
+                            
+                        </EDetails>
+                        <EClubDetails>
+                            <Image 
+                                style={{height: 30, width:30, backgroundColor:"red", borderRadius:90,marginBottom:5}}
+                                source={require("../../assets/Campus_Buddy_Logo.png")}
+                            />
+                            <Text style={{fontFamily:"Roboto-Medium", fontSize:18}}>{eventData.clubName}</Text>
+                        </EClubDetails>
+                    </View>
+                    <View style={{backgroundColor:"white", borderTopWidth:1, width:"100%", borderTopColor:"#B0CFFF",paddingBottom:100, paddingLeft:10,paddingRight:10}}>
+                        <Text style={{marginTop:10, fontFamily:"Roboto-Reg",fontSize:16}}>
+                            {eventData.detail} + {eventData.detail}
+                        </Text>
+                    </View>
+               
+            </Animated.ScrollView>
         </MainContainer>
     )
 }
@@ -82,19 +108,15 @@ export default function EventDetails() {
 const MainContainer = styled(View)`
   height: 100%;
   background-color: #3a86ff;
+
 `;
 
 const HeaderContainer = styled(View)`
   width: 100%;
-  height: 15%;
+  height: 13%;
   justify-content: center;
 `;
-const OverlayContainer = styled(View)`
-    alignItems: center;
-    height: 85%;
-    width: 100%;
-    background-color: white;
-`;
+
 const EDetails = styled(View)`
     margin-left: 10px;
     margin-top:20px;
