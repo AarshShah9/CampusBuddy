@@ -70,7 +70,7 @@ model User {
   profilePic String? @unique @map("profile_pic")
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String      @map("institution_id")
+  institutionId String
 
   enrollments Enrollment[]
 

@@ -145,7 +145,6 @@ export const verifyAccount = async (
             lastName: payload.lastName,
             email: payload.email,
             password: payload.password,
-            institution: institution,
             institutionId: payload.institutionID,
           },
         });
@@ -191,7 +190,7 @@ export const loginUser = async (
       const token = jwt.sign(
         {
           ID: existingUser.id,
-          institutionID: existingUser.institutionID,
+          institutionID: existingUser.institutionId,
           username: existingUser.username,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
