@@ -46,7 +46,7 @@ enum AppPermissionName {
 model Institution {
   id     String @id @default(uuid())
   name   String
-  domain String
+  domain String // fix double entry issue
 
   user User[]
 
