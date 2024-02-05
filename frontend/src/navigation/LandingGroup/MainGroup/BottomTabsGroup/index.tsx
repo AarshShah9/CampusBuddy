@@ -16,6 +16,7 @@ export default function BottomTabGroup() {
             barStyle={{
                 backgroundColor: theme.colors.onPrimary
             }}
+            initialRouteName='Home'
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, focused }) => {
                     let iconName: any;

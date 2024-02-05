@@ -9,8 +9,8 @@ export default function SplashScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<any>();
   const [fontsLoaded] = useFonts({
-    'Nunito-Bold': require('../../assets/fonts/Nunito-Bold.ttf'),
-    'Roboto-Reg': require('../../assets/fonts/Roboto-Reg.ttf')
+    'Nunito-Bold': require('~/assets/fonts/Nunito-Bold.ttf'),
+    'Roboto-Reg': require('~/assets/fonts/Roboto-Reg.ttf')
   });
   useEffect(() => {
     const loadData = async () => {
@@ -42,7 +42,7 @@ export default function SplashScreen() {
         loop={false}
         style={{ width: width, height: height }}
         progress={1}
-        source={require("../../assets/SplashScreenAnimation.json")}
+        source={require("~/assets/SplashScreenAnimation.json")}
         autoPlay
         speed={3}
       />

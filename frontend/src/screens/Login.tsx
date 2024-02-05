@@ -46,7 +46,7 @@ export default function Login() {
       <LogoContainer>
         <Image
           style={{ marginTop: 42 }}
-          source={require("../../assets/Campus_Buddy_Logo.png")}
+          source={require("~/assets/Campus_Buddy_Logo.png")}
         />
       </LogoContainer>
       <OverlayContainer $color={theme.colors.tertiary}>

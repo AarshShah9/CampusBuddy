@@ -1,22 +1,17 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import useThemeContext from '~/hooks/useThemeContext';
 import Profile from '~/screens/Profile';
+import Header from './Header';
+import ProfileTabs from './ProfileTabs';
 
 const Stack = createNativeStackNavigator();
 
 export default function ProfileScreenStack() {
-    const { theme } = useThemeContext();
     return (
         <Stack.Navigator
-            screenOptions={{
-                headerTintColor: theme.colors.onPrimary,
-                headerStyle: {
-                    backgroundColor: theme.colors.primary
-                }
-            }}
+            screenOptions={{ header: Header }}
         >
             <Stack.Screen 
-                name="ProfileScreen" component={Profile} 
+                name="ProfileTabs" component={ProfileTabs} 
                 options={({ navigation }) => ({ 
                     title: 'Profile',
                     /* headerLeft: () => <DrawerIcon />,
