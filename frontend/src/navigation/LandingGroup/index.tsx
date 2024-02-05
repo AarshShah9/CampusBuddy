@@ -1,24 +1,14 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import useThemeContext from '~/hooks/useThemeContext';
-import HomeStackGroup from './HomeStackGroup';
-import CarpoolScreenStack from './CarpoolScreenStack';
-import MessagesStackGroup from './MessagesStackGroup';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import BottomTabsGroup from '~/navigation/LandingGroup/BottomTabsGroup';
+import MessagesGroup from '~/navigation/LandingGroup/MessagesGroup';
 
-const Drawer = createDrawerNavigator();
+const TopTabs = createMaterialTopTabNavigator();
 
-export default function DrawerGroup() {
-    const { theme } = useThemeContext();
-
+export default function TopTabsGroup() {
     return (
-        <Drawer.Navigator 
-            screenOptions={{ 
-                headerShown: false, 
-                drawerStyle: { backgroundColor: theme.colors.surfaceVariant } 
-            }}
-        >
-            <Drawer.Screen name="Home" component={HomeStackGroup} />
-            <Drawer.Screen name="Messages" component={MessagesStackGroup} />
-            <Drawer.Screen name="Carpool" component={CarpoolScreenStack} />
-        </Drawer.Navigator>
+        <TopTabs.Navigator screenOptions={{ tabBarStyle: { display: 'none' } }}>
+            <TopTabs.Screen name="Main" component={BottomTabsGroup} />
+            <TopTabs.Screen name="Messages" component={MessagesGroup} />
+        </TopTabs.Navigator>
     )
 }

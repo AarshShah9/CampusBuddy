@@ -1,12 +1,12 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import useThemeContext from '~/hooks/useThemeContext';
-import Home from '~/screens/Home';
-import DrawerIcon from '../../../DrawerIcon';
-import UserIcon from '../../../UserIcon';
+import TopTabsGroup from './TopTabsGroup';
+import DrawerIcon from '~/navigation/DrawerIcon';
+import UserIcon from '~/navigation/UserIcon';
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeScreenStack() {
+export default function SettingsScreenStack() {
     const { theme } = useThemeContext();
     return (
         <Stack.Navigator
@@ -18,12 +18,12 @@ export default function HomeScreenStack() {
             }}
         >
             <Stack.Screen 
-                name="HomeScreen" component={Home} 
+                name="SettingsScreen" component={TopTabsGroup} 
                 options={({ navigation }) => ({ 
-                    title: 'Home',
+                    title: 'Settings',
                     headerLeft: () => <DrawerIcon />,
                     headerRight: () => <UserIcon />,
-                })} 
+                })}
             />
         </Stack.Navigator>
     )

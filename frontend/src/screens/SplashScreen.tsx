@@ -31,7 +31,7 @@ export default function SplashScreen() {
       // On state change to loading, indicate ready to switch pages
       console.log("Finished Loading move to new page");
       navigation.dispatch(
-        StackActions.replace('Login')
+        StackActions.replace('AuthenticationGroup')
       );
     }
   }, [loading]);

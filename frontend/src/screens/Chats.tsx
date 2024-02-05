@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from "react-native";
+import { View, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback, Pressable, TouchableOpacity } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { FlashList } from "@shopify/flash-list";
@@ -10,7 +10,6 @@ import { ThemedTextInput } from "~/components/ThemedComponents";
 import useChatsSearchContext from "~/hooks/useChatsSearchContext";
 import useChatsContext from "~/hooks/useChatsContext";
 import { ChatsSearchContextProvider } from "~/contexts/chatsSearchContext";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CoversationsArea = () => {
     const { conversations, user, fetchMoreConversations, conversationsAreLoading } = useChatsContext();
