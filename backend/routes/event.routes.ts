@@ -8,8 +8,10 @@ import {
   getAllEventsByOrganization,
   getAllVerifiedEvents,
   getEventById,
+  getEventByUserId,
   getRecentEvents,
   updateEvent,
+
 } from "../controllers/event.controller";
 import { upload } from "../utils/S3Uploader";
 
@@ -23,6 +25,7 @@ router.get("/verified", getAllVerifiedEvents);
 router.get("/organization/:id", getAllEventsByOrganization);
 router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
+router.get("/:id", getEventByUserId);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
 router.post("/", upload.single("file"), createEvent);

@@ -328,6 +328,41 @@ export const getEventById = async (
   }
 };
 
+// Get Event by User Id
+export const getEventByUserId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const userId = IdParamSchema.parse(req.params).id;
+
+    // Get event from db
+    const event = await prisma.event.findMany({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!event) {
+      // Throw error if event not found
+      const notFoundError = new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          `Event created by id ${userId} not found`,
+          404,
+          true,
+      );
+
+      throw notFoundError;
+    }
+
+    res.status(200).json(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Retrieves the most recent events using cursor pagination based on timestamp.
  *
