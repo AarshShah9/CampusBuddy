@@ -10,7 +10,6 @@ export const EventStatusSchema = z.enum(["Verified", "NonVerified"]);
 export const ParticipationStatusSchema = z.enum([
   "Going",
   "Interested",
-  "NotInterested",
 ]);
 
 export const OrganizationStatusSchema = z.enum(["Pending", "Verified"]);

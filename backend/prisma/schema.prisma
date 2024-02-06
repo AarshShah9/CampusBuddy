@@ -29,6 +29,11 @@ enum OrganizationStatus {
   Verified
 }
 
+enum ParticipationStatus {
+  Going
+  Interested
+}
+
 // many of these permissions may not apply to our application
 enum AppPermissionName {
   CREATE_EVENTS

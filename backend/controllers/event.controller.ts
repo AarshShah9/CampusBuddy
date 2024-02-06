@@ -328,36 +328,77 @@ export const getEventById = async (
   }
 };
 
-// Get Event by User Id
+// Get Events by User Id. Sends three json objects
 export const getEventByUserId = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
   try {
     // Validate request id param
     const userId = IdParamSchema.parse(req.params).id;
 
     // Get event from db
-    const event = await prisma.event.findMany({
+    const eventsCreatedByUser = await prisma.event.findMany({
       where: {
         id: userId,
       },
     });
 
-    if (!event) {
+    const eventsInterested = await prisma.event.findMany({
+      where: {
+        eventResponses: {
+          some: {
+            userId,
+            participationStatus: "Interested",
+          },
+        },
+      },
+    });
+
+    const eventsGoing = await prisma.event.findMany({
+      where: {
+        eventResponses: {
+          some: {
+            userId,
+            participationStatus: "Going",
+          },
+        },
+      },
+    });
+    if (!eventsInterested) {
       // Throw error if event not found
       const notFoundError = new AppError(
-          AppErrorName.NOT_FOUND_ERROR,
-          `Event created by id ${userId} not found`,
-          404,
-          true,
+        AppErrorName.NOT_FOUND_ERROR,
+        `Event created by id ${userId} not found`,
+        404,
+        true,
       );
-
       throw notFoundError;
     }
-
-    res.status(200).json(event);
+    if (!eventsCreatedByUser) {
+      // Throw error if event not found
+      const notFoundError = new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Event created by id ${userId} not found`,
+        404,
+        true,
+      );
+      throw notFoundError;
+    }
+    if (!eventsGoing) {
+      // Throw error if event not found
+      const notFoundError = new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Event created by id ${userId} not found`,
+        404,
+        true,
+      );
+      throw notFoundError;
+    }
+    res.status(200).json(eventsCreatedByUser);
+    res.status(200).json(eventsInterested);
+    res.status(200).json(eventsGoing);
   } catch (error) {
     next(error);
   }
