@@ -3,9 +3,12 @@ import { Card, Text } from "react-native-paper";
 import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
 import { useFonts } from "expo-font";
-import CardContent from "react-native-paper/lib/typescript/components/Card/CardContent";
 
-export default function EventCard() {
+type EventSearchCardProps = {
+  eventData: { title: string; time: string; location: string; image: string };
+};
+
+export default function EventCard({eventData}: EventSearchCardProps) {
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
     "Nunito-Reg": require("frontend/assets/fonts/Nunito-Reg.ttf"),
@@ -23,9 +26,9 @@ export default function EventCard() {
         style={{ flexDirection: "row", justifyContent: "space-between" }}
       >
         <Card.Content>
-          <CardTitle>Card title</CardTitle>
-          <EventDateText>Card content</EventDateText>
-          <LocationChip></LocationChip>
+          <CardTitle>{eventData.title}</CardTitle>
+          <EventDateText>{eventData.time}</EventDateText>
+          <LocationChip location ={eventData.location}></LocationChip>
         </Card.Content>
         <Card.Content>
           <HostText>Club Name</HostText>
