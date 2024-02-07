@@ -16,14 +16,15 @@ export default function PersonChip({ numberOfUsers }: PersonChipProps) {
     <Chip
       style={{
         borderRadius: 29,
-        height: 28,
-        width: 98,
+        height: 24,
+        maxWidth:98,
+        padding:0,
         marginLeft: 16,
         backgroundColor: backgroundColor,
       }}
     >
       <ChipContentContainer>
-        <AntDesign name="user" size={12} color="black" />
+        <AntDesign name="user" size={12} color="black" lineThickness={5}/>
         <RemainingUsersText>{numberOfUsers} Spots Left</RemainingUsersText>
       </ChipContentContainer>
     </Chip>
@@ -33,7 +34,6 @@ export default function PersonChip({ numberOfUsers }: PersonChipProps) {
 const ChipContentContainer = styled(View)`
   flex-direction: row;
   align-items: center;
-  max-width: 127px;
 `;
 
 const RemainingUsersText = styled(Text)`

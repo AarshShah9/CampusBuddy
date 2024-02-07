@@ -9,7 +9,7 @@ export default function CommentsChip() {
   return (
     <StyledChip>
       <ChipContentContainer>
-        <FontAwesome5 name="comments" size={12} color="black" />
+        <FontAwesome5 name="comments" size={12} color="black"/>
         <CommentsText>Comments</CommentsText>
       </ChipContentContainer>
     </StyledChip>
@@ -18,19 +18,20 @@ export default function CommentsChip() {
 
 const StyledChip = styled(Chip)`
   border-radius: 29px;
-  height: 28px;
-  width: 95px;
   margin-right:16px;
+  height: 24px;
+  width: 98px;
   background-color: white;
-  borderwidth:0.5px;
+  borderWidth:0.5px;
 `;
 
 const ChipContentContainer = styled(View)`
   flex-direction: row;
   align-items: center;
-  max-width: 127px;
 `;
 
 const CommentsText = styled(Text)`
   font-size: 10px;
+  margin-left: 4px;
+  margin-right: 8px;
 `;
