@@ -46,7 +46,7 @@ const StyledCard = styled(Card)`
   width: 374px;
   height: 294px;
   margin-top: 16px;
-  background-color: #e6e6e6;
+  background-color: rgb(234,232,227) ;
 `;
 
 const StyledCover = styled(Card.Cover)`
