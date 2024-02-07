@@ -10,7 +10,8 @@ type PersonChipProps = {
 };
 
 export default function PersonChip({ numberOfUsers }: PersonChipProps) {
-  const backgroundColor = numberOfUsers < 2 ? "rgb(224,167,140)" : "rgb(141,187,162)";
+  const backgroundColor =
+    numberOfUsers < 2 ? "rgb(224,167,140)" : "rgb(141,187,162)";
   return (
     <Chip
       style={{

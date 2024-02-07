@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { Card, Text } from 'react-native-paper';
-import LocationChip from './LocationChip';
-import styled from 'styled-components';
-import { View } from 'react-native';
-import { useFonts } from 'expo-font';
+import * as React from "react";
+import { Card, Text } from "react-native-paper";
+import LocationChip from "./LocationChip";
+import styled from "styled-components";
+import { View } from "react-native";
+import { useFonts } from "expo-font";
 
 type EventHomeCardProps = {
   eventData: { title: string; time: string; location: string; image: string };
@@ -18,7 +18,10 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
   });
   return (
     <StyledCard>
-      <StyledCover source={{ uri: 'https://picsum.photos/700' }} style={{ width: 159, height: 84 }} />
+      <StyledCover
+        source={{ uri: "https://picsum.photos/700" }}
+        style={{ width: 159, height: 84 }}
+      />
       <CardContent>
         <EventTitle>{eventData.title}</EventTitle>
         <EventDetailsContainer>
@@ -43,8 +46,7 @@ const StyledCover = styled(Card.Cover)`
   height: 178px;
 `;
 
-const CardContent = styled(Card.Content)`
-`;
+const CardContent = styled(Card.Content)``;
 
 const EventTitle = styled(Text)`
   font-family: Nunito-Bold;
@@ -55,6 +57,6 @@ const EventTime = styled(Text)`
 `;
 
 const EventDetailsContainer = styled(View)`
-  flex-direction:row;
-  justifyContent: "space-between";
+  flex-direction: row;
+  justifycontent: "space-between";
 `;
