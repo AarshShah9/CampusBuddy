@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Chip, Text } from "react-native-paper";
 import { ThemedText } from "./ThemedComponents";
-import { Entypo } from "@expo/vector-icons";
+import { EvilIcons } from '@expo/vector-icons';
 import { View } from "react-native";
 import styled from "styled-components";
 
@@ -15,7 +15,7 @@ export default function LocationChip({
   return (
     <StyledChip>
       <ChipContentContainer>
-        <Entypo name="location-pin" size={12} color="black" />
+        <EvilIcons name="location" size={12} color="black" />
         <LocationText>{location}</LocationText>
       </ChipContentContainer>
     </StyledChip>
@@ -23,14 +23,15 @@ export default function LocationChip({
 }
 
 const StyledChip = styled(Chip)`
-  border-radius: 29px;
-  height: 28px;
+border-radius: 29px;
+height: 24px;
+width: 98px;
 `;
 
 const ChipContentContainer = styled(View)`
   flex-direction: row;
   align-items: center;
-  max-width: 127px;
+  margin-bottom: 3px;
 `;
 
 const LocationText = styled(Text)`

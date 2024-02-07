@@ -28,7 +28,7 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
         source={{ uri: "https://picsum.photos/700" }}
         resizeMode="cover"
       />
-      <Card.Content style={{ flexDirection: "row" }}>
+      <Card.Content style={{ flexDirection: "row", alignItems: 'flex-start' }}>
         <Card.Content>
           <CardTitle>{eventData.title}</CardTitle>
           <EventDateText>{eventData.time}</EventDateText>
@@ -43,7 +43,7 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
 }
 
 const StyledCard = styled(Card)`
-  width: 376px;
+  width: 374px;
   height: 294px;
   margin-top: 16px;
   background-color: #e6e6e6;
@@ -57,12 +57,13 @@ const StyledCover = styled(Card.Cover)`
 
 const CardTitle = styled(Text)`
   margin-bottom: 4px;
-  font-size: 30px;
+  font-size: 16px;
   font-family: "Nunito-Bold";
+  margin-right: 120px;
 `;
 
 const EventDateText = styled(Text)`
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   font-family: "Nunito-Reg";
   font-size: 12px;
 `;

@@ -54,6 +54,7 @@ const EventTitle = styled(Text)`
 
 const EventTime = styled(Text)`
   font-family: Nunito-Reg;
+  margin-right:8px;
 `;
 
 const EventDetailsContainer = styled(View)`
