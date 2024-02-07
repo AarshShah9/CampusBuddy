@@ -5,24 +5,29 @@ import { AntDesign } from "@expo/vector-icons";
 import { View } from "react-native";
 import styled from "styled-components";
 
-export default function PersonChip() {
+type PersonChipProps = {
+  numberOfUsers: number;
+};
+
+export default function PersonChip({ numberOfUsers }: PersonChipProps) {
+  const backgroundColor = numberOfUsers < 2 ? "rgb(224,167,140)" : "rgb(141,187,162)";
   return (
-    <StyledChip>
+    <Chip
+      style={{
+        borderRadius: 29,
+        height: 28,
+        width: 98,
+        marginLeft: 16,
+        backgroundColor: backgroundColor,
+      }}
+    >
       <ChipContentContainer>
         <AntDesign name="user" size={12} color="black" />
-        <RemainingUsersText>X Spots Left</RemainingUsersText>
+        <RemainingUsersText>{numberOfUsers} Spots Left</RemainingUsersText>
       </ChipContentContainer>
-    </StyledChip>
+    </Chip>
   );
 }
-
-const StyledChip = styled(Chip)`
-  border-radius: 29px;
-  height: 28px;
-  width: 98px;
-  margin-left: 16px;
-  background-color: rgba(44,108,58, 0.5);
-`;
 
 const ChipContentContainer = styled(View)`
   flex-direction: row;
