@@ -20,9 +20,9 @@ const StyledChip = styled(Chip)`
   border-radius: 29px;
   height: 28px;
   width: 95px;
-  margin-right: 16px;
+  margin-right:16px;
   background-color: white;
-  borderwidth: 0.5px;
+  borderwidth:0.5px;
 `;
 
 const ChipContentContainer = styled(View)`
