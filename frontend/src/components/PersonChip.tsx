@@ -10,7 +10,7 @@ export default function PersonChip() {
     <StyledChip>
       <ChipContentContainer>
         <AntDesign name="user" size={12} color="black" />
-        <RemainingUsersText>X Spots Left Rem</RemainingUsersText>
+        <RemainingUsersText>X Spots Left</RemainingUsersText>
       </ChipContentContainer>
     </StyledChip>
   );
@@ -19,6 +19,8 @@ export default function PersonChip() {
 const StyledChip = styled(Chip)`
   border-radius: 29px;
   height: 28px;
+  width: 98px;
+  margin-left: 16px;
   background-color: rgba(44,108,58, 0.5);
 `;
 

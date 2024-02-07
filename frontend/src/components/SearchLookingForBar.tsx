@@ -23,8 +23,11 @@ export default function LookingForItem() {
         title="Title of the Post"
         description="lorem ipsum dolor sit amet, consectetur adip, lorem ipsum dolor sit amet"
       />
-      <PersonChip></PersonChip>
-      <CommentsChip></CommentsChip>
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop:24 }}>
+        <PersonChip></PersonChip>
+        <CommentsChip></CommentsChip>
+      </View>
     </View>
   );
 }

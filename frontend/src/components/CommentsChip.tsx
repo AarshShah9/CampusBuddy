@@ -19,6 +19,8 @@ export default function CommentsChip() {
 const StyledChip = styled(Chip)`
   border-radius: 29px;
   height: 28px;
+  width: 95px;
+  margin-right: 16px;
   background-color: white;
   borderWidth:0.5px;
 `;
