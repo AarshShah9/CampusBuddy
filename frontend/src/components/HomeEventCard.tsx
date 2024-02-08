@@ -4,12 +4,14 @@ import LocationChip from "./LocationChip";
 import styled from "styled-components";
 import { View } from "react-native";
 import { useFonts } from "expo-font";
-
+// Sets the props of the component
 type EventHomeCardProps = {
   eventData: { title: string; time: string; location: string; image: string };
 };
 
+// Component will generate the event card used on the home page of the application
 export default function EventHomeCard({ eventData }: EventHomeCardProps) {
+  // Loads the font into the component
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
     "Nunito-Reg": require("frontend/assets/fonts/Nunito-Reg.ttf"),
@@ -17,14 +19,17 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
     "Roboto-Bold": require("frontend/assets/fonts/Roboto-Bold.ttf"),
   });
   return (
+    // Importing the Card component from React Native Paper and providing a style using styled-componenets
     <StyledCard>
       <StyledCover
         source={{ uri: "https://picsum.photos/700" }}
         style={{ width: 159, height: 84 }}
       />
       <CardContent>
+        {/* Passing the event title props to the Card */}
         <EventTitle>{eventData.title}</EventTitle>
         <EventDetailsContainer>
+          {/* Passing the event time and location to the Card and using the location component*/}
           <EventTime>{eventData.time}</EventTime>
           <LocationChip location={eventData.location} />
         </EventDetailsContainer>
@@ -33,6 +38,7 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
   );
 }
 
+// Adding styling to the seperate card components
 const StyledCard = styled(Card)`
   margin-left: 16px;
   margin-right: 16px;
@@ -54,7 +60,7 @@ const EventTitle = styled(Text)`
 
 const EventTime = styled(Text)`
   font-family: Nunito-Reg;
-  margin-right:8px;
+  margin-right: 8px;
 `;
 
 const EventDetailsContainer = styled(View)`

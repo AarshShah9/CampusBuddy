@@ -5,24 +5,28 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { View } from "react-native";
 import styled from "styled-components";
 
+// Component to be rendered for the comments chip
 export default function CommentsChip() {
   return (
+    // Parent containr for chip
     <StyledChip>
+      {/* Loads Icon and Text for chip */}
       <ChipContentContainer>
-        <FontAwesome5 name="comments" size={12} color="black"/>
+        <FontAwesome5 name="comments" size={12} color="black" />
         <CommentsText>Comments</CommentsText>
       </ChipContentContainer>
     </StyledChip>
   );
 }
 
+// Styles used for children in the component
 const StyledChip = styled(Chip)`
   border-radius: 29px;
-  margin-right:16px;
+  margin-right: 16px;
   height: 24px;
   width: 98px;
   background-color: white;
-  borderWidth:0.5px;
+  border-width: 0.5px;
 `;
 
 const ChipContentContainer = styled(View)`

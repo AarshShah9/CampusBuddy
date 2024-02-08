@@ -6,6 +6,7 @@ import PersonChip from "./PersonChip";
 import CommentsChip from "./CommentsChip";
 import { useFonts } from "expo-font";
 
+// Sets the Props for the Looking for component
 type LookingForProps = {
   lookingForData: {
     title: string;
@@ -14,7 +15,9 @@ type LookingForProps = {
   };
 };
 
+// Component to render for the look for component
 export default function LookingForItem({ lookingForData }: LookingForProps) {
+  // Loading the fonts into the component
   const window = useWindowDimensions();
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
@@ -22,8 +25,8 @@ export default function LookingForItem({ lookingForData }: LookingForProps) {
     "Roboto-Reg": require("frontend/assets/fonts/Roboto-Reg.ttf"),
     "Roboto-Bold": require("frontend/assets/fonts/Roboto-Bold.ttf"),
   });
-
   return (
+    // Creating the primairy Container
     <View
       style={{
         borderBottomWidth: 0.5,
@@ -32,10 +35,13 @@ export default function LookingForItem({ lookingForData }: LookingForProps) {
         width: window.width,
       }}
     >
+      {/* Setting the container with all the information */}
       <InfoContainer>
+        {/* loading the Title and Description of the post to the component*/}
         <TitleText>{lookingForData.title}</TitleText>
         <DescriptionText>{lookingForData.description}</DescriptionText>
       </InfoContainer>
+      {/* Creating the container for the chips */}
       <View
         style={{
           flexDirection: "row",
@@ -44,13 +50,16 @@ export default function LookingForItem({ lookingForData }: LookingForProps) {
           marginBottom: 16,
         }}
       >
-        <PersonChip numberOfUsers={lookingForData.requiredMembers}></PersonChip>
-        <CommentsChip></CommentsChip>
+        {/* Loading the Person chip with the data */}
+        <PersonChip numberOfUsers={lookingForData.requiredMembers} />
+        {/* Loading the Comments Chip */}
+        <CommentsChip />
       </View>
     </View>
   );
 }
 
+// Setting the Styles for the children used in this component
 const InfoContainer = styled(View)`
   margin-top: 16px;
   margin-right: 16px;

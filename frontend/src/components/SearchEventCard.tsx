@@ -4,6 +4,7 @@ import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
 import { useFonts } from "expo-font";
 
+// Sets the Props for the component
 type EventSearchCardProps = {
   eventData: {
     title: string;
@@ -14,7 +15,9 @@ type EventSearchCardProps = {
   };
 };
 
+// Component to render for the event card used in the Search results
 export default function EventCard({ eventData }: EventSearchCardProps) {
+  //Loading the font into the component
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
     "Nunito-Reg": require("frontend/assets/fonts/Nunito-Reg.ttf"),
@@ -23,18 +26,23 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
   });
 
   return (
+    // Styled Card Compponent
     <StyledCard>
+      {/* Styled Card Cover Component */}
       <StyledCover
         source={{ uri: "https://picsum.photos/700" }}
         resizeMode="cover"
       />
-      <Card.Content style={{ flexDirection: "row", alignItems: 'flex-start' }}>
+      {/* This container contains all the information related to the card */}
+      <Card.Content style={{ flexDirection: "row", alignItems: "flex-start" }}>
         <Card.Content>
           <CardTitle>{eventData.title}</CardTitle>
           <EventDateText>{eventData.time}</EventDateText>
-          <LocationChip location={eventData.location}></LocationChip>
+          {/*This Component renders the location chip and loads the location into the chip*/}
+          <LocationChip location={eventData.location} />
         </Card.Content>
         <Card.Content>
+          {/* This Component renders the host name*/}
           <HostText>{eventData.host}</HostText>
         </Card.Content>
       </Card.Content>
@@ -42,11 +50,12 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
   );
 }
 
+// Setting the styles for the children in this Component
 const StyledCard = styled(Card)`
   width: 374px;
   height: 294px;
   margin-top: 16px;
-  background-color: rgb(234,232,227) ;
+  background-color: rgb(234, 232, 227);
 `;
 
 const StyledCover = styled(Card.Cover)`
