@@ -94,10 +94,6 @@ export default function EventDetails() {
                                 <Feather name="map-pin" size={12} color="black" style={{marginRight:5}}/>
                                 <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>{eventData.location}</Text>
                             </TagContainer>
-                            <TagContainer style={{backgroundColor:'#00dc72'}}>
-                                <Ionicons name="people-outline" size={12} color="black" style={{marginRight:5}}/>
-                                <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>Attendance: 200</Text>
-                            </TagContainer>
                         </EDetails>
                         <EClubDetails>
                             <Image 
@@ -107,7 +103,10 @@ export default function EventDetails() {
                             <Text style={{fontFamily:"Roboto-Medium", fontSize:18}}>{eventData.clubName}</Text>
                         </EClubDetails>
                     </View>
-                    
+                    <View style={{borderTopColor:"#B0CFFF", borderTopWidth:1,flexDirection:"row", height:50,backgroundColor:"white", alignItems:"center"}}>
+                        <Ionicons name="people-outline" size={30} color="black" style={{marginLeft:10}}/>
+                        <Text style={{fontFamily:"Roboto-Medium", fontSize:16, marginLeft:5}}>Attendance: 200</Text>
+                    </View>
                     <View style={{backgroundColor:"white", borderTopWidth:1, width:"100%", borderTopColor:"#B0CFFF",paddingBottom:100, paddingLeft:10,paddingRight:10}}>
                         <Text style={{marginTop:10, fontFamily:"Roboto-Reg",fontSize:16}}>
                             {eventData.detail} + {eventData.detail}
@@ -134,7 +133,7 @@ const HeaderContainer = styled(View)`
 
 const EDetails = styled(View)`
     margin-left: 10px;
-    margin-top:10px;
+    margin-top:20px;
 
 `;
 const EClubDetails = styled(View)`
