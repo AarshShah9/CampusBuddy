@@ -3,17 +3,21 @@ import {
   Organization,
   Permission,
   UserRole,
+  OrganizationStatus,
+  UserOrgStatus,
 } from "@prisma/client";
 import prisma from "../prisma/client";
-import { OrganizationCreateInput } from "../../shared/zodSchemas";
+import { OrganizationCreateType } from "../../shared/zodSchemas";
 import { defaultRolePermissions } from "../constants";
 import { AppError, AppErrorName } from "../utils/AppError";
+import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
 
 // Creates a new organization and add the default role permissions
 // This messy but it works for now
 export const createOrganizationWithDefaults = async (
-  organizationData: OrganizationCreateInput,
+  organizationData: OrganizationCreateType,
   userId: string,
+  file: Express.Multer.File,
 ): Promise<Organization | undefined> => {
   let newOrganization: Organization | undefined;
 
@@ -28,6 +32,24 @@ export const createOrganizationWithDefaults = async (
     newOrganization = await tx.organization.create({
       data: {
         ...organizationData,
+        status: OrganizationStatus.Pending,
+      },
+    });
+
+    // upload the image
+    const uniqueFileName = generateUniqueFileName(
+      file!.originalname,
+      newOrganization.id,
+    );
+    const path = `images/organizations/${uniqueFileName}`;
+
+    await UploadToS3(file!, path);
+
+    // Update organization with image path after successful upload
+    newOrganization = await tx.organization.update({
+      where: { id: newOrganization.id },
+      data: {
+        image: path,
       },
     });
 
@@ -47,11 +69,13 @@ export const createOrganizationWithDefaults = async (
       await tx.userOrganizationRole.create({
         data: {
           userId,
-          organizationId: newOrganization.id,
+          organizationId: newOrgId,
           roleId: roleId,
+          status: UserOrgStatus.Pending,
         },
       });
     } else {
+      // This should never happen
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `RoleId for ${UserRole.Owner} not found`,
@@ -91,7 +115,6 @@ export const createOrganizationWithDefaults = async (
                   // create records to associate org with its roles and permissions
                   await tx.organizationRolePermission.create({
                     data: {
-                      // organizationId: newOrganization?.id,
                       organizationId: newOrgId,
                       roleId,
                       permissionId,
@@ -104,12 +127,10 @@ export const createOrganizationWithDefaults = async (
         },
       ),
     );
-    // log success
-    console.log(
-      `Organization ${newOrganization.id} created with default permissions:`,
-      newOrganization,
-    );
   }); // end of prisma transaction
+
+  //TODO: send email to (admins?) about a new pending organization
+
   return newOrganization;
 };
 
