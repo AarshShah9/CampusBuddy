@@ -1,4 +1,4 @@
-import { AppPermissionName } from "@prisma/client";
+import { AppPermissionName, UserOrgStatus } from "@prisma/client";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "./AppError";
 
@@ -9,13 +9,17 @@ export const checkUserPermission = async (
   requiredPermission: AppPermissionName,
 ): Promise<boolean> => {
   try {
-    // Get the user's role in the organization
+    // Get the user's role in the organization if they are in good standing
     const userRole = await prisma.userOrganizationRole.findFirst({
-      where: { userId, organizationId },
+      where: {
+        userId,
+        organizationId,
+        status: UserOrgStatus.Approved, // user only has role's permissions if they are approved
+      },
     });
 
     if (!userRole) {
-      // The user is not a member of the organization
+      // The user is not an approved member of the organization
       return false;
     }
 
