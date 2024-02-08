@@ -38,4 +38,5 @@ export const defaultRolePermissions: Record<
     AppPermissionName.MANAGE_POSTS,
   ],
   [UserRole.Member]: [AppPermissionName.CREATE_POSTS],
+  [UserRole.PendingMod]: [], // no permissions
 } as const; // make constant readonly
