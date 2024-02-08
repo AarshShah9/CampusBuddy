@@ -59,7 +59,7 @@ export const createNewUser = async (
 
     const token = jwt.sign(
       {
-        institutionID: institutionId,
+        institutionID: institution.id,
         username: username,
         firstName: firstName,
         lastName: lastName,
@@ -68,7 +68,7 @@ export const createNewUser = async (
       },
       process.env.JWT_SECRET ?? "testSecret",
       {
-        expiresIn: "5m",
+        expiresIn: "1h",
         mutatePayload: false,
       },
     );
@@ -77,7 +77,8 @@ export const createNewUser = async (
       from: "nomansanjari2001@gmail.com",
       to: email,
       subject: "Verify your account - CampusBuddy",
-      html: `<b>192.168.1.72:3000/api/verify/${token}</b>`,
+      html: `Verify your account by clicking the link!<br>
+      <a href="http://localhost:3000/api/user/verifyAccount/${token}></a>"`,
     };
 
     await transporter.sendMail(message);
@@ -134,16 +135,6 @@ export const verifyAccount = async (
             },
           });
         }
-        const newUser = await prisma.user.create({
-          data: {
-            username: payload.username,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            email: payload.email,
-            password: payload.password,
-            institutionId: payload.institutionID,
-          },
-        });
 
         res.status(200).json({
           html: '<img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Beijing_bouddhist_monk_2009_IMG_1486.JPG" alt="Word bruh word...">',

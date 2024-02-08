@@ -14,7 +14,7 @@ import { verifyAuthentication } from "../middleware/verifyAuth";
 const router = express.Router();
 
 router.post("/createNewUser", createNewUser);
-router.post("/verifyOTP/:token", verifyAccount);
+router.get("/verifyAccount/:token", verifyAccount);
 router.post("/loginUser", loginUser);
 router.post("/logoutUser", verifyAuthentication, logoutUser);
 router.post("/resetPassword", resetPassword);
