@@ -1,6 +1,7 @@
 import express from "express";
 import {
-  createNewUser,
+  createNewOrgUser,
+  createNewStudentUser,
   getAllUsers,
   loginUser,
   logoutUser,
@@ -14,7 +15,8 @@ import { verifyAuthentication } from "../middleware/verifyAuth";
 
 const router = express.Router();
 
-router.post("/createNewUser", createNewUser);
+router.post("/student", createNewStudentUser); // router.post("/student", createNewStudentUser);
+router.post("/organization/:id", createNewOrgUser);
 router.post("/resendOTP", resendOTP);
 router.post("/verifyOTP", verifyOTP);
 router.post("/loginUser", loginUser);

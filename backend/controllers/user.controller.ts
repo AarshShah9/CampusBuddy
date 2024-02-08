@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  createUserSchema,
-  deleteSchema,
+  userCreateSchema,
   emailSchema,
   IdParamSchema,
   loginSchema,
@@ -15,24 +14,19 @@ import transporter from "../utils/mailer";
 
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
-import { User } from "@prisma/client";
+import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
+
+const userId = "db365290-c550-11ee-83fd-6f8d6c450910"; // Placeholder for testing
 
 // create new User
-export const createNewUser = async (
+export const createNewStudentUser = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const {
-      institutionId,
-      username,
-      firstName,
-      lastName,
-      email,
-      password,
-      yearOfStudy,
-    } = createUserSchema.parse(req.body);
+    const { institutionId, username, firstName, lastName, email, password } =
+      userCreateSchema.parse(req.body);
 
     const domain = email.slice(email.indexOf("@") + 1);
 
@@ -45,7 +39,6 @@ export const createNewUser = async (
     const institution = await prisma.institution.findFirst({
       where: {
         id: institutionId,
-        domain: domain,
       },
     });
 
@@ -53,6 +46,16 @@ export const createNewUser = async (
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // check if the user has the correct email domain for the institution
+    if (institution.domain !== domain) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        `Invalid student email domain: ${domain}`,
         400,
         true,
       );
@@ -109,7 +112,7 @@ export const createNewUser = async (
         isVerified: false,
         institutionId: institution.id,
         status: false,
-        yearOfStudy: yearOfStudy,
+        accountType: UserType.Student,
       },
     });
 
@@ -409,6 +412,133 @@ export const updateUser = async (
       return res.status(400).json({ error: "User could not be updated" });
     }
   } catch (error: any) {
+    next(error);
+  }
+};
+
+// create new Org User (pending approval)
+// maybe we can move common user creation functionality into a user service or helper function -> only userType and domain are different
+export const createNewOrgUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request organization id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    const { institutionId, username, firstName, lastName, email, password } =
+      userCreateSchema.parse(req.body);
+
+    const domain = email.slice(email.indexOf("@") + 1);
+
+    const otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    const institution = await prisma.institution.findFirst({
+      where: {
+        id: institutionId,
+        domain: domain,
+      },
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (userExists) {
+      if (userExists.isVerified) {
+        throw new AppError(
+          AppErrorName.RECORD_EXISTS_ERROR,
+          "User already exists",
+          400,
+          true,
+        );
+      } else if (userExists.isVerified === false) {
+        await prisma.user.update({
+          where: {
+            email: email,
+          },
+          data: {
+            otp: otp,
+          },
+        });
+
+        const message = {
+          from: "nomansanjari2001@gmail.com",
+          to: email,
+          subject: "Verify OTP - CampusBuddy",
+          html: `<b>${otp}</b>`,
+        };
+
+        await transporter.sendMail(message);
+
+        res.status(100).json({
+          success: false,
+          message: "User not verified, otp sent",
+        });
+      }
+    }
+
+    // start transaction
+    await prisma.$transaction(async (tx) => {
+      // Note: This flow may change depending on Noman's auth rework and if we store user data in the email jwt
+
+      // create the new org user
+      const newUser = await tx.user.create({
+        data: {
+          username: username,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          password: password,
+          otp: otp,
+          isVerified: false,
+          institutionId: institution.id,
+          status: false,
+          accountType: UserType.PendingOrg,
+        },
+      });
+
+      // add the user to the organization as a Moderator pending approval
+      await tx.userOrganizationRole.create({
+        data: {
+          userId: newUser.id,
+          organizationId,
+          roleId: UserRole.Moderator,
+          status: UserOrgStatus.Pending,
+        },
+      });
+    });
+
+    const message = {
+      from: "nomansanjari2001@gmail.com",
+      to: email,
+      subject: "Verify OTP - CampusBuddy",
+      html: `<b>${otp}</b>`,
+    };
+
+    await transporter.sendMail(message);
+
+    res.status(200).json({
+      success: true,
+      message: "User created",
+    });
+  } catch (error) {
     next(error);
   }
 };
