@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useLayoutEffect, useState } from 'react';
 import { ThemedText } from '~/components/ThemedComponents';
-import { AntDesign, Feather, Entypo  } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons    } from "@expo/vector-icons";
 import styled from 'styled-components';
 import Animated,{ interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
 
@@ -94,7 +94,10 @@ export default function EventDetails() {
                                 <Feather name="map-pin" size={12} color="black" style={{marginRight:5}}/>
                                 <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>{eventData.location}</Text>
                             </TagContainer>
-                            
+                            <TagContainer style={{backgroundColor:'#00f780'}}>
+                                <Ionicons name="people-outline" size={12} color="black" style={{marginRight:5}}/>
+                                <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>Attendence: 200</Text>
+                            </TagContainer>
                         </EDetails>
                         <EClubDetails>
                             <Image 
@@ -104,6 +107,7 @@ export default function EventDetails() {
                             <Text style={{fontFamily:"Roboto-Medium", fontSize:18}}>{eventData.clubName}</Text>
                         </EClubDetails>
                     </View>
+                    
                     <View style={{backgroundColor:"white", borderTopWidth:1, width:"100%", borderTopColor:"#B0CFFF",paddingBottom:100, paddingLeft:10,paddingRight:10}}>
                         <Text style={{marginTop:10, fontFamily:"Roboto-Reg",fontSize:16}}>
                             {eventData.detail} + {eventData.detail}
@@ -130,7 +134,7 @@ const HeaderContainer = styled(View)`
 
 const EDetails = styled(View)`
     margin-left: 10px;
-    margin-top:20px;
+    margin-top:10px;
 
 `;
 const EClubDetails = styled(View)`
@@ -144,4 +148,5 @@ const TagContainer = styled(View)`
     border-radius: 8px;
     flex-direction: row;
     padding:5px;
+    marginBottom:5px
 `
