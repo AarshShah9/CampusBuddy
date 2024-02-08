@@ -2,12 +2,13 @@ import { View, Text, ScrollView, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useLayoutEffect, useState } from 'react';
 import { ThemedText } from '~/components/ThemedComponents';
-import { AntDesign, Feather  } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo  } from "@expo/vector-icons";
 import styled from 'styled-components';
 import Animated,{ interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
 
 const IMG_HEIGHT = 300;
 export default function EventDetails() {
+    const [isLiked,setIsLiked] = useState(false);
     const scrollRef = useAnimatedRef<Animated.ScrollView>();
     const scrollOffSet = useScrollViewOffset(scrollRef);
     const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -62,12 +63,21 @@ export default function EventDetails() {
         <MainContainer>
             <HeaderContainer>
             <AntDesign
-                        style={{ marginTop: "10%", marginLeft: "3%" }}
+                        style={{ marginTop: "15%", marginLeft: "3%" }}
                         name="caretleft"
                         size={24}
                         color="white"
                         onPress={() => {navigation.navigate("Login")}}
                     />
+            <Entypo 
+                        style={{ marginTop: "15%", marginRight:"5%" }}
+                        name="heart" 
+                        size={28} 
+                        color={isLiked ? "red": "black"}
+                        onPress={()=>{
+                            setIsLiked(!isLiked);
+                        }}
+                        />
             </HeaderContainer>
             <Animated.ScrollView showsVerticalScrollIndicator={false} ref={scrollRef} style={{height:"100%", backgroundColor:"white"}} scrollEventThrottle={16}>
                     
@@ -114,7 +124,8 @@ const MainContainer = styled(View)`
 const HeaderContainer = styled(View)`
   width: 100%;
   height: 13%;
-  justify-content: center;
+  justify-content: space-between;
+  flex-direction: row
 `;
 
 const EDetails = styled(View)`
