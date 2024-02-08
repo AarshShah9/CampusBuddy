@@ -2,9 +2,9 @@ name: React Native CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-test:
@@ -16,8 +16,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-          cache: 'npm'
+          node-version: "16.x"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - run: |
@@ -32,10 +32,10 @@ jobs:
       # Optionally, you can add steps to build your React Native app
 #      - name: Build React Native app
 #      - run: cd frontend && npx react-native build-android
-      #   run: cd frontend && npx react-native run-android
+#   run: cd frontend && npx react-native run-android
 
-      # Run tests (make sure you have a test script in your package.json)
+# Run tests (make sure you have a test script in your package.json)
 #      - name: Run tests
 #        run: cd frontend && npm test
 
-    # Any other steps you need for your CI, like linting, can be added here
+# Any other steps you need for your CI, like linting, can be added here
