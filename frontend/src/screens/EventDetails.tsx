@@ -94,9 +94,9 @@ export default function EventDetails() {
                                 <Feather name="map-pin" size={12} color="black" style={{marginRight:5}}/>
                                 <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>{eventData.location}</Text>
                             </TagContainer>
-                            <TagContainer style={{backgroundColor:'#00f780'}}>
+                            <TagContainer style={{backgroundColor:'#00dc72'}}>
                                 <Ionicons name="people-outline" size={12} color="black" style={{marginRight:5}}/>
-                                <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>Attendence: 200</Text>
+                                <Text style={{fontFamily:"Roboto-Medium", fontSize:10}}>Attendance: 200</Text>
                             </TagContainer>
                         </EDetails>
                         <EClubDetails>
