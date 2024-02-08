@@ -8,8 +8,6 @@ import SplashScreen from "~/screens/SplashScreen";
 import Login from "~/screens/Login";
 import StudentSignUp from "~/screens/StudentSignUp";
 import Home from "~/screens/Home";
-import Map from "~/screens/Map";
-import React from "react";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,10 +25,9 @@ export default function Navigation() {
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen
             name="Login"
-            component={Home}
+            component={Login}
             options={{ gestureEnabled: false }}
           />
-
           <Stack.Screen
             name="StudentSignUp"
             component={StudentSignUp}
