@@ -22,11 +22,26 @@ enum UserRole {
   Admin
   Moderator
   Member
+  PendingMod
+}
+
+enum UserType {
+  Student // has email with proper domain, enrollment record(s)
+  PendingOrg // an org account that hasn't been approved yet by admins or existing org
+  ApprovedOrg
 }
 
 enum OrganizationStatus {
   Pending
-  Verified
+  Approved
+  Rejected
+}
+
+enum UserOrgStatus {
+  Pending
+  Approved
+  Rejected // may not be necessary if we just delete the record instead
+  Banned
 }
 
 // many of these permissions may not apply to our application
@@ -42,53 +57,46 @@ enum AppPermissionName {
   DELETE_ORGANIZATION
 }
 
+enum ParticipationStatus {
+  Going
+  Interested
+}
+
 // CORE MODELS
 model Institution {
-  id     String @id @default(uuid())
-  name   String
-  domain String
-
-  user User[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String         @id @default(uuid())
+  name          String
+  domain        String
+  user          User[]
+  organizations Organization[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@map("institution")
 }
 
 model User {
-  id String @id @default(uuid())
-
-  username String @unique
-
-  firstName String @map("first_name")
-  lastName  String @map("last_name")
-
-  email       String @unique
-  password    String @map("password")
-  yearOfStudy Int    @map("year_of_study")
-
-  otp        String? @default("")
-  jwt        String? @default("")
-  isVerified Boolean @default(false) @map("is_verified")
-
-  profilePic String? @unique @map("profile_pic")
-
-  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String      @map("institution_id")
-
-  enrollments Enrollment[]
-
-  posts    Post[]
-  comments Comment[]
-
-  events            Event[]
-  UserEventResponse UserEventResponse[]
-
+  id                   String                 @id @default(uuid())
+  username             String                 @unique
+  firstName            String                 @map("first_name")
+  lastName             String                 @map("last_name")
+  email                String                 @unique
+  password             String                 @map("password")
+  otp                  String?                @default("")
+  jwt                  String?                @default("")
+  isVerified           Boolean                @default(false) @map("is_verified")
+  profilePic           String?                @unique @map("profile_pic")
+  institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  institutionId        String?                @map("institution_id")
+  enrollments          Enrollment[]
+  posts                Post[]
+  comments             Comment[]
+  events               Event[]
+  UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
-
-  status Boolean
+  status               Boolean // what is this for?
+  accountType          UserType
 
   @@index([email])
   @@index([institutionId])
@@ -96,11 +104,12 @@ model User {
 }
 
 model Enrollment {
-  programId  String  @map("program_id")
-  userId     String  @map("user_id")
-  degreeType String  @map("degree_type")
-  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId   String  @map("program_id")
+  userId      String  @map("user_id")
+  degreeType  String  @map("degree_type")
+  yearOfStudy Int     @map("year_of_study")
+  program     Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([programId, userId])
   @@index([programId])
@@ -141,11 +150,11 @@ model Event {
 }
 
 model UserEventResponse {
-  userId              String @map("user_id")
-  eventId             String @map("event_id")
-  participationStatus String @map("participation_status")
-  user                User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event               Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId              String              @map("user_id")
+  eventId             String              @map("event_id")
+  participationStatus ParticipationStatus @map("participation_status")
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@id([userId, eventId])
   @@index([userId])
@@ -192,24 +201,30 @@ model Organization {
   organizationName            String                       @unique @map("organization_name")
   description                 String?
   createdAt                   DateTime                     @unique @default(now()) @map("created_at")
+  updatedAt                   DateTime                     @updatedAt @map("updated_at")
   status                      OrganizationStatus           @default(Pending)
+  image                       String?
+  institutionId               String                       @map("institution_id")
+  institution                 Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   userOrganizationRoles       UserOrganizationRole[]
   userOrganizationPermissions OrganizationRolePermission[]
   events                      Event[]
   posts                       Post[]
 
+  @@index([institutionId])
   @@map("organization")
 }
 
 model UserOrganizationRole {
-  userId         String       @map("user_id")
-  organizationId String       @map("organization_id")
-  roleId         String       @map("role_id")
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  userId         String        @map("user_id")
+  organizationId String        @map("organization_id")
+  roleId         String        @map("role_id")
+  status         UserOrgStatus
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([userId, organizationId, roleId])
+  @@id([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
   @@index([roleId])
