@@ -7,10 +7,10 @@ import CardContent from "react-native-paper/lib/typescript/components/Card/CardC
 
 export default function EventMainCard() {
   const [fontsLoaded] = useFonts({
-    "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-Reg": require("frontend/assets/fonts/Nunito-Reg.ttf"),
-    "Roboto-Reg": require("frontend/assets/fonts/Roboto-Reg.ttf"),
-    "Roboto-Bold": require("frontend/assets/fonts/Roboto-Bold.ttf"),
+    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
+    "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
+    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
+    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
   });
 
   return (
@@ -29,9 +29,7 @@ export default function EventMainCard() {
         </Card.Content>
         <Card.Content>
           <HostText>Club Name</HostText>
-          <Card.Content>
-            
-          </Card.Content>
+          <Card.Content></Card.Content>
         </Card.Content>
       </Card.Content>
     </StyledCard>
