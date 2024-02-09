@@ -1,24 +1,24 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabsGroup from './BottomTabsGroup';
-import EventDetails from '~/screens/EventDetails';
+import ModalScreen from '~/screens/ModalScreen';
 import useThemeContext from '~/hooks/useThemeContext';
 
 const Stack = createNativeStackNavigator();
 
-export default function HomeStackGroup() {
+export default function MainGroup() {
     const { theme } = useThemeContext();
     
     return (
         <Stack.Navigator>
             <Stack.Screen  
-                name="BottomTabGroup" 
+                name="BottomTabsGroup" 
                 component={BottomTabsGroup}
                 options={{ headerShown: false }}
             />
             <Stack.Screen  
-                name="EventDetails" 
-                component={EventDetails}
-                options={{ presentation: 'modal', headerStyle:  { backgroundColor: theme.colors.surfaceVariant } }}
+                name="ModalScreen" 
+                component={ModalScreen}
+                options={{ presentation: 'modal', headerStyle:  { backgroundColor: theme.colors.primary } }}
             />
         </Stack.Navigator>
     )

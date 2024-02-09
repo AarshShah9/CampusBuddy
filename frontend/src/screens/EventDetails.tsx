@@ -114,7 +114,7 @@ export default function EventDetails() {
             { height: 250, width: "100%", backgroundColor: "red" },
             imageAnimatedStyle,
           ]}
-          source={require("../../assets/Campus_Buddy_Logo.png")}
+          source={require("~/assets/Campus_Buddy_Logo.png")}
         />
 
         <View
@@ -166,7 +166,7 @@ export default function EventDetails() {
                 borderRadius: 90,
                 marginBottom: 5,
               }}
-              source={require("../../assets/Campus_Buddy_Logo.png")}
+              source={require("~/assets/Campus_Buddy_Logo.png")}
             />
             <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
               {eventData.clubName}

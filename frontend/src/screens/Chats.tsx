@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from "react-native";
+import { View, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback, Pressable, TouchableOpacity } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { FlashList } from "@shopify/flash-list";
@@ -10,7 +10,6 @@ import { ThemedTextInput } from "~/components/ThemedComponents";
 import useChatsSearchContext from "~/hooks/useChatsSearchContext";
 import useChatsContext from "~/hooks/useChatsContext";
 import { ChatsSearchContextProvider } from "~/contexts/chatsSearchContext";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CoversationsArea = () => {
     const { conversations, user, fetchMoreConversations, conversationsAreLoading } = useChatsContext();
@@ -57,20 +56,20 @@ const SearchArea = () => {
 
     return (
         <View style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}>
-            <View style={[styles.searchBar, { backgroundColor: `${theme.colors.surfaceVariant}`}]}>
+            <View style={[styles.searchBar, { backgroundColor: `${theme.colors.primary}`}]}>
                 <TouchableOpacity onPress={() => Keyboard.dismiss()}>
-                    <AntDesign name="search1" size={20} color="grey" />
+                    <AntDesign name="search1" size={20} color={theme.colors.background} />
                 </TouchableOpacity>
                 <ThemedTextInput 
                     placeholder='Search Chats'
-                    placeholderTextColor='grey'
-                    style={styles.searchBarInput}
+                    placeholderTextColor={theme.colors.background}
+                    style={[styles.searchBarInput, { color: theme.colors.background }]}
                     value={filterWord}
                     onChangeText={(text) => setFilterWord(text)}
                 />
                 {(filterWord !== '') && 
                     <TouchableOpacity onPress={clearSearchArea}>
-                        <AntDesign name="closecircle" size={15} color="grey" />
+                        <AntDesign name="closecircle" size={15} color={theme.colors.background} />
                     </TouchableOpacity>
                 }
             </View>
