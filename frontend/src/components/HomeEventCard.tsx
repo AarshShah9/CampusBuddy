@@ -4,9 +4,17 @@ import LocationChip from "./LocationChip";
 import styled from "styled-components";
 import { View } from "react-native";
 import { useFonts } from "expo-font";
+import useThemeContext from "~/hooks/useThemeContext";
+
 // Sets the props of the component
 type EventHomeCardProps = {
-  eventData: { title: string; time: string; location: string; image: string };
+  eventData: {
+    title: string;
+    time: string;
+    location: string;
+    image: string;
+    host?: string;
+  };
 };
 
 // Component will generate the event card used on the home page of the application

@@ -3,6 +3,7 @@ import { Card, Text } from "react-native-paper";
 import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
 import { useFonts } from "expo-font";
+import useThemeContext from "~/hooks/useThemeContext";
 
 // Sets the Props for the component
 type EventSearchCardProps = {
@@ -17,6 +18,7 @@ type EventSearchCardProps = {
 
 // Component to render for the event card used in the Search results
 export default function EventCard({ eventData }: EventSearchCardProps) {
+  const { theme } = useThemeContext();
   //Loading the font into the component
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("frontend/assets/fonts/Nunito-Bold.ttf"),
@@ -27,7 +29,7 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
 
   return (
     // Styled Card Compponent
-    <StyledCard>
+    <StyledCard color={theme.colors.surfaceVariant}>
       {/* Styled Card Cover Component */}
       <StyledCover
         source={{ uri: "https://picsum.photos/700" }}
@@ -51,17 +53,18 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
 }
 
 // Setting the styles for the children in this Component
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card)<{ color: string }>`
   width: 374px;
   height: 294px;
   margin-top: 16px;
-  background-color: rgb(234, 232, 227);
+  background-color: ${(props) => props.color};
 `;
 
 const StyledCover = styled(Card.Cover)`
   width: calc(100% - 32px);
   height: 178px;
   margin: 8px;
+  font-color: theme.color.;
 `;
 
 const CardTitle = styled(Text)`

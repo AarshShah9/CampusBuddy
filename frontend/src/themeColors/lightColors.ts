@@ -20,7 +20,7 @@ const lightColors = {
     "onBackground": "rgb(27, 27, 31)",
     "surface": "rgb(254, 251, 255)",
     "onSurface": "rgb(27, 27, 31)",
-    "surfaceVariant": "rgb(225, 226, 236)",
+    "surfaceVariant": "rgb(235, 236, 246)",
     "onSurfaceVariant": "rgb(68, 71, 79)",
     "outline": "rgb(117, 119, 127)",
     "outlineVariant": "rgb(196, 198, 208)",
