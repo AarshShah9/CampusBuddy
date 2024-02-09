@@ -1,8 +1,8 @@
-import { View, Text, Image} from "react-native";
-import {Button} from "react-native-paper";
+import { Image, Text, View } from "react-native";
+import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
-import { AntDesign, Feather, Entypo, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
 import styled from "styled-components";
 import Animated, {
   interpolate,
@@ -23,6 +23,7 @@ export default function EventDetails() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const navigation = useNavigation<any>();
 
   // Function adds the event to users fav list.
   const userLiked = useCallback(() => {
@@ -83,7 +84,6 @@ export default function EventDetails() {
       attendance: 200,
     });
   }, []);
-  const navigation = useNavigation<any>();
 
   return (
     <MainContainer color={theme.colors.primary}>
@@ -99,7 +99,7 @@ export default function EventDetails() {
           style={{ marginTop: "15%", marginRight: "5%" }}
           name="heart"
           size={28}
-          color={isLiked ? theme.colors.onliked : theme.colors.unLiked }
+          color={isLiked ? theme.colors.onliked : theme.colors.unLiked}
           onPress={userLiked}
         />
       </HeaderContainer>
@@ -212,29 +212,34 @@ export default function EventDetails() {
             {eventData.detail} + {eventData.detail}
           </Text>
         </View>
-        <View style={{paddingBottom:60,marginLeft:'auto', marginRight:'auto', width:'80%'}}>
-            <StyledButton
-              mode="contained"
+        <View
+          style={{
+            paddingBottom: 60,
+            marginLeft: "auto",
+            marginRight: "auto",
+            width: "80%",
+          }}
+        >
+          <StyledButton mode="contained">
+            <Text
+              style={{
+                lineHeight: 30,
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "white",
+                fontFamily: "Nunito-Bold",
+              }}
             >
-              <Text
-                style={{
-                  lineHeight: 30,
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: "white",
-                  fontFamily: "Nunito-Bold",
-                }}
-              >
-                Login
-              </Text>
-            </StyledButton>
+              Login
+            </Text>
+          </StyledButton>
         </View>
       </Animated.ScrollView>
     </MainContainer>
   );
 }
 
-const MainContainer = styled(View)<{color:string}>`
+const MainContainer = styled(View)<{ color: string }>`
   height: 100%;
   background-color: ${(props) => props.color};
 `;
