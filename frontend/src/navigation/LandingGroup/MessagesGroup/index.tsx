@@ -1,8 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Chats from '~/screens/Chats';
 import Chat from '~/screens/Chat';
-import DrawerIcon from '~/navigation/DrawerIcon';
-import UserIcon from '~/navigation/UserIcon';
 import useThemeContext from '~/hooks/useThemeContext';
 import ChatScreenHeader from './ChatScreenHeader';
 import { ChatsContextProvider } from '~/contexts/chatsContext';
@@ -22,11 +20,11 @@ export default function MessagesStackGroup() {
                         component={Chats}
                         options={{
                             title: 'Chats',
-                            headerLeft: () => <DrawerIcon />,
-                            headerRight: () => <UserIcon />,
-                            headerTintColor: theme.colors.onSurfaceVariant,
+                           /*  headerLeft: () => <DrawerIcon />,
+                            headerRight: () => <UserIcon />, */
+                            headerTintColor: theme.colors.background,
                             headerStyle: {
-                                backgroundColor: theme.colors.surfaceVariant
+                                backgroundColor: theme.colors.primary
                             }
                         }}
                     />
@@ -35,7 +33,7 @@ export default function MessagesStackGroup() {
                         component={Chat}
                         options={{
                             headerStyle: {
-                                backgroundColor: theme.colors.surfaceVariant
+                                backgroundColor: theme.colors.primary
                             },
                             headerTitle: () => <ChatScreenHeader />
                         }}

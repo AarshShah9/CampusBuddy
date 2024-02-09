@@ -10,6 +10,7 @@ import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
 import Map from "~/screens/Map";
 import MapComponentSmall from "~/components/MapComponentSmall";
+import useThemeContext from "~/hooks/useThemeContext";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -52,6 +53,7 @@ export default function Home() {
     );
   };
 
+  const { theme } = useThemeContext();
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
@@ -59,7 +61,7 @@ export default function Home() {
       <MapComponentSmall latitude={37.78825} longitude={-122.4324} />
       <View style={styles.mockEventsContainer}>
         <Card
-          style={styles.mockEventContainer}
+          style={[styles.mockEventContainer, { backgroundColor: theme.colors.primary }]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 1 });
@@ -70,7 +72,7 @@ export default function Home() {
           </Card.Content>
         </Card>
         <Card
-          style={styles.mockEventContainer}
+          style={[styles.mockEventContainer, { backgroundColor: theme.colors.primary }]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 2 });
