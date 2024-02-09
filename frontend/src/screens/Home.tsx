@@ -11,6 +11,7 @@ import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
+import useThemeContext from "~/hooks/useThemeContext";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -53,6 +54,7 @@ export default function Home() {
     );
   };
 
+  const { theme } = useThemeContext();
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
@@ -60,7 +62,7 @@ export default function Home() {
       <Button title={"Test"} onPress={testCallback} />
       <View style={styles.mockEventsContainer}>
         <Card
-          style={styles.mockEventContainer}
+          style={[styles.mockEventContainer, { backgroundColor: theme.colors.primary }]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 1 });
@@ -71,7 +73,7 @@ export default function Home() {
           </Card.Content>
         </Card>
         <Card
-          style={styles.mockEventContainer}
+          style={[styles.mockEventContainer, { backgroundColor: theme.colors.primary }]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 2 });

@@ -11,7 +11,8 @@ export default function ProfileTabs() {
     const { theme } = useThemeContext();
     return (
         <TopTabs.Navigator screenOptions={{ 
-                tabBarStyle: { backgroundColor: theme.colors.background }
+                tabBarStyle: { backgroundColor: theme.colors.background },
+                tabBarShowLabel: false
             }}>
             <TopTabs.Screen 
                 name="Events" 

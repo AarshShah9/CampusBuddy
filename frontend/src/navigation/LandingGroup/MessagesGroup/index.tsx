@@ -22,9 +22,9 @@ export default function MessagesStackGroup() {
                             title: 'Chats',
                            /*  headerLeft: () => <DrawerIcon />,
                             headerRight: () => <UserIcon />, */
-                            headerTintColor: theme.colors.onSurfaceVariant,
+                            headerTintColor: theme.colors.background,
                             headerStyle: {
-                                backgroundColor: theme.colors.surfaceVariant
+                                backgroundColor: theme.colors.primary
                             }
                         }}
                     />
@@ -33,7 +33,7 @@ export default function MessagesStackGroup() {
                         component={Chat}
                         options={{
                             headerStyle: {
-                                backgroundColor: theme.colors.surfaceVariant
+                                backgroundColor: theme.colors.primary
                             },
                             headerTitle: () => <ChatScreenHeader />
                         }}
