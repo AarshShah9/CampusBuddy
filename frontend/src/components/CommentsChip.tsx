@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Chip, Text } from "react-native-paper";
-import { ThemedText } from "./ThemedComponents";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { View } from "react-native";
 import styled from "styled-components";

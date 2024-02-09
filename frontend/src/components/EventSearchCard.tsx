@@ -5,7 +5,14 @@ import LocationChip from "./LocationChip";
 import { useFonts } from "expo-font";
 import CardContent from "react-native-paper/lib/typescript/components/Card/CardContent";
 
-export default function EventSearchCard() {
+type EventSearchCardProps = {
+  title: string;
+  date: string;
+  location: string;
+  clubName: string;
+};
+
+export default function EventSearchCard(props: EventSearchCardProps) {
   const [fontsLoaded] = useFonts({
     "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
     "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
@@ -23,13 +30,13 @@ export default function EventSearchCard() {
         style={{ flexDirection: "row", justifyContent: "space-between" }}
       >
         <Card.Content>
-          <CardTitle>Card title</CardTitle>
-          <EventDateText>Card content</EventDateText>
-          <LocationChip></LocationChip>
+          <CardTitle>{props.title}</CardTitle>
+          <EventDateText>{props.date}</EventDateText>
+          <LocationChip location={props.location}></LocationChip>
         </Card.Content>
         <Card.Content>
-          <HostText>Club Name</HostText>
-          <Card.Content></Card.Content>
+          <HostText>{props.clubName}</HostText>
+          {/*<Card.Content></Card.Content>*/}
         </Card.Content>
       </Card.Content>
     </StyledCard>
@@ -51,7 +58,7 @@ const StyledCover = styled(Card.Cover)`
 
 const CardTitle = styled(Text)`
   margin-bottom: 4px;
-  font-size: 30;
+  font-size: 30px;
   font-family: "Nunito-Bold";
 `;
 
