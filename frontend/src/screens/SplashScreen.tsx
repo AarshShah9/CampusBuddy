@@ -10,7 +10,9 @@ export default function SplashScreen() {
   const navigation = useNavigation<any>();
   const [fontsLoaded] = useFonts({
     'Nunito-Bold': require('~/assets/fonts/Nunito-Bold.ttf'),
-    'Roboto-Reg': require('~/assets/fonts/Roboto-Reg.ttf')
+    'Roboto-Reg': require('~/assets/fonts/Roboto-Reg.ttf'),
+    'Roboto-Medium': require('~/assets/fonts/Roboto-Medium.ttf'),
+    'Roboto-Bold': require('~/assets/fonts/Roboto-Bold.ttf')
   });
   useEffect(() => {
     const loadData = async () => {
