@@ -69,7 +69,7 @@ const fileFilter = (req: Request, file: any, cb: any) => {
 };
 
 // add properties to multer upload instance
-const upload = multer({ storage, limits, fileFilter });
+const _upload = multer({ storage, limits, fileFilter });
 
 /**
  * Formats a file size in bytes into a human-readable string with an appropriate unit.
@@ -113,7 +113,6 @@ const convertBytesToSize = (
 
 const generateUniqueFileName = function (fileName: string): string {
   const maxFilenameSize = 100;
-  const testing = "wow";
   if (fileName.length > maxFilenameSize) {
     // const error = new Error("Filename too long");
     throw new AppError(
@@ -129,4 +128,4 @@ const generateUniqueFileName = function (fileName: string): string {
     return generatedFilename;
   }
 };
-export { fileSizeFormatter, generateUniqueFileName, upload };
+export { fileSizeFormatter, generateUniqueFileName, _upload };

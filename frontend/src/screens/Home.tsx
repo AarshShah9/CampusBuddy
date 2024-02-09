@@ -1,13 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import * as ImagePicker from "expo-image-picker";
-import { ImagePickerAsset } from "expo-image-picker";
 import React, { useState } from "react";
-import { Button, Platform, StyleSheet, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import { Card } from "react-native-paper";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
-import { getRequest } from "~/lib/CBRequest";
+import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
+import { EventCreateSchema } from "../../../shared/zodSchemas";
+import { z } from "zod";
+import imageGetter from "~/lib/imageGetter";
+import Map from "~/screens/Map";
+import MapComponentSmall from "~/components/MapComponentSmall";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -25,53 +27,36 @@ export default function Home() {
   const { navigate } = useNavigation<any>();
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const result = await imageGetter();
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      await UploadImage(result.assets[0]);
-
+    if (result.canceled) {
       return;
     }
-    console.log(result);
-  };
 
-  const UploadImage = async (selectedImage: ImagePickerAsset) => {
-    const uri =
-      Platform.OS === "android"
-        ? selectedImage.uri
-        : selectedImage.uri.replace("file://", "");
-    const filename = selectedImage.uri.split("/").pop();
-    const match = /\.(\w+)$/.exec(filename as string);
-    const ext = match?.[1];
-    const type = match ? `image/${match[1]}` : `image`;
-    const formData = new FormData();
-    formData.append("file", {
-      uri,
-      name: `image.${ext}`,
-      type,
-    } as any);
-    try {
-      const { data } = await axios.post(`${URL}/api/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("Image Uploaded");
-    } catch (err) {
-      console.log(err);
-      alert("Something went wrong in the Upload Function!");
-    }
+    type EventCreateType = z.infer<typeof EventCreateSchema>;
+
+    const data: EventCreateType = {
+      title: "Test Event NEW",
+      description: "Test Description",
+      location: "Test Location",
+      startTime: new Date(2025, 1, 2024, 1),
+      endTime: new Date(2025, 1, 2024, 4),
+      isPublic: true,
+    };
+    await uploadImageRequest(
+      "post",
+      "/api/events/",
+      result.assets[0],
+      data,
+      {},
+    );
   };
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       <Button title={"Test"} onPress={testCallback} />
+      <MapComponentSmall latitude={37.78825} longitude={-122.4324} />
       <View style={styles.mockEventsContainer}>
         <Card
           style={styles.mockEventContainer}

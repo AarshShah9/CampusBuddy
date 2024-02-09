@@ -10,11 +10,10 @@ import event from "./routes/event.routes";
 import institution from "./routes/institution.routes";
 import user from "./routes/user.routes";
 import org from "./routes/org.routes";
-import UploadToS3 from "./utils/S3Uploader";
+import UploadToS3, { upload } from "./utils/S3Uploader";
 import { env, validateEnv } from "./utils/validateEnv";
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
 const result = dotenv.config();
 
 try {
@@ -38,7 +37,7 @@ app.use(
 app.use(express.json()); // parsing JSON in the request body
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); // parsing URL-encoded form data
-app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path
+app.use("/api/upload", express.static(path.join(__dirname, "uploads"))); // file upload path - deprecated
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Content-Type", "application/json");
   res.header("Access-Control-Allow-Origin", "*");
@@ -60,6 +59,7 @@ app.get("/Test", (req: Request, res: Response) => {
   res.json({ message: "Hello World!" });
 });
 
+// Deprecated - Only for testing purposes
 app.post(
   "/api/upload",
   upload.single("file"),
@@ -69,8 +69,6 @@ app.post(
     }
 
     try {
-      console.log(req.file.originalname);
-
       // Would need to generate a proper path here
       const path = `new/path/${req.file.originalname}`;
       await UploadToS3(req.file, path);
