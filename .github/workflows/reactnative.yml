@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: cd frontend && npm install
 
+      - name: Start Expo project
+        run: cd frontend && expo start --no-dev --minify --non-interactive
+
       # Optionally, you can add steps to build your React Native app
 #      - name: Build React Native app
 #      - run: cd frontend && npx react-native build-android
