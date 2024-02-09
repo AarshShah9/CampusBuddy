@@ -119,7 +119,7 @@ export default function EventDetails() {
 
         <View
           style={{
-            height: "10%",
+            height: 100,
             width: "100%",
             backgroundColor: "white",
             flexDirection: "row",
@@ -209,7 +209,7 @@ export default function EventDetails() {
           <Text
             style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
           >
-            {eventData.detail} + {eventData.detail}
+            {eventData.detail}
           </Text>
         </View>
         <View
@@ -230,7 +230,7 @@ export default function EventDetails() {
                 fontFamily: "Nunito-Bold",
               }}
             >
-              Login
+              Attend
             </Text>
           </StyledButton>
         </View>
@@ -246,7 +246,7 @@ const MainContainer = styled(View)<{ color: string }>`
 
 const HeaderContainer = styled(View)`
   width: 100%;
-  height: 13%;
+  height: 100px; /* TODO this should be consistent across the app */
   justify-content: space-between;
   flex-direction: row;
 `;
