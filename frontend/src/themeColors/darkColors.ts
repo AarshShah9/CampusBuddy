@@ -39,7 +39,9 @@ const darkColors = {
       },
       "surfaceDisabled": "rgba(226, 226, 230, 0.12)",
       "onSurfaceDisabled": "rgba(226, 226, 230, 0.38)",
-      "backdrop": "rgba(44, 49, 55, 0.4)"
+      "backdrop": "rgba(44, 49, 55, 0.4)",
+      "onliked": "rgb(255,0,0)",
+      "unLiked": "rgb(255,255,255)",
     }
 }
 

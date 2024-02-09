@@ -39,7 +39,9 @@ const lightColors = {
       },
       "surfaceDisabled": "rgba(26, 28, 30, 0.12)",
       "onSurfaceDisabled": "rgba(26, 28, 30, 0.38)",
-      "backdrop": "rgba(44, 49, 55, 0.4)"
+      "backdrop": "rgba(44, 49, 55, 0.4)",
+      "onliked": "rgb(255,255,255)",
+      "unLiked": "rgb(0,0,0)",
     }
 }
 
