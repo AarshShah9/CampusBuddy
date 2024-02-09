@@ -1,7 +1,6 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useCallback } from "react";
-import { Button, DimensionValue, StyleSheet, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
 type MapComponentProps = {
   latitude: number;
@@ -12,6 +11,10 @@ type MapComponentProps = {
   description?: string;
 };
 
+/*
+ * This is a simple map component that displays a map with a marker at the given latitude and longitude.
+ * This only fills a small portion of the screen to integrate with other components.
+ */
 const Map = ({
   latitude,
   latitudeDelta,

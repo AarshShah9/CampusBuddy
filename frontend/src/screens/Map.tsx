@@ -12,6 +12,8 @@ type MapProps = {
   description?: string;
 };
 
+// This is a simple map component that displays a map with a marker at the given latitude and longitude.
+// This fills the entire screen and has a back button to return to the previous screen.
 const Map = ({
   latitude,
   longitude,
