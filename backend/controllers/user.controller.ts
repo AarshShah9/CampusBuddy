@@ -94,7 +94,7 @@ export const createNewUser = async (
     next(error);
   }
 };
-
+//
 // verify OTP
 export const verifyAccount = async (
   req: Request,
