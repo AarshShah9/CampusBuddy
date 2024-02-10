@@ -9,10 +9,10 @@ export default function SplashScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<any>();
   const [fontsLoaded] = useFonts({
-    'Nunito-Bold': require('~/assets/fonts/Nunito-Bold.ttf'),
-    'Roboto-Reg': require('~/assets/fonts/Roboto-Reg.ttf'),
-    'Roboto-Medium': require('~/assets/fonts/Roboto-Medium.ttf'),
-    'Roboto-Bold': require('~/assets/fonts/Roboto-Bold.ttf')
+    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
+    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
+    "Roboto-Medium": require("~/assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
   });
   useEffect(() => {
     const loadData = async () => {
@@ -32,9 +32,7 @@ export default function SplashScreen() {
     if (!loading) {
       // On state change to loading, indicate ready to switch pages
       console.log("Finished Loading move to new page");
-      navigation.dispatch(
-        StackActions.replace('AuthenticationGroup')
-      );
+      navigation.dispatch(StackActions.replace("AuthenticationGroup"));
     }
   }, [loading]);
 
