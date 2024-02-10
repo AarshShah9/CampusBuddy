@@ -10,7 +10,7 @@ type PersonChipProps = {
   numberOfUsers: number;
 };
 
-// The component to be rendered for when a people requried 
+// The component to be rendered for when a people requried
 export default function PersonChip({ numberOfUsers }: PersonChipProps) {
   // setting the ternary properties for the background to change depending on spots remaining
   const backgroundColor =
@@ -21,15 +21,15 @@ export default function PersonChip({ numberOfUsers }: PersonChipProps) {
       style={{
         borderRadius: 29,
         height: 24,
-        maxWidth:98,
-        padding:0,
+        maxWidth: 98,
+        padding: 0,
         marginLeft: 16,
         backgroundColor: backgroundColor,
       }}
     >
       {/* Container for the icon and prop data for the Icon */}
       <ChipContentContainer>
-        <AntDesign name="user" size={12} color="black" lineThickness={5}/>
+        <AntDesign name="user" size={12} color="black" lineThickness={5} />
         <RemainingUsersText>{numberOfUsers} Spots Left</RemainingUsersText>
       </ChipContentContainer>
     </Chip>
