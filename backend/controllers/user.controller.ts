@@ -4,12 +4,15 @@ import {
   IdParamSchema,
   loginSchema,
   UserUpdateSchema,
+  tokenSchema,
+  payloadSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
+import { env, validateEnv } from "../utils/validateEnv";
 
 // create new User
 export const createNewUser = async (
@@ -59,14 +62,14 @@ export const createNewUser = async (
 
     const token = jwt.sign(
       {
-        institutionID: institution.id,
+        institutionId: institution.id,
         username: username,
         firstName: firstName,
         lastName: lastName,
         email: email,
         password: password,
       },
-      process.env.JWT_SECRET ?? "testSecret",
+      env.JWT_SECRET,
       {
         expiresIn: "1h",
         mutatePayload: false,
@@ -78,7 +81,7 @@ export const createNewUser = async (
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verifyAccount/${token}></a>"`,
+      <a href="http://localhost:3000/api/user/verifyAccount/${token}">Click here</a>`,
     };
 
     await transporter.sendMail(message);
@@ -99,7 +102,7 @@ export const verifyAccount = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.params.token;
+    const token = tokenSchema.parse(req.params).token;
 
     try {
       const payload: string | JwtPayload = jwt.verify(
@@ -110,16 +113,11 @@ export const verifyAccount = async (
       if (
         typeof payload === "object" &&
         payload !== null &&
-        "username" in payload &&
-        "firstName" in payload &&
-        "lastName" in payload &&
-        "email" in payload &&
-        "password" in payload &&
-        "institutionID" in payload
+        payloadSchema.parse(payload)
       ) {
         const institution = await prisma.institution.findUnique({
           where: {
-            id: payload.institutionID,
+            id: payload.institutionId,
           },
         });
 
@@ -131,7 +129,7 @@ export const verifyAccount = async (
               lastName: payload.lastName,
               email: payload.email,
               password: payload.password,
-              institutionId: payload.institutionID,
+              institutionId: payload.institutionId,
             },
           });
         }
@@ -177,14 +175,14 @@ export const loginUser = async (
       const token = jwt.sign(
         {
           ID: existingUser.id,
-          institutionID: existingUser.institutionId,
+          institutionId: existingUser.institutionId,
           username: existingUser.username,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
           email: existingUser.email,
           password: existingUser.password,
         },
-        process.env.JWT_SECRET ?? "testSecret",
+        env.JWT_SECRET,
       );
 
       res.status(200).cookie("token", token).json({

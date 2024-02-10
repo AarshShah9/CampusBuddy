@@ -45,8 +45,8 @@ enum AppPermissionName {
 // CORE MODELS
 model Institution {
   id     String @id @default(uuid())
-  name   String
-  domain String // fix double entry issue
+  name   String @unique
+  domain String @unique
 
   user User[]
 
@@ -70,7 +70,7 @@ model User {
   profilePic String? @unique @map("profile_pic")
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String
+  institutionId String @map("institution_id")
 
   enrollments Enrollment[]
 
@@ -94,6 +94,7 @@ model Enrollment {
   degreeType String  @map("degree_type")
   program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  yearOfStudy Int  @map("year_of_study")
 
   @@id([programId, userId])
   @@index([programId])

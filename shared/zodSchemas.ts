@@ -250,6 +250,7 @@ export const EnrollmentSchema = z.object({
   programId: z.string().uuid(),
   userId: z.string().uuid(),
   degreeType: z.string(),
+  yearOfStudy: z.number(),
 });
 
 export type Enrollment = z.infer<typeof EnrollmentSchema>;
@@ -416,4 +417,17 @@ export const emailSchema = z.object({
 
 export const deleteSchema = z.object({
   userId: z.string().uuid(),
+});
+
+export const tokenSchema = z.object({
+  token: z.string(),
+});
+
+export const payloadSchema = z.object({
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  password: z.string(),
+  institutionId: z.string(),
 });
