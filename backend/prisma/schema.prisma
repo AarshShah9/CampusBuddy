@@ -65,8 +65,8 @@ enum ParticipationStatus {
 // CORE MODELS
 model Institution {
   id            String         @id @default(uuid())
-  name          String
-  domain        String
+  name          String         @unique
+  domain        String         @unique
   user          User[]
   organizations Organization[]
   createdAt     DateTime       @default(now()) @map("created_at")
@@ -82,12 +82,9 @@ model User {
   lastName             String                 @map("last_name")
   email                String                 @unique
   password             String                 @map("password")
-  otp                  String?                @default("")
-  jwt                  String?                @default("")
-  isVerified           Boolean                @default(false) @map("is_verified")
   profilePic           String?                @unique @map("profile_pic")
-  institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   institutionId        String?                @map("institution_id")
+  institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   enrollments          Enrollment[]
   posts                Post[]
   comments             Comment[]
@@ -95,7 +92,6 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
-  status               Boolean // what is this for?
   accountType          UserType
 
   @@index([email])

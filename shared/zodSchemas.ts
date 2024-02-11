@@ -117,13 +117,9 @@ export const UserSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be greater than 8 characters long" }),
-  institutionId: z.string().uuid(),
-  isVerified: BooleanSchema,
   profilePic: z.string().nullable(),
-  otp: z.string(),
-  jwt: z.string(),
-  status: BooleanSchema,
   accountType: UserType,
+  institutionName: z.string(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -433,11 +429,7 @@ export const InstitutionSchema = z.object({
     .min(3, { message: "Institution domain must at least 3 characters " }),
 });
 
-export const createInstitutionSchema = InstitutionSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const createInstitutionSchema = InstitutionSchema.partial();
 
 export type createInstitutionType = z.infer<typeof createInstitutionSchema>;
 
@@ -485,4 +477,18 @@ export const emailSchema = z.object({
 
 export const deleteSchema = z.object({
   userId: z.string().uuid(),
+});
+
+export const tokenSchema = z.object({
+  token: z.string(),
+});
+
+export const payloadSchema = z.object({
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  password: z.string(),
+  institutionId: z.string(),
+  organizationId: z.string().optional(), // additional field in payload for org users
 });

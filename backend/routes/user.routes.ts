@@ -6,10 +6,9 @@ import {
   loginUser,
   logoutUser,
   removeUserById,
-  resendOTP,
   resetPassword,
   updateUser,
-  verifyOTP,
+  verifyAccount,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 
@@ -17,8 +16,7 @@ const router = express.Router();
 
 router.post("/student", createNewStudentUser); // router.post("/student", createNewStudentUser);
 router.post("/organization/:id", createNewOrgUser);
-router.post("/resendOTP", resendOTP);
-router.post("/verifyOTP", verifyOTP);
+router.get("/verifyAccount/:token", verifyAccount);
 router.post("/loginUser", loginUser);
 router.post("/logoutUser", verifyAuthentication, logoutUser);
 router.post("/resetPassword", resetPassword);

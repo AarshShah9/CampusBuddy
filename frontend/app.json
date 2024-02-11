@@ -1,34 +1,39 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "CampusBuddy",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-   
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "config": {
-        "usesNonExemptEncryption": false
-      }
+        "usesNonExemptEncryption": false,
+        "googleMapsApiKey": "AIzaSyDNqXs5VfojrTbjYKVOilqaYlkfMW1BnJE"
+      },
+      "bundleIdentifier": "com.example.campusbuddy"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.example.campusbuddy",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyATVa14cULE6unb0p7DUj9MW4v6tzRWzdE"
+        }
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/favicon.png"
     }
   }
 }
