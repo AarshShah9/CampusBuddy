@@ -45,8 +45,8 @@ enum AppPermissionName {
 // CORE MODELS
 model Institution {
   id     String @id @default(uuid())
-  name   String
-  domain String
+  name   String @unique
+  domain String @unique
 
   user User[]
 
@@ -66,16 +66,11 @@ model User {
 
   email       String @unique
   password    String @map("password")
-  yearOfStudy Int    @map("year_of_study")
-
-  otp        String? @default("")
-  jwt        String? @default("")
-  isVerified Boolean @default(false) @map("is_verified")
 
   profilePic String? @unique @map("profile_pic")
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String      @map("institution_id")
+  institutionId String @map("institution_id")
 
   enrollments Enrollment[]
 
@@ -88,8 +83,6 @@ model User {
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
 
-  status Boolean
-
   @@index([email])
   @@index([institutionId])
   @@map("user")
@@ -101,6 +94,7 @@ model Enrollment {
   degreeType String  @map("degree_type")
   program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  yearOfStudy Int  @map("year_of_study")
 
   @@id([programId, userId])
   @@index([programId])
