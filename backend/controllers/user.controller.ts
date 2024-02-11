@@ -107,7 +107,7 @@ export const verifyAccount = async (
     try {
       const payload: string | JwtPayload = jwt.verify(
         token,
-        process.env.JWT_SECRET ?? "testSecret",
+        env.JWT_SECRET ?? "testSecret",
       );
 
       if (
