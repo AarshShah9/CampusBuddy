@@ -126,3 +126,7 @@ npm run start
 - Then scan the QR code with your phone camera
 - The app should open up on your phone
 
+### Google Maps API
+- Refer to these docs:
+  - https://docs.expo.dev/versions/latest/sdk/map-view/
+

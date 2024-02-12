@@ -1,9 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import * as ImagePicker from "expo-image-picker";
-import { ImagePickerAsset } from "expo-image-picker";
 import React, { useState } from "react";
-import { Button, Platform, StyleSheet, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import { Card } from "react-native-paper";
 import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
@@ -11,6 +8,10 @@ import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
+import Map from "~/screens/Map";
+import MapComponentSmall from "~/components/MapComponentSmall";
+import useThemeContext from "~/hooks/useThemeContext";
+import EventSearchCard from "~/components/EventSearchCard";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -53,14 +54,18 @@ export default function Home() {
     );
   };
 
+  const { theme } = useThemeContext();
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ThemedText>Open up App.tsx to start working on your app!</ThemedText>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       <Button title={"Test"} onPress={testCallback} />
+      <MapComponentSmall latitude={37.78825} longitude={-122.4324} />
       <View style={styles.mockEventsContainer}>
         <Card
-          style={styles.mockEventContainer}
+          style={[
+            styles.mockEventContainer,
+            { backgroundColor: theme.colors.primary },
+          ]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 1 });
@@ -71,7 +76,10 @@ export default function Home() {
           </Card.Content>
         </Card>
         <Card
-          style={styles.mockEventContainer}
+          style={[
+            styles.mockEventContainer,
+            { backgroundColor: theme.colors.primary },
+          ]}
           mode="elevated"
           onPress={() => {
             navigate("EventDetails", { eventNumber: 2 });

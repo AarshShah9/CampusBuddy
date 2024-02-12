@@ -2,12 +2,10 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "typeRoots": [
-      "./src/types"
-    ],
+    "typeRoots": ["./src/types"],
     "paths": {
       "~/*": ["./src/*"]
     },
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   }
 }

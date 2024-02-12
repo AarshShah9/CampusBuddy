@@ -310,24 +310,28 @@ export const enrollments = [
     programId: "1",
     userId: "1",
     degreeType: "Bachelor",
+    yearOfStudy: 4,
     // Other enrollment details
   },
   {
     programId: "2",
     userId: "2",
     degreeType: "Bachelor",
+    yearOfStudy: 2,
     // Other enrollment details
   },
   {
     programId: "3",
     userId: "3",
     degreeType: "Bachelor",
+    yearOfStudy: 1,
     // Other enrollment details
   },
   {
     programId: "4",
     userId: "4",
     degreeType: "Bachelor",
+    yearOfStudy: 3,
   },
 ];
 
