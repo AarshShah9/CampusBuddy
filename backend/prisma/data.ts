@@ -21,12 +21,7 @@ export const users = [
     lastName: "Doe",
     email: "john@example.com",
     password: "hashed-password123",
-    yearOfStudy: 1,
-    isVerified: true,
     institutionId: "1",
-    otp: "234123",
-    jwt: "",
-    status: true,
   },
   {
     id: "2",
@@ -35,12 +30,7 @@ export const users = [
     lastName: "Smith",
     email: "jane@example.com",
     password: "hashed-password4569",
-    yearOfStudy: 2,
-    isVerified: true,
     institutionId: "1",
-    otp: "234123",
-    jwt: "",
-    status: true,
   },
   {
     id: "3",
@@ -49,12 +39,7 @@ export const users = [
     lastName: "Dee",
     email: "tom@example.com",
     password: "hashed-password1238",
-    yearOfStudy: 3,
-    isVerified: true,
     institutionId: "1",
-    otp: "234123",
-    jwt: "",
-    status: true,
   },
   {
     id: "4",
@@ -63,12 +48,15 @@ export const users = [
     lastName: "Smalls",
     email: "tiffany@example.com",
     password: "hashed-password4560",
-    yearOfStudy: 4,
-    isVerified: true,
     institutionId: "1",
-    otp: "234123",
-    jwt: "",
-    status: true,
+  },
+  {
+    username: "daniel_purba",
+    firstName: "Daniel",
+    lastName: "Purba",
+    email: "daniel@example.com",
+    password: "hashed-password4560",
+    institutionId: "1",
   },
 ];
 
@@ -123,68 +111,55 @@ export const events = [
     isPublic: true,
     status: EventStatus.Verified,
   },
+  {
+    userId: "36f6aae7-e610-4397-8217-6586a3ff3728",
+    title: "Event 5, Verified",
+    organizationId: "1",
+    description: "Fourth event description.",
+    location: "Event Location 5",
+    createdAt: "2023-10-11T12:00:00Z",
+    startTime: "2023-12-18T12:30:00Z",
+    endTime: "2023-12-18T13:00:00Z",
+    isPublic: true,
+    status: EventStatus.Verified,
+  },
 ];
 
 export const userEventResponses = [
   {
-    userId: "1",
-    eventId: "1",
-    participationStatus: "Not Coming",
-  },
-  {
-    userId: "1",
-    eventId: "2",
-    participationStatus: "Not Coming",
-  },
-  {
-    userId: "1",
-    eventId: "3",
-    participationStatus: "Not Coming",
-  },
-  {
-    userId: "2",
-    eventId: "1",
-    participationStatus: "Not Coming",
-  },
-  {
     userId: "2",
     eventId: "2",
-    participationStatus: "Coming",
-  },
-  {
-    userId: "2",
-    eventId: "3",
-    participationStatus: "Not Coming",
+    participationStatus: "Interested",
   },
   {
     userId: "3",
     eventId: "1",
-    participationStatus: "Coming",
-  },
-  {
-    userId: "3",
-    eventId: "2",
-    participationStatus: "Not Coming",
-  },
-  {
-    userId: "3",
-    eventId: "3",
-    participationStatus: "Not Coming",
+    participationStatus: "Interested",
   },
   {
     userId: "4",
+    eventId: "2",
+    participationStatus: "Interested",
+  },
+  {
+    userId: "4",
+    eventId: "3",
+    participationStatus: "Interested",
+  },
+  {
+    userId: "36f6aae7-e610-4397-8217-6586a3ff3728",
+    eventId: "3",
+    participationStatus: "Interested",
+  },
+  {
+    userId: "36f6aae7-e610-4397-8217-6586a3ff3728",
     eventId: "1",
-    participationStatus: "Not Coming",
+    participationStatus: "Interested",
   },
   {
-    userId: "4",
-    eventId: "2",
-    participationStatus: "Coming",
-  },
-  {
-    userId: "4",
-    eventId: "3",
-    participationStatus: "Coming",
+    userId: "36f6aae7-e610-4397-8217-6586a3ff3728",
+    eventId: "4",
+    participationStatus: "Interested",
   },
 ];
 

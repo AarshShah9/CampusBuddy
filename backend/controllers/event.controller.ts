@@ -341,10 +341,9 @@ export const getEventByUserId = async (
     // Get event from db
     const eventsCreatedByUser = await prisma.event.findMany({
       where: {
-        id: userId,
+        userId: userId,
       },
     });
-
     const eventsInterested = await prisma.event.findMany({
       where: {
         eventResponses: {
@@ -355,50 +354,28 @@ export const getEventByUserId = async (
         },
       },
     });
+    let userEventsData = {
+      eventsCreatedByUser: eventsCreatedByUser,
+      eventsInterested: eventsInterested,
+    };
 
-    const eventsGoing = await prisma.event.findMany({
-      where: {
-        eventResponses: {
-          some: {
-            userId,
-            participationStatus: "Going",
-          },
-        },
-      },
-    });
-    if (!eventsInterested) {
-      // Throw error if event not found
-      const notFoundError = new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        `Event created by id ${userId} not found`,
-        404,
-        true,
-      );
-      throw notFoundError;
+    if (eventsCreatedByUser.length === 0 && eventsInterested.length > 0) {
+      // No events created by the user, but interested in some events
+      userEventsData.eventsInterested = eventsInterested;
+    } else if (
+      eventsCreatedByUser.length > 0 &&
+      eventsInterested.length === 0
+    ) {
+      // Events created by the user, but not interested in any events
+      userEventsData.eventsCreatedByUser = eventsCreatedByUser;
+    } else {
+      // Both scenarios: events created by the user and interested in some events
+      userEventsData = {
+        eventsCreatedByUser: eventsCreatedByUser,
+        eventsInterested: eventsInterested,
+      };
     }
-    if (!eventsCreatedByUser) {
-      // Throw error if event not found
-      const notFoundError = new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        `Event created by id ${userId} not found`,
-        404,
-        true,
-      );
-      throw notFoundError;
-    }
-    if (!eventsGoing) {
-      // Throw error if event not found
-      const notFoundError = new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        `Event created by id ${userId} not found`,
-        404,
-        true,
-      );
-      throw notFoundError;
-    }
-    res.status(200).json(eventsCreatedByUser);
-    res.status(200).json(eventsInterested);
-    res.status(200).json(eventsGoing);
+    res.status(200).json(userEventsData);
   } catch (error) {
     next(error);
   }

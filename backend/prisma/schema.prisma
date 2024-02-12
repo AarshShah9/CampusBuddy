@@ -30,7 +30,6 @@ enum OrganizationStatus {
 }
 
 enum ParticipationStatus {
-  Going
   Interested
 }
 
@@ -69,13 +68,13 @@ model User {
   firstName String @map("first_name")
   lastName  String @map("last_name")
 
-  email       String @unique
-  password    String @map("password")
+  email    String @unique
+  password String @map("password")
 
   profilePic String? @unique @map("profile_pic")
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  institutionId String @map("institution_id")
+  institutionId String      @map("institution_id")
 
   enrollments Enrollment[]
 
@@ -94,12 +93,12 @@ model User {
 }
 
 model Enrollment {
-  programId  String  @map("program_id")
-  userId     String  @map("user_id")
-  degreeType String  @map("degree_type")
-  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  yearOfStudy Int  @map("year_of_study")
+  programId   String  @map("program_id")
+  userId      String  @map("user_id")
+  degreeType  String  @map("degree_type")
+  program     Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  yearOfStudy Int     @map("year_of_study")
 
   @@id([programId, userId])
   @@index([programId])
