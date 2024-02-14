@@ -32,11 +32,7 @@ import UploadToS3, {
   deleteFromS3,
   generateUniqueFileName,
 } from "../utils/S3Uploader";
-
-// NOTE: Placeholder, remove later
-// const userId = "304e2caf-02f6-4dc8-b376-d37639c65589";
-const userId = "db365290-c550-11ee-83fd-6f8d6c450910";
-// User1: "db365290-c550-11ee-83fd-6f8d6c450910", owner of org1: ""6d3ff6d0-c553-11ee-83fd-6f8d6c450910""
+import { RequestExtended } from "../middleware/verifyAuth";
 
 // test Organization
 export const organizationTest = async (req: Request, res: Response) => {
@@ -45,7 +41,8 @@ export const organizationTest = async (req: Request, res: Response) => {
 
 // Create a new Organization
 export const createNewOrganization = async (
-  req: Request,
+  // req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -53,6 +50,7 @@ export const createNewOrganization = async (
     // Validate the organization data
     const validatedOrganization = OrganizationCreateSchema.parse(req.body);
 
+    const loggedInUserId = req.userID;
     // If we want to make image upload mandatory upon organization creation
     // if (!req.file) {
     //   throw new AppError(
@@ -82,7 +80,7 @@ export const createNewOrganization = async (
     // Create the new organization
     const newOrganization = await createOrganizationWithDefaults(
       validatedOrganization,
-      userId,
+      loggedInUserId!,
       req.file,
     );
 
@@ -181,7 +179,7 @@ export const getAllOrganizationsByInstitution = async (
 
 // update organization
 export const updateOrganization = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -189,8 +187,7 @@ export const updateOrganization = async (
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
-    //TODO: Get user id from somewhere...
-    // const userId = req.userId;
+    const loggedInUserId = req.userID;
 
     // Validate organization data
     const validatedUpdateOrganizationData = OrganizationUpdateSchema.parse(
@@ -214,7 +211,7 @@ export const updateOrganization = async (
 
     // Check if the user has permission to update the organization details
     const hasPermission = await checkUserPermission(
-      userId,
+      loggedInUserId!,
       existingOrganization.id,
       AppPermissionName.MANAGE_ORGANIZATION,
     );
@@ -269,16 +266,17 @@ export const updateOrganization = async (
   }
 };
 
-// Delete organizationw -> make sure permission/roles tables are cleared appropriately
+// Delete organization
 export const deleteOrganization = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
-    // const userId = req.user.id; //TODO: Get user id from somewhere...
+
+    const loggedInUserId = req.userID;
 
     // get the organization from the database
     const existingOrganization = await prisma.organization.findUnique({
@@ -298,7 +296,7 @@ export const deleteOrganization = async (
 
     // check if the user has permission to delete the organization
     const hasPermission = await checkUserPermission(
-      userId,
+      loggedInUserId!,
       existingOrganization.id,
       AppPermissionName.DELETE_ORGANIZATION,
     );
@@ -369,10 +367,8 @@ export const getAllPendingOrganizations = async (
 };
 
 // Get all users who have requested to join the organization
-// createNewOrgUser should get orgid from req.params
-// maybe create a new role for pending mod (probably without any permissions)
 export const getAllPendingOrgUsers = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -380,12 +376,11 @@ export const getAllPendingOrgUsers = async (
     // Validate request organization id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
-    //TODO: Get user id from somewhere...
-    // const userId = req.userId;
+    const loggedInUserId = req.userID;
 
     // Check if the user has permission to view this data
     const hasPermission = await checkUserPermission(
-      userId,
+      loggedInUserId!,
       organizationId,
       AppPermissionName.MANAGE_MEMBERS,
     );
@@ -428,7 +423,7 @@ export const getAllPendingOrgUsers = async (
 
 // Reject or approve a user's request to join an organization
 export const manageMembershipRequest = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -440,12 +435,11 @@ export const manageMembershipRequest = async (
     const validatedMembershipApprovalData =
       OrganizationMembershipApprovalSchema.parse(req.body);
 
-    //TODO: Get user id from somewhere...
-    // const userId = req.userId;
+    const loggedInUserId = req.userID;
 
     // Check if the user has permission to approve or reject membership requests
     const hasPermission = await checkUserPermission(
-      userId,
+      loggedInUserId!,
       organizationId,
       AppPermissionName.MANAGE_MEMBERS,
     );
@@ -496,7 +490,7 @@ export const manageMembershipRequest = async (
     });
 
     // Approve the request
-    if (validatedMembershipApprovalData.status === UserOrgStatus.Approved) {
+    if (validatedMembershipApprovalData.decision === UserOrgStatus.Approved) {
       // approve the user
       await approveUserRequest(requestingUser, organizationId, role.id);
 
@@ -509,13 +503,14 @@ export const manageMembershipRequest = async (
 
       // Reject the request
     } else if (
-      validatedMembershipApprovalData.status === UserOrgStatus.Rejected
+      validatedMembershipApprovalData.decision === UserOrgStatus.Rejected
     ) {
       // Send email to notify the user
       await emailMembershipRequestRejected(
         requestingUser,
         organization.organizationName,
         role.roleName,
+        validatedMembershipApprovalData.rejectionReason,
       );
 
       // reject the users membership request
@@ -527,7 +522,7 @@ export const manageMembershipRequest = async (
         organization.organizationName
       } as a ${
         role.roleName
-      } has been ${validatedMembershipApprovalData.status.toLowerCase()}`,
+      } has been ${validatedMembershipApprovalData.decision.toLowerCase()}`,
     });
   } catch (error) {
     next(error);
@@ -546,7 +541,7 @@ export const manageNewOrganizationRequest = async (
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
     // Validate org approval decision
-    const { status, rejectionReason } = OrganizationApprovalSchema.parse(
+    const { decision, rejectionReason } = OrganizationApprovalSchema.parse(
       req.body,
     );
 
@@ -595,7 +590,7 @@ export const manageNewOrganizationRequest = async (
     }
 
     // Handle the request
-    if (status === OrganizationStatus.Approved) {
+    if (decision === OrganizationStatus.Approved) {
       // Approve the request
       await approveOrganizationRequest(
         pendingOrg.id,
@@ -608,7 +603,7 @@ export const manageNewOrganizationRequest = async (
         userOrgRole.user,
         userOrgRole.organization.organizationName,
       );
-    } else if (status === OrganizationStatus.Rejected) {
+    } else if (decision === OrganizationStatus.Rejected) {
       // Reject the request
       await rejectOrganizationRequest(pendingOrg.id, userOrgRole.user);
 
@@ -621,7 +616,7 @@ export const manageNewOrganizationRequest = async (
     }
 
     res.status(200).json({
-      message: `Organization creation request successfully ${status.toLowerCase()}`,
+      message: `Organization creation request successfully ${decision.toLowerCase()}`,
     });
   } catch (error) {
     next(error);

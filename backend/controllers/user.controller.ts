@@ -17,9 +17,7 @@ import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import { createOrganizationWithDefaults } from "../services/org.service";
-
-const userId = "216d17bb-573c-4a0e-b29b-a1a78012ae50"; // Placeholder for testing
-// const userId = "db365290-c550-11ee-83fd-6f8d6c450910"; // Placeholder for testing
+import { RequestExtended } from "../middleware/verifyAuth";
 
 // create new User
 export const signupAsStudent = async (
@@ -127,12 +125,6 @@ export const verifyStudentSignup = async (
       env.JWT_SECRET ?? "testSecret",
     );
 
-    if (typeof payload !== "object" || payload === null) {
-      console.error("Invalid JWT");
-      // TODO: improve jwt error handling
-      throw new AppError(AppErrorName.JWT_ERROR, `Invalid JWT`, 400, true);
-    }
-
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);
 
@@ -201,8 +193,8 @@ export const loginUser = async (
 
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: email,
-        password: password,
+        email,
+        password,
       },
     });
 
@@ -212,7 +204,7 @@ export const loginUser = async (
         message: "User doesn't exist",
       });
     } else {
-      const token = jwt.sign(
+      const authToken = jwt.sign(
         {
           ID: existingUser.id,
           institutionId: existingUser.institutionId,
@@ -225,7 +217,7 @@ export const loginUser = async (
         env.JWT_SECRET,
       );
 
-      res.status(200).cookie("token", token).json({
+      res.status(200).cookie("authToken", authToken).json({
         success: true,
         message: "Login successful",
       });
@@ -237,7 +229,7 @@ export const loginUser = async (
 
 // logout Student
 export const logoutUser = async (req: Request, res: Response) => {
-  res.status(200).cookie("token", null).json({
+  res.status(200).cookie("authToken", null).json({
     success: true,
     message: "User logged out",
   });
@@ -273,6 +265,7 @@ export const removeUserById = async (
   next: NextFunction,
 ) => {
   try {
+    //TODO: check permission -> who can delete a user? Admin + the user themself?
     const userId = IdParamSchema.parse(req.params).id;
 
     await prisma.user.delete({
@@ -337,38 +330,27 @@ export const getUserById = async (
   }
 };
 
-//update User Information
+// Update User Information
+// Only the logged in user can update their own information
 export const updateUser = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const userId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userID;
 
     //Validated user data
     const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
 
-    //validation checks
-    // get the user from the database
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-    if (!existingUser) {
-      return res.status(404);
-    }
-
     // Update the user
-    let updatedUser: User;
-
-    updatedUser = await prisma.user.update({
-      where: { id: userId },
+    const updatedUser = await prisma.user.update({
+      where: { id: loggedInUserId! },
       data: {
         ...validatedUpdateUserData,
       },
     });
+
     // send back the updated user
     if (updatedUser) {
       // User updated successfully
@@ -384,7 +366,7 @@ export const updateUser = async (
   }
 };
 
-// New org user joining an existing organization
+// Signup a new org user with an existing organization
 export const signupWithExistingOrg = async (
   req: Request,
   res: Response,
@@ -480,8 +462,8 @@ export const signupWithExistingOrg = async (
   }
 };
 
+// Signup a new org user with a new organization
 // Creates both a new user and a new organization
-// Used when someone wants to sign up as the owner of a new organization
 export const signupAsNewOrg = async (
   req: Request,
   res: Response,
@@ -551,9 +533,9 @@ export const signupAsNewOrg = async (
       },
     };
 
-    // Create the jwt for verifying email, contains user data as payload
+    // Create the jwt for verifying email, contains both user and organization data in payload
     const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
-      expiresIn: "1h", // this should probably be longer, admin approval could take a while
+      expiresIn: "1h",
       mutatePayload: false,
     });
 
@@ -591,12 +573,6 @@ export const verifyExistingOrgSignup = async (
       token,
       env.JWT_SECRET ?? "testSecret",
     );
-
-    if (typeof payload !== "object" || payload === null) {
-      console.error("Invalid JWT");
-      // TODO: improve jwt error handling
-      throw new AppError(AppErrorName.JWT_ERROR, `Invalid JWT`, 400, true);
-    }
 
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);
