@@ -22,7 +22,6 @@ enum UserRole {
   Admin
   Moderator
   Member
-  PendingMod
 }
 
 enum UserType {

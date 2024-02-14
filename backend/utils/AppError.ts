@@ -45,7 +45,6 @@ enum AppErrorName {
   EMPTY_RESULT_ERROR = "EmptyResultError",
   DATABASE_ERROR = "DatabaseError",
   PRISMA_ERROR = "PrismaError",
-  JWT_ERROR = "JWTError",
 }
 
 export { AppError, AppErrorName };
