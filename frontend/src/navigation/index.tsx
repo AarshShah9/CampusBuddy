@@ -5,6 +5,7 @@ import SplashScreen from "~/screens/SplashScreen";
 import AuthenticationGroup from "./AuthenticationGroup";
 import LandingGroup from "./LandingGroup";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import CreateEvent from "~/screens/CreateEvent";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,7 +16,8 @@ export default function Navigation() {
     <NavigationContainer theme={theme}>
       <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        <Stack.Screen name="SplashScreen" component={SplashScreen} /> 
+        <Stack.Screen name="CreateEvent" component={CreateEvent}/>
         <Stack.Screen
           name="AuthenticationGroup"
           component={AuthenticationGroup}

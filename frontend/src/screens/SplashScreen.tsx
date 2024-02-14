@@ -32,7 +32,9 @@ export default function SplashScreen() {
     if (!loading) {
       // On state change to loading, indicate ready to switch pages
       console.log("Finished Loading move to new page");
-      navigation.dispatch(StackActions.replace("AuthenticationGroup"));
+      //navigation.dispatch(StackActions.replace("AuthenticationGroup"));
+      //Delete below after
+      navigation.dispatch(StackActions.replace("CreateEvent"))
     }
   }, [loading]);
 
