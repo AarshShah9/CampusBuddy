@@ -10,6 +10,7 @@ import {
   getOrganizationById,
   organizationTest,
   updateOrganization,
+  manageNewOrganizationRequest,
 } from "../controllers/org.controller";
 import { upload } from "../utils/S3Uploader";
 
@@ -20,6 +21,7 @@ router.get("/", getAllOrganizations);
 router.get("/institution/:id", getAllOrganizationsByInstitution);
 router.get("/:id/pendingUsers", getAllPendingOrgUsers);
 router.get("/pending/", getAllPendingOrganizations); // for admin interface
+router.post("/:id/orgApproval", manageNewOrganizationRequest); // for admin interface
 
 router.post("/:id/membership/approval", manageMembershipRequest); // for moderators
 

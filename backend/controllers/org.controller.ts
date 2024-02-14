@@ -1,19 +1,31 @@
 import {
   IdParamSchema,
+  OrganizationApprovalSchema,
   OrganizationCreateSchema,
   OrganizationMembershipApprovalSchema,
   OrganizationUpdateSchema,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
-import { createOrganizationWithDefaults } from "../services/org.service";
+import {
+  approveUserRequest,
+  rejectUserRequest,
+  createOrganizationWithDefaults,
+  approveOrganizationRequest,
+  rejectOrganizationRequest,
+} from "../services/org.service";
+import {
+  emailMembershipRequestApproved,
+  emailMembershipRequestRejected,
+  emailOrganizationRequestApproved,
+  emailOrganizationRequestRejected,
+} from "../utils/emails";
 import { AppError, AppErrorName } from "../utils/AppError";
 import prisma from "../prisma/client";
 import {
   AppPermissionName,
   OrganizationStatus,
-  User,
   UserOrgStatus,
-  UserType,
+  UserRole,
 } from "@prisma/client";
 import { checkUserPermission } from "../utils/checkUserPermission";
 import UploadToS3, {
@@ -22,6 +34,7 @@ import UploadToS3, {
 } from "../utils/S3Uploader";
 
 // NOTE: Placeholder, remove later
+// const userId = "304e2caf-02f6-4dc8-b376-d37639c65589";
 const userId = "db365290-c550-11ee-83fd-6f8d6c450910";
 // User1: "db365290-c550-11ee-83fd-6f8d6c450910", owner of org1: ""6d3ff6d0-c553-11ee-83fd-6f8d6c450910""
 
@@ -41,10 +54,26 @@ export const createNewOrganization = async (
     const validatedOrganization = OrganizationCreateSchema.parse(req.body);
 
     // If we want to make image upload mandatory upon organization creation
-    if (!req.file) {
+    // if (!req.file) {
+    //   throw new AppError(
+    //     AppErrorName.FILE_UPLOAD_ERROR,
+    //     "No file uploaded.",
+    //     400,
+    //     true,
+    //   );
+    // }
+
+    // Verify that the institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        id: validatedOrganization.institutionId,
+      },
+    });
+
+    if (!institution) {
       throw new AppError(
-        AppErrorName.FILE_UPLOAD_ERROR,
-        "No file uploaded.",
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
         400,
         true,
       );
@@ -54,7 +83,7 @@ export const createNewOrganization = async (
     const newOrganization = await createOrganizationWithDefaults(
       validatedOrganization,
       userId,
-      req.file!,
+      req.file,
     );
 
     if (newOrganization) {
@@ -112,7 +141,7 @@ export const getOrganizationById = async (
   }
 };
 
-// Get all Organizations
+// Get all Approved Organizations
 export const getAllOrganizations = async (
   req: Request,
   res: Response,
@@ -127,7 +156,7 @@ export const getAllOrganizations = async (
   }
 };
 
-// Get all Organizations by institution
+// Get all Approved Organizations by institution
 export const getAllOrganizationsByInstitution = async (
   req: Request,
   res: Response,
@@ -140,6 +169,7 @@ export const getAllOrganizationsByInstitution = async (
     const allOrgsByInstitution = await prisma.organization.findMany({
       where: {
         institutionId,
+        status: OrganizationStatus.Approved, // only get the approved organizations
       },
     });
 
@@ -303,10 +333,31 @@ export const getAllPendingOrganizations = async (
   try {
     // TODO: check the users system-level permissions (admin, not yet implemented)
 
+    // Fetch the roleId for the owner role
+    const { id: roleId } = await prisma.role.findUniqueOrThrow({
+      where: {
+        roleName: UserRole.Owner,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     const allOrgs = await prisma.organization.findMany({
       where: {
         status: OrganizationStatus.Pending,
       },
+      // if we want to include owner information in the results:
+      // include: {
+      //   userOrganizationRoles: {
+      //     where: {
+      //       roleId,
+      //     },
+      //     include: {
+      //       user: true,
+      //     },
+      //   },
+      // },
       orderBy: {
         createdAt: "asc", // show oldest org requests first
       },
@@ -360,6 +411,12 @@ export const getAllPendingOrgUsers = async (
             roleName: true,
           },
         },
+        user: {
+          select: {
+            username: true,
+            accountType: true,
+          },
+        },
       },
     });
 
@@ -403,13 +460,13 @@ export const manageMembershipRequest = async (
     }
 
     // Check if the user exists (the pending user)
-    const requestingUser = await prisma.user.findFirst({
+    const requestingUser = await prisma.user.findUnique({
       where: {
         id: validatedMembershipApprovalData.userId,
       },
     });
 
-    if (requestingUser) {
+    if (!requestingUser) {
       // Throw error if the user is not found
       const notFoundError = new AppError(
         AppErrorName.NOT_FOUND_ERROR,
@@ -421,103 +478,152 @@ export const manageMembershipRequest = async (
       throw notFoundError;
     }
 
-    // Handle user request
+    // Fetch role name
+    const role = await prisma.role.findUniqueOrThrow({
+      where: {
+        id: validatedMembershipApprovalData.roleId,
+      },
+    });
+
+    // Fetch organization name (used for sending an email)
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: {
+        id: organizationId,
+      },
+      select: {
+        organizationName: true,
+      },
+    });
+
+    // Approve the request
     if (validatedMembershipApprovalData.status === UserOrgStatus.Approved) {
       // approve the user
-      await approveUserRequest(requestingUser!, organizationId);
-      // TODO: email user that their account has been approved
-      res.status(200).json({
-        message: `Membership of user: ${
-          requestingUser!.username
-        } successfully approved`,
-      });
+      await approveUserRequest(requestingUser, organizationId, role.id);
+
+      // Send email to notify the user
+      await emailMembershipRequestApproved(
+        requestingUser,
+        organization.organizationName,
+        role.roleName,
+      );
+
+      // Reject the request
     } else if (
       validatedMembershipApprovalData.status === UserOrgStatus.Rejected
     ) {
+      // Send email to notify the user
+      await emailMembershipRequestRejected(
+        requestingUser,
+        organization.organizationName,
+        role.roleName,
+      );
+
       // reject the users membership request
-      await rejectUserRequest(requestingUser!, organizationId);
-      // TODO: email user that their account has been approvedres
-      res.status(200).json({
-        message: `Membership of user: ${
-          requestingUser!.username
-        } successfully rejected`,
-      });
+      await rejectUserRequest(requestingUser, organizationId, role.id);
     }
+
+    res.status(200).json({
+      message: `Role request of user: ${requestingUser!.username} for ${
+        organization.organizationName
+      } as a ${
+        role.roleName
+      } has been ${validatedMembershipApprovalData.status.toLowerCase()}`,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-//Helper functions
+// Reject or approve a new organization
+export const manageNewOrganizationRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // TODO: check the users system-level permissions (admin, not yet implemented)
 
-async function approveUserRequest(user: User, organizationId: string) {
-  await prisma.$transaction(async (tx) => {
-    // change user account status to "ApprovedOrg"
-    if (user.accountType === UserType.PendingOrg) {
-      const updatedUser = await tx.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          accountType: UserType.ApprovedOrg,
-        },
-      });
-    }
+    // Validate request id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+    // Validate org approval decision
+    const { status, rejectionReason } = OrganizationApprovalSchema.parse(
+      req.body,
+    );
 
-    // Change user role status in the organization to approved
-    await tx.userOrganizationRole.update({
+    // Check if the organization exists
+    const pendingOrg = await prisma.organization.findUnique({
       where: {
-        userId_organizationId: {
-          userId: user.id,
-          organizationId,
-        },
-      },
-      data: {
-        status: UserOrgStatus.Approved,
+        id: organizationId,
       },
     });
-  });
-}
 
-// Reject a user's request to join an organization (eg )
-async function rejectUserRequest(user: User, organizationId: string) {
-  await prisma.$transaction(async (tx) => {
-    // change user account status to "Rejected"
-    if (user.accountType === UserType.PendingOrg) {
-      const updatedUser = await tx.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          accountType: UserType.ApprovedOrg,
-        },
-      });
+    if (!pendingOrg) {
+      // Throw error if the organization is not found
+      const notFoundError = new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Organization not found id: ${organizationId}`,
+        404,
+        true,
+      );
+
+      throw notFoundError;
     }
 
-    // Change user role status in the organization to rejected
-    // await tx.userOrganizationRole.update({
-    //   where: {
-    //     userId_organizationId: {
-    //       userId: user.id,
-    //       organizationId,
-    //     },
-    //   },
-    //   data: {
-    //     status: UserOrgStatus.Rejected,
-    //   },
-    // });
-
-    // Delete the user's role in the organization
-    await tx.userOrganizationRole.delete({
+    // Fetch the organizations owner
+    const userOrgRole = await prisma.userOrganizationRole.findFirst({
       where: {
-        userId_organizationId: {
-          userId: user.id,
-          organizationId,
+        organizationId,
+        role: {
+          roleName: UserRole.Owner,
         },
       },
+      include: {
+        user: true,
+        organization: true,
+        // role: true,
+      },
     });
-  });
 
-  // TODO: set user type to rejected org or just delete the user?
-  // should we send an email to the user letting them know their request was rejected?
-}
+    if (!userOrgRole) {
+      // should never happen
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization owner does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Handle the request
+    if (status === OrganizationStatus.Approved) {
+      // Approve the request
+      await approveOrganizationRequest(
+        pendingOrg.id,
+        userOrgRole.user,
+        userOrgRole.roleId,
+      );
+
+      // Send email to notify the user
+      await emailOrganizationRequestApproved(
+        userOrgRole.user,
+        userOrgRole.organization.organizationName,
+      );
+    } else if (status === OrganizationStatus.Rejected) {
+      // Reject the request
+      await rejectOrganizationRequest(pendingOrg.id, userOrgRole.user);
+
+      // Send email to notify the user
+      await emailOrganizationRequestRejected(
+        userOrgRole.user,
+        userOrgRole.organization.organizationName,
+        rejectionReason,
+      );
+    }
+
+    res.status(200).json({
+      message: `Organization creation request successfully ${status.toLowerCase()}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
