@@ -84,6 +84,7 @@ model User {
   password             String                 @map("password")
   profilePic           String?                @unique @map("profile_pic")
   institutionId        String?                @map("institution_id")
+  accountType          UserType               @map("account_type")
   institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   enrollments          Enrollment[]
   posts                Post[]
@@ -92,7 +93,6 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
-  accountType          UserType
 
   @@index([email])
   @@index([institutionId])
@@ -220,7 +220,7 @@ model UserOrganizationRole {
   organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([userId, organizationId])
+  @@id([userId, organizationId, roleId])
   @@index([userId])
   @@index([organizationId])
   @@index([roleId])
@@ -229,7 +229,7 @@ model UserOrganizationRole {
 
 model Role {
   id                          String                       @id @default(uuid())
-  roleName                    UserRole                     @map("role_name")
+  roleName                    UserRole                     @unique @map("role_name")
   userOrganizationRoles       UserOrganizationRole[]
   organizationRolePermissions OrganizationRolePermission[]
 
