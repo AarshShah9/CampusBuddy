@@ -179,9 +179,10 @@ export const OrganizationCreateSchema = OrganizationSchema.omit({
 
 export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
 
-// Can only manually change the organization name, description, and image
+// Can only manually change the description and image
 export const OrganizationUpdateSchema = OrganizationSchema.omit({
   id: true,
+  organizationName: true,
   createdAt: true,
   updatedAt: true,
   institutionId: true,
@@ -192,12 +193,13 @@ export const OrganizationUpdateSchema = OrganizationSchema.omit({
 export const OrganizationMembershipApprovalSchema = z.object({
   userId: z.string().uuid(),
   roleId: z.string().uuid(),
-  status: ApprovalStatusSchema,
+  decision: ApprovalStatusSchema,
+  rejectionReason: z.string().optional(),
 });
 
 // For approving or rejecting a new organization
 export const OrganizationApprovalSchema = z.object({
-  status: ApprovalStatusSchema,
+  decision: ApprovalStatusSchema,
   rejectionReason: z.string().optional(),
 });
 
