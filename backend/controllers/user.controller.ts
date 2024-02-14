@@ -752,3 +752,37 @@ export const verifyNewOrgSignup = async (
     next(error);
   }
 };
+
+// Get the logged in user's info
+export const getLoggedInUser = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userID;
+
+    // Get user from db
+    const user = await prisma.user.findMany({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    if (!user) {
+      // Throw error if user not found -> should never happen since user is already authenticated
+      const notFoundError = new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+
+      throw notFoundError;
+    }
+
+    res.status(200).json({ data: user });
+  } catch (error: any) {
+    next(error);
+  }
+};
