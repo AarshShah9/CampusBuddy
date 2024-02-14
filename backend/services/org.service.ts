@@ -13,8 +13,6 @@ import { OrganizationCreateType } from "../../shared/zodSchemas";
 import { defaultRolePermissions } from "../constants";
 import { AppError, AppErrorName } from "../utils/AppError";
 import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
-import transporter from "../utils/mailer";
-import { env } from "../utils/validateEnv";
 
 // Creates a new organization and add the default role permissions
 // This messy but it works for now
@@ -48,7 +46,7 @@ export const createOrganizationWithDefaults = async (
       );
       const path = `images/organizations/${uniqueFileName}`;
 
-      // await UploadToS3(file!, path); //TODO: uncomment
+      await UploadToS3(file!, path);
 
       // Update organization with image path after successful upload
       newOrganization = await tx.organization.update({
@@ -190,7 +188,7 @@ export async function approveUserRequest(
   });
 }
 
-// Reject a user's request to join an organization
+// Reject a user's request to join the organization
 export async function rejectUserRequest(
   user: User,
   organizationId: string,
