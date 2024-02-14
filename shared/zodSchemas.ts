@@ -40,6 +40,11 @@ export const AppPermissionNameSchema = z.enum([
   "DELETE_ORGANIZATION",
 ]);
 
+export const ApprovalStatusSchema = OrganizationStatusSchema.extract([
+  "Approved",
+  "Rejected",
+]);
+
 export const UserType = z.enum(["Student", "PendingOrg", "ApprovedOrg"]);
 
 ///////////////////////////////
@@ -111,8 +116,8 @@ export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 export const UserSchema = z.object({
   id: z.string().uuid(),
   username: z.string().min(3).max(20),
-  firstName: z.string().min(3).max(20),
-  lastName: z.string().min(3).max(20),
+  firstName: z.string().min(2).max(20),
+  lastName: z.string().min(2).max(20),
   email: z.string().email({ message: "Invalid email address" }).min(5),
   password: z
     .string()
@@ -124,17 +129,13 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
-export const userCreateSchema = UserSchema.omit({
+export const UserCreateSchema = UserSchema.omit({
   id: true,
-  isVerified: true,
-  otp: true,
-  jwt: true,
   profilePic: true,
-  status: true,
   accountType: true,
 });
 
-export type UserCreateType = z.infer<typeof userCreateSchema>;
+export type UserCreateType = z.infer<typeof UserCreateSchema>;
 
 /**
  * Update User Schema
@@ -190,12 +191,14 @@ export const OrganizationUpdateSchema = OrganizationSchema.omit({
 // For approving or rejecting a membership request to join an organization
 export const OrganizationMembershipApprovalSchema = z.object({
   userId: z.string().uuid(),
-  status: UserOrgStatusSchema,
+  roleId: z.string().uuid(),
+  status: ApprovalStatusSchema,
 });
 
 // For approving or rejecting a new organization
 export const OrganizationApprovalSchema = z.object({
-  status: OrganizationStatusSchema,
+  status: ApprovalStatusSchema,
+  rejectionReason: z.string().optional(),
 });
 
 /////////////////////////////////////////
@@ -483,12 +486,8 @@ export const tokenSchema = z.object({
   token: z.string(),
 });
 
-export const payloadSchema = z.object({
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  password: z.string(),
-  institutionId: z.string(),
-  organizationId: z.string().optional(), // additional field in payload for org users
+// For signing up with a new organization
+export const OrgSignupPayloadSchema = z.object({
+  user: UserCreateSchema,
+  organization: OrganizationCreateSchema,
 });
