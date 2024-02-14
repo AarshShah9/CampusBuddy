@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { ZodError } from "zod";
 import { AppError } from "../utils/AppError";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 export const errorHandler = (
   error: any,
@@ -44,6 +45,22 @@ export const errorHandler = (
   if (error instanceof PrismaClientKnownRequestError) {
     return res.status(500).json({
       message: "PrismaClientKnownRequestError: " + error.message,
+      stack,
+    });
+  }
+
+  // Handle expired jwt error
+  if (error instanceof TokenExpiredError) {
+    return res.status(500).json({
+      message: error.message,
+      stack,
+    });
+  }
+
+  // Handle JWT errors
+  if (error instanceof JsonWebTokenError) {
+    return res.status(500).json({
+      message: "JsonWebTokenError: " + error.message,
       stack,
     });
   }
