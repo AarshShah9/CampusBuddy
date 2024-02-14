@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  userCreateSchema,
   IdParamSchema,
   loginSchema,
   UserUpdateSchema,
   tokenSchema,
-  payloadSchema,
+  OrgSignupPayloadSchema,
+  UserCreateSchema,
+  OrganizationCreateType,
+  UserCreateType,
+  OrganizationCreateSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -13,27 +16,43 @@ import transporter from "../utils/mailer";
 import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
+import { createOrganizationWithDefaults } from "../services/org.service";
 
-const userId = "db365290-c550-11ee-83fd-6f8d6c450910"; // Placeholder for testing
+const userId = "216d17bb-573c-4a0e-b29b-a1a78012ae50"; // Placeholder for testing
+// const userId = "db365290-c550-11ee-83fd-6f8d6c450910"; // Placeholder for testing
 
 // create new User
-export const createNewStudentUser = async (
+export const signupAsStudent = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const { institutionName, username, firstName, lastName, email, password } =
-      userCreateSchema.parse(req.body);
+      UserCreateSchema.parse(req.body);
 
-    const domain = email.slice(email.indexOf("@") + 1);
+    // Check if the user already exists
+    const studentExists = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-    const institution = await prisma.institution.findFirst({
+    if (studentExists) {
+      res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    // Verify that institution exists
+    const institution = await prisma.institution.findUnique({
       where: {
         name: institutionName,
       },
     });
 
+    // Verify that institution exists
     if (!institution) {
       res.status(400).json({
         success: false,
@@ -48,7 +67,9 @@ export const createNewStudentUser = async (
       );
     }
 
-    // check if the user has the correct email domain for the institution
+    const domain = email.slice(email.indexOf("@") + 1);
+
+    // check if the student has the correct email domain for the institution
     if (institution.domain !== domain) {
       throw new AppError(
         AppErrorName.INVALID_INPUT_ERROR,
@@ -58,42 +79,26 @@ export const createNewStudentUser = async (
       );
     }
 
-    const studentExists = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
+    const payload: UserCreateType = {
+      username: username,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      institutionName: institution.name,
+    };
+
+    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+      expiresIn: "1h",
+      mutatePayload: false,
     });
 
-    if (studentExists) {
-      res.status(400).json({
-        success: false,
-        message: "User already exists",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        institutionId: institution.id,
-        username: username,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-        accountType: UserType.Student,
-      },
-      env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-        mutatePayload: false,
-      },
-    );
-
     const message = {
-      from: "nomansanjari2001@gmail.com",
+      from: env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verifyAccount/${token}">Click here</a>`,
+      <a href="http://localhost:3000/api/user/verify/student/${token}">Click here</a>`,
     };
 
     await transporter.sendMail(message);
@@ -106,9 +111,9 @@ export const createNewStudentUser = async (
     next(error);
   }
 };
-//
-// verify OTP
-export const verifyAccount = async (
+
+// verify a new Student user
+export const verifyStudentSignup = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -116,84 +121,70 @@ export const verifyAccount = async (
   try {
     const token = tokenSchema.parse(req.params).token;
 
-    try {
-      const payload: string | JwtPayload = jwt.verify(
-        token,
-        env.JWT_SECRET ?? "testSecret",
-      );
+    // Verify jwt
+    const payload: string | JwtPayload = jwt.verify(
+      token,
+      env.JWT_SECRET ?? "testSecret",
+    );
 
-      if (
-        typeof payload === "object" &&
-        payload !== null &&
-        payloadSchema.parse(payload)
-      ) {
-        const institution = await prisma.institution.findUnique({
-          where: {
-            id: payload.institutionId,
-          },
-        });
-
-        if (institution) {
-          if (payload.accountType === UserType.Student) {
-            // Create a new Student user
-            const newUser = await prisma.user.create({
-              data: {
-                institutionId: payload.institutionId,
-                username: payload.username,
-                firstName: payload.firstName,
-                lastName: payload.lastName,
-                email: payload.email,
-                password: payload.password,
-                accountType: payload.accountType,
-              },
-            });
-          } else if (payload.accountType === UserType.PendingOrg) {
-            // Create a new Org user
-            await prisma.$transaction(async (tx) => {
-              const newUser = await tx.user.create({
-                data: {
-                  institutionId: payload.institutionId,
-                  username: payload.username,
-                  firstName: payload.firstName,
-                  lastName: payload.lastName,
-                  email: payload.email,
-                  password: payload.password,
-                  accountType: payload.accountType,
-                },
-              });
-
-              // add the user to the organization as a Moderator pending approval
-              await tx.userOrganizationRole.create({
-                data: {
-                  userId: newUser.id,
-                  organizationId: payload.organizationId,
-                  roleId: UserRole.Moderator,
-                  status: UserOrgStatus.Pending,
-                },
-              });
-            });
-          } else {
-            // invalid account type input for a new user
-            throw new AppError(
-              AppErrorName.INVALID_INPUT_ERROR,
-              "Invalid account type",
-              400,
-              true,
-            );
-          }
-        }
-
-        res.status(200).json({
-          html: '<img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Beijing_bouddhist_monk_2009_IMG_1486.JPG" alt="Word bruh word...">',
-        });
-      }
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: "JWT timed out",
-      });
-      next(error);
+    if (typeof payload !== "object" || payload === null) {
+      console.error("Invalid JWT");
+      // TODO: improve jwt error handling
+      throw new AppError(AppErrorName.JWT_ERROR, `Invalid JWT`, 400, true);
     }
+
+    // Validate the jwt payload
+    const validatedUserData = UserCreateSchema.parse(payload);
+
+    // Check if the user already exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: validatedUserData.email,
+      },
+    });
+
+    if (userExists) {
+      throw new AppError(
+        AppErrorName.RECORD_EXISTS_ERROR,
+        "User already exists",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        name: validatedUserData.institutionName,
+      },
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Create new student
+    const newStudent = await prisma.user.create({
+      data: {
+        username: validatedUserData.username,
+        firstName: validatedUserData.firstName,
+        lastName: validatedUserData.lastName,
+        email: validatedUserData.email,
+        password: validatedUserData.password,
+        accountType: UserType.Student,
+        institutionId: institution.id,
+      },
+    });
+
+    res.status(200).json({
+      message: `JWT verified and a new student was created`,
+      data: { user: newStudent },
+    });
   } catch (error) {
     next(error);
   }
@@ -259,16 +250,20 @@ export const resetPassword = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, password } = loginSchema.parse(req.body);
+  try {
+    const { email, password } = loginSchema.parse(req.body);
 
-  await prisma.user.update({
-    where: {
-      email: email,
-    },
-    data: {
-      password: password,
-    },
-  });
+    await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        password: password,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
 };
 
 // remove User
@@ -277,15 +272,19 @@ export const removeUserById = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = IdParamSchema.parse(req.params).id;
+  try {
+    const userId = IdParamSchema.parse(req.params).id;
 
-  const deletedUser = await prisma.user.delete({
-    where: {
-      id: userId,
-    },
-  });
+    await prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
 
-  res.status(200).send(deletedUser);
+  res.status(204).end();
 };
 
 // get all Users
@@ -294,9 +293,48 @@ export const getAllUsers = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const allStudents = await prisma.user.findMany();
+  try {
+    const allStudents = await prisma.user.findMany();
 
-  res.status(200).json(allStudents);
+    res.status(200).json(allStudents);
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// get Users by ID
+export const getUserById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const userId = IdParamSchema.parse(req.params).id;
+
+    // Get user from db
+    const user = await prisma.user.findMany({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      // Throw error if user not found
+      const notFoundError = new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${userId} not found`,
+        404,
+        true,
+      );
+
+      throw notFoundError;
+    }
+
+    res.status(200).json({ data: user });
+  } catch (error: any) {
+    next(error);
+  }
 };
 
 //update User Information
@@ -346,9 +384,8 @@ export const updateUser = async (
   }
 };
 
-// create new Org User (pending approval)
-// maybe we can move common user creation functionality into a user service or helper function -> only userType and domain are different
-export const createNewOrgUser = async (
+// New org user joining an existing organization
+export const signupWithExistingOrg = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -357,26 +394,11 @@ export const createNewOrgUser = async (
     // Validate request organization id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
+    // Validate request body
     const { institutionName, username, firstName, lastName, email, password } =
-      userCreateSchema.parse(req.body);
+      UserCreateSchema.parse(req.body);
 
-    const domain = email.slice(email.indexOf("@") + 1);
-
-    const institution = await prisma.institution.findFirst({
-      where: {
-        name: institutionName,
-      },
-    });
-
-    if (!institution) {
-      throw new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        "Institution does not exist",
-        400,
-        true,
-      );
-    }
-
+    // Check if the user already exists
     const userExists = await prisma.user.findUnique({
       where: {
         email: email,
@@ -392,30 +414,59 @@ export const createNewOrgUser = async (
       );
     }
 
-    const token = jwt.sign(
-      {
-        institutionId: institution.id,
-        username: username,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-        accountType: UserType.Student,
-        organizationId,
+    // Verify that institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        name: institutionName,
       },
-      env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-        mutatePayload: false,
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the organization exists
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: organizationId,
       },
-    );
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Organization with id ${organizationId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const payload: UserCreateType = {
+      username: username,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      institutionName: institution.name,
+    };
+
+    // Create the jwt for verifying email, contains user data as payload
+    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+      expiresIn: "1h",
+      mutatePayload: false,
+    });
 
     const message = {
-      from: "nomansanjari2001@gmail.com",
+      from: env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verifyAccount/${token}">Click here</a>`,
+      <a href="http://localhost:3000/api/user/verify/organization/${organizationId}/${token}">Click here</a>`,
     };
 
     await transporter.sendMail(message);
@@ -423,6 +474,303 @@ export const createNewOrgUser = async (
     res.status(200).json({
       success: true,
       message: "User created, awaiting verification",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Creates both a new user and a new organization
+// Used when someone wants to sign up as the owner of a new organization
+export const signupAsNewOrg = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // NOTE!: request data nested in req.body.user and req.body.organization
+
+    // Validate the new user data
+    const { institutionName, username, firstName, lastName, email, password } =
+      UserCreateSchema.parse(req.body.user);
+
+    // Validate the new organization data
+    // We have both institution name and id just bcs we are re-using same zod schemas
+    const { organizationName, description, institutionId } =
+      OrganizationCreateSchema.parse(req.body.organization);
+
+    // Check if the user already exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (userExists) {
+      throw new AppError(
+        AppErrorName.RECORD_EXISTS_ERROR,
+        "User already exists",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        id: institutionId,
+      },
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Construct payload for jwt
+    const payload: {
+      user: UserCreateType;
+      organization: OrganizationCreateType;
+    } = {
+      user: {
+        username,
+        firstName,
+        lastName,
+        email,
+        password,
+        institutionName: institution.name,
+      },
+      organization: {
+        description,
+        organizationName,
+        institutionId,
+      },
+    };
+
+    // Create the jwt for verifying email, contains user data as payload
+    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+      expiresIn: "1h", // this should probably be longer, admin approval could take a while
+      mutatePayload: false,
+    });
+
+    const message = {
+      from: env.MAILER_EMAIL,
+      to: email,
+      subject: "Verify your account - CampusBuddy",
+      html: `Verify your account by clicking the link!<br>
+      <a href="http://localhost:3000/api/user/verify/organization/new/${token}">Click here</a>`,
+    };
+
+    await transporter.sendMail(message);
+
+    res.status(200).json({
+      success: true,
+      message: "New user and organization created, awaiting verification",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Verify a new organization user signing up with an existing organization
+// User is created as a pending moderator for the organization
+export const verifyExistingOrgSignup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = tokenSchema.parse(req.params).token;
+
+    // Verify jwt
+    const payload: string | JwtPayload = jwt.verify(
+      token,
+      env.JWT_SECRET ?? "testSecret",
+    );
+
+    if (typeof payload !== "object" || payload === null) {
+      console.error("Invalid JWT");
+      // TODO: improve jwt error handling
+      throw new AppError(AppErrorName.JWT_ERROR, `Invalid JWT`, 400, true);
+    }
+
+    // Validate the jwt payload
+    const validatedUserData = UserCreateSchema.parse(payload);
+
+    // Validate request organization id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    // Check if the user already exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: validatedUserData.email,
+      },
+    });
+
+    if (userExists) {
+      throw new AppError(
+        AppErrorName.RECORD_EXISTS_ERROR,
+        "User already exists",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        name: validatedUserData.institutionName,
+      },
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the organization exists
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: organizationId,
+      },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Organization with id ${organizationId} not found`,
+        404,
+        true,
+      );
+    }
+
+    // Fetch the roleId for the moderator role
+    const { id: roleId } = await prisma.role.findUniqueOrThrow({
+      where: {
+        roleName: UserRole.Moderator,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    // Perform a transaction to create the user and add their userOrganizationRole
+    let newUser: User | undefined;
+    await prisma.$transaction(async (tx) => {
+      // Create a new Org user
+      newUser = await tx.user.create({
+        data: {
+          username: validatedUserData.username,
+          firstName: validatedUserData.firstName,
+          lastName: validatedUserData.lastName,
+          email: validatedUserData.email,
+          password: validatedUserData.password,
+          accountType: UserType.PendingOrg,
+          institutionId: institution.id,
+        },
+      });
+
+      // Add the user to the organization as a Moderator (pending approval from the organization)
+      await tx.userOrganizationRole.create({
+        data: {
+          userId: newUser.id,
+          organizationId: organizationId,
+          roleId,
+          status: UserOrgStatus.Pending,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: `JWT verified and a new org user was created as a pending moderator for orgId: ${organizationId}`,
+      data: { user: newUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Verify a new organization user signing up with a new organization
+// User is created as a pending owner for the organization
+export const verifyNewOrgSignup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = tokenSchema.parse(req.params).token;
+
+    // Verify jwt
+    const payload: string | JwtPayload = jwt.verify(
+      token,
+      env.JWT_SECRET ?? "testSecret",
+    );
+
+    // Validate the jwt payload
+    const { user: validatedUserData, organization: validatedorganizationData } =
+      OrgSignupPayloadSchema.parse(payload);
+
+    // Check if the user already exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: validatedUserData.email,
+      },
+    });
+
+    if (userExists) {
+      throw new AppError(
+        AppErrorName.RECORD_EXISTS_ERROR,
+        "User already exists",
+        400,
+        true,
+      );
+    }
+
+    // Verify that the institution exists
+    const institution = await prisma.institution.findUnique({
+      where: {
+        name: validatedUserData.institutionName,
+      },
+    });
+
+    if (!institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution does not exist",
+        400,
+        true,
+      );
+    }
+
+    // Create the new Org user
+    const newUser = await prisma.user.create({
+      data: {
+        username: validatedUserData.username,
+        firstName: validatedUserData.firstName,
+        lastName: validatedUserData.lastName,
+        email: validatedUserData.email,
+        password: validatedUserData.password,
+        accountType: UserType.PendingOrg,
+        institutionId: institution.id,
+      },
+    });
+
+    // Create the new organization
+    const newOrganization = await createOrganizationWithDefaults(
+      validatedorganizationData,
+      newUser.id,
+    );
+    res.status(200).json({
+      message: `JWT verified and a new org user was created as the pending owner of the organization: ${newOrganization?.organizationName}`,
+      data: { user: newUser, organization: newOrganization },
     });
   } catch (error) {
     next(error);
