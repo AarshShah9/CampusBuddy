@@ -53,35 +53,36 @@ export default function EventCard({ eventData }: EventSearchCardProps) {
 }
 
 // Setting the styles for the children in this Component
+// prettier-ignore
 const StyledCard = styled(Card)<{ color: string }>`
-  width: 374px;
-  height: 294px;
-  margin-top: 16px;
-  background-color: ${(props) => props.color};
+    width: 374px;
+    height: 294px;
+    margin-top: 16px;
+    background-color: ${(props) => props.color};
 `;
-
+// prettier-ignore
 const StyledCover = styled(Card.Cover)`
-  width: calc(100% - 32px);
-  height: 178px;
-  margin: 8px;
-  font-color: theme.color.;
+    width: calc(100% - 32px);
+    height: 178px;
+    margin: 8px;
+  //font-color: theme.color.; TODO AJ WAS THIS U? THIS THROWING ERRORS
 `;
-
+// prettier-ignore
 const CardTitle = styled(Text)`
-  margin-bottom: 4px;
-  font-size: 16px;
-  font-family: "Nunito-Bold";
-  margin-right: 120px;
+    margin-bottom: 4px;
+    font-size: 16px;
+    font-family: "Nunito-Bold";
+    margin-right: 120px;
 `;
-
+// prettier-ignore
 const EventDateText = styled(Text)`
-  margin-bottom: 8px;
-  font-family: "Nunito-Reg";
-  font-size: 12px;
+    margin-bottom: 8px;
+    font-family: "Nunito-Reg";
+    font-size: 12px;
 `;
-
+// prettier-ignore
 const HostText = styled(Text)`
-  font-family: Nunito-Bold;
-  font-size: 12px;
-  margin-top: 4px;
+    font-family: Nunito-Bold;
+    font-size: 12px;
+    margin-top: 4px;
 `;

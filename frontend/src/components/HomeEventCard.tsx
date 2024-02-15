@@ -47,31 +47,32 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
 }
 
 // Adding styling to the seperate card components
+// prettier-ignore
 const StyledCard = styled(Card)`
-  margin-left: 16px;
-  margin-right: 16px;
-  width: 159px;
-  height: 130px;
-  background-color: rgba(0, 0, 0, 0);
+    margin-left: 16px;
+    margin-right: 16px;
+    width: 159px;
+    height: 130px;
+    background-color: rgba(0, 0, 0, 0);
 `;
-
+// prettier-ignore
 const StyledCover = styled(Card.Cover)`
-  width: 159px;
-  height: 178px;
+    width: 159px;
+    height: 178px;
 `;
-
+// prettier-ignore
 const CardContent = styled(Card.Content)``;
-
+// prettier-ignore
 const EventTitle = styled(Text)`
-  font-family: Nunito-Bold;
+    font-family: Nunito-Bold;
 `;
-
+// prettier-ignore
 const EventTime = styled(Text)`
-  font-family: Nunito-Reg;
-  margin-right: 8px;
+    font-family: Nunito-Reg;
+    margin-right: 8px;
 `;
-
+// prettier-ignore
 const EventDetailsContainer = styled(View)`
-  flex-direction: row;
-  justifycontent: "space-between";
+    flex-direction: row;
+    justifycontent: "space-between";
 `;

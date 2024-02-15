@@ -128,60 +128,65 @@ export default function Login() {
   );
 }
 
+// prettier-ignore
 const LogoContainer = styled(View)`
-  height: 28%;
-  align-items: center;
-  justify-content: center;
+    height: 28%;
+    align-items: center;
+    justify-content: center;
 `;
+// prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`
-  height: 74%;
-  width: 100%;
-  border-top-left-radius: 76px;
-  border-width: 0s;
-  background-color: ${(props) => props.$color};
-  justifycontent: center;
-  align-item: center;
+    height: 74%;
+    width: 100%;
+    border-top-left-radius: 76px;
+    border-width: 0s;
+    background-color: ${(props) => props.$color};
+    justifycontent: center;
+    align-item: center;
 `;
-
+// prettier-ignore
 const FormContainer = styled(View)`
-  width: 90%;
-  margin-top: 8%;
-  height: 500px;
-  margin-left: auto;
-  margin-right: auto;
+    width: 90%;
+    margin-top: 8%;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
 `;
-
+// prettier-ignore
 const ClickLink = styled(Text)<{ $color: string }>`
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 64px;
-  font-size: 16px;
-  font-family: Roboto-Reg;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 64px;
+    font-size: 16px;
+    font-family: Roboto-Reg;
 `;
+// prettier-ignore
 const Header = styled(Text)`
-  font-size: 40px;
-  font-weight: bold;
-  margin-top: 64px;
-  margin-bottom: 32px;
-  margin-left: auto;
-  margin-right: auto;
-  font-family: Nunito-Bold;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 64px;
+    margin-bottom: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: Nunito-Bold;
 `;
+// prettier-ignore
 const InputField = styled(TextInput)`
-  width: 100%;
-  height: 56px;
-  margin-bottom: 30px;
-  border-radius: 8px 8px 0 0;
-  font-family: Roboto-Reg;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 30px;
+    border-radius: 8px 8px 0 0;
+    font-family: Roboto-Reg;
 `;
+// prettier-ignore
 const StyledButton = styled(Button)`
-  border-radius: 8px;
-  width: 100%;
-  height: 48px;
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  justify-content: center;
+    border-radius: 8px;
+    width: 100%;
+    height: 48px;
+    font-size: 25px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    justify-content: center;
 `;

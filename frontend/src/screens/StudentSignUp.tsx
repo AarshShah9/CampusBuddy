@@ -208,62 +208,67 @@ export default function StudentSignUp() {
 }
 
 // Component
+// prettier-ignore
 const MainContainer = styled(View)`
-  height: 100%;
-  background-color: #3a86ff;
+    height: 100%;
+    background-color: #3a86ff;
 `;
+// prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`
-  alignitems: center;
-  height: 85%;
-  width: 100%;
-  border-top-left-radius: 76px;
-  background-color: ${(props) => props.$color};
+    alignitems: center;
+    height: 85%;
+    width: 100%;
+    border-top-left-radius: 76px;
+    background-color: ${(props) => props.$color};
 `;
+// prettier-ignore
 const HeaderContainer = styled(View)`
-  width: 100%;
-  height: 15%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    height: 15%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 `;
+// prettier-ignore
 const HeaderText = styled(Text)<{ $textColor: string }>`
-  margin: 32px auto 0px auto;
-  color: ${(props) => props.$textColor};
-  font-size: 28px;
-  font-weight: bold;
-  fontfamily: "Nunito-Bold";
+    margin: 32px auto 0px auto;
+    color: ${(props) => props.$textColor};
+    font-size: 28px;
+    font-weight: bold;
+    fontfamily: "Nunito-Bold";
 `;
-
+// prettier-ignore
 const FormContainer = styled(View)`
-  width: 90%;
-  margin-top: 18%;
-  height: 500px;
+    width: 90%;
+    margin-top: 18%;
+    height: 500px;
 `;
-
+// prettier-ignore
 const InputField = styled(TextInput)`
-  width: 100%;
-  height: 56px;
-  margin-bottom: 25px;
-  border-radius: 8px 8px 0 0;
-  font-family: Roboto-Reg;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 25px;
+    border-radius: 8px 8px 0 0;
+    font-family: Roboto-Reg;
 `;
-
+// prettier-ignore
 const StyledButton = styled(Button)`
-  border-radius: 8px;
-  width: 100%;
-  height: 48px;
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  justify-content: center;
+    border-radius: 8px;
+    width: 100%;
+    height: 48px;
+    font-size: 25px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    justify-content: center;
 `;
+// prettier-ignore
 const ClickLink = styled(Text)<{ $color: string }>`
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 16px;
-  font-size: 16px;
-  justify-content: center;
-  align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 16px;
+    font-size: 16px;
+    justify-content: center;
+    align-items: center;
 `;

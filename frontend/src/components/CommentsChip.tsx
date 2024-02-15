@@ -25,23 +25,24 @@ export default function CommentsChip() {
 }
 
 // Styles used for children in the component
+// prettier-ignore
 const StyledChip = styled(Chip)<{ color: string }>`
-  border-radius: 29px;
-  margin-right: 16px;
-  height: 24px;
-  width: 98px;
-  background-color: ${(props) => props.color};
-  border-width: 0.5px;
+    border-radius: 29px;
+    margin-right: 16px;
+    height: 24px;
+    width: 98px;
+    background-color: ${(props) => props.color};
+    border-width: 0.5px;
 `;
-
+// prettier-ignore
 const ChipContentContainer = styled(View)`
-  flex-direction: row;
-  align-items: center;
+    flex-direction: row;
+    align-items: center;
 `;
-
+// prettier-ignore
 const CommentsText = styled(Text)<{ color: string }>`
-  font-size: 10px;
-  margin-left: 4px;
-  margin-right: 8px;
-  color: ${(props) => props.color};
+    font-size: 10px;
+    margin-left: 4px;
+    margin-right: 8px;
+    color: ${(props) => props.color};
 `;
