@@ -108,7 +108,7 @@ export default function Login() {
               </Text>
             </StyledButton>
             <ClickLink $color={theme.colors.primary}>
-              <Text>Don't have any account? </Text>
+              <Text style={{ marginRight: 5 }}>Don't have an account? </Text>
               <Text
                 onPress={() => {
                   navigation.navigate("StudentSignUp");
@@ -139,10 +139,10 @@ const OverlayContainer = styled(View)<{ $color: string }>`
     height: 74%;
     width: 100%;
     border-top-left-radius: 76px;
-    border-width: 0s;
+    border-width: 0;
     background-color: ${(props) => props.$color};
-    justifycontent: center;
-    align-item: center;
+    justify-content: center;
+    align-items: center;
 `;
 // prettier-ignore
 const FormContainer = styled(View)`
@@ -159,6 +159,9 @@ const ClickLink = styled(Text)<{ $color: string }>`
     margin-top: 64px;
     font-size: 16px;
     font-family: Roboto-Reg;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 `;
 // prettier-ignore
 const Header = styled(Text)`
