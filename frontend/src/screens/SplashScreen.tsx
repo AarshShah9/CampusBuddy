@@ -9,6 +9,7 @@ export default function SplashScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<any>();
   const [fontsLoaded] = useFonts({
+    "Nunito-Medium": require("~/assets/fonts/Nunito-Medium.ttf"),
     "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
     "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
     "Roboto-Medium": require("~/assets/fonts/Roboto-Medium.ttf"),
@@ -34,7 +35,7 @@ export default function SplashScreen() {
       console.log("Finished Loading move to new page");
       //navigation.dispatch(StackActions.replace("AuthenticationGroup"));
       //Delete below after
-      navigation.dispatch(StackActions.replace("CreateEvent"))
+      navigation.dispatch(StackActions.replace("CreateScreen"))
     }
   }, [loading]);
 

@@ -4,13 +4,14 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Image
 } from "react-native";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Animated, {
+    Extrapolate,
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
@@ -20,7 +21,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { Button } from "react-native-paper";
-import { useRef } from "react";
+import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 const IMG_HEIGHT = 300;
 
@@ -37,12 +38,8 @@ export default function CreateEvent() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  const inputRef = useRef();
 
-
-  const onSubmit = (data: createEvent) => {
-    console.log(data);
-  };
+  // React Hook Related
   const schema = zod.object({
     eventName: zod.string(),
     date: zod.date(),
@@ -68,6 +65,10 @@ export default function CreateEvent() {
     resolver: zodResolver(schema),
   });
 
+  //Functions
+  const onSubmit = (data: createEvent) => {
+    console.log(data);
+  };
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -89,77 +90,43 @@ export default function CreateEvent() {
     };
   });
 
-  const pages = [
-    { label: "Event", value: "1" },
-    { label: "Looking For", value: "2" },
-    { label: "Marketplace", value: "3" },
-  ];
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}  
+      style={{flex:1}}
     >
-      <MainContainer style={{}} color={theme.colors.primary}>
-        <HeaderContainer>
-          <MaterialIcons
-            style={{ marginTop: 60, marginLeft: 10 }}
-            name="cancel"
-            size={24}
-            color="white"
-          />
-          <Dropdown
-            style={{ width: 125, marginTop: 50, paddingRight: 5 }}
-            placeholderStyle={{ color: "white", paddingLeft: 40 }}
-            selectedTextStyle={{ color: "white" }}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            onChange={() => {}}
-            data={pages}
-            placeholder="Event"
-          />
-        </HeaderContainer>
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
           ref={scrollRef}
-          style={{ height: "100%", backgroundColor: "white" }}
+          style={{ height: "100%", backgroundColor: "white", }}
           scrollEventThrottle={16}
         >
-          <View
-            style={{
-              backgroundColor: "#D9D9D9",
-              width: "100%",
-              height: 250,
-              flexDirection: "column-reverse",
-            }}
-          >
-            <AntDesign
-              style={{ marginLeft: "auto", marginRight: 10, marginBottom: 10 }}
+        <View>
+          <Animated.Image
+            source={require("~/assets/images/lightGreyImage.png")}
+            style={[{
+                width: "100%",
+                height: 250,
+                
+            },imageAnimatedStyle]}>
+          </Animated.Image>
+          <AntDesign
+              style={{position:"absolute", marginLeft:"90%", marginBottom: 10, marginTop:200 }}
               name="upload"
               size={24}
               color="black"
             />
-          </View>
-          <View style={{ marginTop: 10 }}>
+        </View >
+        <View style={{backgroundColor:"white"}}>
             <Controller
               control={control}
               rules={{
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text style={{ marginLeft: 20 }}>Event Name:*</Text>
-                  <TextInput
-                    style={{
-                      width: 350,
-                      height: 50,
-                      borderWidth: 1,
-                      borderRadius: 8,
-                      borderColor: "grey",
-                      padding: 10,
-                      marginLeft: "auto",
-                      marginRight: "auto",
-                    }}
+                <View style={{ marginTop: 10, marginBottom: 15 }}>
+                  <Text style={{ marginLeft: 20, marginBottom:3, fontFamily:"Nunito-Medium", fontSize:16 }}>Event Name*</Text>
+                  <EventNameInput
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -167,77 +134,72 @@ export default function CreateEvent() {
                 </View>
               )}
               name="eventName"
-            />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              height: 30,
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 25,
-            }}
-          >
-            <Text style={{ marginLeft: 20 }}>Date *</Text>
-            <Controller
+            /> 
+        </View>
+            {/* <Controller
               control={control}
               rules={{
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <DateTimePicker
-                  style={{ marginRight: 10 }}
-                  value={value}
-                  mode={"date"}
-                  is24Hour={true}
-                  onChange={(event, date) => {
-                    onChange(date);
-                  }}
-                />
+                <View   style={{
+                    flexDirection: "row",
+                    height: 30,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginTop: 25,
+                    marginBottom:15
+                  }}>
+                    <Text style={{ marginLeft: 20, fontFamily:"Nunito-Medium", fontSize:16 }}>Date *</Text>
+                    <DateTimePicker
+                    style={{ marginRight: 10 }}
+                    value={value}
+                    mode={"date"}
+                    is24Hour={true}
+                    onChange={(event, date) => {
+                        onChange(date);
+                    }}
+                    />
+                </View>
               )}
               name="date"
             />
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              height: 30,
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 25,
-            }}
-          >
-            <Text style={{ marginLeft: 20 }}>Time*</Text>
             <Controller
               control={control}
               rules={{
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <DateTimePicker
-                  style={{ marginRight: 10 }}
-                  value={value}
-                  mode={"time"}
-                  is24Hour={true}
-                  onChange={(event, time) => {
-                    onChange(time);
-                  }}
-                />
+                <View  style={{
+                    flexDirection: "row",
+                    height: 30,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginTop: 25,
+                    marginBottom:15
+                  }}>
+                    <Text style={{ marginLeft: 20, fontFamily:"Nunito-Medium", fontSize:16 }}>Time*</Text>
+                    <DateTimePicker
+                    style={{ marginRight: 10 }}
+                    value={value}
+                    mode={"time"}
+                    is24Hour={true}
+                    onChange={(event, time) => {
+                        onChange(time);
+                    }}
+                    />
+                </View>
               )}
               name="time"
             />
-          </View>
-
-          <View style={{ marginTop: 25 }}>
             <Controller
               control={control}
               rules={{
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text style={{ marginLeft: 20 }}>Location*</Text>
+                <View style={{marginBottom:15}}>
+                  <Text style={{ marginLeft: 20, marginBottom:3, fontFamily:"Nunito-Medium", fontSize:16 }}>Location*</Text>
                   <TextInput
                     style={{
                       width: 350,
@@ -257,16 +219,16 @@ export default function CreateEvent() {
               )}
               name="location"
             />
-          </View>
-          <View style={{ marginTop: 25 }}>
+       
+
             <Controller
               control={control}
               rules={{
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text style={{ marginLeft: 20 }}>Tags*</Text>
+                <View style={{marginBottom:15}}>
+                  <Text style={{ marginLeft: 20,  marginBottom:3, fontFamily:"Nunito-Medium", fontSize:16 }}>Tags*</Text>
                   <TextInput
                     style={{
                       width: 350,
@@ -286,9 +248,8 @@ export default function CreateEvent() {
               )}
               name="tags"
             />
-          </View>
-
-          <View style={{ marginTop: 25 }}>
+       
+          
             <Controller
               control={control}
               rules={{
@@ -296,21 +257,9 @@ export default function CreateEvent() {
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <View>
-                  <Text style={{ marginLeft: 20 }}>Event Description:*</Text>
-                  <TextInput
-                    
+                  <Text style={{ marginLeft: 20,  marginBottom:3, fontFamily:"Nunito-Medium", fontSize:16 }}>Event Description:*</Text>
+                  <EventTextInput
                     multiline={true}
-                    style={{
-                      textAlignVertical: "top",
-                      width: 350,
-                      height: 100,
-                      borderWidth: 1,
-                      borderRadius: 8,
-                      borderColor: "grey",
-                      padding: 10,
-                      marginLeft: "auto",
-                      marginRight: "auto",
-                    }}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -319,23 +268,36 @@ export default function CreateEvent() {
               )}
               name="description"
             />
-          </View>
-          <View style={{ marginBottom: 15, marginTop: 15 }}>
-            <Button onPress={handleSubmit(onSubmit)}>Submit</Button>
-          </View>
+        </View>
+          <View style={{ marginBottom: 15, marginTop: 15}}>
+            <Button style={{backgroundColor:"", width:300, marginLeft:"auto", marginRight:"auto"}} onPress={handleSubmit(onSubmit)}>Submit</Button>
+          </View> */}
         </Animated.ScrollView>
-      </MainContainer>
     </KeyboardAvoidingView>
   );
 }
-const MainContainer = styled(View)<{ color: string }>`
-  height: 100%;
-  background-color: ${(props) => props.color};
+
+
+const EventTextInput = styled(TextInput)`
+  textAlignVertical: top;
+  width: 350px;
+  height: 100px;
+  borderWidth: 1px;
+  borderRadius: 8px;
+  borderColor:grey;
+  padding: 10px;
+  marginLeft: auto;
+  marginRight: auto;
 `;
 
-const HeaderContainer = styled(View)`
-  width: 100%;
-  height: 100px;
-  justify-content: space-between;
-  flex-direction: row;
-`;
+const EventNameInput = styled(TextInput)`
+    width: 350px;
+    height: 50px;
+    borderWidth: 1px;
+    borderRadius: 8px;
+    borderColor: grey;
+    padding: 10px;
+    marginLeft: auto;
+    marginRight: auto;
+`
+
