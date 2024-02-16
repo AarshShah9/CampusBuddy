@@ -5,6 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 import { useState } from "react";
 import CreateEvent from "./CreateEvent";
+import CreateLookingFor from "./CreateLookingFor";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -39,7 +40,7 @@ export default function CreateScreen() {
         />
       </HeaderContainer>
       {currentSelected == "1" && <CreateEvent />}
-      {currentSelected == "2" && <Text>Looking For</Text>}
+      {currentSelected == "2" && <CreateLookingFor/>}
       {currentSelected == "3" && <Text>MarketPlace</Text>}
     </MainContainer>
   );
