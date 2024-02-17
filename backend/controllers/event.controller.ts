@@ -358,23 +358,6 @@ export const getEventByUserId = async (
       eventsCreatedByUser: eventsCreatedByUser,
       eventsInterested: eventsInterested,
     };
-
-    if (eventsCreatedByUser.length === 0 && eventsInterested.length > 0) {
-      // No events created by the user, but interested in some events
-      userEventsData.eventsInterested = eventsInterested;
-    } else if (
-      eventsCreatedByUser.length > 0 &&
-      eventsInterested.length === 0
-    ) {
-      // Events created by the user, but not interested in any events
-      userEventsData.eventsCreatedByUser = eventsCreatedByUser;
-    } else {
-      // Both scenarios: events created by the user and interested in some events
-      userEventsData = {
-        eventsCreatedByUser: eventsCreatedByUser,
-        eventsInterested: eventsInterested,
-      };
-    }
     res.status(200).json(userEventsData);
   } catch (error) {
     next(error);
