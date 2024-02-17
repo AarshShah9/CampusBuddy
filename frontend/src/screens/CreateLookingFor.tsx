@@ -186,7 +186,7 @@ export default function CreateLookingFor() {
       <View style={{ marginTop: 150 }}>
         <Button
           style={{
-            backgroundColor: theme.colors.primary,
+
             width: 300,
             marginLeft: "auto",
             marginRight: "auto",

@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -21,8 +21,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { Button } from "react-native-paper";
-import ItemTag from "~/components/ItemTag";
-import { useState } from "react";
+import ItemTag from "~/components/ItemTags";
 
 const IMG_HEIGHT = 300;
 
@@ -31,7 +30,7 @@ type createEvent = {
   date: Date;
   time: Date;
   location: string;
-  tags: string;
+  tags: string[];
   description: string;
 };
 
@@ -39,12 +38,7 @@ export default function CreateEvent() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  
-  // Testing Tags Area
-    const [tags, setTags] = useState([
-    "HTML", "CSS", "JavaScript"
-    ])
-    const [currentInput, setCurrentInput] = useState('')
+
 
   // React Hook Related
   const schema = zod.object({
@@ -52,7 +46,7 @@ export default function CreateEvent() {
     date: zod.date(),
     time: zod.date(),
     location: zod.string(),
-    tags: zod.string(),
+    tags: zod.string().array(),
     description: zod.string(),
   });
 
@@ -66,16 +60,19 @@ export default function CreateEvent() {
       date: new Date(),
       time: new Date(),
       location: "",
-      tags: "",
+      tags: [],
       description: "",
     },
     resolver: zodResolver(schema),
   });
 
   //Functions
+
+  // Function to handle submission of user data
   const onSubmit = (data: createEvent) => {
     console.log(data);
   };
+  // Function for animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -97,21 +94,7 @@ export default function CreateEvent() {
     };
   });
 
-  const handleKeyDown = (e: any) => {
-    // If user did not press enter key, return
-    console.log(currentInput)
-    if(e.nativeEvent.key !== 'Enter') return
-    // Get the value of the input
-    const value = currentInput
-    Keyboard.dismiss()
-    // If the value is empty, return
-    if(!value.trim()) return
-    // Add the value to the tags array
-    setTags([...tags, value])
-    // Clear the input
-    setCurrentInput('niss')
-    console.log(currentInput)
-  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -292,7 +275,7 @@ export default function CreateEvent() {
             rules={{
               required: true,
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange } }) => (
               <View>
                 <Text
                   style={{
@@ -304,21 +287,7 @@ export default function CreateEvent() {
                 >
                   Tags*
                 </Text>
-                <TagContainer>
-                    {tags.map((tag,index)=>(
-                        <ItemTag key={index} title={tag}/>
-                    ))}
-                    
-                    <TextInput
-                    style={{flexGrow:1,}}
-                    multiline={true}
-                    onKeyPress={handleKeyDown}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    
-                    />
-                </TagContainer>
+                <ItemTag controllerOnChange={onChange}/>
               </View>
             )}
             name="tags"
@@ -352,18 +321,17 @@ export default function CreateEvent() {
             name="description"
           />
         </View>
-        <View style={{paddingBottom:30, marginTop: 15 }}>
+        <View style={{ paddingBottom: 30, marginTop: 15 }}>
           <Button
             style={{
               backgroundColor: theme.colors.primary,
               width: 300,
               marginLeft: "auto",
               marginRight: "auto",
-              
             }}
             onPress={handleSubmit(onSubmit)}
           >
-            <Text style={{color:"white"}}>Submit</Text>
+            <Text style={{ color: "white" }}>Submit</Text>
           </Button>
         </View>
       </Animated.ScrollView>
@@ -399,7 +367,7 @@ const EventNameInput = styled(TextInput)`
 const TagContainer = styled(View)`
     marginBottom: 15px;
     width: 90%;
-    height:50px;
+    minHeight:50px;
     borderColor:black;
     borderWidth:1px;
     flex-wrap: wrap;
