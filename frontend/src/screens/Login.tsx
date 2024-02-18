@@ -1,11 +1,9 @@
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
   Keyboard,
+  Text,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -13,10 +11,10 @@ import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import { useCallback } from "react";
 
 type loginForm = {
   email: string;
@@ -44,10 +42,13 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: loginForm) => {
-    console.log(data);
-    navigation.dispatch(StackActions.replace("LandingGroup"));
-  };
+  const onSubmit = useCallback(
+    (data: loginForm) => {
+      console.log(data);
+      navigation.dispatch(StackActions.replace("LandingGroup"));
+    },
+    [navigation],
+  );
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

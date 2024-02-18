@@ -1,9 +1,9 @@
-import { View, Text, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,11 +48,14 @@ export default function StudentSignUp() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: signUpSchool) => {
-    console.log(data);
-    navigation.navigate("StudentSignUpInfo");
-    //validate()
-  };
+  const onSubmit = useCallback(
+    (data: signUpSchool) => {
+      console.log(data);
+      navigation.navigate("StudentSignUpInfo");
+      //validate()
+    },
+    [navigation],
+  );
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
