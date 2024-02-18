@@ -2,6 +2,7 @@ import {
   Image,
   Keyboard,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -108,20 +109,41 @@ export default function Login() {
                 Login
               </Text>
             </StyledButton>
-            <ClickLink $color={theme.colors.primary}>
-              <Text style={{ marginRight: 5 }}>Don't have an account? </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 64,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
               <Text
-                onPress={() => {
-                  navigation.navigate("StudentSignUp");
-                }}
                 style={{
-                  color: theme.colors.primary,
+                  marginRight: 5,
+                  fontSize: 16,
                   fontFamily: "Roboto-Reg",
                 }}
               >
-                Sign up
+                Don't have an account?
               </Text>
-            </ClickLink>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("StudentSignUp");
+                }}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    fontFamily: "Roboto-Reg",
+                  }}
+                >
+                  Sign up
+                </Text>
+              </TouchableOpacity>
+            </View>
           </FormContainer>
         </OverlayContainer>
       </MainContainer>
@@ -152,17 +174,6 @@ const FormContainer = styled(View)`
     height: 500px;
     margin-left: auto;
     margin-right: auto;
-`;
-// prettier-ignore
-const ClickLink = styled(Text)<{ $color: string }>`
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 64px;
-    font-size: 16px;
-    font-family: Roboto-Reg;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
 `;
 // prettier-ignore
 const Header = styled(Text)`

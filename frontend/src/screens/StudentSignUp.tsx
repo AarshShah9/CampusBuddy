@@ -1,4 +1,10 @@
-import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Keyboard,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
@@ -57,17 +63,22 @@ export default function StudentSignUp() {
     [navigation],
   );
 
+  const handlePress = useCallback(() => {
+    console.log("Pressed");
+    // Add any navigation or logic here
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <MainContainer>
         <HeaderContainer>
-          <AntDesign
-            style={{ marginTop: "10%", marginLeft: "3%" }}
-            name="caretleft"
-            size={24}
-            color="white"
+          <TouchableOpacity
             onPress={() => navigation.navigate("Login")}
-          />
+            style={{ marginTop: "10%", marginLeft: "3%" }}
+            activeOpacity={0.7}
+          >
+            <AntDesign name="caretleft" size={24} color="white" />
+          </TouchableOpacity>
           <HeaderText $textColor={theme.colors.tertiary}>
             Student Sign Up
           </HeaderText>
@@ -188,21 +199,35 @@ export default function StudentSignUp() {
                 Next
               </Text>
             </StyledButton>
-            <ClickLink $color={theme.colors.primary}>
-              <Text>Sign up as an Organization </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 32,
+              }}
+            >
               <Text
-                onPress={() => {
-                  console.log("Pressed");
-                }}
                 style={{
-                  color: theme.colors.primary,
                   fontSize: 16,
                   fontFamily: "Roboto-Reg",
+                  marginRight: 5,
                 }}
               >
-                here
+                Sign up as an Organization
               </Text>
-            </ClickLink>
+              <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    fontSize: 16,
+                    fontFamily: "Roboto-Reg",
+                  }}
+                >
+                  here
+                </Text>
+              </TouchableOpacity>
+            </View>
           </FormContainer>
         </OverlayContainer>
       </MainContainer>
@@ -218,7 +243,7 @@ const MainContainer = styled(View)`
 `;
 // prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`
-    alignitems: center;
+    align-items: center;
     height: 85%;
     width: 100%;
     border-top-left-radius: 76px;
@@ -238,7 +263,7 @@ const HeaderText = styled(Text)<{ $textColor: string }>`
     color: ${(props) => props.$textColor};
     font-size: 28px;
     font-weight: bold;
-    fontfamily: "Nunito-Bold";
+    font-family: "Nunito-Bold";
 `;
 // prettier-ignore
 const FormContainer = styled(View)`
@@ -265,13 +290,4 @@ const StyledButton = styled(Button)`
     margin-right: auto;
     margin-top: 10px;
     justify-content: center;
-`;
-// prettier-ignore
-const ClickLink = styled(Text)<{ $color: string }>`
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 16px;
-    font-size: 16px;
-    justify-content: center;
-    align-items: center;
 `;
