@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mapBox: {
-    width: 300,
+    width: 350,
     height: 200,
     borderRadius: 10,
     overflow: "hidden", // Ensure the map respects the border radius

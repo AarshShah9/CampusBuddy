@@ -11,6 +11,7 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
+import MapComponentSmall from "~/components/MapComponentSmall";
 
 const IMG_HEIGHT = 300;
 
@@ -66,6 +67,8 @@ export default function EventDetails() {
     clubName: "",
     detail: "",
     attendance: 0,
+    longitude: -122.4324,
+    latitude: 37.78825,
   });
   // Fetch event details from backend
   useLayoutEffect(() => {
@@ -82,6 +85,8 @@ export default function EventDetails() {
       detail:
         "Step into the exhilarating realm of competition and showcase your tactical prowess at our upcoming local Valorant tournament! Embark on a thrilling journey where precision meets strategy, as teams battle it out for glory and recognition. Unleash your skills in this adrenaline-fueled arena, where every shot fired and every well-executed strategy could be the turning point in your team's ascent to victory. \n Join fellow enthusiasts in a celebration of camaraderie and sportsmanship, and let the electrifying atmosphere of the tournament propel you to new heights. Whether you're a seasoned veteran or a rising star, this is your chance to leave your mark and etch your name in the annals of local Valorant history.\n The stage is set, the competition is fierce, and the glory awaits—seize the opportunity and be part of an unforgettable gaming experience!",
       attendance: 200,
+      longitude: -122.4324,
+      latitude: 37.78825,
     });
   }, []);
 
@@ -212,6 +217,14 @@ export default function EventDetails() {
           </Text>
         </View>
         <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <MapComponentSmall
+            latitude={eventData.latitude}
+            longitude={eventData.longitude}
+          />
+        </View>
+        <View
           style={{
             paddingBottom: 60,
             marginLeft: "auto",
@@ -268,7 +281,7 @@ const TagContainer = styled(View)`
     border-radius: 8px;
     flex-direction: row;
     padding: 5px;
-    marginbottom: 5px;
+    margin-bottom: 5px;
 `;
 // prettier-ignore
 const StyledButton = styled(Button)`
