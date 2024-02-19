@@ -8,6 +8,7 @@ import {
   getAllEventsByOrganization,
   getAllVerifiedEvents,
   getEventById,
+  getEventByUserId,
   getRecentEvents,
   updateEvent,
 } from "../controllers/event.controller";
@@ -23,6 +24,7 @@ router.get("/verified", getAllVerifiedEvents);
 router.get("/organization/:id", getAllEventsByOrganization);
 router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
+router.get("/user-events/:id", getEventByUserId);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
 router.post("/", upload.single("file"), createEvent);

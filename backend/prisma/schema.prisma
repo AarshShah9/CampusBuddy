@@ -43,6 +43,10 @@ enum UserOrgStatus {
   Banned
 }
 
+enum ParticipationStatus {
+  Interested
+}
+
 // many of these permissions may not apply to our application
 enum AppPermissionName {
   CREATE_EVENTS
@@ -54,11 +58,6 @@ enum AppPermissionName {
   VIEW_ANALYTICS // view details about the organization
   MANAGE_ORGANIZATION // edit org name, description, image, permissions
   DELETE_ORGANIZATION
-}
-
-enum ParticipationStatus {
-  Going
-  Interested
 }
 
 // CORE MODELS
