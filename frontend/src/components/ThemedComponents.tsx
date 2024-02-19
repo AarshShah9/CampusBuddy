@@ -31,7 +31,8 @@ export const ThemedTextInput = ({ style, ...props }: TextInputProps) => {
 
   return <TextInput {...props} style={stylesList} />;
 };
+// prettier-ignore
 export const MainContainer = styled(View)<{ $primary: string }>`
-  height: 100%;
-  background-color: ${(props) => props.$primary};
+    height: 100%;
+    background-color: ${(props) => props.$primary};
 `;

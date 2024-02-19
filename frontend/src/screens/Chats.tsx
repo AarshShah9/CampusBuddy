@@ -121,32 +121,33 @@ export default function Chats() {
   );
 }
 
+// prettier-ignore
 const styles = StyleSheet.create({
-  searchArea: {
-    paddingHorizontal: 20,
-    flex: 0.01,
-    minHeight: 80,
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 1,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    minWidth: 300,
-    minHeight: 34,
-    borderRadius: 10,
-    color: "black",
-    paddingLeft: 6,
-  },
-  searchBarInput: {
-    height: "90%",
-    marginHorizontal: 5,
-    fontSize: 18,
-    flex: 0.98,
-  },
-  chatListArea: {
-    flex: 1,
-  },
+    searchArea: {
+      paddingHorizontal: 20,
+      flex: 0.01,
+      minHeight: 80,
+      justifyContent: "center",
+      alignItems: "center",
+      borderBottomWidth: 1,
+    },
+    searchBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      width: "100%",
+      minWidth: 300,
+      minHeight: 34,
+      borderRadius: 10,
+      color: "black",
+      paddingLeft: 6,
+    },
+    searchBarInput: {
+      height: "90%",
+      marginHorizontal: 5,
+      fontSize: 18,
+      flex: 0.98,
+    },
+    chatListArea: {
+      flex: 1,
+    },
 });

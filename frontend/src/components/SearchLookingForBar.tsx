@@ -60,25 +60,26 @@ export default function LookingForItem({ lookingForData }: LookingForProps) {
 }
 
 // Setting the Styles for the children used in this component
+// prettier-ignore
 const InfoContainer = styled(View)`
-  margin-top: 16px;
-  margin-right: 16px;
-  margin-left: 16px;
+    margin-top: 16px;
+    margin-right: 16px;
+    margin-left: 16px;
 `;
-
+// prettier-ignore
 const TitleText = styled(Text)`
-  font-family: Nunito-Bold;
-  font-size: 16px;
-  margin-bottom: 8px;
+    font-family: Nunito-Bold;
+    font-size: 16px;
+    margin-bottom: 8px;
 `;
-
+// prettier-ignore
 const DescriptionText = styled(Text)`
-  font-family: Roboto-Reg;
-  font-size: 12px;
-  height: 48px;
-  width: 361px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 16px;
-  numberoflines: 3;
+    font-family: Roboto-Reg;
+    font-size: 12px;
+    height: 48px;
+    width: 361px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 16px;
+    numberoflines: 3;
 `;
