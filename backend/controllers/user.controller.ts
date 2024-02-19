@@ -87,7 +87,7 @@ export const signupAsStudent = async (
     };
 
     const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "10m",
       mutatePayload: false,
     });
 
@@ -439,7 +439,7 @@ export const signupWithExistingOrg = async (
 
     // Create the jwt for verifying email, contains user data as payload
     const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "10m",
       mutatePayload: false,
     });
 
@@ -535,7 +535,7 @@ export const signupAsNewOrg = async (
 
     // Create the jwt for verifying email, contains both user and organization data in payload
     const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "10m",
       mutatePayload: false,
     });
 
