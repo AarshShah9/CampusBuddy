@@ -7,13 +7,20 @@ import { BooleanSchema } from "./utils";
 
 export const EventStatusSchema = z.enum(["Verified", "NonVerified"]);
 
-export const ParticipationStatusSchema = z.enum([
-  "Going",
-  "Interested",
-  "NotInterested",
+export const ParticipationStatusSchema = z.enum(["Interested"]);
+
+export const OrganizationStatusSchema = z.enum([
+  "Pending",
+  "Approved",
+  "Rejected",
 ]);
 
-export const OrganizationStatusSchema = z.enum(["Pending", "Verified"]);
+export const UserOrgStatusSchema = z.enum([
+  "Pending",
+  "Approved",
+  "Rejected",
+  "Banned",
+]);
 
 export const UserRoleSchema = z.enum(["Owner", "Admin", "Moderator", "Member"]);
 
@@ -28,6 +35,13 @@ export const AppPermissionNameSchema = z.enum([
   "MANAGE_ORGANIZATION",
   "DELETE_ORGANIZATION",
 ]);
+
+export const ApprovalStatusSchema = OrganizationStatusSchema.extract([
+  "Approved",
+  "Rejected",
+]);
+
+export const UserType = z.enum(["Student", "PendingOrg", "ApprovedOrg"]);
 
 ///////////////////////////////
 // EVENT SCHEMAS
@@ -81,7 +95,7 @@ export const EventCreateSchema = EventSchema.omit({
   path: ["endTime"],
 });
 
-export type EventCreateInput = z.infer<typeof EventCreateSchema>;
+export type EventCreateType = z.infer<typeof EventCreateSchema>;
 
 /**
  * Update Event Schema
@@ -89,7 +103,7 @@ export type EventCreateInput = z.infer<typeof EventCreateSchema>;
  */
 export const EventUpdateSchema = EventSchema.partial();
 
-export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
+export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 
 ///////////////////////////////
 // USER SCHEMAS
@@ -98,46 +112,92 @@ export type EventUpdateInput = z.infer<typeof EventUpdateSchema>;
 export const UserSchema = z.object({
   id: z.string().uuid(),
   username: z.string().min(3).max(20),
-  firstName: z.string().min(3).max(20),
-  lastName: z.string().min(3).max(20),
+  firstName: z.string().min(2).max(20),
+  lastName: z.string().min(2).max(20),
   email: z.string().email({ message: "Invalid email address" }).min(5),
   password: z
     .string()
     .min(8, { message: "Password must be greater than 8 characters long" }),
+  profilePic: z.string().nullable(),
+  accountType: UserType,
   institutionName: z.string(),
 });
 
 export type User = z.infer<typeof UserSchema>;
 
+export const UserCreateSchema = UserSchema.omit({
+  id: true,
+  profilePic: true,
+  accountType: true,
+});
+
+export type UserCreateType = z.infer<typeof UserCreateSchema>;
+
 /**
  * Update User Schema
- * partial makes all fields optional, useful for update (patch request)
+ * Cannot change account type
+ * Partial makes all fields optional
  */
-export const UserUpdateSchema = UserSchema.partial();
+// export const UserUpdateSchema = UserSchema.partial();
+export const UserUpdateSchema = UserSchema.omit({
+  id: true,
+  email: true,
+  accountType: true,
+}).partial();
 
-export type UserUpdateInput = z.infer<typeof UserUpdateSchema>;
+export type UserUpdateType = z.infer<typeof UserUpdateSchema>;
 
 ///////////////////////////////
 // ORGANIZATION SCHEMAS
 ///////////////////////////////
 
 export const OrganizationSchema = z.object({
-  status: OrganizationStatusSchema,
   id: z.string().uuid(),
   organizationName: z.string(),
   description: z.string().nullable(),
   createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  status: OrganizationStatusSchema,
+  institutionId: z.string().uuid(),
+  image: z.string().nullable(),
 });
 
 export type Organization = z.infer<typeof OrganizationSchema>;
 
-// Create a new schema based on OrganizationSchema, omitting id and createdAt
+// Create a new schema based on OrganizationSchema
 export const OrganizationCreateSchema = OrganizationSchema.omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+  image: true,
+  status: true,
 });
 
-export type OrganizationCreateInput = z.infer<typeof OrganizationCreateSchema>;
+export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
+
+// Can only manually change the description and image
+export const OrganizationUpdateSchema = OrganizationSchema.omit({
+  id: true,
+  organizationName: true,
+  createdAt: true,
+  updatedAt: true,
+  institutionId: true,
+  status: true,
+}).partial();
+
+// For approving or rejecting a membership request to join an organization
+export const OrganizationMembershipApprovalSchema = z.object({
+  userId: z.string().uuid(),
+  roleId: z.string().uuid(),
+  decision: ApprovalStatusSchema,
+  rejectionReason: z.string().optional(),
+});
+
+// For approving or rejecting a new organization
+export const OrganizationApprovalSchema = z.object({
+  decision: ApprovalStatusSchema,
+  rejectionReason: z.string().optional(),
+});
 
 /////////////////////////////////////////
 // SCHOOL SCHEMAS
@@ -202,6 +262,7 @@ export const UserOrganizationRoleSchema = z.object({
   userId: z.string().uuid(),
   organizationId: z.string().uuid(),
   roleId: z.string().uuid(),
+  status: UserOrgStatusSchema,
 });
 
 export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>;
@@ -250,7 +311,10 @@ export const EnrollmentSchema = z.object({
   programId: z.string().uuid(),
   userId: z.string().uuid(),
   degreeType: z.string(),
-  yearOfStudy: z.number(),
+  yearOfStudy: z.coerce
+    .number()
+    .min(1, { message: "Year of Study must be greater than 0" })
+    .max(10, { message: "Year of Study must be less than 11" }),
 });
 
 export type Enrollment = z.infer<typeof EnrollmentSchema>;
@@ -325,6 +389,11 @@ export const IdParamSchema = z.object({
     }),
 });
 
+export const OrganizationRoleNameParamsSchema = z.object({
+  organizationId: z.string().uuid(),
+  roleName: UserRoleSchema,
+});
+
 ///////////////////////////////
 // PAGINATION SCHEMAS
 ///////////////////////////////
@@ -363,6 +432,8 @@ export const InstitutionSchema = z.object({
 
 export const createInstitutionSchema = InstitutionSchema.partial();
 
+export type createInstitutionType = z.infer<typeof createInstitutionSchema>;
+
 export const institutionNameSchema = z
   .string()
   .refine((data) => data.length > 0, {
@@ -381,16 +452,6 @@ export const institutionIDSchema = z
   .refine((data) => data.length > 0, {
     message: "ID is invalid",
   });
-
-///////////////////////////////
-// USER SCHEMAS
-///////////////////////////////
-export const createUserSchema = UserSchema.omit({
-  id: true,
-  isVerified: true,
-  otp: true,
-  jwt: true,
-});
 
 export const otpRequestSchema = z.object({
   email: z.string().email().min(1, { message: "Invalid OTP" }),
@@ -423,11 +484,8 @@ export const tokenSchema = z.object({
   token: z.string(),
 });
 
-export const payloadSchema = z.object({
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  password: z.string(),
-  institutionId: z.string(),
+// For signing up with a new organization
+export const OrgSignupPayloadSchema = z.object({
+  user: UserCreateSchema,
+  organization: OrganizationCreateSchema,
 });

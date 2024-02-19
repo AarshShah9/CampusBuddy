@@ -328,6 +328,42 @@ export const getEventById = async (
   }
 };
 
+// Get Events by User Id. Sends three json objects
+export const getEventByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const userId = IdParamSchema.parse(req.params).id;
+
+    // Get event from db
+    const eventsCreatedByUser = await prisma.event.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+    const eventsInterested = await prisma.event.findMany({
+      where: {
+        eventResponses: {
+          some: {
+            userId,
+            participationStatus: "Interested",
+          },
+        },
+      },
+    });
+    let userEventsData = {
+      eventsCreatedByUser: eventsCreatedByUser,
+      eventsInterested: eventsInterested,
+    };
+    res.status(200).json(userEventsData);
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Retrieves the most recent events using cursor pagination based on timestamp.
  *
