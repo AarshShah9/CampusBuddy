@@ -248,7 +248,7 @@ export const userEventResponses = [
   {
     userId: ids.userIds[2],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Going,
+    participationStatus: ParticipationStatus.Interested,
   },
   {
     userId: ids.userIds[2],
@@ -258,7 +258,7 @@ export const userEventResponses = [
   {
     userId: ids.userIds[3],
     eventId: ids.eventIds[1],
-    participationStatus: ParticipationStatus.Going,
+    participationStatus: ParticipationStatus.Interested,
   },
   {
     userId: ids.userIds[3],
@@ -278,12 +278,12 @@ export const userEventResponses = [
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Going,
+    participationStatus: ParticipationStatus.Interested,
   },
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[3],
-    participationStatus: ParticipationStatus.Going,
+    participationStatus: ParticipationStatus.Interested,
   },
 ];
 
