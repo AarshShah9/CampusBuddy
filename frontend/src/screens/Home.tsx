@@ -1,17 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
-import { Card } from "react-native-paper";
-import { ThemedText } from "~/components/ThemedComponents";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
-import Map from "~/screens/Map";
-import MapComponentSmall from "~/components/MapComponentSmall";
-import useThemeContext from "~/hooks/useThemeContext";
-import EventSearchCard from "~/components/EventSearchCard";
+import VerticalScrollView from "~/components/VerticalScrollView";
+import EventHomeCard from "~/components/HomeEventCard";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -54,60 +49,25 @@ export default function Home() {
     );
   };
 
-  const { theme } = useThemeContext();
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
-      <Button title={"Test"} onPress={testCallback} />
-      <MapComponentSmall latitude={37.78825} longitude={-122.4324} />
-      <View style={styles.mockEventsContainer}>
-        <Card
-          style={[
-            styles.mockEventContainer,
-            { backgroundColor: theme.colors.primary },
-          ]}
-          mode="elevated"
-          onPress={() => {
-            navigate("EventDetails", { eventNumber: 1 });
-          }}
-        >
-          <Card.Content style={{ alignItems: "center" }}>
-            <ThemedText>Mock Event 1</ThemedText>
-          </Card.Content>
-        </Card>
-        <Card
-          style={[
-            styles.mockEventContainer,
-            { backgroundColor: theme.colors.primary },
-          ]}
-          mode="elevated"
-          onPress={() => {
-            navigate("EventDetails", { eventNumber: 2 });
-          }}
-        >
-          <Card.Content style={{ alignItems: "center" }}>
-            <ThemedText>Mock Event 2</ThemedText>
-          </Card.Content>
-        </Card>
-      </View>
-    </View>
+  <VerticalScrollView />
   );
 }
 
-// prettier-ignore
-const styles = StyleSheet.create({
-    mockEventsContainer: {
-      marginTop: 30,
-      display: "flex",
-      flexDirection: "row",
-      width: "95%",
-      height: "auto",
-      justifyContent: "space-around",
-      alignItems: "center",
-    },
-    mockEventContainer: {
-      width: 100,
-      height: 100,
-      justifyContent: "center",
-    },
-});
+// // prettier-ignore
+// const styles = StyleSheet.create({
+//     mockEventsContainer: {
+//       marginTop: 30,
+//       display: "flex",
+//       flexDirection: "row",
+//       width: "95%",
+//       height: "auto",
+//       justifyContent: "space-around",
+//       alignItems: "center",
+//     },
+//     mockEventContainer: {
+//       width: 100,
+//       height: 100,
+//       justifyContent: "center",
+//     },
+// });
