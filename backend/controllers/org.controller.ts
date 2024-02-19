@@ -41,7 +41,6 @@ export const organizationTest = async (req: Request, res: Response) => {
 
 // Create a new Organization
 export const createNewOrganization = async (
-  // req: Request,
   req: RequestExtended,
   res: Response,
   next: NextFunction,
@@ -51,15 +50,6 @@ export const createNewOrganization = async (
     const validatedOrganization = OrganizationCreateSchema.parse(req.body);
 
     const loggedInUserId = req.userID;
-    // If we want to make image upload mandatory upon organization creation
-    // if (!req.file) {
-    //   throw new AppError(
-    //     AppErrorName.FILE_UPLOAD_ERROR,
-    //     "No file uploaded.",
-    //     400,
-    //     true,
-    //   );
-    // }
 
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
@@ -341,26 +331,53 @@ export const getAllPendingOrganizations = async (
       },
     });
 
-    const allOrgs = await prisma.organization.findMany({
+    const pendingOrgData = await prisma.organization.findMany({
       where: {
         status: OrganizationStatus.Pending,
       },
-      // if we want to include owner information in the results:
-      // include: {
-      //   userOrganizationRoles: {
-      //     where: {
-      //       roleId,
-      //     },
-      //     include: {
-      //       user: true,
-      //     },
-      //   },
-      // },
+      // Include owner information in the results:
+      include: {
+        userOrganizationRoles: {
+          where: {
+            roleId,
+          },
+          include: {
+            user: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "asc", // show oldest org requests first
       },
     });
-    res.status(200).json({ data: allOrgs });
+
+    // Format the query data to include only the organization and owner's information
+    const formattedPendingOrgData = pendingOrgData.map((data) => {
+      const ownerRole = data.userOrganizationRoles[0]; // Access first element as there will always be only one owner
+
+      // omit the user's password from the user data being sent in the response
+      const ownerInfo = ownerRole
+        ? (({ password, ...rest }) => rest)(ownerRole.user)
+        : null;
+
+      // extract the org info
+      const orgInfo = {
+        id: data.id,
+        organizationName: data.organizationName,
+        description: data.description,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        status: data.status,
+        image: data.image,
+        institutionId: data.institutionId,
+      };
+
+      return {
+        organization: orgInfo,
+        owner: ownerInfo,
+      };
+    });
+    res.status(200).json({ data: formattedPendingOrgData });
   } catch (error) {
     next(error);
   }
