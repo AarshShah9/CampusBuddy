@@ -11,12 +11,7 @@ type Item2 = {
 
 const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
   return (
-    <View
-      style={{
-        height: 214,
-        margin: 14,
-      }}
-    >
+    <View>
       <Text
         style={{
           color: "white",
@@ -26,7 +21,7 @@ const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
         {item.title}
       </Text>
       <FlatList
-        style={{ backgroundColor: "red", marginBottom: 0, height:130 }}
+        style={{marginBottom: 0, height: 130 }}
         data={item.items}
         renderItem={Cards}
         horizontal={true}
@@ -41,9 +36,9 @@ const Cards = ({ item }: { item: Item }) => {
     <View>
       <Text
         style={{
-          color: "white",
+          color: "red",
           fontSize: 15,
-          paddingRight: 100,
+          paddingRight: 1,
         }}
       >
         <EventHomeCard eventData={item} />
