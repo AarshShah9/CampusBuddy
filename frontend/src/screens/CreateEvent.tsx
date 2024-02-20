@@ -4,12 +4,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Image,
-  Keyboard,
 } from "react-native";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Animated, {
   interpolate,
@@ -22,6 +20,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { Button } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
+import { useCallback } from "react";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const IMG_HEIGHT = 300;
 
@@ -69,9 +69,10 @@ export default function CreateEvent() {
   //Functions
 
   // Function to handle submission of user data
-  const onSubmit = (data: createEvent) => {
+  const onSubmit = useCallback((data: createEvent) => {
     console.log(data);
-  };
+  },[])
+
   // Function for animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -96,6 +97,7 @@ export default function CreateEvent() {
 
 
   return (
+
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
@@ -276,10 +278,9 @@ export default function CreateEvent() {
               required: true,
             }}
             render={({ field: { onChange } }) => (
-              <View>
+              <View style={{marginLeft: 20}}>
                 <Text
                   style={{
-                    marginLeft: 20,
                     marginBottom: 3,
                     fontFamily: "Nunito-Medium",
                     fontSize: 16,
@@ -324,14 +325,17 @@ export default function CreateEvent() {
         <View style={{ paddingBottom: 30, marginTop: 15 }}>
           <Button
             style={{
-              backgroundColor: theme.colors.primary,
               width: 300,
               marginLeft: "auto",
               marginRight: "auto",
+              backgroundColor: theme.colors.primary,
             }}
             onPress={handleSubmit(onSubmit)}
           >
-            <Text style={{ color: "white" }}>Submit</Text>
+            <Text style={{ color: "white",
+                fontFamily: "Roboto-Bold",
+                fontSize: 24,
+                lineHeight: 30,}}>Submit</Text>
           </Button>
         </View>
       </Animated.ScrollView>

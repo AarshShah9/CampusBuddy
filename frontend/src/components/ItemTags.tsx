@@ -66,8 +66,6 @@ const TagContainer = styled(View)`
     flex-direction:row;
     align-item:center;
     border-radius:3px;
-    margin-left:auto;
-    margin-right:auto;
     borderRadius:8px;
     padding:5px;
 `

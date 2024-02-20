@@ -6,6 +6,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useState } from "react";
 import CreateEvent from "./CreateEvent";
 import CreateLookingFor from "./CreateLookingFor";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import CreateMarketplace from "./CreateMarketplace";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -19,12 +21,12 @@ export default function CreateScreen() {
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
-        <MaterialIcons
-          style={{ marginTop: 60, marginLeft: 10 }}
-          name="cancel"
-          size={24}
-          color="white"
-        />
+          <MaterialIcons
+            style={{ marginTop: 60, marginLeft: 10 }}
+            name="cancel"
+            size={24}
+            color="white"
+          />
         <Dropdown
           style={{ width: 125, marginTop: 50, paddingRight: 5 }}
           placeholderStyle={{ color: "white", paddingLeft: 40 }}
@@ -41,7 +43,7 @@ export default function CreateScreen() {
       </HeaderContainer>
       {currentSelected == "1" && <CreateEvent />}
       {currentSelected == "2" && <CreateLookingFor/>}
-      {currentSelected == "3" && <Text>MarketPlace</Text>}
+      {currentSelected == "3" && <CreateMarketplace/>}
     </MainContainer>
   );
 }
