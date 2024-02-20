@@ -21,12 +21,12 @@ export default function CreateScreen() {
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
-          <MaterialIcons
-            style={{ marginTop: 60, marginLeft: 10 }}
-            name="cancel"
-            size={24}
-            color="white"
-          />
+        <MaterialIcons
+          style={{ marginTop: 60, marginLeft: 10 }}
+          name="cancel"
+          size={24}
+          color="white"
+        />
         <Dropdown
           style={{ width: 125, marginTop: 50, paddingRight: 5 }}
           placeholderStyle={{ color: "white", paddingLeft: 40 }}
@@ -42,17 +42,17 @@ export default function CreateScreen() {
         />
       </HeaderContainer>
       {currentSelected == "1" && <CreateEvent />}
-      {currentSelected == "2" && <CreateLookingFor/>}
-      {currentSelected == "3" && <CreateMarketplace/>}
+      {currentSelected == "2" && <CreateLookingFor />}
+      {currentSelected == "3" && <CreateMarketplace />}
     </MainContainer>
   );
 }
-
+// prettier-ignore
 const MainContainer = styled(View)<{ color: string }>`
   height: 100%;
   background-color: ${(props) => props.color};
 `;
-
+// prettier-ignore
 const HeaderContainer = styled(View)`
   width: 100%;
   height: 100px;

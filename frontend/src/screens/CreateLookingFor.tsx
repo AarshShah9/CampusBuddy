@@ -1,4 +1,10 @@
-import { View, Text, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
@@ -52,7 +58,7 @@ export default function CreateLookingFor() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={()=>Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ backgroundColor: "white", flexGrow: 1 }}>
         <Controller
           control={control}
@@ -82,7 +88,7 @@ export default function CreateLookingFor() {
             required: true,
           }}
           render={({ field: { onChange } }) => (
-            <View style={{marginLeft: 20,}}>
+            <View style={{ marginLeft: 20 }}>
               <Text
                 style={{
                   marginBottom: 3,
