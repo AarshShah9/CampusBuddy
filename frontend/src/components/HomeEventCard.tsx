@@ -49,8 +49,6 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
 // Adding styling to the seperate card components
 // prettier-ignore
 const StyledCard = styled(Card)`
-    margin-left: 16px;
-    margin-right: 16px;
     width: 159px;
     height: 130px;
     background-color: rgba(0, 0, 0, 0);
