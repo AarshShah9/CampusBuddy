@@ -24,6 +24,7 @@ const VerticalScrollComponent = () => {
         <View
           style={{
             marginTop:14,
+            marginBottom: 32,
             height: 214,
             width: 326,
             backgroundColor: "blue",
