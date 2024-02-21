@@ -13,7 +13,7 @@ export default function BottomTabGroup() {
   return (
     <BottomTab.Navigator
       barStyle={{
-        backgroundColor: theme.colors.onPrimary,
+        backgroundColor: theme.colors.background,
       }}
       labeled={false}
       initialRouteName="Home"
