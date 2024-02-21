@@ -63,6 +63,7 @@ const CardContent = styled(Card.Content)``;
 // prettier-ignore
 const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
+    font-size: 12px;
 `;
 // prettier-ignore
 const EventTime = styled(Text)`

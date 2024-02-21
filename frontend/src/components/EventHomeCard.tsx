@@ -9,7 +9,7 @@ type EventHomeCardProps = {
   eventData: { title: string; time: string; location: string; image: string };
 };
 
-export default function EventHomeCard({ eventData }: EventHomeCardProps) {
+export default function NOT_USING_THIS({ eventData }: EventHomeCardProps) {
   return (
     <CardContainer>
       <Card.Cover
