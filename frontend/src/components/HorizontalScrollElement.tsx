@@ -17,7 +17,6 @@ const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
           color: "white",
           fontSize: 16,
           paddingBottom: 16,
-          paddingLeft:16
         }}
       >
         {item.title}
