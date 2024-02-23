@@ -39,7 +39,12 @@ const VerticalScrollComponent = () => {
             alignItems: "center",
           }}
         >
-          <Carousel style={{ height: 214, width: 326 }}>
+          <Carousel
+            autoplay={true}
+            autoplayInterval={5000}
+            showsControls={false}
+            style={{ height: 214, width: 326 }}
+          >
             {images.map((imageUrl, index) => (
               <Image
                 key={index}
