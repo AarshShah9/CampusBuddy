@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
-import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
 
@@ -14,8 +13,9 @@ type EventMainCardProps = {
 
 export default function EventMainCard(props: EventMainCardProps) {
     return (
-        <StyledCard>
-            <StyledCover
+        <Card style={styles.card}>
+            <Card.Cover
+                style={styles.cardCover}
                 source={{ uri: props.picture }}
                 resizeMode="cover"
             />
@@ -29,12 +29,22 @@ export default function EventMainCard(props: EventMainCardProps) {
                     <LocationChip location={props.location}></LocationChip>
                 </Card.Content>
             </Card.Content>
-        </StyledCard>
+        </Card>
     );
 }
 
 // prettier-ignore
 const styles = StyleSheet.create({
+    // need to talk about these card widths and height
+    card: {
+        width: "100%",
+        height: 300,
+        marginTop: 16,
+    },
+    cardCover: {
+        height: 178,
+        margin: 12
+    },
     cardContent: {
         paddingHorizontal: 12
     },
@@ -62,16 +72,3 @@ const styles = StyleSheet.create({
         marginBottom: 8
     },
 })
-
-// need to talk about these card widths and height
-// prettier-ignore
-const StyledCard = styled(Card)`
-    width: 100%;
-    height: 300px;
-    margin-top: 16px;
-`;
-// prettier-ignore
-const StyledCover = styled(Card.Cover)`
-    height: 178px;
-    margin: 12px;
-`;

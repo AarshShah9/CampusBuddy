@@ -12,7 +12,7 @@ export default function Events() {
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <ScrollView style={{ flex: 1 }}>
                 <Pressable style={{ paddingVertical: 20 }}>
-                    <ThemedText style={{ paddingLeft: 20, fontWeight: 'bold', fontSize: 24 }}>
+                    <ThemedText style={{ paddingLeft: 20, fontFamily: "Nunito-Bold", fontSize: 24 }}>
                         Events
                     </ThemedText>
                     <View style={{ paddingHorizontal: 20 }}>

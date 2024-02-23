@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     innerContainer: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: 'center'
     }
 })

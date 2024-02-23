@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons, Fontisto } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { MaterialBottomTabNavigationOptions, createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import HomeScreenStack from "./HomeStack";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -26,9 +26,9 @@ const screenOptions: ScreenOptions = ({ route }) => ({
             iconName = focused ? "add-circle" : "add-circle-outline";
         else if (route.name === "Threads")
             return (
-                <Fontisto 
+                <Octicons 
                     {...{
-                        name: "hashtag",
+                        name: "hash",
                         size: 22,
                         color
                     }} 

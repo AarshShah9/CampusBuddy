@@ -1,80 +1,52 @@
-import * as React from "react";
-import { List, Text } from "react-native-paper";
-import { Dimensions, View, useWindowDimensions } from "react-native";
-import styled from "styled-components";
+import { Text } from "react-native-paper";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import PersonChip from "./PersonChip";
 import CommentsChip from "./CommentsChip";
-import { useFonts } from "expo-font";
 
-// Sets the Props for the Looking for component
-type LookingForProps = {
-  lookingForData: {
-    title: string;
-    description: string;
-    requiredMembers: number;
-  };
+type Props = {
+    title: string,
+    description: string,
+    requiredMembers?: number
 };
 
-// Component to render for the look for component
-export default function LookingForItem({ lookingForData }: LookingForProps) {
-  // Loading the fonts into the component
-  const window = useWindowDimensions();
-  
-  return (
-    // Creating the primairy Container
-    <View
-      style={{
-        borderBottomWidth: 0.5,
-        borderBottomColor: "rgb(204, 204, 204)",
-        height: 174,
-        width: window.width,
-      }}
-    >
-      {/* Setting the container with all the information */}
-      <InfoContainer>
-        {/* loading the Title and Description of the post to the component*/}
-        <TitleText>{lookingForData.title}</TitleText>
-        <DescriptionText>{lookingForData.description}</DescriptionText>
-      </InfoContainer>
-      {/* Creating the container for the chips */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: "auto",
-          marginBottom: 16,
-        }}
-      >
-        {/* Loading the Person chip with the data */}
-        <PersonChip numberOfUsers={lookingForData.requiredMembers} />
-        {/* Loading the Comments Chip */}
-        <CommentsChip />
-      </View>
-    </View>
-  );
+export default function LookingForItem({ title, description, requiredMembers }: Props) {
+    return (
+        <View style={styles.container}>
+            <TouchableOpacity>
+                <Text style={styles.title}>{title}</Text>
+            </TouchableOpacity>
+            <Text style={styles.description}>{description}</Text>
+            <View style={styles.bottomContainer}>
+                <TouchableOpacity>
+                    <CommentsChip />
+                </TouchableOpacity>
+                {requiredMembers && <PersonChip numberOfUsers={requiredMembers} />}
+            </View>
+        </View>
+    );
 }
 
-// Setting the Styles for the children used in this component
-// prettier-ignore
-const InfoContainer = styled(View)`
-    margin-top: 16px;
-    margin-right: 16px;
-    margin-left: 16px;
-`;
-// prettier-ignore
-const TitleText = styled(Text)`
-    font-family: Nunito-Bold;
-    font-size: 16px;
-    margin-bottom: 8px;
-`;
-// prettier-ignore
-const DescriptionText = styled(Text)`
-    font-family: Roboto-Reg;
-    font-size: 12px;
-    height: 48px;
-    width: 361px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 16px;
-    numberoflines: 3;
-`;
+const styles = StyleSheet.create({
+    container: {
+        width: "100%",
+        //height: 174,
+        marginTop: 20,
+        borderBottomWidth: 0.5,
+        borderBottomColor: "rgb(204, 204, 204)",
+    },
+    title: {
+        fontFamily: 'Nunito-Bold',
+        fontSize: 18,
+        marginBottom: 8
+    },
+    description: {
+        fontFamily: 'Roboto-Reg',
+    },
+    bottomContainer: {
+        marginTop: 20,
+        marginBottom: 15,
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    }
+})
