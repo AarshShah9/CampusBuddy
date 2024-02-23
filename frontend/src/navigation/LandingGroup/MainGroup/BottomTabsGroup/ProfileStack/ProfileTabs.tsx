@@ -16,7 +16,7 @@ export default function ProfileTabs() {
   return (
     <TopTabs.Navigator
       screenOptions={{
-        tabBarStyle: { backgroundColor: theme.colors.background },
+        tabBarStyle: { backgroundColor: theme.colors.onPrimary },
         tabBarShowLabel: false,
       }}
     >

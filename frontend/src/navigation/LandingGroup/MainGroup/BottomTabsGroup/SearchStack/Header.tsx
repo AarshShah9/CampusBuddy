@@ -68,7 +68,7 @@ export default function Header() {
             >
                 <View style={styles.searchArea}>
                     <SearchArea />
-                    <AntDesign name="filter" size={30} color="white" />
+                    <AntDesign name="filter" size={30} color={theme.colors.onPrimary} />
                 </View>
             </View>
         </TouchableWithoutFeedback>

@@ -16,10 +16,7 @@ export default function Navigation() {
             <StatusBar style="auto" />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="SplashScreen" component={SplashScreen} />
-                <Stack.Screen
-                    name="AuthenticationGroup"
-                    component={AuthenticationGroup}
-                />
+                <Stack.Screen name="AuthenticationGroup" component={AuthenticationGroup} />
                 <Stack.Screen name="LandingGroup" component={LandingGroup} />
             </Stack.Navigator>
         </NavigationContainer>

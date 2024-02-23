@@ -14,7 +14,10 @@ export default function MessagesStackGroup() {
   return (
     <ChatsContextProvider>
       <ChatContextProvider>
-        <Stack.Navigator>
+        <Stack.Navigator 
+          initialRouteName="ChatList" 
+          screenOptions={{ headerTintColor: theme.colors.onSecondary }}
+        >
           <Stack.Screen
             name="ChatList"
             component={Chats}
