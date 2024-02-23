@@ -8,10 +8,6 @@ import {
   UserType,
 } from "@prisma/client";
 
-interface IDMap {
-  [key: number]: string;
-}
-
 export const ids = {
   userIds: {
     1: "db365290-c550-11ee-83fd-6f8d6c450910",
