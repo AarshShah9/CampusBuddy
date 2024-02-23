@@ -1,7 +1,9 @@
 import React from "react";
-import { FlatList, Text, View } from "react-native";
+import { Dimensions, FlatList, Text, View, Image } from "react-native";
 import eventData from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
+import Carousel from "pinar";
+import styled from "styled-components/native";
 
 export type Item = {
   id: string;
@@ -11,26 +13,42 @@ export type Item = {
   image: string;
 };
 
+const images = [
+  "https://picsum.photos/700",
+  "https://picsum.photos/600",
+  "https://picsum.photos/800",
+  "https://picsum.photos/900",
+];
+
+const WIDTH = Dimensions.get("window").width;
+const HEIGHT = Dimensions.get("window").height;
+
 const VerticalScrollComponent = () => {
   const data2 = eventData;
-
   return (
     <FlatList
       data={data2}
       renderItem={HorizontalScrollElement}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={
-        //Carosel
         <View
           style={{
-            marginTop:14,
-            marginBottom: 32,
-            height: 214,
-            width: 326,
-            backgroundColor: "blue",
-            alignSelf: "center",
+            justifyContent: "center",
+            marginTop: 14,
+            marginBottom: 36,
+            alignItems: "center",
           }}
-        ></View>
+        >
+          <Carousel style={{ height: 214, width: 326 }}>
+            {images.map((imageUrl, index) => (
+              <Image
+                key={index}
+                source={{ uri: imageUrl }}
+                style={{ width: 326, height: 214, borderRadius: 8 }}
+              />
+            ))}
+          </Carousel>
+        </View>
       }
     />
   );
