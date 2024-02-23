@@ -44,7 +44,13 @@ export default function SearchTabs() {
     return (
         <TopTabs.Navigator
             screenOptions={{
-                tabBarStyle: { backgroundColor: theme.colors.background }
+                tabBarStyle: { 
+                    backgroundColor: theme.colors.background,
+                    shadowColor: 'grey',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 3
+                }
             }}
         >
             <TopTabs.Screen
