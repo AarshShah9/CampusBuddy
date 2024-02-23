@@ -69,6 +69,10 @@ export default function CreateMarketplace() {
     resolver: zodResolver(schema),
   });
 
+  const onSubmit = (data: marketPlaceDetail) => {
+    console.log(data);
+  };
+
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -198,32 +202,32 @@ export default function CreateMarketplace() {
                   <CheckBoxContainer
                     style={{
                       marginTop: 10,
-                      marginBottom: 15,
                       flexDirection: "row",
                       alignItems: "center",
                     }}
                   >
-                    <Checkbox
+                    <Checkbox.Android
                       uncheckedColor="black"
                       status={
                         checkedItem === "Brand New" ? "checked" : "unchecked"
                       }
-                      onPress={() => handleCheckboxToggle("Brand New")}
+                      onPress={() => {handleCheckboxToggle("Brand New")
+                      onChange("Brand New")}}
                     />
                     <Text>Like Brand New</Text>
                   </CheckBoxContainer>
                   <CheckBoxContainer
                     style={{
                       marginTop: 5,
-                      marginBottom: 15,
                       flexDirection: "row",
                       alignItems: "center",
                     }}
                   >
-                    <Checkbox
-                      uncheckedColor="black"
+                    <Checkbox.Android
                       status={checkedItem === "Used" ? "checked" : "unchecked"}
-                      onPress={() => handleCheckboxToggle("Used")}
+                      onPress={() => {handleCheckboxToggle("Used")
+                                      onChange("Used")
+                      }}
                     />
                     <Text>Used</Text>
                   </CheckBoxContainer>
@@ -235,18 +239,20 @@ export default function CreateMarketplace() {
                       alignItems: "center",
                     }}
                   >
-                    <Checkbox
+                    <Checkbox.Android
                       uncheckedColor="black"
                       status={
                         checkedItem === "Heavily Used" ? "checked" : "unchecked"
                       }
-                      onPress={() => handleCheckboxToggle("Heavily Used")}
+                      onPress={() => {handleCheckboxToggle("Heavily Used")
+                      onChange("Heavily Used")
+                    }}
                     />
                     <Text>Heavily Used</Text>
                   </CheckBoxContainer>
                 </View>
               )}
-              name="price"
+              name="condition"
             />
             <Controller
               control={control}
@@ -332,6 +338,7 @@ export default function CreateMarketplace() {
         </View>
         <View style={{ marginTop: 50, marginBottom: 50 }}>
           <Button
+            onPress={handleSubmit(onSubmit)}
             style={{
               width: 300,
               backgroundColor: theme.colors.primary,

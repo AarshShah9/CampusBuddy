@@ -6,7 +6,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useState } from "react";
 import CreateEvent from "./CreateEvent";
 import CreateLookingFor from "./CreateLookingFor";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import CreateMarketplace from "./CreateMarketplace";
 
 const pages = [
@@ -28,8 +27,8 @@ export default function CreateScreen() {
           color="white"
         />
         <Dropdown
-          style={{ width: 125, marginTop: 50, paddingRight: 5 }}
-          placeholderStyle={{ color: "white", paddingLeft: 40 }}
+          style={{ width: 125, marginTop: 50, paddingRight: 5}}
+          placeholderStyle={{ color: "white"}}
           selectedTextStyle={{ color: "white" }}
           maxHeight={300}
           labelField="label"
