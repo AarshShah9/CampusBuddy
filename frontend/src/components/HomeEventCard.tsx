@@ -19,13 +19,6 @@ type EventHomeCardProps = {
 
 // Component will generate the event card used on the home page of the application
 export default function EventHomeCard({ eventData }: EventHomeCardProps) {
-  // Loads the font into the component
-  const [fontsLoaded] = useFonts({
-    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
-    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
-    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
-  });
   return (
     // Importing the Card component from React Native Paper and providing a style using styled-componenets
     <StyledCard>

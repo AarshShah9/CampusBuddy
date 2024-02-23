@@ -1,6 +1,5 @@
 import {
   Image,
-  Keyboard,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -16,6 +15,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { useCallback } from "react";
+import useAppContext from "~/hooks/useAppContext";
 
 type loginForm = {
   email: string;
@@ -51,8 +51,10 @@ export default function Login() {
     [navigation],
   );
 
+  const { dismissKeyboard } = useAppContext();
+
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <MainContainer $primary={theme.colors.primary}>
         <LogoContainer>
           <Image

@@ -1,5 +1,4 @@
 import {
-  Keyboard,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -14,6 +13,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import useAppContext from "~/hooks/useAppContext";
 
 type signUpSchool = {
   uniEmail: string;
@@ -68,8 +68,10 @@ export default function StudentSignUp() {
     // Add any navigation or logic here
   }, []);
 
+  const { dismissKeyboard } = useAppContext();
+
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <MainContainer>
         <HeaderContainer>
           <TouchableOpacity

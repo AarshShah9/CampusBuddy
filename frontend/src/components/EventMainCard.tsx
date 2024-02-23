@@ -1,75 +1,79 @@
-import * as React from "react";
+import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
-import { useFonts } from "expo-font";
+import { limitTextToMax } from "~/lib/helperFunctions";
 
 type EventMainCardProps = {
-  title: string;
-  date: string;
-  location: string;
-  clubName: string;
+    title: string;
+    date: string;
+    location: string;
+    clubName: string;
+    picture: string
 };
 
 export default function EventMainCard(props: EventMainCardProps) {
-  const [fontsLoaded] = useFonts({
-    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
-    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
-    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
-  });
-
-  return (
-    <StyledCard>
-      <StyledCover
-        source={{ uri: "https://picsum.photos/700" }}
-        resizeMode="cover"
-      />
-      <Card.Content
-        style={{ flexDirection: "row", justifyContent: "space-between" }}
-      >
-        <Card.Content>
-          <CardTitle>{props.title}</CardTitle>
-          <EventDateText>{props.date}</EventDateText>
-          <LocationChip location={props.location}></LocationChip>
-        </Card.Content>
-        <Card.Content>
-          <HostText>{props.clubName}</HostText>
-          {/*<Card.Content></Card.Content>*/}
-        </Card.Content>
-      </Card.Content>
-    </StyledCard>
-  );
+    return (
+        <StyledCard>
+            <StyledCover
+                source={{ uri: props.picture }}
+                resizeMode="cover"
+            />
+            <Card.Content style={styles.cardContent}>
+                <Card.Content style={styles.topCardContent}>
+                    <Text style={styles.cardTitle}>{limitTextToMax(props.title, 16)}</Text>
+                    <Text style={styles.hostText}>{props.clubName}</Text>
+                </Card.Content>
+                <Card.Content style={styles.bottomCardContent}>
+                    <Text style={styles.eventDateText}>{props.date}</Text>
+                    <LocationChip location={props.location}></LocationChip>
+                </Card.Content>
+            </Card.Content>
+        </StyledCard>
+    );
 }
 
 // prettier-ignore
+const styles = StyleSheet.create({
+    cardContent: {
+        paddingHorizontal: 12
+    },
+    topCardContent: {
+        paddingHorizontal: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    cardTitle: {
+        fontSize: 24,
+        fontFamily: "Nunito-Bold"
+    },
+    hostText: {
+        fontSize: 12,
+        fontFamily: "Nunito-Bold",
+        fontWeight: 'bold'
+    },
+    bottomCardContent: {
+        paddingHorizontal: 0,
+    },
+    eventDateText: {
+        fontSize: 12,
+        fontFamily: "Nunito-Reg",
+        marginBottom: 8
+    },
+})
+
+// need to talk about these card widths and height
+// prettier-ignore
 const StyledCard = styled(Card)`
-    width: 376px;
-    height: 294px;
+    width: 100%;
+    height: 300px;
     margin-top: 16px;
-    background-color: #f0f0f0;
+    background-color: #f1f1f1;
 `;
 // prettier-ignore
 const StyledCover = styled(Card.Cover)`
     width: calc(100% - 32px);
     height: 178px;
-    margin: 8px;
-`;
-// prettier-ignore
-const CardTitle = styled(Text)`
-    margin-bottom: 4px;
-    font-size: 30px;
-    font-family: "Nunito-Bold";
-`;
-// prettier-ignore
-const EventDateText = styled(Text)`
-    margin-bottom: 4px;
-    font-family: "Nunito-Reg";
-    font-size: 12;
-`;
-// prettier-ignore
-const HostText = styled(Text)`
-    font-family: "Nunito-Bold";
-    font-size: 12px;
-    margin-top: 4px;
+    margin: 12px;
 `;

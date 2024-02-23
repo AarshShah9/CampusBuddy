@@ -13,12 +13,6 @@ type EventSearchCardProps = {
 };
 
 export default function EventSearchCard(props: EventSearchCardProps) {
-  const [fontsLoaded] = useFonts({
-    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
-    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
-    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
-  });
 
   return (
     <StyledCard>

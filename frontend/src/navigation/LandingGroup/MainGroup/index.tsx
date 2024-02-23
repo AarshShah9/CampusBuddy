@@ -6,23 +6,23 @@ import useThemeContext from "~/hooks/useThemeContext";
 const Stack = createNativeStackNavigator();
 
 export default function MainGroup() {
-  const { theme } = useThemeContext();
+    const { theme } = useThemeContext();
 
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="BottomTabsGroup"
-        component={BottomTabsGroup}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ModalScreen"
-        component={ModalScreen}
-        options={{
-          presentation: "modal",
-          headerStyle: { backgroundColor: theme.colors.primary },
-        }}
-      />
-    </Stack.Navigator>
-  );
+    return (
+        <Stack.Navigator>
+            <Stack.Screen
+                name="BottomTabsGroup"
+                component={BottomTabsGroup}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ModalScreen"
+                component={ModalScreen}
+                options={{
+                    presentation: "modal",
+                    headerStyle: { backgroundColor: theme.colors.primary },
+                }}
+            />
+        </Stack.Navigator>
+    );
 }

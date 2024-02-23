@@ -1,46 +1,37 @@
-import * as React from "react";
-import { Chip, Text } from "react-native-paper";
-import { ThemedText } from "./ThemedComponents";
+import { Text } from "react-native-paper";
 import { EvilIcons } from "@expo/vector-icons";
-import { View } from "react-native";
-import styled from "styled-components";
+import { View, StyleSheet } from "react-native";
+import useThemeContext from "~/hooks/useThemeContext";
 
-// Sets the Props of the Component
 type LocationChipProps = {
-  location: string;
+    location: string;
 };
 
-// Component to render when LocationChip is used
-export default function LocationChip({
-  location,
-}: Readonly<LocationChipProps>) {
-  return (
-    // Styled Chip component from React Native Paper
-    <StyledChip>
-      <ChipContentContainer>
-        {/* Importing the icon into the component */}
-        <EvilIcons name="location" size={12} color="black" />
-        {/* Loading the prop location into the chip */}
-        <LocationText>{location}</LocationText>
-      </ChipContentContainer>
-    </StyledChip>
-  );
+export default function LocationChip({ location }: Readonly<LocationChipProps>) {
+    const { theme } = useThemeContext();
+
+    return (
+        <View style={[styles.container, { backgroundColor: theme.colors.inversePrimary }]}>
+            <View style={styles.innerContainer}>
+                <EvilIcons name="location" size={20} color="black" />
+                <Text>{location}</Text>
+            </View>
+        </View>
+    );
 }
 
-// Styles used for the Location Chip component
 // prettier-ignore
-const StyledChip = styled(Chip)`
-    border-radius: 29px;
-    height: 24px;
-    width: 98px;
-`;
-// prettier-ignore
-const ChipContentContainer = styled(View)`
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 3px;
-`;
-// prettier-ignore
-const LocationText = styled(Text)`
-    font-size: 10px;
-`;
+const styles = StyleSheet.create({
+    container: {
+        borderRadius: 29,
+        paddingVertical: 2.5,
+        paddingLeft: 1,
+        paddingRight: 6,
+        flexDirection: 'row',
+        alignSelf: 'flex-start',
+        justifyContent: 'flex-start'
+    },
+    innerContainer: {
+        flexDirection: 'row'
+    }
+})
