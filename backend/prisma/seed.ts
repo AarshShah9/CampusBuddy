@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import {
   comments,
   enrollments,
@@ -18,6 +18,7 @@ import {
   userOrganizationRoles,
   users,
 } from "./data";
+import { hashPassword } from "../utils/hasher";
 
 const prisma = new PrismaClient();
 
@@ -78,6 +79,9 @@ const load = async () => {
       data: institutes,
     });
     console.log("Added institution data");
+
+    await hashAllPasswords(users);
+    console.log("Hashed user passwords");
 
     await prisma.user.createMany({
       data: users,
@@ -166,3 +170,13 @@ const load = async () => {
   }
 };
 load();
+
+// Replace plain text passwords in seed script with hashed password
+async function hashAllPasswords(users: User[]) {
+  // Hash passwords before seeding
+  await Promise.all(
+    users.map(async (user) => {
+      user.password = await hashPassword(user.password);
+    }),
+  );
+}

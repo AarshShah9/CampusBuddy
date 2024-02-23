@@ -3,6 +3,7 @@ import {
   EventStatus,
   OrganizationStatus,
   ParticipationStatus,
+  User,
   UserOrgStatus,
   UserRole,
   UserType,
@@ -84,7 +85,7 @@ export const institutes = [
   },
 ];
 
-export const users = [
+export const users: User[] = [
   {
     id: ids.userIds[1],
     username: "john_doe",
@@ -94,6 +95,7 @@ export const users = [
     password: "hashed-password123",
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
+    profilePic: null,
   },
   {
     id: ids.userIds[2],
@@ -104,6 +106,7 @@ export const users = [
     password: "hashed-password4569",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
+    profilePic: null,
   },
   {
     id: ids.userIds[3],
@@ -114,6 +117,7 @@ export const users = [
     password: "hashed-password1238",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
+    profilePic: null,
   },
   {
     id: ids.userIds[4],
@@ -124,6 +128,7 @@ export const users = [
     password: "hashed-password4560",
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
+    profilePic: null,
   },
   {
     id: ids.userIds[5],
@@ -134,6 +139,7 @@ export const users = [
     password: "hashed-password8893",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
+    profilePic: null,
   },
   {
     id: ids.userIds[6],
@@ -144,6 +150,7 @@ export const users = [
     password: "hashed-password2814",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
+    profilePic: null,
   },
   {
     id: ids.userIds[7],
@@ -154,6 +161,7 @@ export const users = [
     password: "hashed-password7510",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
+    profilePic: null,
   },
   {
     id: ids.userIds[8],
@@ -164,6 +172,7 @@ export const users = [
     password: "hashed-password1110",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
+    profilePic: null,
   },
 ];
 
