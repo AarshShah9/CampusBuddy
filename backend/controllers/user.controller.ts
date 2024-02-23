@@ -18,6 +18,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended } from "../middleware/verifyAuth";
+import { hashPassword, comparePassword } from "../utils/hasher";
 
 // create new User
 export const signupAsStudent = async (
@@ -160,6 +161,8 @@ export const verifyStudentSignup = async (
       );
     }
 
+    const hashedPassword = await hashPassword(validatedUserData.password);
+
     // Create new student
     const newStudent = await prisma.user.create({
       data: {
@@ -167,7 +170,7 @@ export const verifyStudentSignup = async (
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
-        password: validatedUserData.password,
+        password: hashedPassword,
         accountType: UserType.Student,
         institutionId: institution.id,
       },
@@ -194,7 +197,6 @@ export const loginUser = async (
     const existingUser = await prisma.user.findUnique({
       where: {
         email,
-        password,
       },
     });
 
@@ -204,6 +206,16 @@ export const loginUser = async (
         message: "User doesn't exist",
       });
     } else {
+      // Confirm password matches
+      const isCorrectPassword = await comparePassword(
+        password,
+        existingUser.password,
+      );
+
+      if (!isCorrectPassword) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+
       const authToken = jwt.sign(
         {
           ID: existingUser.id,
@@ -638,6 +650,8 @@ export const verifyExistingOrgSignup = async (
       },
     });
 
+    const hashedPassword = await hashPassword(validatedUserData.password);
+
     // Perform a transaction to create the user and add their userOrganizationRole
     let newUser: User | undefined;
     await prisma.$transaction(async (tx) => {
@@ -648,7 +662,7 @@ export const verifyExistingOrgSignup = async (
           firstName: validatedUserData.firstName,
           lastName: validatedUserData.lastName,
           email: validatedUserData.email,
-          password: validatedUserData.password,
+          password: hashedPassword,
           accountType: UserType.PendingOrg,
           institutionId: institution.id,
         },
@@ -726,6 +740,8 @@ export const verifyNewOrgSignup = async (
       );
     }
 
+    const hashedPassword = await hashPassword(validatedUserData.password);
+
     // Create the new Org user
     const newUser = await prisma.user.create({
       data: {
@@ -733,7 +749,7 @@ export const verifyNewOrgSignup = async (
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
-        password: validatedUserData.password,
+        password: hashedPassword,
         accountType: UserType.PendingOrg,
         institutionId: institution.id,
       },
