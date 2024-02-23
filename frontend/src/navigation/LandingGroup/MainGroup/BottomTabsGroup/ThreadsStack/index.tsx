@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import useThemeContext from "~/hooks/useThemeContext";
-import AddFriends from "~/screens/AddFriends";
+import Threads from "~/screens/Threads";
 
 const Stack = createNativeStackNavigator();
 
-export default function AddFriendsScreenStack() {
+export default function ThreadsScreenStack() {
     const { theme } = useThemeContext();
     return (
         <Stack.Navigator
@@ -16,9 +16,9 @@ export default function AddFriendsScreenStack() {
             }}
         >
             <Stack.Screen
-                name="AddFriendsScreen"
-                component={AddFriends}
-                options={{ title: "Add Friends" }}
+                name="ThreadsScreen"
+                component={Threads}
+                options={{ title: "Threads" }}
             />
         </Stack.Navigator>
     );

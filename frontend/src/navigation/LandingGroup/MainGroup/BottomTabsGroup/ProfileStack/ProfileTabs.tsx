@@ -17,7 +17,7 @@ export default function ProfileTabs() {
     <TopTabs.Navigator
       screenOptions={{
         tabBarStyle: { 
-          backgroundColor: theme.colors.onPrimary,
+          backgroundColor: theme.colors.onSecondary,
           shadowColor: 'grey',
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.4,

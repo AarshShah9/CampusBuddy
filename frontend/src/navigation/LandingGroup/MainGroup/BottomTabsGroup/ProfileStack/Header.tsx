@@ -14,7 +14,7 @@ export default function Header() {
                 styles.headerContainer,
                 {
                     paddingTop: insets.top + 35,
-                    backgroundColor: theme.colors.onPrimary,
+                    backgroundColor: theme.colors.onSecondary,
                     borderBottomColor: theme.colors.background
                 }
             ]}

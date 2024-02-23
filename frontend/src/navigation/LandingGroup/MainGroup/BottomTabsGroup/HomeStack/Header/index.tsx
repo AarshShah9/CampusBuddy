@@ -18,7 +18,7 @@ export default function Header() {
                 }
             ]}
         >
-            <Text style={[styles.homeHeading, { color: theme.colors.onPrimary }]}>Campus Buddy</Text>
+            <Text style={[styles.homeHeading, { color: theme.colors.onSecondary }]}>Campus Buddy</Text>
             <RightHeaderItem />
         </View>
     )

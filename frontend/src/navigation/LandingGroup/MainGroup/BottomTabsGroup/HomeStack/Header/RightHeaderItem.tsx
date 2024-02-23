@@ -16,7 +16,7 @@ export default function RightHeaderItem() {
             <MaterialCommunityIcons 
                 name="chat-outline" 
                 size={28} 
-                color={theme.colors.onPrimary}
+                color={theme.colors.onSecondary}
             />
         </TouchableOpacity>
     )

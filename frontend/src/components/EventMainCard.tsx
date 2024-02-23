@@ -72,7 +72,6 @@ const StyledCard = styled(Card)`
 `;
 // prettier-ignore
 const StyledCover = styled(Card.Cover)`
-    width: calc(100% - 32px);
     height: 178px;
     margin: 12px;
 `;
