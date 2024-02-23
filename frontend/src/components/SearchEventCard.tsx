@@ -65,7 +65,7 @@ const StyledCover = styled(Card.Cover)`
     width: calc(100% - 32px);
     height: 178px;
     margin: 8px;
-  //font-color: theme.color.; TODO AJ WAS THIS U? THIS THROWING ERRORS
+    font-color: theme.color.onPrimary;
 `;
 // prettier-ignore
 const CardTitle = styled(Text)`
