@@ -7,6 +7,7 @@ import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
 import VerticalScrollView from "~/components/VerticalScrollView";
 import EventHomeCard from "~/components/HomeEventCard";
+import EventCard from "~/components/SearchEventCard";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
@@ -53,21 +54,3 @@ export default function Home() {
   <VerticalScrollView />
   );
 }
-
-// // prettier-ignore
-// const styles = StyleSheet.create({
-//     mockEventsContainer: {
-//       marginTop: 30,
-//       display: "flex",
-//       flexDirection: "row",
-//       width: "95%",
-//       height: "auto",
-//       justifyContent: "space-around",
-//       alignItems: "center",
-//     },
-//     mockEventContainer: {
-//       width: 100,
-//       height: 100,
-//       justifyContent: "center",
-//     },
-// });
