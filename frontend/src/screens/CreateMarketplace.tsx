@@ -296,7 +296,7 @@ export default function CreateMarketplace() {
                   >
                     Tags*
                   </Text>
-                  <ItemTag controllerOnChange={onChange} />
+                  <ItemTag controllerOnChange={onChange}/>
                 </View>
               )}
               name="tags"
