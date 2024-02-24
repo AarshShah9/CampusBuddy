@@ -8,7 +8,7 @@ const lightColors = {
     onSecondary: "rgb(255, 255, 255)",
     secondaryContainer: "rgb(212, 227, 255)",
     onSecondaryContainer: "rgb(0, 28, 57)",
-    tertiary: "rgb(0, 104, 116)",
+    tertiary: "rgb(255,255,255)",
     onTertiary: "rgb(255, 255, 255)",
     tertiaryContainer: "rgb(151, 240, 255)",
     onTertiaryContainer: "rgb(0, 31, 36)",

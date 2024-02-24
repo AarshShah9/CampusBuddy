@@ -74,36 +74,6 @@ const load = async () => {
     await prisma.topicSubscription.deleteMany();
     console.log("Deleted records in the Topic Subscription table");
 
-    await prisma.$queryRaw`ALTER TABLE institution AUTO_INCREMENT = 1`;
-    console.log("reset Institute auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE user AUTO_INCREMENT = 1`;
-    console.log("reset User auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE event AUTO_INCREMENT = 1`;
-    console.log("reset Event auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE post AUTO_INCREMENT = 1`;
-    console.log("reset Post auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE comment AUTO_INCREMENT = 1`;
-    console.log("reset Comment auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE organization AUTO_INCREMENT = 1`;
-    console.log("reset Group auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE role AUTO_INCREMENT = 1`;
-    console.log("reset Role auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE permission AUTO_INCREMENT = 1`;
-    console.log("reset Permission auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE program AUTO_INCREMENT = 1`;
-    console.log("reset Program auto increment to 1");
-
-    await prisma.$queryRaw`ALTER TABLE topic AUTO_INCREMENT = 1`;
-    console.log("reset Topic auto increment to 1");
-
     await prisma.institution.createMany({
       data: institutes,
     });
@@ -148,11 +118,6 @@ const load = async () => {
       data: userOrganizationRoles,
     });
     console.log("Added User Organization Roles data");
-
-    // await prisma.role.createMany({
-    //     data: roles,
-    // });
-    // console.log('Added Role data');
 
     await prisma.organizationRolePermission.createMany({
       data: organizationRolePermissions,

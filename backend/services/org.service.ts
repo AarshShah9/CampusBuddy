@@ -3,17 +3,23 @@ import {
   Organization,
   Permission,
   UserRole,
+  OrganizationStatus,
+  UserOrgStatus,
+  User,
+  UserType,
 } from "@prisma/client";
 import prisma from "../prisma/client";
-import { OrganizationCreateInput } from "../../shared/zodSchemas";
+import { OrganizationCreateType } from "../../shared/zodSchemas";
 import { defaultRolePermissions } from "../constants";
 import { AppError, AppErrorName } from "../utils/AppError";
+import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
 
 // Creates a new organization and add the default role permissions
 // This messy but it works for now
 export const createOrganizationWithDefaults = async (
-  organizationData: OrganizationCreateInput,
+  organizationData: OrganizationCreateType,
   userId: string,
+  file?: Express.Multer.File,
 ): Promise<Organization | undefined> => {
   let newOrganization: Organization | undefined;
 
@@ -28,8 +34,28 @@ export const createOrganizationWithDefaults = async (
     newOrganization = await tx.organization.create({
       data: {
         ...organizationData,
+        status: OrganizationStatus.Pending,
       },
     });
+
+    // upload the image
+    if (file) {
+      const uniqueFileName = generateUniqueFileName(
+        file.originalname,
+        newOrganization.id,
+      );
+      const path = `images/organizations/${uniqueFileName}`;
+
+      await UploadToS3(file!, path);
+
+      // Update organization with image path after successful upload
+      newOrganization = await tx.organization.update({
+        where: { id: newOrganization.id },
+        data: {
+          image: path,
+        },
+      });
+    }
 
     const newOrgId = newOrganization.id;
 
@@ -47,11 +73,13 @@ export const createOrganizationWithDefaults = async (
       await tx.userOrganizationRole.create({
         data: {
           userId,
-          organizationId: newOrganization.id,
+          organizationId: newOrgId,
           roleId: roleId,
+          status: UserOrgStatus.Pending,
         },
       });
     } else {
+      // This should never happen
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `RoleId for ${UserRole.Owner} not found`,
@@ -91,7 +119,6 @@ export const createOrganizationWithDefaults = async (
                   // create records to associate org with its roles and permissions
                   await tx.organizationRolePermission.create({
                     data: {
-                      // organizationId: newOrganization?.id,
                       organizationId: newOrgId,
                       roleId,
                       permissionId,
@@ -104,17 +131,15 @@ export const createOrganizationWithDefaults = async (
         },
       ),
     );
-    // log success
-    console.log(
-      `Organization ${newOrganization.id} created with default permissions:`,
-      newOrganization,
-    );
   }); // end of prisma transaction
+
+  //TODO: send email to (admins?) about a new pending organization
+
   return newOrganization;
 };
 
-// helper function to get the permission record for each value in rolePermissions
-async function fetchDefaultPermissions(
+// Get the permission record for each value in rolePermissions
+export async function fetchDefaultPermissions(
   rolePermissions: Record<UserRole, readonly AppPermissionName[]>,
 ): Promise<Permission[]> {
   // call slice() to create shallow copy so we can deal with read only role permissions
@@ -125,5 +150,138 @@ async function fetchDefaultPermissions(
         in: allPermissions,
       },
     },
+  });
+}
+
+// Approve a user's request to join the organization
+export async function approveUserRequest(
+  user: User,
+  organizationId: string,
+  roleId: string,
+) {
+  await prisma.$transaction(async (tx) => {
+    // change user account status to "ApprovedOrg"
+    if (user.accountType === UserType.PendingOrg) {
+      const updatedUser = await tx.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          accountType: UserType.ApprovedOrg,
+        },
+      });
+    }
+
+    // Change user role status in the organization to approved
+    await tx.userOrganizationRole.update({
+      where: {
+        userId_organizationId_roleId: {
+          userId: user.id,
+          organizationId,
+          roleId,
+        },
+      },
+      data: {
+        status: UserOrgStatus.Approved,
+      },
+    });
+  });
+}
+
+// Reject a user's request to join the organization
+export async function rejectUserRequest(
+  user: User,
+  organizationId: string,
+  roleId: string,
+) {
+  await prisma.$transaction(async (tx) => {
+    // Delete the user's role in the organization
+    await tx.userOrganizationRole.delete({
+      where: {
+        userId_organizationId_roleId: {
+          userId: user.id,
+          organizationId,
+          roleId,
+        },
+      },
+    });
+
+    // Delete the user if they have not been previously approved
+    if (user.accountType === UserType.PendingOrg) {
+      await tx.user.delete({
+        where: {
+          id: user.id,
+        },
+      });
+    }
+  });
+}
+
+// Approve the creation of a new organization
+export async function approveOrganizationRequest(
+  organizationId: string,
+  user: User,
+  roleId: string,
+) {
+  await prisma.$transaction(async (tx) => {
+    // Approve the organization
+    const updatedOrg = await tx.organization.update({
+      where: {
+        id: organizationId,
+      },
+      data: {
+        status: OrganizationStatus.Approved,
+      },
+    });
+
+    // Approve the user's account (if org account)
+    if (user.accountType === UserType.PendingOrg) {
+      const updatedUser = await tx.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          accountType: UserType.ApprovedOrg,
+        },
+      });
+    }
+
+    // Approve the owner's role
+    await tx.userOrganizationRole.update({
+      where: {
+        userId_organizationId_roleId: {
+          userId: user.id,
+          organizationId,
+          roleId,
+        },
+      },
+      data: {
+        status: UserOrgStatus.Approved,
+      },
+    });
+  });
+}
+
+// Reject the creation of a new pending organization
+export async function rejectOrganizationRequest(
+  organizationId: string,
+  user: User,
+) {
+  await prisma.$transaction(async (tx) => {
+    // Delete the organization
+    await tx.organization.delete({
+      where: {
+        id: organizationId,
+      },
+    });
+
+    // Delete user account if is hasn't been approved previously
+    if (user.accountType === UserType.PendingOrg) {
+      await tx.user.delete({
+        where: {
+          id: user.id,
+        },
+      });
+    }
   });
 }

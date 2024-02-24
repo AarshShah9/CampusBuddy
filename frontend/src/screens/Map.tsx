@@ -54,6 +54,7 @@ const Map = ({
   );
 };
 
+// prettier-ignore
 const styles = {
   container: {
     flex: 1,

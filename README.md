@@ -92,7 +92,7 @@ $ npx prisma db seed // seed the database with data
 ### Code Formatting
 
 The project uses a common Prettier config file to maintain consistent code formatting. Install the Prettier extension and configure your IDE to use Prettier as your default code formatter and set it to format on save.
-
+- Please use `// prettier-ignore` to ignore Prettier formatting for all styled-components code.
 
 ### Git
 
@@ -129,4 +129,5 @@ npm run start
 ### Google Maps API
 - Refer to these docs:
   - https://docs.expo.dev/versions/latest/sdk/map-view/
+
 

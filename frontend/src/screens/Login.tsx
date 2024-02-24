@@ -1,11 +1,10 @@
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
   Keyboard,
+  Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -13,10 +12,10 @@ import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import { useCallback } from "react";
 
 type loginForm = {
   email: string;
@@ -44,10 +43,13 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: loginForm) => {
-    console.log(data);
-    navigation.dispatch(StackActions.replace("LandingGroup"));
-  };
+  const onSubmit = useCallback(
+    (data: loginForm) => {
+      console.log(data);
+      navigation.dispatch(StackActions.replace("LandingGroup"));
+    },
+    [navigation],
+  );
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -107,20 +109,41 @@ export default function Login() {
                 Login
               </Text>
             </StyledButton>
-            <ClickLink $color={theme.colors.primary}>
-              <Text>Don't have any account? </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 64,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
               <Text
-                onPress={() => {
-                  navigation.navigate("StudentSignUp");
-                }}
                 style={{
-                  color: theme.colors.primary,
+                  marginRight: 5,
+                  fontSize: 16,
                   fontFamily: "Roboto-Reg",
                 }}
               >
-                Sign up
+                Don't have an account?
               </Text>
-            </ClickLink>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("StudentSignUp");
+                }}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    fontFamily: "Roboto-Reg",
+                  }}
+                >
+                  Sign up
+                </Text>
+              </TouchableOpacity>
+            </View>
           </FormContainer>
         </OverlayContainer>
       </MainContainer>
@@ -128,60 +151,57 @@ export default function Login() {
   );
 }
 
+// prettier-ignore
 const LogoContainer = styled(View)`
-  height: 28%;
-  align-items: center;
-  justify-content: center;
+    height: 28%;
+    align-items: center;
+    justify-content: center;
 `;
+// prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`
-  height: 74%;
-  width: 100%;
-  border-top-left-radius: 76px;
-  border-width: 0s;
-  background-color: ${(props) => props.$color};
-  justifycontent: center;
-  align-item: center;
+    height: 74%;
+    width: 100%;
+    border-top-left-radius: 76px;
+    border-width: 0;
+    background-color: ${(props) => props.$color};
+    justify-content: center;
+    align-items: center;
 `;
-
+// prettier-ignore
 const FormContainer = styled(View)`
-  width: 90%;
-  margin-top: 8%;
-  height: 500px;
-  margin-left: auto;
-  margin-right: auto;
+    width: 90%;
+    margin-top: 8%;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
 `;
-
-const ClickLink = styled(Text)<{ $color: string }>`
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 64px;
-  font-size: 16px;
-  font-family: Roboto-Reg;
-`;
+// prettier-ignore
 const Header = styled(Text)`
-  font-size: 40px;
-  font-weight: bold;
-  margin-top: 64px;
-  margin-bottom: 32px;
-  margin-left: auto;
-  margin-right: auto;
-  font-family: Nunito-Bold;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 64px;
+    margin-bottom: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: Nunito-Bold;
 `;
+// prettier-ignore
 const InputField = styled(TextInput)`
-  width: 100%;
-  height: 56px;
-  margin-bottom: 30px;
-  border-radius: 8px 8px 0 0;
-  font-family: Roboto-Reg;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 30px;
+    border-radius: 8px 8px 0 0;
+    font-family: Roboto-Reg;
 `;
+// prettier-ignore
 const StyledButton = styled(Button)`
-  border-radius: 8px;
-  width: 100%;
-  height: 48px;
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  justify-content: center;
+    border-radius: 8px;
+    width: 100%;
+    height: 48px;
+    font-size: 25px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    justify-content: center;
 `;

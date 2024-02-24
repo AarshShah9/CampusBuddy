@@ -28,18 +28,19 @@ export default function LocationChip({
 }
 
 // Styles used for the Location Chip component
+// prettier-ignore
 const StyledChip = styled(Chip)`
-  border-radius: 29px;
-  height: 24px;
-  width: 98px;
+    border-radius: 29px;
+    height: 24px;
+    width: 98px;
 `;
-
+// prettier-ignore
 const ChipContentContainer = styled(View)`
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 3px;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 3px;
 `;
-
+// prettier-ignore
 const LocationText = styled(Text)`
-  font-size: 10px;
+    font-size: 10px;
 `;

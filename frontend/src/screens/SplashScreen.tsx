@@ -53,6 +53,7 @@ export default function SplashScreen() {
   );
 }
 
+// prettier-ignore
 const styles = StyleSheet.create({
   container: {
     flex: 1,

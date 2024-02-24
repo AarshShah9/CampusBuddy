@@ -94,19 +94,20 @@ export default function Home() {
   );
 }
 
+// prettier-ignore
 const styles = StyleSheet.create({
-  mockEventsContainer: {
-    marginTop: 30,
-    display: "flex",
-    flexDirection: "row",
-    width: "95%",
-    height: "auto",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  mockEventContainer: {
-    width: 100,
-    height: 100,
-    justifyContent: "center",
-  },
+    mockEventsContainer: {
+      marginTop: 30,
+      display: "flex",
+      flexDirection: "row",
+      width: "95%",
+      height: "auto",
+      justifyContent: "space-around",
+      alignItems: "center",
+    },
+    mockEventContainer: {
+      width: 100,
+      height: 100,
+      justifyContent: "center",
+    },
 });

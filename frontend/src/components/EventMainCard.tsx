@@ -42,33 +42,34 @@ export default function EventMainCard(props: EventMainCardProps) {
   );
 }
 
+// prettier-ignore
 const StyledCard = styled(Card)`
-  width: 376px;
-  height: 294px;
-  margin-top: 16px;
-  background-color: #f0f0f0;
+    width: 376px;
+    height: 294px;
+    margin-top: 16px;
+    background-color: #f0f0f0;
 `;
-
+// prettier-ignore
 const StyledCover = styled(Card.Cover)`
-  width: calc(100% - 32px);
-  height: 178px;
-  margin: 8px;
+    width: calc(100% - 32px);
+    height: 178px;
+    margin: 8px;
 `;
-
+// prettier-ignore
 const CardTitle = styled(Text)`
-  margin-bottom: 4px;
-  font-size: 30px;
-  font-family: "Nunito-Bold";
+    margin-bottom: 4px;
+    font-size: 30px;
+    font-family: "Nunito-Bold";
 `;
-
+// prettier-ignore
 const EventDateText = styled(Text)`
-  margin-bottom: 4px;
-  font-family: "Nunito-Reg";
-  font-size: 12;
+    margin-bottom: 4px;
+    font-family: "Nunito-Reg";
+    font-size: 12;
 `;
-
+// prettier-ignore
 const HostText = styled(Text)`
-  font-family: "Nunito-Bold";
-  font-size: 12px;
-  margin-top: 4px;
+    font-family: "Nunito-Bold";
+    font-size: 12px;
+    margin-top: 4px;
 `;

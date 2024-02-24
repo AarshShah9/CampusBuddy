@@ -27,14 +27,16 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
   );
 }
 
+// prettier-ignore
 const CardContainer = styled(Card)`
-  margin-left: 16px;
-  margin-right: 16px;
-  width: 159px;
-  height: 130px;
+    margin-left: 16px;
+    margin-right: 16px;
+    width: 159px;
+    height: 130px;
 `;
 
+// prettier-ignore
 const EventDetailsContainer = styled(View)`
-  flexdirection: "row";
-  align-items: "center";
+    flexdirection: "row";
+    align-items: "center";
 `;

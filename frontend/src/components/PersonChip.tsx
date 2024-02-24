@@ -37,11 +37,12 @@ export default function PersonChip({ numberOfUsers }: PersonChipProps) {
 }
 
 // The style used for the children used in the Chip
+// prettier-ignore
 const ChipContentContainer = styled(View)`
-  flex-direction: row;
-  align-items: center;
+    flex-direction: row;
+    align-items: center;
 `;
-
+// prettier-ignore
 const RemainingUsersText = styled(Text)`
-  font-size: 10px;
+    font-size: 10px;
 `;
