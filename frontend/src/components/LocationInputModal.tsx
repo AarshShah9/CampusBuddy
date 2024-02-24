@@ -21,8 +21,9 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
   const userLocation = useCallback(
     (text: string) => {
       setLocation(text);
-      setModalVisible(!modalVisible);
-      props.controllerOnChange(location);
+      setModalVisible(false);
+      props.controllerOnChange(text);
+      
     },
     [location],
   );
