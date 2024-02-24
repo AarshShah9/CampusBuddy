@@ -42,7 +42,7 @@ export default function CreateMarketplace() {
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
   };
-
+  // React Hook Form Section
   const schema = zod.object({
     image: zod.string(),
     itemName: zod.string(),
@@ -70,10 +70,12 @@ export default function CreateMarketplace() {
     resolver: zodResolver(schema),
   });
 
+  // Functions
+  // Handle submission of data to backend
   const onSubmit = (data: marketPlaceDetail) => {
     console.log(data);
   };
-
+  // Handle animating image when uploaded, may be scrapped and not needed
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -108,6 +110,7 @@ export default function CreateMarketplace() {
         scrollEventThrottle={16}
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
+          {/* View holds the icon for user to click to upload their own image */}
           <View
             style={{
               width: 100,
@@ -133,6 +136,7 @@ export default function CreateMarketplace() {
               Add Image
             </Text>
           </View>
+          {/* View holds all the Controllers for user to enter their information */}
           <View>
             <Controller
               control={control}

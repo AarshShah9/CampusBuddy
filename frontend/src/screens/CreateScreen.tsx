@@ -13,6 +13,7 @@ const pages = [
   { label: "Marketplace", value: "3" },
 ];
 
+// Component is responsible to hosting all the create page options and toggle between different pages based on drop down.
 export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");

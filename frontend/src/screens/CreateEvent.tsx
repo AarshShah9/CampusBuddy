@@ -33,7 +33,7 @@ type createEvent = {
   tags: string[];
   description: string;
 };
-
+// Component is responsible for allowing users to create a new event page
 export default function CreateEvent() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -67,12 +67,12 @@ export default function CreateEvent() {
 
   //Functions
 
-  // Function to handle submission of user data
+  // Handle submission of user data
   const onSubmit = useCallback((data: createEvent) => {
     console.log(data);
   }, []);
 
-  // Function for animation of scroll image
+  //  Animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -106,6 +106,7 @@ export default function CreateEvent() {
         style={{ height: "100%", backgroundColor: "white" }}
         scrollEventThrottle={16}
       >
+        {/* View houses the image component, and icon for uploading images */}
         <View>
           <Animated.Image
             source={require("~/assets/images/lightGreyImage.png")}
@@ -129,6 +130,7 @@ export default function CreateEvent() {
             color="black"
           />
         </View>
+        {/* View houses the controllers for each field */}
         <View style={{ backgroundColor: "white" }}>
           <Controller
             control={control}

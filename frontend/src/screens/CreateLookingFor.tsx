@@ -4,16 +4,15 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  StyleSheet,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
-import styled from "styled-components";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import ItemTag from "~/components/ItemTags";
-import { useCallback } from "react";
 
 type lookingForDetail = {
   title: string;
@@ -26,7 +25,8 @@ type lookingForDetail = {
 
 export default function CreateLookingFor() {
   const { theme } = useThemeContext();
-  // React Hook Detail
+
+  // React Hook Section
   const schema = zod.object({
     title: zod.string(),
     tags: zod.string().array(),
@@ -53,6 +53,7 @@ export default function CreateLookingFor() {
   });
 
   //Functions
+  // Handles submission of user data
   const onSubmit = (data: lookingForDetail) => {
     console.log(data);
   };
@@ -77,7 +78,12 @@ export default function CreateLookingFor() {
               >
                 Title*
               </Text>
-              <InputBox onBlur={onBlur} onChangeText={onChange} value={value} />
+              <TextInput
+                style={style.inputBox}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
             </View>
           )}
           name="title"
@@ -120,7 +126,12 @@ export default function CreateLookingFor() {
               >
                 Description*
               </Text>
-              <InputBox onBlur={onBlur} onChangeText={onChange} value={value} />
+              <TextInput
+                style={style.inputBox}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
             </View>
           )}
           name="description"
@@ -142,7 +153,8 @@ export default function CreateLookingFor() {
               >
                 # of Spots Needed*
               </Text>
-              <NumberOfSpotBox
+              <TextInput
+                style={style.numberOfSpotContainer}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 keyboardType="numeric"
@@ -219,23 +231,23 @@ export default function CreateLookingFor() {
 }
 
 // prettier-ignore
-const InputBox = styled(TextInput)`
-    width: 350px;
-    height: 50px;
-    borderWidth: 1px;
-    borderRadius: 8px;
-    borderColor: grey;
-    padding: 10px;
-    marginLeft: auto;
-    marginRight: auto;
-`
-// prettier-ignore
-const NumberOfSpotBox = styled(TextInput)`
-    width: 100px;
-    height: 50px;
-    borderWidth: 1px;
-    borderRadius: 8px;
-    borderColor: grey;
-    padding: 10px;
-    marginLeft: 30px;
-`
+
+const style = StyleSheet.create({
+  inputBox:{
+    width:350,
+    height:50,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor:"grey",
+    marginLeft:20
+  },
+  numberOfSpotContainer:{
+    width:100,
+    height:50,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor:"grey",
+    padding:10,
+    marginLeft:20
+  }
+})

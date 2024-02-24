@@ -1,11 +1,8 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
-import styled from "styled-components";
 
-export default function ItemTag(props: {
-  controllerOnChange: any;
-}) {
+export default function ItemTag(props: { controllerOnChange: any }) {
   const [tags, setTags] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState("");
   const updateArray = useCallback(() => {
@@ -13,7 +10,7 @@ export default function ItemTag(props: {
   }, [tags]);
 
   // Functions
-  // function to handle adding tag
+  // Handle adding tag
   const addTag = () => {
     // If input is empty than simply do nothing
     if (currentInput == "") return;
@@ -25,7 +22,7 @@ export default function ItemTag(props: {
     props.controllerOnChange([...tags, currentInput]);
   };
 
-  // function to handling deleting tags
+  // Handle deleting tags
   const deleteTag = (tagIndex: number) => {
     setTags(
       tags.filter((value, index) => {
@@ -80,14 +77,14 @@ export default function ItemTag(props: {
 const styles = StyleSheet.create({
   tagContainer: {
     marginBottom: 15,
-    width:'90%',
-    minHeight:50,
-    borderColor:"black",
-    borderWidth:1,
-    flexWrap:"wrap",
-    flexDirection:"row",
-    alignItem:"center",
-    borderRadius:8,
-    padding:5,
-  }
-})
+    width: "95%",
+    minHeight: 50,
+    borderColor: "grey",
+    borderWidth: 1,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    alignItem: "center",
+    borderRadius: 8,
+    padding: 5,
+  },
+});
