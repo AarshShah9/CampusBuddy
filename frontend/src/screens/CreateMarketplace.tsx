@@ -4,8 +4,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from "react-native";
-import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,7 @@ import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import { Button, Checkbox } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
+import LocationInputModal from "~/components/LocationInputModal";
 
 const IMG_HEIGHT = 300;
 type marketPlaceDetail = {
@@ -100,6 +101,7 @@ export default function CreateMarketplace() {
       style={{ flex: 1 }}
     >
       <Animated.ScrollView
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
         style={{ height: "100%", backgroundColor: "white" }}
@@ -148,7 +150,8 @@ export default function CreateMarketplace() {
                   >
                     Item
                   </Text>
-                  <EventInput
+                  <TextInput
+                    style={style.eventInput}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -173,8 +176,8 @@ export default function CreateMarketplace() {
                   >
                     Price
                   </Text>
-                  <EventInput
-                    style={{ width: 175 }}
+                  <TextInput
+                    style={style.priceInput}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -199,7 +202,7 @@ export default function CreateMarketplace() {
                   >
                     Condition
                   </Text>
-                  <CheckBoxContainer
+                  <View
                     style={{
                       marginTop: 10,
                       flexDirection: "row",
@@ -211,12 +214,14 @@ export default function CreateMarketplace() {
                       status={
                         checkedItem === "Brand New" ? "checked" : "unchecked"
                       }
-                      onPress={() => {handleCheckboxToggle("Brand New")
-                      onChange("Brand New")}}
+                      onPress={() => {
+                        handleCheckboxToggle("Brand New");
+                        onChange("Brand New");
+                      }}
                     />
                     <Text>Like Brand New</Text>
-                  </CheckBoxContainer>
-                  <CheckBoxContainer
+                  </View>
+                  <View
                     style={{
                       marginTop: 5,
                       flexDirection: "row",
@@ -225,13 +230,14 @@ export default function CreateMarketplace() {
                   >
                     <Checkbox.Android
                       status={checkedItem === "Used" ? "checked" : "unchecked"}
-                      onPress={() => {handleCheckboxToggle("Used")
-                                      onChange("Used")
+                      onPress={() => {
+                        handleCheckboxToggle("Used");
+                        onChange("Used");
                       }}
                     />
                     <Text>Used</Text>
-                  </CheckBoxContainer>
-                  <CheckBoxContainer
+                  </View>
+                  <View
                     style={{
                       marginTop: 5,
                       marginBottom: 15,
@@ -244,12 +250,13 @@ export default function CreateMarketplace() {
                       status={
                         checkedItem === "Heavily Used" ? "checked" : "unchecked"
                       }
-                      onPress={() => {handleCheckboxToggle("Heavily Used")
-                      onChange("Heavily Used")
-                    }}
+                      onPress={() => {
+                        handleCheckboxToggle("Heavily Used");
+                        onChange("Heavily Used");
+                      }}
                     />
                     <Text>Heavily Used</Text>
-                  </CheckBoxContainer>
+                  </View>
                 </View>
               )}
               name="condition"
@@ -270,7 +277,8 @@ export default function CreateMarketplace() {
                   >
                     Event Description:*
                   </Text>
-                  <EventTextInput
+                  <TextInput
+                    style={style.eventtextInput}
                     multiline={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -296,7 +304,7 @@ export default function CreateMarketplace() {
                   >
                     Tags*
                   </Text>
-                  <ItemTag controllerOnChange={onChange}/>
+                  <ItemTag controllerOnChange={onChange} />
                 </View>
               )}
               name="tags"
@@ -317,19 +325,7 @@ export default function CreateMarketplace() {
                   >
                     Location*
                   </Text>
-                  <TextInput
-                    style={{
-                      width: 350,
-                      height: 50,
-                      borderWidth: 1,
-                      borderRadius: 8,
-                      borderColor: "grey",
-                      padding: 10,
-                    }}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
+                  <LocationInputModal controllerOnChange={onChange} />
                 </View>
               )}
               name="location"
@@ -362,26 +358,31 @@ export default function CreateMarketplace() {
     </KeyboardAvoidingView>
   );
 }
-
-// prettier-ignore
-const EventInput = styled(TextInput)`
-    width: 350px;
-    height: 50px;
-    borderWidth: 1px;
-    borderRadius: 8px;
-    borderColor: grey;
-    padding: 10px;
-`
-const CheckBoxContainer = styled(View)``;
-
-// prettier-ignore
-const EventTextInput = styled(TextInput)`
-  textAlignVertical: top;
-  width: 350px;
-  height: 100px;
-  borderWidth: 1px;
-  borderRadius: 8px;
-  borderColor:grey;
-  padding: 10px;
-  marginRight: auto;
-`;
+const style = StyleSheet.create({
+  priceInput: {
+    width: 350,
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "grey",
+    padding: 10,
+  },
+  eventtextInput: {
+    textAlignVertical: "top",
+    width: 350,
+    height: 100,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "grey",
+    padding: 10,
+    marginRight: "auto",
+  },
+  eventInput: {
+    width: 350,
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "grey",
+    padding: 10,
+  },
+});

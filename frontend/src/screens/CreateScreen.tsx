@@ -1,5 +1,4 @@
-import { View, Text } from "react-native";
-import styled from "styled-components";
+import { View, StyleSheet } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
@@ -18,8 +17,8 @@ export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");
   return (
-    <MainContainer color={theme.colors.primary}>
-      <HeaderContainer>
+    <View style={{ backgroundColor: theme.colors.primary, flex: 1 }}>
+      <View style={styles.headerContainer}>
         <MaterialIcons
           style={{ marginTop: 60, marginLeft: 10 }}
           name="cancel"
@@ -27,9 +26,14 @@ export default function CreateScreen() {
           color="white"
         />
         <Dropdown
-          style={{ width: 125, marginTop: 50, paddingRight: 5}}
-          placeholderStyle={{ color: "white"}}
-          selectedTextStyle={{ color: "white" }}
+          style={{ width: 125, marginTop: 50, paddingRight: 5 }}
+          itemTextStyle={{ fontSize: 12, fontFamily: "Nunito-Medium" }}
+          placeholderStyle={{ color: "white" }}
+          selectedTextStyle={{
+            color: "white",
+            fontSize: 16,
+            fontFamily: "Nunito-Bold",
+          }}
           maxHeight={300}
           labelField="label"
           valueField="value"
@@ -39,22 +43,19 @@ export default function CreateScreen() {
           data={pages}
           placeholder="Event"
         />
-      </HeaderContainer>
+      </View>
       {currentSelected == "1" && <CreateEvent />}
       {currentSelected == "2" && <CreateLookingFor />}
       {currentSelected == "3" && <CreateMarketplace />}
-    </MainContainer>
+    </View>
   );
 }
-// prettier-ignore
-const MainContainer = styled(View)<{ color: string }>`
-  height: 100%;
-  background-color: ${(props) => props.color};
-`;
-// prettier-ignore
-const HeaderContainer = styled(View)`
-  width: 100%;
-  height: 100px;
-  justify-content: space-between;
-  flex-direction: row;
-`;
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    width: "100%",
+    height: 100,
+    justifyContent: "space-between",
+    flexDirection: "row",
+  },
+});

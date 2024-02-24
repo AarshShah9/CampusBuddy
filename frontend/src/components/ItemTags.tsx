@@ -1,4 +1,4 @@
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
@@ -6,7 +6,7 @@ import styled from "styled-components";
 export default function ItemTag(props: {
   controllerOnChange: any;
 }) {
-  const [tags, setTags] = useState(["HTML", "CSS", "JavaScript"]);
+  const [tags, setTags] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState("");
   const updateArray = useCallback(() => {
     props.controllerOnChange([...tags, currentInput]);
@@ -21,6 +21,7 @@ export default function ItemTag(props: {
     if (!value.trim()) return;
     setTags([...tags, value]);
     setCurrentInput("");
+    // Change hook form value for tags
     props.controllerOnChange([...tags, currentInput]);
   };
 
@@ -38,7 +39,7 @@ export default function ItemTag(props: {
   }, [tags]);
 
   return (
-    <TagContainer>
+    <View style={styles.tagContainer}>
       {tags.map((tag, index) => (
         <View
           key={index}
@@ -72,21 +73,21 @@ export default function ItemTag(props: {
           setCurrentInput(text);
         }}
       />
-    </TagContainer>
+    </View>
   );
 }
 
-// prettier-ignore
-const TagContainer = styled(View)`
-    marginBottom: 15px;
-    width: 90%;
-    minHeight:50px;
-    borderColor:black;
-    borderWidth:1px;
-    flex-wrap: wrap;
-    flex-direction:row;
-    align-item:center;
-    border-radius:3px;
-    borderRadius:8px;
-    padding:5px;
-`
+const styles = StyleSheet.create({
+  tagContainer: {
+    marginBottom: 15,
+    width:'90%',
+    minHeight:50,
+    borderColor:"black",
+    borderWidth:1,
+    flexWrap:"wrap",
+    flexDirection:"row",
+    alignItem:"center",
+    borderRadius:8,
+    padding:5,
+  }
+})
