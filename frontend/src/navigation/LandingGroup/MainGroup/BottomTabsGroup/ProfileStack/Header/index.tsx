@@ -1,8 +1,8 @@
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { Text } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
+import MenuIcon from "./MenuIcon";
 
 export default function Header() {
     const insets = useSafeAreaInsets();
@@ -35,9 +35,7 @@ export default function Header() {
                         <Text style={styles.profileInfoItem}>5</Text>
                         <Text style={styles.profileInfoItem}>Following</Text>
                     </View>
-                    <TouchableOpacity style={styles.miniInfoContainer}>
-                        <Ionicons name="menu-outline" size={40} color={theme.colors.text} />
-                    </TouchableOpacity>
+                    <MenuIcon />
                 </View>
                 <View style={styles.lowerSection}>
                     <Text style={{ fontWeight: "bold" }}>Peter Parker</Text>

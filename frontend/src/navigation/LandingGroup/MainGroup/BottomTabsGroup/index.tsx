@@ -7,6 +7,8 @@ import AddFriendsScreenStack from "./AddFriendsStack";
 import ProfileScreenStack from "./ProfileStack";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 import ThreadsScreenStack from "./ThreadsStack";
+import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const BottomTab = createMaterialBottomTabNavigator();
 
@@ -57,20 +59,24 @@ export default function BottomTabGroup() {
     const { theme } = useThemeContext();
     
     return (
-        <BottomTab.Navigator
-            barStyle={{
-                backgroundColor: theme.colors.onPrimary,
-                height: 80
-            }}
-            labeled={false}
-            initialRouteName="Home"
-            screenOptions={screenOptions}
-        >
-            <BottomTab.Screen name="Home" component={HomeScreenStack} />
-            <BottomTab.Screen name="Search" component={SearchScreenStack} />
-            <BottomTab.Screen name="Add Friends" component={AddFriendsScreenStack} />
-            <BottomTab.Screen name="Threads" component={ThreadsScreenStack} />
-            <BottomTab.Screen name="Profile" component={ProfileScreenStack} />
-        </BottomTab.Navigator>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetModalProvider>
+                <BottomTab.Navigator
+                    barStyle={{
+                        backgroundColor: theme.colors.onPrimary,
+                        height: 80
+                    }}
+                    labeled={false}
+                    initialRouteName="Home"
+                    screenOptions={screenOptions}
+                >
+                    <BottomTab.Screen name="Home" component={HomeScreenStack} />
+                    <BottomTab.Screen name="Search" component={SearchScreenStack} />
+                    <BottomTab.Screen name="Add Friends" component={AddFriendsScreenStack} />
+                    <BottomTab.Screen name="Threads" component={ThreadsScreenStack} />
+                    <BottomTab.Screen name="Profile" component={ProfileScreenStack} />
+                </BottomTab.Navigator>
+            </BottomSheetModalProvider>
+        </GestureHandlerRootView>
     );
 }
