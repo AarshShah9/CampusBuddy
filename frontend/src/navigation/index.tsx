@@ -18,7 +18,6 @@ export default function Navigation() {
       <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="SplashScreen" component={SplashScreen} /> 
-        <Stack.Screen name="CreateScreen" component={CreateScreen}/>
         <Stack.Screen
           name="AuthenticationGroup"
           component={AuthenticationGroup}

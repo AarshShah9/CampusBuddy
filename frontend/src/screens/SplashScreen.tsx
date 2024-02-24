@@ -35,7 +35,7 @@ export default function SplashScreen() {
       console.log("Finished Loading move to new page");
       //navigation.dispatch(StackActions.replace("AuthenticationGroup"));
       //Delete below after
-      navigation.dispatch(StackActions.replace("CreateScreen"))
+      navigation.dispatch(StackActions.replace("AuthenticationGroup"))
     }
   }, [loading]);
 
