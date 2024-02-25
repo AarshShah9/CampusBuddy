@@ -4,33 +4,35 @@ import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
 
 type EventMainCardProps = {
-    title: string;
-    date: string;
-    location: string;
-    clubName: string;
-    picture: string
+  title: string;
+  date: string;
+  location: string;
+  clubName: string;
+  picture: string;
 };
 
 export default function EventMainCard(props: EventMainCardProps) {
-    return (
-        <Card style={styles.card}>
-            <Card.Cover
-                style={styles.cardCover}
-                source={{ uri: props.picture }}
-                resizeMode="cover"
-            />
-            <Card.Content style={styles.cardContent}>
-                <Card.Content style={styles.topCardContent}>
-                    <Text style={styles.cardTitle}>{limitTextToMax(props.title, 16)}</Text>
-                    <Text style={styles.hostText}>{props.clubName}</Text>
-                </Card.Content>
-                <Card.Content style={styles.bottomCardContent}>
-                    <Text style={styles.eventDateText}>{props.date}</Text>
-                    <LocationChip location={props.location}></LocationChip>
-                </Card.Content>
-            </Card.Content>
-        </Card>
-    );
+  return (
+    <Card style={styles.card}>
+      <Card.Cover
+        style={styles.cardCover}
+        source={{ uri: props.picture }}
+        resizeMode="cover"
+      />
+      <Card.Content style={styles.cardContent}>
+        <Card.Content style={styles.topCardContent}>
+          <Text style={styles.cardTitle}>
+            {limitTextToMax(props.title, 16)}
+          </Text>
+          <Text style={styles.hostText}>{props.clubName}</Text>
+        </Card.Content>
+        <Card.Content style={styles.bottomCardContent}>
+          <Text style={styles.eventDateText}>{props.date}</Text>
+          <LocationChip location={props.location}></LocationChip>
+        </Card.Content>
+      </Card.Content>
+    </Card>
+  );
 }
 
 // prettier-ignore
