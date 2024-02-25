@@ -27,7 +27,7 @@ const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
       </Text>
       {/* FlatList renders a horizontal scrollable list of cards */}
       <FlatList
-        style={{ marginBottom: 0, marginBottom:16}
+        style={{paddingBottom:16}}
         data={item.items}
         renderItem={Cards}
         horizontal={true}
