@@ -5,9 +5,11 @@ import { useState, useEffect, useCallback } from "react";
 export default function ItemTag(props: { controllerOnChange: any }) {
   const [tags, setTags] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const updateArray = useCallback(() => {
+  const updateArray = useCallback((index:number) => {
+    deleteTag(index);
     props.controllerOnChange([...tags, currentInput]);
   }, [tags]);
+  
 
   // Functions
   // Handle adding tag
@@ -52,10 +54,7 @@ export default function ItemTag(props: { controllerOnChange: any }) {
         >
           <Text style={{ marginRight: 5 }}>{tag}</Text>
           <Feather
-            onPress={() => {
-              deleteTag(index);
-              updateArray;
-            }}
+            onPress={()=>updateArray(index)}
             name="x-circle"
             size={18}
             color="black"
