@@ -5,7 +5,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
   TouchableOpacity,
   FlatList,
 } from "react-native";
@@ -18,6 +17,7 @@ import { initialNumberOfMessages } from "~/lib/helperFunctions";
 import { ActivityIndicator } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import useChatContext from "~/hooks/useChatContext";
+import useAppContext from "~/hooks/useAppContext";
 
 function ListArea({ otherEndUserId }: { otherEndUserId: string }) {
   const { user, fetchMoreMessages, getConversation, updateMessagesReadStatus } =
@@ -107,9 +107,11 @@ function TypingArea({ otherEndUserId }: { otherEndUserId: string }) {
 
   const [message, setMessage] = useState("");
 
+  const { dismissKeyboard } = useAppContext();
+
   const handleSendMessage = async () => {
     setMessage("");
-    Keyboard.dismiss();
+    dismissKeyboard();
     if (message.trim().length > 0)
       await createNewMessage(otherEndUserId, message);
   };

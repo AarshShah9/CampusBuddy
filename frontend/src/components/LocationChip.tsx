@@ -1,46 +1,71 @@
-import * as React from "react";
-import { Chip, Text } from "react-native-paper";
-import { ThemedText } from "./ThemedComponents";
+import { Text } from "react-native-paper";
 import { EvilIcons } from "@expo/vector-icons";
-import { View } from "react-native";
-import styled from "styled-components";
+import {
+  View,
+  StyleSheet,
+  ViewStyle,
+  StyleProp,
+  TextStyle,
+} from "react-native";
+import useThemeContext from "~/hooks/useThemeContext";
 
-// Sets the Props of the Component
-type LocationChipProps = {
+type Props = {
   location: string;
+  size?: "small" | "normal";
 };
 
-// Component to render when LocationChip is used
-export default function LocationChip({
-  location,
-}: Readonly<LocationChipProps>) {
+export default function LocationChip({ location, size = "normal" }: Props) {
+  const { theme } = useThemeContext();
+
+  const containerStyles: StyleProp<ViewStyle> =
+    size === "small"
+      ? {
+          borderRadius: 24,
+          paddingVertical: 2,
+          paddingRight: 4,
+        }
+      : {
+          borderRadius: 29,
+          paddingVertical: 2.5,
+          paddingRight: 6,
+        };
+
+  const iconSize = size === "small" ? 15 : 20;
+
+  const textStyles: StyleProp<TextStyle> =
+    size === "small" ? { fontSize: 10 } : {};
+
   return (
-    // Styled Chip component from React Native Paper
-    <StyledChip>
-      <ChipContentContainer>
-        {/* Importing the icon into the component */}
-        <EvilIcons name="location" size={12} color="black" />
-        {/* Loading the prop location into the chip */}
-        <LocationText>{location}</LocationText>
-      </ChipContentContainer>
-    </StyledChip>
+    <View
+      style={[
+        styles.container,
+        containerStyles,
+        {
+          backgroundColor: theme.colors.inversePrimary,
+        },
+      ]}
+    >
+      <View style={styles.innerContainer}>
+        <EvilIcons name="location" size={iconSize} color="black" />
+        <Text style={[styles.text, textStyles]}>{location}</Text>
+      </View>
+    </View>
   );
 }
 
-// Styles used for the Location Chip component
 // prettier-ignore
-const StyledChip = styled(Chip)`
-    border-radius: 29px;
-    height: 24px;
-    width: 98px;
-`;
-// prettier-ignore
-const ChipContentContainer = styled(View)`
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 3px;
-`;
-// prettier-ignore
-const LocationText = styled(Text)`
-    font-size: 10px;
-`;
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignSelf: 'flex-start',
+        justifyContent: 'flex-start',
+        paddingLeft: 1,
+    },
+    innerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    text: {
+        fontFamily: 'Nunito-Bold'
+    }
+})

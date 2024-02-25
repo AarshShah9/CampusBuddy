@@ -2,7 +2,6 @@ import {
   View,
   StyleSheet,
   TextInput,
-  Keyboard,
   TouchableWithoutFeedback,
   Pressable,
   TouchableOpacity,
@@ -18,6 +17,7 @@ import { ThemedTextInput } from "~/components/ThemedComponents";
 import useChatsSearchContext from "~/hooks/useChatsSearchContext";
 import useChatsContext from "~/hooks/useChatsContext";
 import { ChatsSearchContextProvider } from "~/contexts/chatsSearchContext";
+import useAppContext from "~/hooks/useAppContext";
 
 const CoversationsArea = () => {
   const {
@@ -74,6 +74,8 @@ const SearchArea = () => {
   const { filterWord, setFilterWord, clearSearchArea } =
     useChatsSearchContext();
 
+  const { dismissKeyboard } = useAppContext();
+
   return (
     <View
       style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}
@@ -84,7 +86,7 @@ const SearchArea = () => {
           { backgroundColor: `${theme.colors.primary}` },
         ]}
       >
-        <TouchableOpacity onPress={() => Keyboard.dismiss()}>
+        <TouchableOpacity onPress={dismissKeyboard}>
           <AntDesign name="search1" size={20} color={theme.colors.background} />
         </TouchableOpacity>
         <ThemedTextInput
@@ -109,8 +111,10 @@ const SearchArea = () => {
 };
 
 export default function Chats() {
+  const { dismissKeyboard } = useAppContext();
+
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={{ flex: 1 }}>
         <ChatsSearchContextProvider>
           <SearchArea />
