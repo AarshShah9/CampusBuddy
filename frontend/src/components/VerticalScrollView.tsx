@@ -3,7 +3,6 @@ import { Dimensions, FlatList, Text, View, Image } from "react-native";
 import eventData from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
-import styled from "styled-components/native";
 
 // Props Type for the Data for the Cards
 export type Item = {
@@ -47,6 +46,7 @@ const VerticalScrollComponent = () => {
           {/* Carousel component renders a slideshow */}
 
           <Carousel
+            loop={true}  
             autoplay={true}
             autoplayInterval={5000}
             showsControls={false}
