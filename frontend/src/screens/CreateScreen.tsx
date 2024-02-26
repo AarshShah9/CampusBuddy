@@ -1,11 +1,12 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 import { useState } from "react";
 import CreateEvent from "./CreateEvent";
 import CreateLookingFor from "./CreateLookingFor";
 import CreateMarketplace from "./CreateMarketplace";
+import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -17,15 +18,20 @@ const pages = [
 export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");
+  const navigation = useNavigation<any>();
+
   return (
     <View style={{ backgroundColor: theme.colors.primary, flex: 1 }}>
       <View style={styles.headerContainer}>
-        <MaterialIcons
-          style={{ marginTop: 60, marginLeft: 10 }}
-          name="cancel"
-          size={24}
-          color="white"
-        />
+        <TouchableOpacity onPress={navigation.goBack}>
+          <MaterialIcons
+            name="cancel"
+            size={24}
+            color="white"
+            style={{ marginTop: 60, marginLeft: 10 }}
+          />
+        </TouchableOpacity>
+
         <Dropdown
           style={{ width: 125, marginTop: 50, paddingRight: 5 }}
           itemTextStyle={{ fontSize: 12, fontFamily: "Nunito-Medium" }}
