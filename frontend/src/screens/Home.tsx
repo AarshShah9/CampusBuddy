@@ -8,10 +8,8 @@ import { getRequest, uploadImageRequest } from "~/lib/CBRequest";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 import { z } from "zod";
 import imageGetter from "~/lib/imageGetter";
-import Map from "~/screens/Map";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import useThemeContext from "~/hooks/useThemeContext";
-import EventSearchCard from "~/components/EventSearchCard";
 
 export default function Home() {
   const { startLoading, stopLoading } = useLoadingContext();
