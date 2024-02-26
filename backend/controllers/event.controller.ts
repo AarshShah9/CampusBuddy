@@ -7,15 +7,14 @@ import {
   IdParamSchema,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
-import prisma from "../prisma/client"; // import the singleton prisma instance
+import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import { checkUserPermission } from "../utils/checkUserPermission";
 import UploadToS3, {
   deleteFromS3,
   generateUniqueFileName,
 } from "../utils/S3Uploader";
-
-const userId = "3"; // Placeholder for testing
+import { RequestExtended } from "../middleware/verifyAuth";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -23,24 +22,22 @@ export const eventTest = async (req: Request, res: Response) => {
 };
 
 // Create new Event
-// Takes multipart form data.
-// The user is required to have CREATE_EVENTS permission for the organization
 export const createVerifiedEvent = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
+    const loggedInUserId = req.userID;
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate the Event data with zod schema
-    // Note we are expecting form data on anything that includes a file upload, thus we must parse the data
     const validatedEventData = EventCreateSchema.parse(req.body);
 
     // Check if the user has permission to create an event
     const hasPermission = await checkUserPermission(
-      userId, // Assuming you've got the userId from somewhere, like req.user.id
+      loggedInUserId!,
       organizationId,
       AppPermissionName.CREATE_EVENTS,
     );
@@ -69,7 +66,7 @@ export const createVerifiedEvent = async (
         data: {
           ...validatedEventData,
           organizationId,
-          userId,
+          userId: loggedInUserId!,
           status: EventStatus.Verified,
         },
       });
@@ -100,15 +97,15 @@ export const createVerifiedEvent = async (
     next(error);
   }
 };
+
 // Create new Event
 export const createEvent = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // Get userId
-    // const userId = req.user.id; // get userId from the request -> set in auth middleware
+    const loggedInUserId = req.userID;
 
     // Validate the Event data
     const validatedEventData = EventCreateSchema.parse(req.body);
@@ -128,7 +125,7 @@ export const createEvent = async (
       const event = await prisma.event.create({
         data: {
           ...validatedEventData,
-          userId,
+          userId: loggedInUserId!,
           status: EventStatus.NonVerified,
         },
       });
@@ -173,14 +170,15 @@ export const createEvent = async (
 
 // Update Event
 export const updateEvent = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
+    const loggedInUserId = req.userID;
+
     // Validate request id param
     const eventId = IdParamSchema.parse(req.params).id;
-    // const userId = req.userId; // get userId from the request
 
     // Validate event data
     const validatedUpdateEventData = EventUpdateSchema.parse(req.body);
@@ -201,14 +199,14 @@ export const updateEvent = async (
     }
 
     // Check if the user has permission to update the event details
-    const isCreatedByUser: boolean = existingEvent.userId === userId;
+    const isCreatedByUser: boolean = existingEvent.userId === loggedInUserId;
     let hasPermission: boolean = false;
 
     // Check if there is a group associated with the event data
     if (existingEvent.organizationId) {
       // check if the user has permission to update the event
       hasPermission = await checkUserPermission(
-        userId,
+        loggedInUserId!,
         existingEvent.organizationId,
         AppPermissionName.MANAGE_EVENTS,
       );
@@ -442,16 +440,16 @@ export const getAllEventsByOrganization = async (
 
 // Delete event
 export const deleteEvent = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
+    const loggedInUserId = req.userID;
+
     // Validate request id param
     const eventId = IdParamSchema.parse(req.params).id;
-    // const userId = req.user.id;
 
-    // TODO: clean up and pull the code below into event.service
     // get the event from the database
     const existingEvent = await prisma.event.findUnique({
       where: {
@@ -469,13 +467,13 @@ export const deleteEvent = async (
     }
 
     // Check if the user is the event's creator
-    const isCreatedByUser: boolean = existingEvent.userId === userId;
+    const isCreatedByUser: boolean = existingEvent.userId === loggedInUserId;
 
     // Check if there is a group associated with the event data
     if (existingEvent.organizationId) {
       // check if the user has permission to delete the event
       const hasPermission = await checkUserPermission(
-        userId,
+        loggedInUserId!,
         existingEvent.organizationId,
         AppPermissionName.MANAGE_EVENTS,
       );
@@ -488,7 +486,7 @@ export const deleteEvent = async (
         });
       } else {
         console.error(
-          `User with userId: ${userId} does not have permission to delete the event with eventId: ${eventId}`,
+          `User with userId: ${loggedInUserId} does not have permission to delete the event with eventId: ${eventId}`,
         );
 
         throw new AppError(
@@ -506,7 +504,7 @@ export const deleteEvent = async (
       });
     } else {
       console.error(
-        `User with userId: ${userId} does not have permission to delete the event with eventId: ${eventId}`,
+        `User with userId: ${loggedInUserId} does not have permission to delete the event with eventId: ${eventId}`,
       );
 
       throw new AppError(
@@ -516,7 +514,7 @@ export const deleteEvent = async (
         true,
       );
     }
-    res.status(204).end(); // No content after sucessful deletion
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }

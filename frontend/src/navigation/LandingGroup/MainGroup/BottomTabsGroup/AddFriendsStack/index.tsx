@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import useThemeContext from "~/hooks/useThemeContext";
-import AddFriends from "~/screens/AddFriends";
+import CreateScreen from "~/screens/CreateScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -9,21 +9,10 @@ export default function AddFriendsScreenStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTintColor: theme.colors.onPrimary,
-        headerStyle: {
-          backgroundColor: theme.colors.primary,
-        },
+        headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="AddFriendsScreen"
-        component={AddFriends}
-        options={({ navigation }) => ({
-          title: "Add Friends",
-          /* headerLeft: () => <DrawerIcon />,
-                    headerRight: () => <UserIcon />, */
-        })}
-      />
+      <Stack.Screen name="CreateScreen" component={CreateScreen} />
     </Stack.Navigator>
   );
 }

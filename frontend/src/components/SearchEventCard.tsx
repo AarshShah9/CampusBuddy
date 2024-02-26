@@ -19,13 +19,6 @@ type EventSearchCardProps = {
 // Component to render for the event card used in the Search results
 export default function EventCard({ eventData }: EventSearchCardProps) {
   const { theme } = useThemeContext();
-  //Loading the font into the component
-  const [fontsLoaded] = useFonts({
-    "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-Reg": require("~/assets/fonts/Nunito-Reg.ttf"),
-    "Roboto-Reg": require("~/assets/fonts/Roboto-Reg.ttf"),
-    "Roboto-Bold": require("~/assets/fonts/Roboto-Bold.ttf"),
-  });
 
   return (
     // Styled Card Compponent

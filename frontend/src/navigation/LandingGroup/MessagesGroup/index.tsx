@@ -9,37 +9,36 @@ import { ChatContextProvider } from "~/contexts/chatContext";
 const Stack = createNativeStackNavigator();
 
 export default function MessagesStackGroup() {
-  const { theme } = useThemeContext();
+    const { theme } = useThemeContext();
 
-  return (
-    <ChatsContextProvider>
-      <ChatContextProvider>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="ChatList"
-            component={Chats}
-            options={{
-              title: "Chats",
-              /*  headerLeft: () => <DrawerIcon />,
-                            headerRight: () => <UserIcon />, */
-              headerTintColor: theme.colors.background,
-              headerStyle: {
-                backgroundColor: theme.colors.primary,
-              },
-            }}
-          />
-          <Stack.Screen
-            name="ChatScreen"
-            component={Chat}
-            options={{
-              headerStyle: {
-                backgroundColor: theme.colors.primary,
-              },
-              headerTitle: () => <ChatScreenHeader />,
-            }}
-          />
-        </Stack.Navigator>
-      </ChatContextProvider>
-    </ChatsContextProvider>
-  );
+    return (
+        <ChatsContextProvider>
+            <ChatContextProvider>
+                <Stack.Navigator
+                    initialRouteName="ChatList"
+                    screenOptions={{
+                        headerTintColor: theme.colors.onSecondary, 
+                        headerStyle: {
+                            backgroundColor: theme.colors.primary,
+                        },
+                        headerTitleStyle: {
+                            fontSize: 21,
+                            fontWeight: 'bold'
+                        }
+                    }}
+                >
+                    <Stack.Screen
+                        name="ChatList"
+                        component={Chats}
+                        options={{ title: "Chats" }}
+                    />
+                    <Stack.Screen
+                        name="ChatScreen"
+                        component={Chat}
+                        options={{ headerTitle: () => <ChatScreenHeader /> }}
+                    />
+                </Stack.Navigator>
+            </ChatContextProvider>
+        </ChatsContextProvider>
+    );
 }
