@@ -5,20 +5,10 @@ import styled from "styled-components";
 import { View } from "react-native";
 import { useFonts } from "expo-font";
 import useThemeContext from "~/hooks/useThemeContext";
-
-// Sets the props of the component
-type EventHomeCardProps = {
-  eventData: {
-    title: string;
-    time: string;
-    location: string;
-    image: string;
-    host?: string;
-  };
-};
+import { Item } from "~/components/VerticalScrollView";
 
 // Component will generate the event card used on the home page of the application
-export default function EventHomeCard({ eventData }: EventHomeCardProps) {
+export default function EventHomeCard(props: Item) {
   return (
     // Importing the Card component from React Native Paper and providing a style using styled-componenets
     <StyledCard>
@@ -28,11 +18,11 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
       />
       <CardContent>
         {/* Passing the event title props to the Card */}
-        <EventTitle>{eventData.title}</EventTitle>
+        <EventTitle>{props.title}</EventTitle>
         <EventDetailsContainer>
           {/* Passing the event time and location to the Card and using the location component*/}
-          <EventTime>{eventData.time}</EventTime>
-          <LocationChip location={eventData.location} />
+          <EventTime>{props.time}</EventTime>
+          <LocationChip location={props.location} />
         </EventDetailsContainer>
       </CardContent>
     </StyledCard>
@@ -42,8 +32,6 @@ export default function EventHomeCard({ eventData }: EventHomeCardProps) {
 // Adding styling to the seperate card components
 // prettier-ignore
 const StyledCard = styled(Card)`
-    margin-left: 16px;
-    margin-right: 16px;
     width: 159px;
     height: 130px;
     background-color: rgba(0, 0, 0, 0);
@@ -58,6 +46,7 @@ const CardContent = styled(Card.Content)``;
 // prettier-ignore
 const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
+    font-size: 12px;
 `;
 // prettier-ignore
 const EventTime = styled(Text)`
