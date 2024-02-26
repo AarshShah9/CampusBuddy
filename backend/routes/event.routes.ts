@@ -13,12 +13,12 @@ import {
   updateEvent,
 } from "../controllers/event.controller";
 import { upload } from "../utils/S3Uploader";
+import { verifyAuthentication } from "../middleware/verifyAuth";
 
 const router = express.Router();
 
-// app.use(verifyAuthentication); // Use auth middleware for all routes
-
 router.get("/test", eventTest);
+router.use(verifyAuthentication); // Use auth middleware for all routes below
 router.get("/", getAllEvents);
 router.get("/verified", getAllVerifiedEvents);
 router.get("/organization/:id", getAllEventsByOrganization);

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
@@ -11,7 +11,7 @@ type EventMainCardProps = {
   picture: string;
 };
 
-export default function EventMainCard(props: EventMainCardProps) {
+export default function MarketplaceItem(props: EventMainCardProps) {
   return (
     <Card style={styles.card}>
       <Card.Cover
@@ -22,13 +22,12 @@ export default function EventMainCard(props: EventMainCardProps) {
       <Card.Content style={styles.cardContent}>
         <Card.Content style={styles.topCardContent}>
           <Text style={styles.cardTitle}>
-            {limitTextToMax(props.title, 16)}
+            {limitTextToMax(props.title, 14)}
           </Text>
-          <Text style={styles.hostText}>{props.clubName}</Text>
+          <Text style={styles.price}>{props.clubName}</Text>
         </Card.Content>
         <Card.Content style={styles.bottomCardContent}>
-          <Text style={styles.eventDateText}>{props.date}</Text>
-          <LocationChip location={props.location}></LocationChip>
+          <LocationChip size={"small"} location={props.location}></LocationChip>
         </Card.Content>
       </Card.Content>
     </Card>
@@ -39,12 +38,12 @@ export default function EventMainCard(props: EventMainCardProps) {
 const styles = StyleSheet.create({
     // need to talk about these card widths and height
     card: {
-        width: "100%",
-        height: 300,
+        width: (Dimensions.get('window').width - 50) / 2,
+        height: 205,
         marginTop: 16,
     },
     cardCover: {
-        height: 178,
+        height: 130,
         margin: 12
     },
     cardContent: {
@@ -57,20 +56,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardTitle: {
-        fontSize: 24,
+        fontSize: 14,
         fontFamily: "Nunito-Bold"
     },
-    hostText: {
-        fontSize: 12,
-        fontFamily: "Nunito-Bold",
-        fontWeight: 'bold'
+    price: {
+        fontSize: 14,
+        fontFamily: "Roboto-Bold"
     },
     bottomCardContent: {
+        marginTop: 5,
         paddingHorizontal: 0,
-    },
-    eventDateText: {
-        fontSize: 12,
-        fontFamily: "Nunito-Reg",
-        marginBottom: 8
-    },
+    }
 })
