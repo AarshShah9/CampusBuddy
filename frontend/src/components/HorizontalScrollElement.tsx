@@ -27,7 +27,7 @@ const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
       </Text>
       {/* FlatList renders a horizontal scrollable list of cards */}
       <FlatList
-        style={{paddingBottom:16}}
+        style={{ paddingBottom: 16 }}
         data={item.items}
         renderItem={Cards}
         horizontal={true}
@@ -44,7 +44,7 @@ const Cards = ({ item }: { item: Item }) => {
     <View>
       {/* EventHomeCard component renders the event card */}
       <Text style={{ paddingLeft: 16 }}>
-        <EventHomeCard eventData={item} />
+        <EventHomeCard {...item} />
       </Text>
     </View>
   );

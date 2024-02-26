@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, FlatList, Text, View, Image } from "react-native";
+import { FlatList, View, Image } from "react-native";
 import eventData from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
@@ -46,7 +46,7 @@ const VerticalScrollComponent = () => {
           {/* Carousel component renders a slideshow */}
 
           <Carousel
-            loop={true}  
+            loop={true}
             autoplay={true}
             autoplayInterval={5000}
             showsControls={false}
