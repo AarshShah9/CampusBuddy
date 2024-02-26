@@ -18,7 +18,7 @@ const HorizontalScrollElement = ({ item }: { item: Item2 }) => {
       {/* Text displaying the title of the horizontal scroll element */}
       <Text
         style={{
-          color: "white",
+          color: "black",
           fontSize: 16,
           paddingBottom: 16,
         }}
