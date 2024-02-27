@@ -50,6 +50,7 @@ const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
     font-size: 11px;
     text-shadow-color: transparent;
+    margin-bottom: 4px;
 `;
 // prettier-ignore
 const EventTime = styled(Text)`
