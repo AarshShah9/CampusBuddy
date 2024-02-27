@@ -33,7 +33,7 @@ export default function LocationChip({ location, size = "normal" }: Props) {
   const iconSize = size === "small" ? 15 : 20;
 
   const textStyles: StyleProp<TextStyle> =
-    size === "small" ? { fontSize: 10 } : {};
+    size === "small" ? { fontSize: 9 } : {};
 
   return (
     <View

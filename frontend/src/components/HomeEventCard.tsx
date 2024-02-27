@@ -49,11 +49,14 @@ const CardContent = styled(Card.Content)`
 const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
     font-size: 11px;
+    text-shadow-color: transparent;
 `;
 // prettier-ignore
 const EventTime = styled(Text)`
     font-family: Nunito-Reg;
+    font-size: 11px;
     margin-right: 8px;
+    text-shadow-color: transparent;
 `;
 // prettier-ignore
 const EventDetailsContainer = styled(View)`
