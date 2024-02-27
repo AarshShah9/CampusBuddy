@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     text: {
-        fontFamily: 'Nunito-Bold'
+        fontFamily: 'Roboto-Medium'
     }
 })

@@ -22,7 +22,7 @@ export default function EventHomeCard(props: Item) {
         <EventDetailsContainer>
           {/* Passing the event time and location to the Card and using the location component*/}
           <EventTime>{props.time}</EventTime>
-          <LocationChip location={props.location} />
+          <LocationChip location={props.location} size="small" />
         </EventDetailsContainer>
       </CardContent>
     </StyledCard>
