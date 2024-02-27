@@ -16,15 +16,15 @@ export default function EventHomeCard(props: Item) {
         source={{ uri: "https://picsum.photos/700" }}
         style={{ width: 159, height: 84 }}
       />
-      <CardContent>
+      <Card.Content style={{ paddingHorizontal: 0 }}>
         {/* Passing the event title props to the Card */}
         <EventTitle>{props.title}</EventTitle>
         <EventDetailsContainer>
           {/* Passing the event time and location to the Card and using the location component*/}
           <EventTime>{props.time}</EventTime>
-          <LocationChip location={props.location} />
+          <LocationChip location={props.location} size="small" />
         </EventDetailsContainer>
-      </CardContent>
+      </Card.Content>
     </StyledCard>
   );
 }
@@ -42,8 +42,6 @@ const StyledCover = styled(Card.Cover)`
     height: 178px;
 `;
 // prettier-ignore
-const CardContent = styled(Card.Content)``;
-// prettier-ignore
 const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
     font-size: 12px;
@@ -51,10 +49,9 @@ const EventTitle = styled(Text)`
 // prettier-ignore
 const EventTime = styled(Text)`
     font-family: Nunito-Reg;
-    margin-right: 8px;
 `;
 // prettier-ignore
 const EventDetailsContainer = styled(View)`
     flex-direction: row;
-    justifycontent: "space-between";
+    justify-content: space-between;
 `;
