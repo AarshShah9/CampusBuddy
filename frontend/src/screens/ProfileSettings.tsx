@@ -55,7 +55,7 @@ export default function ProfileSettings() {
               ]}
             >
               <Text style={styles.settingText}>{setting}</Text>
-              <Ionicons name="chevron-forward" size={24} color={"#3a86ff"} />
+              <Ionicons name="chevron-forward" size={16} color={"#3a86ff"} />
             </View>
           </TouchableOpacity>
         ))}
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 0.8
   },
   settingText: {
     fontSize: 16,
