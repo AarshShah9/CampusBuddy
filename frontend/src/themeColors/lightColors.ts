@@ -6,7 +6,7 @@ const lightColors = {
     onPrimaryContainer: "rgb(0, 26, 65)",
     secondary: "rgb(27, 96, 165)",
     onSecondary: "rgb(255, 255, 255)",
-    secondaryContainer: "rgb(212, 227, 255)",
+    secondaryContainer: "transparent",
     onSecondaryContainer: "rgb(0, 28, 57)",
     tertiary: "rgb(255,255,255)",
     onTertiary: "rgb(255, 255, 255)",
@@ -39,7 +39,7 @@ const lightColors = {
     },
     surfaceDisabled: "rgba(27, 27, 31, 0.12)",
     onSurfaceDisabled: "rgba(27, 27, 31, 0.38)",
-    backdrop: "rgba(46, 48, 56, 0.4)",
+    backdrop: "rgba(211, 211, 211, 0.5)",
   },
 };
 
