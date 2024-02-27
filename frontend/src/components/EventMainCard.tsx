@@ -1,7 +1,9 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { Card, Text } from "react-native-paper";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
+import { useCallback } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 type EventMainCardProps = {
   title: string;
@@ -12,7 +14,19 @@ type EventMainCardProps = {
 };
 
 export default function EventMainCard(props: EventMainCardProps) {
+  const navigation = useNavigation<any>();
+  const openEventDetails = useCallback(() => {
+    navigation.navigate('EventDetails', { 
+      title: props.title,
+      date: props.date,
+      location: props.location,
+      clubName: props.clubName,
+      picture: props.picture 
+    })
+  }, [])
+
   return (
+    <TouchableOpacity onPress={openEventDetails}>
     <Card style={styles.card}>
       <Card.Cover
         style={styles.cardCover}
@@ -32,6 +46,7 @@ export default function EventMainCard(props: EventMainCardProps) {
         </Card.Content>
       </Card.Content>
     </Card>
+    </TouchableOpacity>
   );
 }
 
