@@ -40,6 +40,7 @@ const StyledCard = styled(Card)`
 const StyledCover = styled(Card.Cover)`
     width: 159px;
     height: 178px;
+    margin-bottom: 4px;
 `;
 // prettier-ignore
 const EventTitle = styled(Text)`
