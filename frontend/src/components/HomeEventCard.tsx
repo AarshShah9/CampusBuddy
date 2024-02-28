@@ -40,11 +40,14 @@ const StyledCard = styled(Card)`
 const StyledCover = styled(Card.Cover)`
     width: 159px;
     height: 178px;
+    margin-bottom: 4px;
 `;
 // prettier-ignore
 const EventTitle = styled(Text)`
     font-family: Nunito-Bold;
-    font-size: 12px;
+    font-size: 11px;
+    text-shadow-color: transparent;
+    margin-bottom: 4px;
 `;
 // prettier-ignore
 const EventTime = styled(Text)`
