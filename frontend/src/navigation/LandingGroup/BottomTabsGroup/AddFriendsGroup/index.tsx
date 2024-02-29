@@ -4,7 +4,7 @@ import CreateScreen from "~/screens/CreateScreen";
 
 const Stack = createNativeStackNavigator();
 
-export default function AddFriendsScreenStack() {
+export default function AddFriendsGroup() {
   const { theme } = useThemeContext();
   return (
     <Stack.Navigator

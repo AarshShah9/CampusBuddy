@@ -6,7 +6,7 @@ import ProfileSettings from "~/screens/ProfileSettings";
 
 const Stack = createNativeStackNavigator();
 
-export default function ProfileScreenStack() {
+export default function ProfileGroup() {
     return (
         <ProfileContextProvider>
             <Stack.Navigator screenOptions={{ header: Header }}>
