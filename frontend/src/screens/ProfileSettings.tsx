@@ -42,6 +42,7 @@ export default function ProfileSettings() {
       index={0}
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
+      backgroundStyle={{ borderRadius: 20 }} // play around with the number to find a suitable one
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
