@@ -5,6 +5,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import ChatScreenHeader from "./ChatScreenHeader";
 import { ChatsContextProvider } from "~/contexts/chatsContext";
 import { ChatContextProvider } from "~/contexts/chatContext";
+import BackButton from "./ChatsScreenBackButton";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,12 +31,15 @@ export default function MessagesStackGroup() {
                     <Stack.Screen
                         name="ChatList"
                         component={Chats}
-                        options={{ title: "Chats" }}
+                        options={{ 
+                            title: "Chats",
+                            headerLeft: BackButton
+                        }}
                     />
                     <Stack.Screen
                         name="ChatScreen"
                         component={Chat}
-                        options={{ headerTitle: () => <ChatScreenHeader /> }}
+                        options={{ headerTitle: ChatScreenHeader }}
                     />
                 </Stack.Navigator>
             </ChatContextProvider>
