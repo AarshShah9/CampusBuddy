@@ -14,11 +14,14 @@ import {
   verifyNewOrgSignup,
   signupAsNewOrg,
   getLoggedInUser,
+  generateJWT,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 
 const router = express.Router();
 
+router.get("/token", generateJWT);
+router.get("/verify", verifyAuthentication);
 router.post("/student", signupAsStudent);
 router.post("/organization/new/", signupAsNewOrg);
 router.post("/organization/:id/", signupWithExistingOrg);

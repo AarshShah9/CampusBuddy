@@ -218,7 +218,7 @@ export const loginUser = async (
 
       const authToken = jwt.sign(
         {
-          ID: existingUser.id,
+          Id: existingUser.id,
           institutionId: existingUser.institutionId,
           username: existingUser.username,
           firstName: existingUser.firstName,
@@ -307,7 +307,7 @@ export const getAllUsers = async (
   }
 };
 
-// get Users by ID
+// get Users by Id
 export const getUserById = async (
   req: Request,
   res: Response,
@@ -801,4 +801,26 @@ export const getLoggedInUser = async (
   } catch (error: any) {
     next(error);
   }
+};
+
+export const generateJWT = async (req: Request, res: Response) => {
+  const authToken = jwt.sign(
+    {
+      id: "db365290-c550-11ee-83fd-6f8d6c450910",
+      username: "john_doe",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john@example.com",
+      password: "hashed-password123",
+      institutionId: "d1300780-c552-11ee-83fd-6f8d6c450910",
+      accountType: "ApprovedOrg",
+      profilePic: null,
+    },
+    env.JWT_SECRET,
+  );
+
+  res.status(200).cookie("authToken", authToken).json({
+    success: true,
+    message: "generated JWT and set as cookie",
+  });
 };

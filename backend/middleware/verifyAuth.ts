@@ -8,7 +8,13 @@ export interface RequestExtended extends Request {
 }
 
 interface MyJwtPayload extends JwtPayload {
-  ID?: string;
+  id?: string;
+  username?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  institutionName: string;
 }
 
 export const verifyAuthentication = async (
@@ -16,12 +22,12 @@ export const verifyAuthentication = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const authToken = req.cookies.authToken ?? null;
+  let authToken = req.headers.authorization?.split(" ")[1] ?? "";
   const secret = env.JWT_SECRET;
 
   try {
     const decoded = jwt.verify(authToken, secret) as MyJwtPayload;
-    if (decoded.ID) {
+    if (decoded.id) {
       // Check if the user exists
       const userExists = await prisma.user.findUnique({
         where: {
@@ -35,7 +41,7 @@ export const verifyAuthentication = async (
         });
       }
 
-      req.userID = decoded.ID;
+      req.userID = decoded.id;
       next();
     } else {
       res.status(401).send({ message: "Invalid JWT: ID not found" });
