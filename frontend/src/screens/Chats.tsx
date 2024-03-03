@@ -87,11 +87,11 @@ const SearchArea = () => {
                 ]}
             >
                 <TouchableOpacity onPress={dismissKeyboard}>
-                    <AntDesign name="search1" size={20} color={theme.colors.text} />
+                    <AntDesign name="search1" size={20} color={'white'} />
                 </TouchableOpacity>
                 <ThemedTextInput
                     placeholder="Search Chats"
-                    placeholderTextColor={theme.colors.text}
+                    placeholderTextColor={'white'}
                     style={[styles.searchBarInput]}
                     value={filterWord}
                     onChangeText={(text) => setFilterWord(text)}
@@ -101,7 +101,7 @@ const SearchArea = () => {
                         <AntDesign
                             name="closecircle"
                             size={15}
-                            color={theme.colors.text}
+                            color={'white'}
                         />
                     </TouchableOpacity>
                 )}

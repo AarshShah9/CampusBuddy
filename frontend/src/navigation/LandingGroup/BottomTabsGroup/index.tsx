@@ -1,20 +1,14 @@
 import { Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
-import {
-    MaterialBottomTabNavigationOptions,
-    createMaterialBottomTabNavigator,
-} from "@react-navigation/material-bottom-tabs";
-import HomeScreenStack from "./HomeStack";
+import { MaterialBottomTabNavigationOptions, createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import useThemeContext from "~/hooks/useThemeContext";
-import SearchScreenStack from "./SearchStack";
-import AddFriendsScreenStack from "./AddFriendsStack";
-import ProfileScreenStack from "./ProfileStack";
+import SearchGroup from "./SearchGroup";
+import AddFriendsGroup from "./AddFriendsGroup";
+import ProfileGroup from "./ProfileGroup";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
-import ThreadsScreenStack from "./ThreadsStack";
-import {
-    BottomSheetModal,
-    BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
+import ThreadsGroup from "./ThreadsGroup";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import HomeGroup from "./HomeGroup/";
 
 const BottomTab = createMaterialBottomTabNavigator();
 
@@ -75,14 +69,11 @@ export default function BottomTabGroup() {
                     initialRouteName="Home"
                     screenOptions={screenOptions}
                 >
-                    <BottomTab.Screen name="Home" component={HomeScreenStack} />
-                    <BottomTab.Screen name="Search" component={SearchScreenStack} />
-                    <BottomTab.Screen
-                        name="Add Friends"
-                        component={AddFriendsScreenStack}
-                    />
-                    <BottomTab.Screen name="Threads" component={ThreadsScreenStack} />
-                    <BottomTab.Screen name="Profile" component={ProfileScreenStack} />
+                    <BottomTab.Screen name="Home" component={HomeGroup} />
+                    <BottomTab.Screen name="Search" component={SearchGroup} />
+                    <BottomTab.Screen name="Add Friends" component={AddFriendsGroup} />
+                    <BottomTab.Screen name="Threads" component={ThreadsGroup} />
+                    <BottomTab.Screen name="Profile" component={ProfileGroup} />
                 </BottomTab.Navigator>
             </BottomSheetModalProvider>
         </GestureHandlerRootView>

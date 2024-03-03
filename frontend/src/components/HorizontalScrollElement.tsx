@@ -1,8 +1,14 @@
-import { FlatList, Text, View } from "react-native";
-import React from "react";
-import { Item } from "~/components/VerticalScrollView";
+import { FlatList, View } from "react-native";
 import EventHomeCard from "./HomeEventCard";
 import { ThemedText } from "./ThemedComponents";
+
+export type Item = {
+    id: string;
+    title: string;
+    time?: string;
+    location: string;
+    image: string;
+};
 
 // Functional component that renders each card within the horizontal scroll element
 const Cards = ({ item }: { item: Item }) => {

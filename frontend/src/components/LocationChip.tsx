@@ -46,7 +46,7 @@ export default function LocationChip({ location, size = "normal" }: Props) {
       ]}
     >
       <View style={styles.innerContainer}>
-        <EvilIcons name="location" size={iconSize} color="black" />
+        <EvilIcons name="location" size={iconSize} color={theme.colors.text} />
         <Text style={[styles.text, textStyles]}>{location}</Text>
       </View>
     </View>

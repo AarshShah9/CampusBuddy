@@ -4,8 +4,9 @@ import Threads from "~/screens/Threads";
 
 const Stack = createNativeStackNavigator();
 
-export default function ThreadsScreenStack() {
+export default function ThreadsGroup() {
     const { theme } = useThemeContext();
+    
     return (
         <Stack.Navigator
             screenOptions={{
