@@ -199,9 +199,12 @@ export const loginUser = async (
       where: {
         email,
       },
+      include: {
+        institution: true,
+      },
     });
 
-    if (!existingUser) {
+    if (!existingUser || existingUser.institution === null) {
       res.status(404).json({
         success: false,
         message: "User doesn't exist",
@@ -219,8 +222,8 @@ export const loginUser = async (
 
       const authToken = jwt.sign(
         {
-          Id: existingUser.id,
-          institutionId: existingUser.institutionId,
+          id: existingUser.id,
+          institutionName: existingUser.institution.name,
           username: existingUser.username,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
