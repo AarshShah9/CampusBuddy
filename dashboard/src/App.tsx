@@ -34,6 +34,7 @@ const App = () => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
       const response = await fetch(`/api/orgs/:${id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -53,6 +54,7 @@ const App = () => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
       const response = await fetch(`/api/orgs/:${id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
