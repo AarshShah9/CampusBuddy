@@ -99,5 +99,6 @@ if (env.ENV === "dev") {
       console.log(`Ingress established at: ${listener.url()}`),
     );
 }
+
 export default app;
 export { server };
