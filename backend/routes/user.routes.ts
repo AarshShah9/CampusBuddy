@@ -24,7 +24,7 @@ const router = express.Router();
 
 router.get("/token", generateJWT); // TODO - Remove this endpoint - for testing only
 router.get("/verify", verifyAuthentication, verify);
-router.get("/loginAdmin", loginAsAdmin);
+router.post("/loginAdmin", loginAsAdmin);
 router.post("/student", signupAsStudent);
 router.post("/organization/new/", signupAsNewOrg);
 router.post("/organization/:id/", signupWithExistingOrg);
