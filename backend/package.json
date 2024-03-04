@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anatine/zod-mock": "^3.13.3",
     "@aws-sdk/client-s3": "^3.485.0",
     "@aws-sdk/lib-storage": "^3.485.0",
     "@ngrok/ngrok": "^0.9.1",

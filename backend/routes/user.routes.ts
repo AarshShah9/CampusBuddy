@@ -15,13 +15,14 @@ import {
   signupAsNewOrg,
   getLoggedInUser,
   generateJWT,
+  verify,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 
 const router = express.Router();
 
-router.get("/token", generateJWT);
-router.get("/verify", verifyAuthentication);
+router.get("/token", generateJWT); // TODO - Remove this endpoint - for testing only
+router.get("/verify", verifyAuthentication, verify);
 router.post("/student", signupAsStudent);
 router.post("/organization/new/", signupAsNewOrg);
 router.post("/organization/:id/", signupWithExistingOrg);

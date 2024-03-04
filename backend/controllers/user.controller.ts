@@ -19,6 +19,7 @@ import { env } from "../utils/validateEnv";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended } from "../middleware/verifyAuth";
 import { hashPassword, comparePassword } from "../utils/hasher";
+import { users } from "../prisma/data";
 
 // create new User
 export const signupAsStudent = async (
@@ -350,7 +351,7 @@ export const updateUser = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     //Validated user data
     const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
@@ -776,7 +777,7 @@ export const getLoggedInUser = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Get user from db
     const user = await prisma.user.findMany({
@@ -803,24 +804,13 @@ export const getLoggedInUser = async (
   }
 };
 
-export const generateJWT = async (req: Request, res: Response) => {
-  const authToken = jwt.sign(
-    {
-      id: "db365290-c550-11ee-83fd-6f8d6c450910",
-      username: "john_doe",
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      password: "hashed-password123",
-      institutionId: "d1300780-c552-11ee-83fd-6f8d6c450910",
-      accountType: "ApprovedOrg",
-      profilePic: null,
-    },
-    env.JWT_SECRET,
-  );
+export const verify = async (req: Request, res: Response) => {
+  res.status(200).json({ message: "User is verified" });
+};
 
-  res.status(200).cookie("authToken", authToken).json({
-    success: true,
-    message: "generated JWT and set as cookie",
-  });
+export const generateJWT = async (req: Request, res: Response) => {
+  console.log("HERE FOR TESTING ONLY");
+  const authToken = jwt.sign(users[0] as JwtPayload, env.JWT_SECRET);
+
+  res.status(200).json({ authToken });
 };

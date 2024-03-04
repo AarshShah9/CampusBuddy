@@ -28,7 +28,7 @@ export const createVerifiedEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
@@ -105,7 +105,7 @@ export const createEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Validate the Event data
     const validatedEventData = EventCreateSchema.parse(req.body);
@@ -175,7 +175,7 @@ export const updateEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Validate request id param
     const eventId = IdParamSchema.parse(req.params).id;
@@ -445,7 +445,7 @@ export const deleteEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Validate request id param
     const eventId = IdParamSchema.parse(req.params).id;

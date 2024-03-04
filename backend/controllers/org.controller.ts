@@ -49,7 +49,7 @@ export const createNewOrganization = async (
     // Validate the organization data
     const validatedOrganization = OrganizationCreateSchema.parse(req.body);
 
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
@@ -177,7 +177,7 @@ export const updateOrganization = async (
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Validate organization data
     const validatedUpdateOrganizationData = OrganizationUpdateSchema.parse(
@@ -266,7 +266,7 @@ export const deleteOrganization = async (
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // get the organization from the database
     const existingOrganization = await prisma.organization.findUnique({
@@ -393,7 +393,7 @@ export const getAllPendingOrgUsers = async (
     // Validate request organization id param
     const organizationId = IdParamSchema.parse(req.params).id;
 
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Check if the user has permission to view this data
     const hasPermission = await checkUserPermission(
@@ -452,7 +452,7 @@ export const manageMembershipRequest = async (
     const validatedMembershipApprovalData =
       OrganizationMembershipApprovalSchema.parse(req.body);
 
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Check if the user has permission to approve or reject membership requests
     const hasPermission = await checkUserPermission(

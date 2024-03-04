@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { useCallback } from "react";
 import useAppContext from "~/hooks/useAppContext";
+import useAuthContext from "~/hooks/useAuthContext";
 
 type loginForm = {
   email: string;
@@ -25,6 +26,7 @@ type loginForm = {
 export default function Login() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
+  const { signIn } = useAuthContext();
 
   const schema = zod.object({
     email: zod.string(),
@@ -46,6 +48,7 @@ export default function Login() {
   const onSubmit = useCallback(
     (data: loginForm) => {
       console.log(data);
+      signIn(data.email, data.password);
       navigation.dispatch(StackActions.replace("LandingGroup"));
     },
     [navigation],

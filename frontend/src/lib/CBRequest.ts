@@ -41,6 +41,8 @@ const allowedEndpoints = [
   // Miscellaneous endpoints
   "/Test",
   "/api/upload",
+  "/api/user/verify",
+  "/api/user/token", // TODO - Remove this endpoint - for testing only
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints
@@ -79,17 +81,10 @@ const makeRequest = async (
   method: Method,
   endpoint: AllowedEndpoints,
   options: RequestArgs = {},
-  data?: any, // TODO USE ZOD TO VALIDATE THIS
 ) => {
-  // TODO REMOVE THIS LINE AFTER -- THIS IS FOR TESTING PURPOSES ONLY
-  const authToken =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImRiMzY1MjkwLWM1NTAtMTFlZS04M2ZkLTZmOGQ2YzQ1MDkxMCIsInVzZXJuYW1lIjoiam9obl9kb2UiLCJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJEb2UiLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJwYXNzd29yZCI6Imhhc2hlZC1wYXNzd29yZDEyMyIsImluc3RpdHV0aW9uSWQiOiJkMTMwMDc4MC1jNTUyLTExZWUtODNmZC02ZjhkNmM0NTA5MTAiLCJhY2NvdW50VHlwZSI6IkFwcHJvdmVkT3JnIiwicHJvZmlsZVBpYyI6bnVsbH0.925fX9Jd3Gf-cZpANx1yd0WXPgHHp64nOt1lrOlNOZU";
-
-  // Include the auth token in the request headers if it exists
-  const headersWithAuth = {
+  const headers = {
     ...options.headers,
     "ngrok-skip-browser-warning": "skip", // TODO REMOVE THIS LINE AFTER -- THIS IS FOR TESTING PURPOSES ONLY
-    Authorization: authToken ? `Bearer ${authToken}` : "",
   };
 
   const url = generateUrl(endpoint, options.params);
@@ -98,9 +93,9 @@ const makeRequest = async (
   const response = await axios({
     method,
     url,
-    headers: headersWithAuth,
-    data: method !== "get" && method !== "delete" ? data : undefined,
-    params: method === "get" || method === "delete" ? data : undefined,
+    headers: headers,
+    data: options.body,
+    params: options.params,
   });
 
   return response.data;
