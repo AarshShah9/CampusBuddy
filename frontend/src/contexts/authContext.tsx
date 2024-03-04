@@ -3,7 +3,7 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { UserDataType } from "~/types/User";
-import { makeRequest } from "~/lib/CBRequest";
+import { CBRequest } from "~/lib/CBRequest";
 
 const setAxiosTokenHeader = (token: string) =>
   (axios.defaults.headers.common["Authorization"] = `Bearer ${token}`);
@@ -54,7 +54,7 @@ export const AuthContextProvider = ({
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      const jwt = await makeRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
+      const jwt = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
       setAxiosTokenHeader(jwt.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {

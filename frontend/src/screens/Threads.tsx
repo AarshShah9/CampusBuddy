@@ -1,11 +1,11 @@
 import { Button, View } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
 import { useCallback } from "react";
-import { makeRequest } from "~/lib/CBRequest";
+import { CBRequest } from "~/lib/CBRequest";
 
 export default function Threads() {
   const onClickHandler = useCallback(async () => {
-    makeRequest("GET", "/api/user/verify", {})
+    CBRequest("GET", "/api/user/verify", {})
       .then((res) => {
         console.log(res);
       })

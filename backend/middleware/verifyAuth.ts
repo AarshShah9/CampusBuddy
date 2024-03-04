@@ -45,11 +45,9 @@ export const verifyAuthentication = async (
       });
     }
 
-    req.userId = decoded.id;
+    req.userId = result.id;
     next();
-    console.log("userExists", userExists);
   } catch (error) {
-    console.log("Error in verifyAuth", error);
     res.status(401).send({ message: `Invalid JWT - ${error}` });
   }
 };
