@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import {
   IdParamSchema,
   loginSchema,
-  UserUpdateSchema,
-  tokenSchema,
-  OrgSignupPayloadSchema,
-  UserCreateSchema,
-  OrganizationCreateType,
-  UserCreateType,
   OrganizationCreateSchema,
+  OrganizationCreateType,
+  OrgSignupPayloadSchema,
+  tokenSchema,
+  UserCreateSchema,
+  UserCreateType,
+  UserUpdateSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -18,7 +18,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { hashPassword, comparePassword } from "../utils/hasher";
+import { comparePassword, hashPassword } from "../utils/hasher";
+import { users } from "../prisma/data";
 
 // create new User
 export const signupAsStudent = async (
@@ -198,9 +199,12 @@ export const loginUser = async (
       where: {
         email,
       },
+      include: {
+        institution: true,
+      },
     });
 
-    if (!existingUser) {
+    if (!existingUser || existingUser.institution === null) {
       res.status(404).json({
         success: false,
         message: "User doesn't exist",
@@ -218,8 +222,8 @@ export const loginUser = async (
 
       const authToken = jwt.sign(
         {
-          ID: existingUser.id,
-          institutionId: existingUser.institutionId,
+          id: existingUser.id,
+          institutionName: existingUser.institution.name,
           username: existingUser.username,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
@@ -229,10 +233,7 @@ export const loginUser = async (
         env.JWT_SECRET,
       );
 
-      res.status(200).cookie("authToken", authToken).json({
-        success: true,
-        message: "Login successful",
-      });
+      res.status(200).json({ authToken });
     }
   } catch (error) {
     next(error);
@@ -307,7 +308,7 @@ export const getAllUsers = async (
   }
 };
 
-// get Users by ID
+// get Users by Id
 export const getUserById = async (
   req: Request,
   res: Response,
@@ -326,14 +327,12 @@ export const getUserById = async (
 
     if (!user) {
       // Throw error if user not found
-      const notFoundError = new AppError(
+      throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `User with id ${userId} not found`,
         404,
         true,
       );
-
-      throw notFoundError;
     }
 
     res.status(200).json({ data: user });
@@ -350,7 +349,7 @@ export const updateUser = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     //Validated user data
     const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
@@ -581,10 +580,7 @@ export const verifyExistingOrgSignup = async (
     const token = tokenSchema.parse(req.params).token;
 
     // Verify jwt
-    const payload: string | JwtPayload = jwt.verify(
-      token,
-      env.JWT_SECRET ?? "testSecret",
-    );
+    const payload: string | JwtPayload = jwt.verify(token, env.JWT_SECRET);
 
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);
@@ -776,7 +772,7 @@ export const getLoggedInUser = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userID;
+    const loggedInUserId = req.userId;
 
     // Get user from db
     const user = await prisma.user.findMany({
@@ -787,18 +783,26 @@ export const getLoggedInUser = async (
 
     if (!user) {
       // Throw error if user not found -> should never happen since user is already authenticated
-      const notFoundError = new AppError(
+      throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `User with id ${loggedInUserId} not found`,
         404,
         true,
       );
-
-      throw notFoundError;
     }
 
     res.status(200).json({ data: user });
   } catch (error: any) {
     next(error);
   }
+};
+
+export const verify = async (req: Request, res: Response) => {
+  res.status(200).json({ message: "User is verified" });
+};
+
+export const generateJWT = async (req: Request, res: Response) => {
+  const authToken = jwt.sign(users[0] as JwtPayload, env.JWT_SECRET);
+
+  res.status(200).json({ authToken });
 };

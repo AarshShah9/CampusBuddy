@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
-import multer from "multer";
 import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
 import event from "./routes/event.routes";
@@ -100,5 +99,6 @@ if (env.ENV === "dev") {
       console.log(`Ingress established at: ${listener.url()}`),
     );
 }
+
 export default app;
 export { server };

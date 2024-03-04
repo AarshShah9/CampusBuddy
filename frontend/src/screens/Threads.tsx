@@ -1,10 +1,23 @@
-import { View } from "react-native";
+import { Button, View } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
+import { useCallback } from "react";
+import { CBRequest } from "~/lib/CBRequest";
 
 export default function Threads() {
-    return (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ThemedText>Threads</ThemedText>
-        </View>
-    );
+  const onClickHandler = useCallback(async () => {
+    CBRequest("GET", "/api/user/verify", {})
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ThemedText>Threads</ThemedText>
+      <Button title={"TEST AUTH"} onPress={onClickHandler} />
+    </View>
+  );
 }
