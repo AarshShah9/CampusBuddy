@@ -1,116 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
-
-interface Request {
-  id: number;
-  name: string;
-  organization: string;
-  time: string;
-  message: string;
-}
+import Layout from "./components/Layout";
+import Table from "./components/Table";
+import Login from "./components/Login";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
 const App = () => {
-  const [requests, setRequests] = useState<Request[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchRequests();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
   }, []);
-
-  const fetchRequests = async () => {
-    try {
-      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch("/api/orgs/pending/");
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
-      } else {
-        console.error("Failed to fetch organization requests");
-      }
-    } catch (error) {
-      console.error("Error fetching organization requests:", error);
-    }
-  };
-  const handleAccept = async (id: number) => {
-    try {
-      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`/api/orgs/:${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "Approved" }),
-      });
-      if (response.ok) {
-        fetchRequests();
-      } else {
-        console.error("Failed to update organization request");
-      }
-    } catch (error) {
-      console.error("Error updating organization requests:", error);
-    }
-  };
-
-  const handleDecline = async (id: number) => {
-    try {
-      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`/api/orgs/:${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "Rejected" }),
-      });
-      if (response.ok) {
-        fetchRequests();
-      } else {
-        console.error("Failed to update organization request");
-      }
-    } catch (error) {
-      console.error("Error updating organization requests:", error);
-    }
-  };
 
   return (
     <div className="App">
-      <h2>Requests Dashboard</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Organization</th>
-            <th>Time</th>
-            <th>Message</th>
-            <th>Accept</th>
-            <th>Decline</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.name}</td>
-              <td>{request.organization}</td>
-              <td>{request.time}</td>
-              <td>{request.message}</td>
-              <td>
-                <button
-                  className="accept-button"
-                  onClick={() => handleAccept(request.id)}
-                >
-                  Accept
-                </button>
-              </td>
-              <td>
-                <button
-                  className="decline-button"
-                  onClick={() => handleDecline(request.id)}
-                >
-                  Decline
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Layout />}>
+          <Route path="/dashboard/table" element={<Table />} />
+        </Route>
+      </Routes>
     </div>
   );
 };

@@ -806,3 +806,56 @@ export const generateJWT = async (req: Request, res: Response) => {
 
   res.status(200).json({ authToken });
 };
+
+export const loginAsAdmin = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = loginSchema.parse(req.body);
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User doesn't exist",
+      });
+    }
+
+    if (existingUser.accountType !== UserType.Admin) {
+      return res.status(401).json({
+        success: false,
+        message: "User is not an admin",
+      });
+    }
+
+    // Confirm password matches
+    const isCorrectPassword = await comparePassword(
+      password,
+      existingUser.password,
+    );
+
+    if (!isCorrectPassword) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const authToken = jwt.sign(
+      {
+        id: existingUser.id,
+        institutionName: null,
+        username: existingUser.username,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        email: existingUser.email,
+        password: existingUser.password,
+      },
+      env.JWT_SECRET,
+    );
+
+    res.status(200).json({ authToken });
+  } catch (error) {
+    console.log(error);
+  }
+};
