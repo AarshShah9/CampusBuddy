@@ -314,12 +314,26 @@ export const deleteOrganization = async (
 // Get all Pending Organizations
 // Will be used by an admin dashboard
 export const getAllPendingOrganizations = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // TODO: check the users system-level permissions (admin, not yet implemented)
+    const userId = req.userId;
+    const admin = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (admin.accountType !== "Admin") {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission`,
+        403,
+        true,
+      );
+    }
 
     // Fetch the roleId for the owner role
     const { id: roleId } = await prisma.role.findUniqueOrThrow({

@@ -28,6 +28,7 @@ enum UserType {
   Student // has email with proper domain, enrollment record(s)
   PendingOrg // an org account that hasn't been approved yet by admins or existing org
   ApprovedOrg
+  Admin // System level admin
 }
 
 enum OrganizationStatus {
