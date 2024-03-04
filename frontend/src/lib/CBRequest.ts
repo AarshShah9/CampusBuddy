@@ -1,136 +1,56 @@
-import { BACKEND_URL, ENV } from "@env";
 import { ImagePickerAsset } from "expo-image-picker";
-import { Platform } from "react-native";
 import axios, { Method } from "axios";
-import imageGetter from "~/lib/imageGetter";
+import {
+  AllowedEndpoints,
+  RequestArgs,
+  generateUrl,
+  prepareImageData,
+  imageGetter,
+} from "~/lib/requestHelpers";
 import { z } from "zod";
 import { EventCreateSchema } from "../../../shared/zodSchemas";
 
-// List of allowed API endpoints to ensure valid endpoint usage in requests
-const allowedEndpoints = [
-  // User-related endpoints
-  "/api/user/createNewUser",
-  "/api/user/resendOTP",
-  "/api/user/verifyOTP",
-  "/api/user/loginUser",
-  "/api/user/logoutUser",
-  "/api/user/resetPassword",
-  "/api/user/removeUser/:id",
-  "/api/user/getAllUsers",
-  "/api/user/updateUser/:id",
-
-  // Organization-related endpoints
-  "/api/orgs/test",
-  "/api/orgs/",
-
-  // Institution-related endpoints
-  "/api/institution/createInstitution",
-  "/api/institution/getInstitutionByID",
-  "/api/institution/getInstitutionByName",
-  "/api/institution/removeInstitutionByID",
-  "/api/institution/getAllInstitutions",
-
-  // Event-related endpoints
-  "/api/events/test",
-  "/api/events/",
-  "/api/events/verified",
-  "/api/events/organization/:id",
-  "/api/events/recent/",
-  "/api/events/:id",
-
-  // Miscellaneous endpoints
-  "/Test",
-  "/api/upload",
-  "/api/user/verify",
-  "/api/user/token", // TODO - Remove this endpoint - for testing only
-] as const;
-
-// Type alias for allowed endpoints to restrict function parameters to valid endpoints
-export type AllowedEndpoints = (typeof allowedEndpoints)[number];
-
-// Interface for common request parameters
-export interface RequestArgs {
-  body?: any;
-  headers?: Record<string, string>;
-  params?: Record<string, string | number>;
-}
-
 /**
- * Generates a complete URL by appending the endpoint to the BACKEND_URL and
- * interpolating any parameters into the endpoint string.
+ * Performs an HTTP request to a specified endpoint using the provided method and options.
+ * This function centralizes request handling, including URL generation and optional parameter inclusion.
  *
- * @param endpoint - The API endpoint to call.
- * @param params - Optional parameters to replace in the endpoint string.
- * @return The fully constructed URL.
+ * @param method - The HTTP method to be used for the request (e.g., GET, POST).
+ * @param endpoint - The API endpoint to which the request will be sent. Must be one of the allowed endpoints.
+ * @param options - Optional. An object containing any of the following request customizations:
+ *                  - body: The data to be sent in the request body (for methods like POST or PUT).
+ *                  - headers: An object representing HTTP headers to include in the request.
+ *                  - params: An object representing additional URL parameters to be included in the request.
+ * @returns A promise that resolves with the response data from the request.
  */
-const generateUrl = (
-  endpoint: AllowedEndpoints,
-  params?: Record<string, string | number>,
-): string => {
-  let url = `${BACKEND_URL}${endpoint}`;
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      url = url.replace(`:${key}`, encodeURIComponent(value.toString()));
-    });
-  }
-  return url;
-};
-
-// Unified request function that can handle any HTTP method and incorporates auth token handling and URL generation
-const makeRequest = async (
+const CBRequest = async (
   method: Method,
   endpoint: AllowedEndpoints,
   options: RequestArgs = {},
 ) => {
+  // Extend any provided headers with a testing-related header (should be removed in production).
   const headers = {
     ...options.headers,
-    "ngrok-skip-browser-warning": "skip", // TODO REMOVE THIS LINE AFTER -- THIS IS FOR TESTING PURPOSES ONLY
+    "ngrok-skip-browser-warning": "skip", // Indicate this is for bypassing specific ngrok warnings during development/testing.
   };
 
+  // Generate the full URL with any necessary parameter substitutions.
   const url = generateUrl(endpoint, options.params);
 
-  // Making the request based on the method and provided data
-  const response = await axios({
-    method,
-    url,
-    headers: headers,
-    data: options.body,
-    params: options.params,
-  });
+  // Execute the HTTP request using axios and return the response data.
+  try {
+    const response = await axios({
+      method,
+      url,
+      headers: headers,
+      data: options.body,
+      params: options.params,
+    });
 
-  return response.data;
-};
-
-/**
- * Prepares the image data for uploading by creating a FormData object.
- *
- * @param selectedImage - The image selected by the user.
- * @param data - Additional data to be sent with the image.
- * @return The FormData object containing the image and additional data.
- */
-const prepareImageData = (
-  selectedImage: ImagePickerAsset,
-  data: Record<string, any>,
-): FormData => {
-  const uri =
-    Platform.OS === "android"
-      ? selectedImage.uri
-      : selectedImage.uri.replace("file://", "");
-  const filename = selectedImage.uri.split("/").pop();
-  const match = /\.(\w+)$/.exec(filename as string);
-  const type = `image/${match ? match[1] : ""}`;
-
-  const formData = new FormData();
-  formData.append("file", {
-    uri,
-    name: `image.${match ? match[1] : ""}`,
-    type,
-  } as any);
-  Object.entries(data).forEach(([key, value]) => {
-    if (value instanceof Date) value = value.toISOString();
-    formData.append(key, value);
-  });
-  return formData;
+    return response.data;
+  } catch (error) {
+    console.error("Error during HTTP request:", error);
+    throw error;
+  }
 };
 
 /**
@@ -194,4 +114,4 @@ const sampleUsages = async () => {
   };
 };
 
-export { uploadImageRequest, makeRequest, generateUrl };
+export { uploadImageRequest, CBRequest };

@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import {
   IdParamSchema,
   loginSchema,
-  UserUpdateSchema,
-  tokenSchema,
-  OrgSignupPayloadSchema,
-  UserCreateSchema,
-  OrganizationCreateType,
-  UserCreateType,
   OrganizationCreateSchema,
+  OrganizationCreateType,
+  OrgSignupPayloadSchema,
+  tokenSchema,
+  UserCreateSchema,
+  UserCreateType,
+  UserUpdateSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -18,7 +18,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { hashPassword, comparePassword } from "../utils/hasher";
+import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
 
 // create new User
@@ -788,14 +788,12 @@ export const getLoggedInUser = async (
 
     if (!user) {
       // Throw error if user not found -> should never happen since user is already authenticated
-      const notFoundError = new AppError(
+      throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `User with id ${loggedInUserId} not found`,
         404,
         true,
       );
-
-      throw notFoundError;
     }
 
     res.status(200).json({ data: user });
@@ -809,7 +807,6 @@ export const verify = async (req: Request, res: Response) => {
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
-  console.log("HERE FOR TESTING ONLY");
   const authToken = jwt.sign(users[0] as JwtPayload, env.JWT_SECRET);
 
   res.status(200).json({ authToken });
