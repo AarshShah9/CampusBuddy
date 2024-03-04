@@ -230,10 +230,7 @@ export const loginUser = async (
         env.JWT_SECRET,
       );
 
-      res.status(200).cookie("authToken", authToken).json({
-        success: true,
-        message: "Login successful",
-      });
+      res.status(200).json({ authToken });
     }
   } catch (error) {
     next(error);
@@ -327,14 +324,12 @@ export const getUserById = async (
 
     if (!user) {
       // Throw error if user not found
-      const notFoundError = new AppError(
+      throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         `User with id ${userId} not found`,
         404,
         true,
       );
-
-      throw notFoundError;
     }
 
     res.status(200).json({ data: user });
@@ -582,10 +577,7 @@ export const verifyExistingOrgSignup = async (
     const token = tokenSchema.parse(req.params).token;
 
     // Verify jwt
-    const payload: string | JwtPayload = jwt.verify(
-      token,
-      env.JWT_SECRET ?? "testSecret",
-    );
+    const payload: string | JwtPayload = jwt.verify(token, env.JWT_SECRET);
 
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);

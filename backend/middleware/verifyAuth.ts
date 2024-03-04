@@ -3,7 +3,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import prisma from "../prisma/client";
 import { z } from "zod";
-import { users } from "../prisma/data";
 
 export interface RequestExtended extends Request {
   userId?: string;
@@ -16,7 +15,7 @@ const MyJwtPayloadSchema = z.object({
   lastName: z.string(),
   email: z.string().email(),
   password: z.string(),
-  institutionId: z.string().uuid(),
+  institutionName: z.string(),
 });
 
 type MyJwtPayload = JwtPayload & z.infer<typeof MyJwtPayloadSchema>;
