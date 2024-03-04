@@ -2,45 +2,51 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { env } from "../utils/validateEnv";
 import prisma from "../prisma/client";
+import { z } from "zod";
 
 export interface RequestExtended extends Request {
-  userID?: string;
+  userId?: string;
 }
 
-interface MyJwtPayload extends JwtPayload {
-  ID?: string;
-}
+const MyJwtPayloadSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  password: z.string(),
+  institutionName: z.string(),
+});
+
+type MyJwtPayload = JwtPayload & z.infer<typeof MyJwtPayloadSchema>;
 
 export const verifyAuthentication = async (
   req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
-  const authToken = req.cookies.authToken ?? null;
+  let authToken = req.headers.authorization?.split(" ")[1] ?? "";
   const secret = env.JWT_SECRET;
 
   try {
     const decoded = jwt.verify(authToken, secret) as MyJwtPayload;
-    if (decoded.ID) {
-      // Check if the user exists
-      const userExists = await prisma.user.findUnique({
-        where: {
-          id: decoded.ID,
-        },
+    const result = MyJwtPayloadSchema.parse(decoded);
+
+    // Check if the user exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        id: result.id,
+      },
+    });
+    if (!userExists) {
+      return res.status(401).json({
+        message: "User not found",
       });
-
-      if (!userExists) {
-        return res.status(401).json({
-          message: "User not found or invalid credentials",
-        });
-      }
-
-      req.userID = decoded.ID;
-      next();
-    } else {
-      res.status(401).send({ message: "Invalid JWT: ID not found" });
     }
+
+    req.userId = result.id;
+    next();
   } catch (error) {
-    res.status(401).send({ message: "Invalid JWT" });
+    res.status(401).send({ message: `Invalid JWT - ${error}` });
   }
 };

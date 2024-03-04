@@ -3,10 +3,10 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { UserDataType } from "~/types/User";
+import { CBRequest } from "~/lib/CBRequest";
 
 const setAxiosTokenHeader = (token: string) =>
-  (axios.defaults.headers.common["authToken"] = `${token}`);
-
+  (axios.defaults.headers.common["Authorization"] = `Bearer ${token}`);
 const removeAxiosTokenHeader = () =>
   (axios.defaults.headers.common["authToken"] = "");
 
@@ -29,7 +29,7 @@ type userRegistrationData = {
 type authContext = {
   user: UserDataType | null;
   registerUser: (arg: userRegistrationData) => Promise<void>;
-  signIn: (email: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
 };
 const AuthContext = createContext<authContext | null>(null);
@@ -52,11 +52,11 @@ export const AuthContextProvider = ({
     }
   }, []);
 
-  const signIn = useCallback(async (email: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
-      let tokenFromBackend = "tokenFromBackend";
-      setAxiosTokenHeader(tokenFromBackend);
-      await setTokenInSecureStore(TOKEN_KEY, tokenFromBackend);
+      const jwt = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
+      setAxiosTokenHeader(jwt.authToken as string);
+      await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {
       console.log(error);
     }
