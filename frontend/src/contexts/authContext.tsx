@@ -22,9 +22,12 @@ const getTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) =>
 const deleteTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) =>
   await SecureStore.deleteItemAsync(key.trim());
 
-type userRegistrationData = {
-  name: string;
+export type userRegistrationData = {
   email: string;
+  institutionName: string;
+  firstName: string;
+  lastName: string;
+  password: string;
 };
 type authContext = {
   user: UserDataType | null;
@@ -46,7 +49,17 @@ export const AuthContextProvider = ({
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
-      const { name, email } = data;
+      const { email, institutionName, firstName, lastName, password } = data;
+      const data2 = {
+        institutionName,
+        username: "jtran",
+        firstName,
+        lastName,
+        email,
+        password,
+      };
+      console.log(email + institutionName + firstName);
+      let res = await CBRequest('POST', "/api/user/student",{body:data2})
     } catch (error) {
       console.log(error);
     }

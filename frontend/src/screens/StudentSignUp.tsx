@@ -14,50 +14,40 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import useAppContext from "~/hooks/useAppContext";
+import useAuthContext from "~/hooks/useAuthContext";
+import { userRegistrationData } from "~/contexts/authContext";
 
-type signUpSchool = {
-  uniEmail: string;
-  uniName: string;
-  fName: string;
-  lName: string;
-  password: string;
-  rePassword: string;
-};
+
+
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
+  const {registerUser} = useAuthContext();
+  
 
   const schema = zod.object({
-    uniEmail: zod.string(),
-    uniName: zod.string(),
-    fName: zod.string(),
-    lName: zod.string(),
+    email: zod.string(),
+    institutionName: zod.string(),
+    firstName: zod.string(),
+    lastName: zod.string(),
     password: zod.string(),
-    rePassword: zod.string(),
   });
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<signUpSchool>({
-    defaultValues: {
-      uniEmail: "",
-      uniName: "",
-      fName: "",
-      lName: "",
-      password: "",
-      rePassword: "",
-    },
+  } = useForm<userRegistrationData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = useCallback(
-    (data: signUpSchool) => {
+    (data: userRegistrationData) => {
       console.log(data);
-      navigation.navigate("StudentSignUpInfo");
+      registerUser(data);
+      //navigation.navigate("StudentSignUpInfo");
       //validate()
     },
     [navigation],
@@ -100,9 +90,9 @@ export default function StudentSignUp() {
                   value={value}
                 />
               )}
-              name="uniEmail"
+              name="email"
             />
-            {errors.uniEmail && <Text>University Email is required.</Text>}
+            {errors.email && <Text>University Email is required.</Text>}
             <Controller
               control={control}
               rules={{
@@ -116,9 +106,9 @@ export default function StudentSignUp() {
                   value={value}
                 />
               )}
-              name="uniName"
+              name="institutionName"
             />
-            {errors.uniName && <Text>Institution Name is required.</Text>}
+            {errors.institutionName && <Text>Institution Name is required.</Text>}
             <Controller
               control={control}
               rules={{
@@ -132,9 +122,9 @@ export default function StudentSignUp() {
                   value={value}
                 />
               )}
-              name="fName"
+              name="firstName"
             />
-            {errors.fName && <Text>Institution Name is required.</Text>}
+            {errors.firstName && <Text>Institution Name is required.</Text>}
             <Controller
               control={control}
               rules={{
@@ -148,9 +138,9 @@ export default function StudentSignUp() {
                   value={value}
                 />
               )}
-              name="lName"
+              name="lastName"
             />
-            {errors.lName && <Text>Institution Name is required.</Text>}
+            {errors.lastName && <Text>Institution Name is required.</Text>}
             <Controller
               control={control}
               rules={{
@@ -167,7 +157,7 @@ export default function StudentSignUp() {
               name="password"
             />
             {errors.password && <Text>Institution Name is required.</Text>}
-            <Controller
+            {/* <Controller
               control={control}
               rules={{
                 required: true,
@@ -182,12 +172,10 @@ export default function StudentSignUp() {
               )}
               name="rePassword"
             />
-            {errors.rePassword && <Text>Institution Name is required.</Text>}
+            {errors.rePassword && <Text>Institution Name is required.</Text>} */}
             <StyledButton
               mode="contained"
-              onPress={() => {
-                console.log("Pressed");
-              }}
+              onPress={handleSubmit(onSubmit)}
             >
               <Text
                 style={{
