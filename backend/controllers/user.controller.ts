@@ -14,12 +14,13 @@ import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
 import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { env } from "../utils/validateEnv";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
+
+const jwtSecret = process.env.JWT_SECRET as Secret;
 
 // create new User
 export const signupAsStudent = async (
@@ -88,13 +89,13 @@ export const signupAsStudent = async (
       institutionName: institution.name,
     };
 
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -124,7 +125,7 @@ export const verifyStudentSignup = async (
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
       token,
-      env.JWT_SECRET ?? "testSecret",
+      jwtSecret ?? "testSecret",
     );
 
     // Validate the jwt payload
@@ -230,7 +231,7 @@ export const loginUser = async (
           email: existingUser.email,
           password: existingUser.password,
         },
-        env.JWT_SECRET,
+        jwtSecret,
       );
 
       res.status(200).json({ authToken });
@@ -449,13 +450,13 @@ export const signupWithExistingOrg = async (
     };
 
     // Create the jwt for verifying email, contains user data as payload
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -545,13 +546,13 @@ export const signupAsNewOrg = async (
     };
 
     // Create the jwt for verifying email, contains both user and organization data in payload
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -580,7 +581,7 @@ export const verifyExistingOrgSignup = async (
     const token = tokenSchema.parse(req.params).token;
 
     // Verify jwt
-    const payload: string | JwtPayload = jwt.verify(token, env.JWT_SECRET);
+    const payload: string | JwtPayload = jwt.verify(token, jwtSecret);
 
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);
@@ -697,7 +698,7 @@ export const verifyNewOrgSignup = async (
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
       token,
-      env.JWT_SECRET ?? "testSecret",
+      jwtSecret ?? "testSecret",
     );
 
     // Validate the jwt payload
@@ -802,7 +803,7 @@ export const verify = async (req: Request, res: Response) => {
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
-  const authToken = jwt.sign(users[0] as JwtPayload, env.JWT_SECRET);
+  const authToken = jwt.sign(users[0] as JwtPayload, jwtSecret);
 
   res.status(200).json({ authToken });
 };
@@ -851,7 +852,7 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
         email: existingUser.email,
         password: existingUser.password,
       },
-      env.JWT_SECRET,
+      jwtSecret,
     );
 
     res.status(200).json({ authToken });

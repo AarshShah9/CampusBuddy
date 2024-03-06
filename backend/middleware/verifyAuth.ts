@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { env } from "../utils/validateEnv";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import prisma from "../prisma/client";
 import { z } from "zod";
 
@@ -26,7 +25,7 @@ export const verifyAuthentication = async (
   next: NextFunction,
 ) => {
   let authToken = req.headers.authorization?.split(" ")[1] ?? "";
-  const secret = env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET as Secret;
 
   try {
     const decoded = jwt.verify(authToken, secret) as MyJwtPayload;

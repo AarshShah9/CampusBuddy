@@ -10,7 +10,7 @@ import institution from "./routes/institution.routes";
 import user from "./routes/user.routes";
 import org from "./routes/org.routes";
 import UploadToS3, { upload } from "./utils/S3Uploader";
-import { env, validateEnv } from "./utils/validateEnv";
+import { validateEnv } from "./utils/validateEnv";
 
 const app = express();
 const result = dotenv.config();
@@ -22,7 +22,7 @@ try {
   throw new Error("Failed to validate environment variables" + error);
 }
 
-const port = env.PORT;
+const port = process.env.PORT;
 
 // middleware
 app.use(
@@ -87,12 +87,12 @@ const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-if (env.ENV === "dev") {
+if (process.env.ENV === "dev") {
   ngrok
     .forward({
       addr: port,
-      authtoken: env.NGROK_AUTHTOKEN,
-      domain: env.URL,
+      authtoken: process.env.NGROK_AUTHTOKEN,
+      domain: process.env.URL,
       schemes: ["http", "https"],
     })
     .then((listener) =>
