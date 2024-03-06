@@ -41,7 +41,12 @@ export const ApprovalStatusSchema = OrganizationStatusSchema.extract([
   "Rejected",
 ]);
 
-export const UserType = z.enum(["Student", "PendingOrg", "ApprovedOrg"]);
+export const UserType = z.enum([
+  "Student",
+  "PendingOrg",
+  "ApprovedOrg",
+  "Admin",
+]);
 
 ///////////////////////////////
 // EVENT SCHEMAS
@@ -120,10 +125,12 @@ export const UserSchema = z.object({
     .min(8, { message: "Password must be greater than 8 characters long" }),
   profilePic: z.string().nullable(),
   accountType: UserType,
-  institutionName: z.string(),
+  institutionId: z.string().uuid().nullable(),
 });
 
-export type User = z.infer<typeof UserSchema>;
+export type UserType = z.infer<typeof UserSchema>;
+
+export type UserWithoutPasswordType = Omit<UserType, "password">;
 
 export const UserCreateSchema = UserSchema.omit({
   id: true,
@@ -162,7 +169,7 @@ export const OrganizationSchema = z.object({
   image: z.string().nullable(),
 });
 
-export type Organization = z.infer<typeof OrganizationSchema>;
+export type OrganizationType = z.infer<typeof OrganizationSchema>;
 
 // Create a new schema based on OrganizationSchema
 export const OrganizationCreateSchema = OrganizationSchema.omit({
@@ -198,6 +205,9 @@ export const OrganizationApprovalSchema = z.object({
   decision: ApprovalStatusSchema,
   rejectionReason: z.string().optional(),
 });
+export type OrganizationApprovalType = z.infer<
+  typeof OrganizationApprovalSchema
+>;
 
 /////////////////////////////////////////
 // SCHOOL SCHEMAS
@@ -482,6 +492,11 @@ export const deleteSchema = z.object({
 
 export const tokenSchema = z.object({
   token: z.string(),
+});
+
+export const loginJwtPayloadSchema = UserSchema.omit({
+  profilePic: true,
+  accountType: true,
 });
 
 // For signing up with a new organization
