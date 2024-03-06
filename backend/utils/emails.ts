@@ -1,6 +1,5 @@
 import { User, UserRole } from "@prisma/client";
 import transporter from "./mailer";
-import { env } from "./validateEnv";
 
 export async function emailMembershipRequestApproved(
   user: User,
@@ -25,7 +24,7 @@ export async function emailMembershipRequestApproved(
 
   // Create the email message
   const message = {
-    from: env.MAILER_EMAIL,
+    from: process.env.MAILER_EMAIL,
     to: user.email,
     subject: `${subject}`,
     html: `
@@ -65,7 +64,7 @@ export async function emailMembershipRequestRejected(
 
   // Create the email message
   const message = {
-    from: env.MAILER_EMAIL,
+    from: process.env.MAILER_EMAIL,
     to: user.email,
     subject: `${subject}`,
     html: `
@@ -87,7 +86,7 @@ export async function emailOrganizationRequestApproved(
 
   // Create the email message
   const message = {
-    from: env.MAILER_EMAIL,
+    from: process.env.MAILER_EMAIL,
     to: user.email,
     subject,
     html: `
@@ -113,7 +112,7 @@ export async function emailOrganizationRequestRejected(
 
   // Create the email message
   const message = {
-    from: env.MAILER_EMAIL,
+    from: process.env.MAILER_EMAIL,
     to: user.email,
     subject,
     html: `

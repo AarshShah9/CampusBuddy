@@ -3,7 +3,9 @@ import {
   OrganizationApprovalSchema,
   OrganizationCreateSchema,
   OrganizationMembershipApprovalSchema,
+  OrganizationType,
   OrganizationUpdateSchema,
+  UserWithoutPasswordType,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import {
@@ -370,12 +372,11 @@ export const getAllPendingOrganizations = async (
       const ownerRole = data.userOrganizationRoles[0]; // Access first element as there will always be only one owner
 
       // omit the user's password from the user data being sent in the response
-      const ownerInfo = ownerRole
-        ? (({ password, ...rest }) => rest)(ownerRole.user)
-        : null;
+      const ownerInfo: UserWithoutPasswordType = (({ password, ...rest }) =>
+        rest)(ownerRole.user);
 
       // extract the org info
-      const orgInfo = {
+      const orgInfo: OrganizationType = {
         id: data.id,
         organizationName: data.organizationName,
         description: data.description,
