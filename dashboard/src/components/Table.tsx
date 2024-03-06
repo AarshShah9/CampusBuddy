@@ -18,7 +18,10 @@ const Table = () => {
   const fetchRequests = async () => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const token = localStorage.getItem(authToken);
+      console.log("here");
+      const token = localStorage.getItem("token");
+      console.log("token:", token);
+      console.log("here");
       const response = await fetch("http://localhost:3000/api/orgs/pending/", {
         method: "GET",
         headers: {
