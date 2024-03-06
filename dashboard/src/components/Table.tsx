@@ -18,9 +18,17 @@ const Table = () => {
   const fetchRequests = async () => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch("/api/orgs/pending/");
+      const token = localStorage.getItem(authToken);
+      const response = await fetch("http://localhost:3000/api/orgs/pending/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         const data = await response.json();
+        console.log("Fetched data:", data);
         setRequests(data);
       } else {
         console.error("Failed to fetch organization requests");
@@ -32,7 +40,7 @@ const Table = () => {
   const handleAccept = async (id: number) => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`/api/orgs/:${id}`, {
+      const response = await fetch(`http://localhost:3000/api/orgs/:${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +60,7 @@ const Table = () => {
   const handleDecline = async (id: number) => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`/api/orgs/:${id}`, {
+      const response = await fetch(`http://localhost:3000/api/orgs/:${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
