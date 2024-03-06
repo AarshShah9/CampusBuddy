@@ -900,7 +900,10 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
       email: existingUser.email,
       password: existingUser.password,
     };
-    const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
+    const authToken = jwt.sign(
+      { ...loginTokenPayload },
+      process.env.JWT_SECRET as Secret,
+    );
 
     res.status(200).json({ authToken });
   } catch (error) {

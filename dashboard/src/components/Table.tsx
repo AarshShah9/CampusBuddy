@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
+import {
+  UserWithoutPasswordType,
+  OrganizationType,
+  OrganizationApprovalType,
+} from "../../../shared/zodSchemas";
 
-interface Request {
-  id: number;
-  name: string;
-  organization: string;
-  time: string;
-  message: string;
-}
-
+type Request = {
+  organization: OrganizationType;
+  owner: UserWithoutPasswordType;
+};
 const Table = () => {
   const [requests, setRequests] = useState<Request[]>([]);
 
@@ -18,21 +19,18 @@ const Table = () => {
   const fetchRequests = async () => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      console.log("here");
-      const token = localStorage.getItem("token");
-      console.log("token:", token);
-      console.log("here");
+      const authToken = localStorage.getItem("token");
       const response = await fetch("http://localhost:3000/api/orgs/pending/", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
       });
       if (response.ok) {
-        const data = await response.json();
-        console.log("Fetched data:", data);
-        setRequests(data);
+        const res = await response.json();
+
+        setRequests(res.data);
       } else {
         console.error("Failed to fetch organization requests");
       }
@@ -40,44 +38,73 @@ const Table = () => {
       console.error("Error fetching organization requests:", error);
     }
   };
-  const handleAccept = async (id: number) => {
+  const handleAccept = async (id: string) => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`http://localhost:3000/api/orgs/:${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const acceptBody: OrganizationApprovalType = {
+        decision: "Approved",
+      };
+      const authToken = localStorage.getItem("token");
+
+      const response = await fetch(
+        `http://localhost:3000/api/orgs/${id}/orgApproval`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(acceptBody),
         },
-        body: JSON.stringify({ status: "Approved" }),
-      });
+      );
       if (response.ok) {
         fetchRequests();
       } else {
-        console.error("Failed to update organization request");
+        console.error("Failed to approve organization request");
       }
     } catch (error) {
       console.error("Error updating organization requests:", error);
     }
   };
 
-  const handleDecline = async (id: number) => {
+  const handleDecline = async (id: string, rejectionReason?: string) => {
     try {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-      const response = await fetch(`http://localhost:3000/api/orgs/:${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const rejectBody: OrganizationApprovalType = {
+        decision: "Rejected",
+        rejectionReason,
+      };
+      const authToken = localStorage.getItem("token");
+
+      const response = await fetch(
+        `http://localhost:3000/api/orgs/${id}/orgApproval`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(rejectBody),
         },
-        body: JSON.stringify({ status: "Rejected" }),
-      });
+      );
       if (response.ok) {
         fetchRequests();
       } else {
-        console.error("Failed to update organization request");
+        console.error("Failed to reject organization request");
       }
     } catch (error) {
       console.error("Error updating organization requests:", error);
     }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleDateString("en-US"); // Customize the format as needed
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }); // Customize the format as needed
+    return `${formattedDate}, ${formattedTime}`;
   };
 
   return (
@@ -87,24 +114,27 @@ const Table = () => {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Organization</th>
-            <th>Time</th>
-            <th>Message</th>
+            <th>Description</th>
+            <th>Date/Time</th>
+            <th>Owner</th>
             <th>Accept</th>
             <th>Decline</th>
           </tr>
         </thead>
         <tbody>
           {requests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.name}</td>
-              <td>{request.organization}</td>
-              <td>{request.time}</td>
-              <td>{request.message}</td>
+            <tr key={request.organization.id}>
+              <td>{request.organization.organizationName}</td>
+              <td>{request.organization.description}</td>
+              <td>
+                {formatDateTime(request.organization.createdAt.toString())}
+              </td>
+              <td>{request.owner.username}</td>
+              {/* // put a message field here for reason */}
               <td>
                 <button
                   className="accept-button"
-                  onClick={() => handleAccept(request.id)}
+                  onClick={() => handleAccept(request.organization.id)}
                 >
                   Accept
                 </button>
@@ -112,7 +142,7 @@ const Table = () => {
               <td>
                 <button
                   className="decline-button"
-                  onClick={() => handleDecline(request.id)}
+                  onClick={() => handleDecline(request.organization.id)}
                 >
                   Decline
                 </button>
