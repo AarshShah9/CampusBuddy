@@ -907,6 +907,6 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
 
     res.status(200).json({ authToken });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ message: `Internal server error - ${error}` });
   }
 };
