@@ -20,7 +20,6 @@ const Table = () => {
       // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
       const authToken = localStorage.getItem("token");
       const response = await fetch(`${BACKEND_URL}/api/orgs/pending/`, {
-        referrerPolicy: "unsafe-url",
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +51,6 @@ const Table = () => {
       const response = await fetch(
         `${BACKEND_URL}/api/orgs/${id}/orgApproval`,
         {
-          referrerPolicy: "unsafe-url",
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -84,7 +82,6 @@ const Table = () => {
       const response = await fetch(
         `${BACKEND_URL}/api/orgs/${id}/orgApproval`,
         {
-          referrerPolicy: "unsafe-url",
           method: "POST",
           headers: {
             "Content-Type": "application/json",
