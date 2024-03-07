@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { BACKEND_URL } from "../lib/constants";
 
 type loginData = {
   email: string;
@@ -13,7 +14,7 @@ export default function Login() {
   const submitForm = async (data: loginData) => {
     const email = data.email as string;
     const password = data.password as string;
-    fetch(" http://localhost:3000/api/user/loginAdmin", {
+    fetch(`${BACKEND_URL}/api/user/loginAdmin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
