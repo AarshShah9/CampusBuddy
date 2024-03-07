@@ -11,7 +11,6 @@ export default function Login() {
   const { register, handleSubmit } = useForm<loginData>();
 
   const submitForm = async (data: loginData) => {
-    console.log(data);
     const email = data.email as string;
     const password = data.password as string;
     fetch(" http://localhost:3000/api/user/loginAdmin", {

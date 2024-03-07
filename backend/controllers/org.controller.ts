@@ -392,6 +392,7 @@ export const getAllPendingOrganizations = async (
         owner: ownerInfo,
       };
     });
+
     res.status(200).json({ data: formattedPendingOrgData });
   } catch (error) {
     next(error);

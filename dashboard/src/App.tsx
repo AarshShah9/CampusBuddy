@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import "./App.css";
 import Layout from "./components/Layout";
 import Table from "./components/Table";
 import Login from "./components/Login";
