@@ -15,6 +15,7 @@ export default function Login() {
     const email = data.email as string;
     const password = data.password as string;
     fetch(`${BACKEND_URL}/api/user/loginAdmin`, {
+      referrerPolicy: "unsafe-url",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
