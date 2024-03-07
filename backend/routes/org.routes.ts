@@ -22,7 +22,7 @@ router.use(verifyAuthentication); // Use auth middleware for all routes below
 router.get("/", getAllOrganizations);
 router.get("/institution/:id", getAllOrganizationsByInstitution);
 router.get("/:id/pendingUsers", getAllPendingOrgUsers);
-router.get("/pending/", getAllPendingOrganizations); // for admin interface
+router.get("/pending", getAllPendingOrganizations); // for admin interface
 router.post("/:id/orgApproval", manageNewOrganizationRequest); // for admin interface
 router.post("/:id/membership/approval", manageMembershipRequest);
 router.post("/", upload.single("file"), createNewOrganization);

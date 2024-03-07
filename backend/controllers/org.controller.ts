@@ -3,7 +3,9 @@ import {
   OrganizationApprovalSchema,
   OrganizationCreateSchema,
   OrganizationMembershipApprovalSchema,
+  OrganizationType,
   OrganizationUpdateSchema,
+  UserWithoutPasswordType,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import {
@@ -314,12 +316,26 @@ export const deleteOrganization = async (
 // Get all Pending Organizations
 // Will be used by an admin dashboard
 export const getAllPendingOrganizations = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // TODO: check the users system-level permissions (admin, not yet implemented)
+    const userId = req.userId;
+    const admin = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (admin.accountType !== "Admin") {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission`,
+        403,
+        true,
+      );
+    }
 
     // Fetch the roleId for the owner role
     const { id: roleId } = await prisma.role.findUniqueOrThrow({
@@ -356,12 +372,11 @@ export const getAllPendingOrganizations = async (
       const ownerRole = data.userOrganizationRoles[0]; // Access first element as there will always be only one owner
 
       // omit the user's password from the user data being sent in the response
-      const ownerInfo = ownerRole
-        ? (({ password, ...rest }) => rest)(ownerRole.user)
-        : null;
+      const ownerInfo: UserWithoutPasswordType = (({ password, ...rest }) =>
+        rest)(ownerRole.user);
 
       // extract the org info
-      const orgInfo = {
+      const orgInfo: OrganizationType = {
         id: data.id,
         organizationName: data.organizationName,
         description: data.description,
@@ -377,6 +392,7 @@ export const getAllPendingOrganizations = async (
         owner: ownerInfo,
       };
     });
+
     res.status(200).json({ data: formattedPendingOrgData });
   } catch (error) {
     next(error);

@@ -14,12 +14,13 @@ import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
 import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { env } from "../utils/validateEnv";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
-import { RequestExtended } from "../middleware/verifyAuth";
+import { RequestExtended, loginJwtPayloadType } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
+
+const jwtSecret = process.env.JWT_SECRET as Secret;
 
 // create new User
 export const signupAsStudent = async (
@@ -28,7 +29,7 @@ export const signupAsStudent = async (
   next: NextFunction,
 ) => {
   try {
-    const { institutionName, username, firstName, lastName, email, password } =
+    const { institutionId, username, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -45,10 +46,19 @@ export const signupAsStudent = async (
       });
     }
 
+    if (!institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
+
     // Verify that institution exists
     const institution = await prisma.institution.findUnique({
       where: {
-        name: institutionName,
+        id: institutionId,
       },
     });
 
@@ -85,16 +95,16 @@ export const signupAsStudent = async (
       lastName: lastName,
       email: email,
       password: password,
-      institutionName: institution.name,
+      institutionId: institution.id,
     };
 
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -124,7 +134,7 @@ export const verifyStudentSignup = async (
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
       token,
-      env.JWT_SECRET ?? "testSecret",
+      jwtSecret ?? "testSecret",
     );
 
     // Validate the jwt payload
@@ -146,10 +156,19 @@ export const verifyStudentSignup = async (
       );
     }
 
+    if (!validatedUserData.institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
+
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
       where: {
-        name: validatedUserData.institutionName,
+        id: validatedUserData.institutionId,
       },
     });
 
@@ -220,18 +239,16 @@ export const loginUser = async (
         return res.status(401).json({ message: "Invalid password" });
       }
 
-      const authToken = jwt.sign(
-        {
-          id: existingUser.id,
-          institutionName: existingUser.institution.name,
-          username: existingUser.username,
-          firstName: existingUser.firstName,
-          lastName: existingUser.lastName,
-          email: existingUser.email,
-          password: existingUser.password,
-        },
-        env.JWT_SECRET,
-      );
+      const loginTokenPayload: loginJwtPayloadType = {
+        id: existingUser.id,
+        institutionId: existingUser.institution.id,
+        username: existingUser.username,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        email: existingUser.email,
+        password: existingUser.password,
+      };
+      const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
       res.status(200).json({ authToken });
     }
@@ -388,7 +405,7 @@ export const signupWithExistingOrg = async (
     const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate request body
-    const { institutionName, username, firstName, lastName, email, password } =
+    const { institutionId, username, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -407,10 +424,18 @@ export const signupWithExistingOrg = async (
       );
     }
 
+    if (!institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
     // Verify that institution exists
     const institution = await prisma.institution.findUnique({
       where: {
-        name: institutionName,
+        id: institutionId,
       },
     });
 
@@ -445,17 +470,17 @@ export const signupWithExistingOrg = async (
       lastName: lastName,
       email: email,
       password: password,
-      institutionName: institution.name,
+      institutionId: institution.id,
     };
 
     // Create the jwt for verifying email, contains user data as payload
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -484,14 +509,14 @@ export const signupAsNewOrg = async (
     // NOTE!: request data nested in req.body.user and req.body.organization
 
     // Validate the new user data
-    const { institutionName, username, firstName, lastName, email, password } =
+    const { institutionId, username, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body.user);
 
     // Validate the new organization data
     // We have both institution name and id just bcs we are re-using same zod schemas
-    const { organizationName, description, institutionId } =
-      OrganizationCreateSchema.parse(req.body.organization);
-
+    const validatedOrgData = OrganizationCreateSchema.parse(
+      req.body.organization,
+    );
     // Check if the user already exists
     const userExists = await prisma.user.findUnique({
       where: {
@@ -508,6 +533,14 @@ export const signupAsNewOrg = async (
       );
     }
 
+    if (!institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
       where: {
@@ -535,23 +568,23 @@ export const signupAsNewOrg = async (
         lastName,
         email,
         password,
-        institutionName: institution.name,
+        institutionId: institution.id,
       },
       organization: {
-        description,
-        organizationName,
+        description: validatedOrgData.description,
+        organizationName: validatedOrgData.organizationName,
         institutionId,
       },
     };
 
     // Create the jwt for verifying email, contains both user and organization data in payload
-    const token = jwt.sign({ ...payload }, env.JWT_SECRET, {
+    const token = jwt.sign({ ...payload }, jwtSecret, {
       expiresIn: "10m",
       mutatePayload: false,
     });
 
     const message = {
-      from: env.MAILER_EMAIL,
+      from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
@@ -580,7 +613,7 @@ export const verifyExistingOrgSignup = async (
     const token = tokenSchema.parse(req.params).token;
 
     // Verify jwt
-    const payload: string | JwtPayload = jwt.verify(token, env.JWT_SECRET);
+    const payload: string | JwtPayload = jwt.verify(token, jwtSecret);
 
     // Validate the jwt payload
     const validatedUserData = UserCreateSchema.parse(payload);
@@ -604,10 +637,19 @@ export const verifyExistingOrgSignup = async (
       );
     }
 
+    if (!validatedUserData.institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
+
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
       where: {
-        name: validatedUserData.institutionName,
+        id: validatedUserData.institutionId,
       },
     });
 
@@ -697,7 +739,7 @@ export const verifyNewOrgSignup = async (
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
       token,
-      env.JWT_SECRET ?? "testSecret",
+      jwtSecret ?? "testSecret",
     );
 
     // Validate the jwt payload
@@ -719,11 +761,19 @@ export const verifyNewOrgSignup = async (
         true,
       );
     }
+    if (!validatedUserData.institutionId) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Institution id is required",
+        400,
+        true,
+      );
+    }
 
     // Verify that the institution exists
     const institution = await prisma.institution.findUnique({
       where: {
-        name: validatedUserData.institutionName,
+        id: validatedUserData.institutionId,
       },
     });
 
@@ -802,7 +852,61 @@ export const verify = async (req: Request, res: Response) => {
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
-  const authToken = jwt.sign(users[0] as JwtPayload, env.JWT_SECRET);
+  const authToken = jwt.sign(users[0] as JwtPayload, jwtSecret);
 
   res.status(200).json({ authToken });
+};
+
+export const loginAsAdmin = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = loginSchema.parse(req.body);
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User doesn't exist",
+      });
+    }
+
+    if (existingUser.accountType !== UserType.Admin) {
+      return res.status(401).json({
+        success: false,
+        message: "User is not an admin",
+      });
+    }
+
+    // Confirm password matches
+    const isCorrectPassword = await comparePassword(
+      password,
+      existingUser.password,
+    );
+
+    if (!isCorrectPassword) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const loginTokenPayload: loginJwtPayloadType = {
+      id: existingUser.id,
+      institutionId: null,
+      username: existingUser.username,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      email: existingUser.email,
+      password: existingUser.password,
+    };
+    const authToken = jwt.sign(
+      { ...loginTokenPayload },
+      process.env.JWT_SECRET as Secret,
+    );
+
+    res.status(200).json({ authToken });
+  } catch (error) {
+    console.log(error);
+  }
 };

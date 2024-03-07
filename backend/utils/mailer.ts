@@ -1,11 +1,10 @@
 import nodemailer from "nodemailer";
-import { env } from "./validateEnv";
 
 const config = {
   service: "gmail",
   auth: {
-    user: env.MAILER_EMAIL,
-    pass: env.MAILER_PASS,
+    user: process.env.MAILER_EMAIL,
+    pass: process.env.MAILER_PASS,
   },
 };
 
