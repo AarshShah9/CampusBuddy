@@ -1,9 +1,9 @@
 import {
-  View,
+  Modal,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
-  Modal,
+  View,
 } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { GOOGLE_MAPS_API_KEY } from "@env";
@@ -27,7 +27,15 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
     [location],
   );
 
-  console.log("HERE");
+  const getCoordinatesFromPlaceId = async (placeId: string) => {
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${GOOGLE_MAPS_API_KEY}`;
+    try {
+      let response = await fetch(url);
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <View>
@@ -66,9 +74,9 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
               color="black"
             />
             <GooglePlacesAutocomplete
-              onPress={(data) => {
-                userLocation(data.description);
-                console.log(data);
+              onPress={async (data) => {
+                userLocation(data.place_id);
+                // const location = await getCoordinatesFromPlaceId(data.place_id);
               }}
               styles={{
                 textInput: {

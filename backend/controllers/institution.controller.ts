@@ -27,7 +27,7 @@ export const createInstitution = async (
       );
     }
 
-    const { institutionName, institutionDomain } = req.body;
+    const { institutionName, institutionDomain, location } = req.body;
 
     const validName = institutionNameSchema.safeParse(institutionName);
     const validDomain = institutionDomainSchema.safeParse(institutionDomain);
@@ -54,6 +54,7 @@ export const createInstitution = async (
       data: {
         name: institutionName,
         domain: institutionDomain,
+        location: location,
       },
     });
 

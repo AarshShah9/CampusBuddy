@@ -13,6 +13,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   MAILER_EMAIL: z.string(),
   MAILER_PASS: z.string(),
+  GOOGLE_MAPS_API_KEY: z.string(),
   // Add more environment variables as needed
 });
 
@@ -34,6 +35,7 @@ const env = {
   JWT_SECRET: process.env.JWT_SECRET!,
   MAILER_EMAIL: process.env.MAILER_EMAIL!,
   MAILER_PASS: process.env.MAILER_PASS!,
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY!,
 };
 
 export { env, validateEnv };
