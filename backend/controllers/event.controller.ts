@@ -266,7 +266,10 @@ export const updateEvent = async (
 export const getAllEvents = async (req: Request, res: Response) => {
   try {
     const allEvents = await prisma.event.findMany();
-    res.status(200).json(allEvents);
+    res.status(200).json({
+      message: "All events",
+      data: allEvents,
+    });
   } catch (error) {
     console.error("Error fetching events:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -285,7 +288,10 @@ export const getAllVerifiedEvents = async (
         status: EventStatus.Verified,
       },
     });
-    res.status(200).json(allEvents);
+    res.status(200).json({
+      message: "All verified events",
+      data: allEvents,
+    });
   } catch (error) {
     next(error);
   }
@@ -320,7 +326,10 @@ export const getEventById = async (
       throw notFoundError;
     }
 
-    res.status(200).json(event);
+    res.status(200).json({
+      message: "Event found",
+      data: event,
+    });
   } catch (error) {
     next(error);
   }
@@ -356,7 +365,10 @@ export const getEventByUserId = async (
       eventsCreatedByUser: eventsCreatedByUser,
       eventsInterested: eventsInterested,
     };
-    res.status(200).json(userEventsData);
+    res.status(200).json({
+      message: "Events found",
+      data: userEventsData,
+    });
   } catch (error) {
     next(error);
   }
@@ -407,6 +419,7 @@ export const getRecentEvents = async (
         : null;
 
     res.status(200).json({
+      message: "Recent events",
       data: recentEvents,
       cursor: nextCursor,
     });
@@ -432,7 +445,10 @@ export const getAllEventsByOrganization = async (
       },
     });
 
-    res.status(200).json(allOrgEvents);
+    res.status(200).json({
+      message: "All events for organization",
+      data: allOrgEvents,
+    });
   } catch (error) {
     next(error);
   }
