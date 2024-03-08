@@ -9,6 +9,7 @@ import {
   getAllVerifiedEvents,
   getEventById,
   getEventByUserId,
+  getMainPageEvents,
   getRecentEvents,
   updateEvent,
 } from "../controllers/event.controller";
@@ -19,6 +20,7 @@ const router = express.Router();
 
 router.get("/test", eventTest);
 router.use(verifyAuthentication); // Use auth middleware for all routes below
+router.get("/mainPage", getMainPageEvents);
 router.get("/", getAllEvents);
 router.get("/verified", getAllVerifiedEvents);
 router.get("/organization/:id", getAllEventsByOrganization);

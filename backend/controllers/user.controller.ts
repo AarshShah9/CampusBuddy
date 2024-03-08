@@ -19,6 +19,7 @@ import { createOrganizationWithDefaults } from "../services/org.service";
 import { RequestExtended, loginJwtPayloadType } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
+import { thankYouMessage } from "../utils/emails";
 
 const jwtSecret = process.env.JWT_SECRET as Secret;
 
@@ -102,13 +103,13 @@ export const signupAsStudent = async (
       expiresIn: "10m",
       mutatePayload: false,
     });
-
+    const url = `${process.env.URL}/api/user/verify/student/${token}`;
     const message = {
       from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verify/student/${token}">Click here</a>`,
+      <a href="${url}">Click here</a>`,
     };
 
     await transporter.sendMail(message);
@@ -196,10 +197,9 @@ export const verifyStudentSignup = async (
       },
     });
 
-    res.status(200).json({
-      message: `JWT verified and a new student was created`,
-      data: { user: newStudent },
-    });
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.write(thankYouMessage);
+    res.end();
   } catch (error) {
     next(error);
   }
@@ -478,13 +478,14 @@ export const signupWithExistingOrg = async (
       expiresIn: "10m",
       mutatePayload: false,
     });
+    const url = `${process.env.URL}/api/user/verify/organization/${organizationId}/${token}`;
 
     const message = {
       from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verify/organization/${organizationId}/${token}">Click here</a>`,
+            <a href="${url}">Click here</a>`,
     };
 
     await transporter.sendMail(message);
@@ -583,12 +584,13 @@ export const signupAsNewOrg = async (
       mutatePayload: false,
     });
 
+    const url = `${process.env.URL}/api/user/verify/organization/new/${token}`;
     const message = {
       from: process.env.MAILER_EMAIL,
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="http://localhost:3000/api/user/verify/organization/new/${token}">Click here</a>`,
+     <a href="${url}">Click here</a>`,
     };
 
     await transporter.sendMail(message);

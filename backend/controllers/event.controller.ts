@@ -519,3 +519,41 @@ export const deleteEvent = async (
     next(error);
   }
 };
+
+export const getMainPageEvents = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const loggedInUserId = req.userId;
+
+    const attendingEvents = await prisma.event.findMany({
+      where: {
+        eventResponses: {
+          some: {
+            userId: loggedInUserId,
+            participationStatus: "Interested",
+          },
+        },
+      },
+    });
+
+    // Find the top 10 trending events by looking at the location
+    const trendingEvents = await prisma.event.findMany({
+      where: {
+        status: EventStatus.Verified,
+      },
+      take: 10,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      data: { attendingEvents },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};

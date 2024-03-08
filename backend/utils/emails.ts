@@ -124,3 +124,44 @@ export async function emailOrganizationRequestRejected(
   // Send the email
   await transporter.sendMail(message);
 }
+
+export const thankYouMessage = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Thank You</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f3f4f6;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .thank-you {
+                text-align: center;
+                background-color: #fff;
+                padding: 50px;
+                box-shadow: 0 5px 15px rgba(0,0,0,.1);
+                border-radius: 5px;
+            }
+            .thank-you h1 {
+                color: #333;
+            }
+            .thank-you p {
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="thank-you">
+            <h1>Thank You!</h1>
+            <p>Your request has been processed successfully.</p>
+        </div>
+    </body>
+    </html>
+`;
