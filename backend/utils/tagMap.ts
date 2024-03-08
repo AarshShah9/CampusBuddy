@@ -1,0 +1,25 @@
+const tagMapping: Record<any, number> = {
+  Sports: 0,
+  Fitness: 1,
+  Culture: 2,
+  Theatre: 3,
+  Academic: 4,
+  Music: 5,
+  Community: 6,
+  Tech: 7,
+  Food: 8,
+  Health: 9,
+  Wellness: 10,
+  Science: 11,
+  Business: 12,
+  Engineering: 13,
+  Art: 14,
+  Games: 15,
+  Social: 16,
+  Software: 17,
+  Mechanical: 18,
+  Electrical: 19,
+  Outdoors: 20,
+};
+
+export default tagMapping;

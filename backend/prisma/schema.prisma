@@ -61,6 +61,41 @@ enum AppPermissionName {
   DELETE_ORGANIZATION
 }
 
+// RECOMMENDATION MODELS
+model Tag {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users  User[]  @relation("UserTags")
+  events Event[] @relation("EventTags")
+
+  UserTags  UserTags[]
+  EventTags EventTags[]
+
+  @@map("tag")
+}
+
+// Intermediate table for many-to-many relations 
+model UserTags {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  String
+
+  @@unique([userId, tagId])
+  @@index([tagId])
+}
+
+model EventTags {
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@unique([eventId, tagId])
+  @@index([tagId])
+}
+
 // CORE MODELS
 model Institution {
   id            String         @id @default(uuid())
@@ -92,6 +127,9 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
+
+  tags     Tag[]      @relation("UserTags")
+  UserTags UserTags[]
 
   @@index([email])
   @@index([institutionId])
@@ -138,6 +176,9 @@ model Event {
   organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   eventTags      EventTag[]
   eventResponses UserEventResponse[]
+
+  tags      Tag[]       @relation("EventTags")
+  EventTags EventTags[]
 
   @@index([userId])
   @@index([organizationId])
