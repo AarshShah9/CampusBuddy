@@ -65,7 +65,10 @@ export const createInstitution = async (
     };
 
     await transporter.sendMail(message);
-    res.status(200).json(newInstitution);
+    res.status(200).json({
+      message: "Institution created successfully",
+      data: newInstitution,
+    });
   } catch (error) {
     next(error);
   }
@@ -97,7 +100,10 @@ export const getInstitutionByID = async (
       },
     });
 
-    res.status(200).json(institution);
+    res.status(200).json({
+      message: "Institution found",
+      data: institution,
+    });
   } catch (error) {
     next(error);
   }
@@ -129,7 +135,10 @@ export const getInstitutionByName = async (
       },
     });
 
-    res.status(200).json(institution);
+    res.status(200).json({
+      message: "Institution found",
+      data: institution,
+    });
   } catch (error) {
     next(error);
   }
@@ -171,5 +180,8 @@ export const removeInstitutionByID = async (
 export const getAllInstitutions = async (req: Request, res: Response) => {
   const allSchools = await prisma.institution.findMany();
 
-  res.status(200).json(allSchools);
+  res.status(200).json({
+    message: "All institutions",
+    data: allSchools,
+  });
 };

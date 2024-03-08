@@ -16,7 +16,7 @@ import transporter from "../utils/mailer";
 import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
-import { RequestExtended, loginJwtPayloadType } from "../middleware/verifyAuth";
+import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
 
@@ -198,7 +198,7 @@ export const verifyStudentSignup = async (
 
     res.status(200).json({
       message: `JWT verified and a new student was created`,
-      data: { user: newStudent },
+      data: newStudent,
     });
   } catch (error) {
     next(error);
@@ -317,9 +317,12 @@ export const getAllUsers = async (
   next: NextFunction,
 ) => {
   try {
-    const allStudents = await prisma.user.findMany();
+    const allUsers = await prisma.user.findMany();
 
-    res.status(200).json(allStudents);
+    res.status(200).json({
+      message: "All users",
+      data: allUsers,
+    });
   } catch (error: any) {
     next(error);
   }
@@ -352,7 +355,10 @@ export const getUserById = async (
       );
     }
 
-    res.status(200).json({ data: user });
+    res.status(200).json({
+      message: `User with id ${userId}`,
+      data: user,
+    });
   } catch (error: any) {
     next(error);
   }
@@ -719,7 +725,7 @@ export const verifyExistingOrgSignup = async (
 
     res.status(200).json({
       message: `JWT verified and a new org user was created as a pending moderator for orgId: ${organizationId}`,
-      data: { user: newUser },
+      data: newUser,
     });
   } catch (error) {
     next(error);
