@@ -9,11 +9,11 @@ import {
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import {
-  approveUserRequest,
-  rejectUserRequest,
-  createOrganizationWithDefaults,
   approveOrganizationRequest,
+  approveUserRequest,
+  createOrganizationWithDefaults,
   rejectOrganizationRequest,
+  rejectUserRequest,
 } from "../services/org.service";
 import {
   emailMembershipRequestApproved,
@@ -125,7 +125,10 @@ export const getOrganizationById = async (
       throw notFoundError;
     }
 
-    res.status(200).json({ data: organization });
+    res.status(200).json({
+      message: "Organization retrieved successfully",
+      data: organization,
+    });
   } catch (error) {
     next(error);
   }
@@ -140,7 +143,10 @@ export const getAllOrganizations = async (
   try {
     // Retrieves array of entire org objects
     const allOrgs = await prisma.organization.findMany();
-    res.status(200).json({ data: allOrgs });
+    res.status(200).json({
+      message: "All organizations retrieved successfully",
+      data: allOrgs,
+    });
   } catch (error) {
     next(error);
   }
@@ -163,7 +169,10 @@ export const getAllOrganizationsByInstitution = async (
       },
     });
 
-    res.status(200).json({ data: allOrgsByInstitution });
+    res.status(200).json({
+      message: "All organizations retrieved successfully",
+      data: allOrgsByInstitution,
+    });
   } catch (error) {
     next(error);
   }
@@ -307,7 +316,7 @@ export const deleteOrganization = async (
       where: { id: organizationId },
     });
 
-    res.status(204).end(); // No content after sucessful deletion
+    res.status(204).end(); // No content after successful deletion
   } catch (error: any) {
     next(error);
   }
@@ -393,7 +402,10 @@ export const getAllPendingOrganizations = async (
       };
     });
 
-    res.status(200).json({ data: formattedPendingOrgData });
+    res.status(200).json({
+      message: "All pending organizations retrieved successfully",
+      data: formattedPendingOrgData,
+    });
   } catch (error) {
     next(error);
   }
@@ -448,7 +460,10 @@ export const getAllPendingOrgUsers = async (
       },
     });
 
-    res.status(200).json({ data: pendingOrgUsers });
+    res.status(200).json({
+      message: "All pending organization users retrieved successfully",
+      data: pendingOrgUsers,
+    });
   } catch (error) {
     next(error);
   }
