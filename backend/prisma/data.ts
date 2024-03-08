@@ -84,6 +84,7 @@ export const institutes = [
     id: ids.instituteIds[1],
     name: "University of Calgary",
     domain: "ucalgary.ca",
+    location: "Calgary, Alberta",
   },
 ];
 

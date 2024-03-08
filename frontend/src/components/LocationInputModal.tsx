@@ -6,7 +6,7 @@ import {
   Modal,
 } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { GOOGLE_MAPS_API_KEY, ENV } from "@env";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useCallback, useState } from "react";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -23,10 +23,12 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
       setLocation(text);
       setModalVisible(false);
       props.controllerOnChange(text);
-      
     },
     [location],
   );
+
+  console.log("HERE");
+
   return (
     <View>
       <TouchableWithoutFeedback onPress={showModal}>
@@ -66,6 +68,7 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
             <GooglePlacesAutocomplete
               onPress={(data) => {
                 userLocation(data.description);
+                console.log(data);
               }}
               styles={{
                 textInput: {

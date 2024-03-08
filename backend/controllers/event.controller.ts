@@ -528,27 +528,58 @@ export const getMainPageEvents = async (
   try {
     const loggedInUserId = req.userId;
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId,
+      },
+      include: {
+        institution: true,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+    }
+
+    if (!user.institution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} does not have an institution`,
+        404,
+        true,
+      );
+    }
+
     const attendingEvents = await prisma.event.findMany({
       where: {
         eventResponses: {
           some: {
-            userId: loggedInUserId,
+            userId: user.id,
             participationStatus: "Interested",
           },
         },
       },
     });
 
-    // Find the top 10 trending events by looking at the location
-    const trendingEvents = await prisma.event.findMany({
-      where: {
-        status: EventStatus.Verified,
-      },
-      take: 10,
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    // Find the top 10 trending events by finding the most recent verified events,
+    // which have the most responses. And also comparing to make sure it is located in the same location as the user
+    // const trendingEvents = await prisma.event.findMany({
+    //   where: {
+    //     status: EventStatus.Verified,
+    //     location: user.institution.location,
+    //   },
+    //   orderBy: {
+    //     eventResponses: {
+    //       count: "desc",
+    //     },
+    //   },
+    //   take: 10,
+    // });
 
     res.status(200).json({
       data: { attendingEvents },
