@@ -27,16 +27,6 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
     [location],
   );
 
-  const getCoordinatesFromPlaceId = async (placeId: string) => {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${GOOGLE_MAPS_API_KEY}`;
-    try {
-      let response = await fetch(url);
-      return await response.json();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <View>
       <TouchableWithoutFeedback onPress={showModal}>
@@ -76,7 +66,6 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
             <GooglePlacesAutocomplete
               onPress={async (data) => {
                 userLocation(data.place_id);
-                // const location = await getCoordinatesFromPlaceId(data.place_id);
               }}
               styles={{
                 textInput: {

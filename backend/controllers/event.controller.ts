@@ -15,6 +15,7 @@ import UploadToS3, {
   generateUniqueFileName,
 } from "../utils/S3Uploader";
 import { RequestExtended } from "../middleware/verifyAuth";
+import { getCoordinatesFromPlaceId } from "../utils/googleMapsApi";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -542,11 +543,11 @@ export const getMainPageEvents = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const loggedInUserId = req.userId;
+    const userId = req.userId;
 
     const user = await prisma.user.findUnique({
       where: {
-        id: loggedInUserId,
+        id: userId,
       },
       include: {
         institution: true,
@@ -556,7 +557,7 @@ export const getMainPageEvents = async (
     if (!user) {
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
-        `User with id ${loggedInUserId} not found`,
+        "User not found",
         404,
         true,
       );
@@ -565,40 +566,50 @@ export const getMainPageEvents = async (
     if (!user.institution) {
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
-        `User with id ${loggedInUserId} does not have an institution`,
+        "User institution not found",
         404,
         true,
       );
     }
 
+    const { lat, lng } = await getCoordinatesFromPlaceId(
+      user.institution.location,
+    );
+
+    // All events returned here are in the user's location and are verified
+    // TODO Events from organizations the user follows
+
+    // Trending events [0-3 are featured at the top, 4-9 are trending]
+    // Events that the user is attending
     const attendingEvents = await prisma.event.findMany({
       where: {
-        eventResponses: {
-          some: {
-            userId: user.id,
-            participationStatus: "Interested",
+        AND: [
+          {
+            eventResponses: {
+              some: {
+                userId,
+                participationStatus: "Interested",
+              },
+            },
           },
-        },
+          {
+            endTime: {
+              gt: new Date(), // TODO need to handle timezones
+            },
+          },
+        ],
       },
+      orderBy: {
+        endTime: "asc",
+      },
+      take: 10,
     });
 
-    // Find the top 10 trending events by finding the most recent verified events,
-    // which have the most responses. And also comparing to make sure it is located in the same location as the user
-    // const trendingEvents = await prisma.event.findMany({
-    //   where: {
-    //     status: EventStatus.Verified,
-    //     location: user.institution.location,
-    //   },
-    //   orderBy: {
-    //     eventResponses: {
-    //       count: "desc",
-    //     },
-    //   },
-    //   take: 10,
-    // });
+    // Explore upcoming events
+    // Explore verified organizations
 
     res.status(200).json({
-      data: { attendingEvents },
+      data: { location: { lat, lng }, attendingEvents },
     });
   } catch (error: any) {
     next(error);
