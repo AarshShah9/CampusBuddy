@@ -1,16 +1,9 @@
 import { Response, NextFunction } from "express";
 import { RequestExtended } from "../middleware/verifyAuth";
 import prisma from "../prisma/client";
-import tagMapping from "../utils/tagMap";
 import cosineSimilarity from "../utils/cosineSimilarity";
-
-const normalizeTags = (tags: string[]) => {
-  const normalizedTags = new Array(20).fill(0);
-  tags.forEach((tag) => {
-    normalizedTags[tagMapping[tag]] = 1;
-  });
-  return normalizedTags;
-};
+import normalizeTags from "../utils/normalizeTags";
+import { consoleLog } from "@ngrok/ngrok";
 
 export const recommendEvents = async (
   req: RequestExtended,
@@ -19,7 +12,7 @@ export const recommendEvents = async (
 ) => {
   // modify during integration
   const loggedInUserId = req.body.userId;
-  const userTags = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       id: loggedInUserId,
     },
@@ -27,90 +20,40 @@ export const recommendEvents = async (
       tags: true,
     },
   });
+  const userTags = user?.tags;
 
-  const allEventTags = await prisma.event.findMany({
-    select: {
-      tags: true,
-    },
-  });
+  const allTags = await prisma.tag.findMany({});
 
-  const allEventTagIds = allEventTags.map((event) =>
-    event.tags.map((tag) => tag.id),
-  );
+  if (userTags) {
+    const userTagsNormalized = normalizeTags(userTags, allTags);
 
-  const recommendations = allEventTagIds.map((event) => ({
-    event,
-    similarity: cosineSimilarity([1], [1]),
-  }));
+    const allEvents = await prisma.event.findMany({
+      include: {
+        tags: true,
+      },
+    });
 
-  recommendations.sort((a, b) => b.similarity - a.similarity);
+    const eventTagMap = new Map();
 
-  // placeholder code
-  return recommendations.map((recommendation) => recommendation.event);
+    allEvents.forEach((event) => {
+      const eventTagsNormalized = normalizeTags(event.tags, allTags);
+      eventTagMap.set(event.id, eventTagsNormalized);
+    });
+
+    const recommendationMap = new Map();
+
+    for (let [key, value] of eventTagMap) {
+      console.log(key);
+      console.log(value);
+      console.log(userTagsNormalized);
+      let similarity = cosineSimilarity(userTagsNormalized, value);
+      console.log(similarity);
+      recommendationMap.set(key, similarity);
+    }
+
+    const similarityArray = Array.from(recommendationMap.entries());
+    similarityArray.sort((a, b) => b[1] - a[1]);
+
+    res.status(200).json({ similarityArray });
+  }
 };
-
-// export const recommendPosts = async (
-//   req: RequestExtended,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const loggedInUserId = req.userId;
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       id: loggedInUserId,
-//     },
-//     include: {
-//       // change after discussion with JC
-//       // tags: true,
-//     },
-//   });
-
-//   const allPosts = await prisma.post.findMany({
-//     select: {
-//       // ask JC about this
-//     },
-//   });
-
-//   const recommendations = allPosts.map((post) => ({
-//     post,
-//     similarity: cosineSimilarity(user.tags, post.tags),
-//   }));
-
-//   recommendations.sort((a, b) => b.similarity - a.similarity);
-
-//   // placeholder code
-//   return recommendations.map((recommendation) => recommendation.post);
-// };
-
-// export const recommendUsers = async (
-//   req: RequestExtended,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const loggedInUserId = req.userId;
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       id: loggedInUserId,
-//     },
-//     include: {
-//       // change after discussion with JC
-//       // tags: true,
-//     },
-//   });
-
-//   const allUsers = await prisma.user.findMany({
-//     select: {
-//       // ask JC about this
-//     },
-//   });
-
-//   const recommendations = allUsers.map((user) => ({
-//     user,
-//     similarity: cosineSimilarity(user.tags, user.tags),
-//   }));
-
-//   recommendations.sort((a, b) => b.similarity - a.similarity);
-
-//   // placeholder code
-//   return recommendations.map((recommendation) => recommendation.user);
-// };

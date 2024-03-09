@@ -109,7 +109,7 @@ export const modifyEventTags = async (
     });
 
     if (foundTag) {
-      await prisma.user.update({
+      await prisma.event.update({
         where: {
           id: relevantEventId,
         },
