@@ -66,11 +66,12 @@ model Tag {
   id   String @id @default(uuid())
   name String @unique
 
-  users  User[]  @relation("UserTags")
-  events Event[] @relation("EventTags")
-
+  users     User[]      @relation("UserTags")
+  events    Event[]     @relation("EventTags")
+  posts     Post[]      @relation("PostTags")
   UserTags  UserTags[]
   EventTags EventTags[]
+  PostTags  PostTags[]
 
   @@map("tag")
 }
@@ -93,6 +94,16 @@ model EventTags {
   tagId   String
 
   @@unique([eventId, tagId])
+  @@index([tagId])
+}
+
+model PostTags {
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  String
+
+  @@unique([postId, tagId])
   @@index([tagId])
 }
 
@@ -211,7 +222,10 @@ model Post {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   comments Comment[]
+
+  tags     Tag[]      @relation("PostTags")
   postTags PostTag[]
+  PostTags PostTags[]
 
   @@index([userId])
   @@index([organizationId])

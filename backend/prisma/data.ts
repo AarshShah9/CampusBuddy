@@ -1,9 +1,10 @@
 import {
   AppPermissionName,
   EventStatus,
+  Institution,
+  User,
   OrganizationStatus,
   ParticipationStatus,
-  User,
   UserOrgStatus,
   UserRole,
   UserType,
@@ -77,7 +78,112 @@ export const ids = {
     3: "f6700561-c5f5-11ee-83fd-6f8d6c450910",
     4: "f6700562-c5f5-11ee-83fd-6f8d6c450910",
   },
+  tagIds: {
+    1: "1a574339-f3fc-49d5-8db0-564289f26c19",
+    2: "1a574339-f3fc-49d5-8db0-564289f26c20",
+    3: "1a574339-f3fc-49d5-8db0-564289f26c21",
+    4: "1a574339-f3fc-49d5-8db0-564289f26c22",
+    5: "1a574339-f3fc-49d5-8db0-564289f26c23",
+    6: "1a574339-f3fc-49d5-8db0-564289f26c24",
+    7: "1a574339-f3fc-49d5-8db0-564289f26c25",
+    8: "1a574339-f3fc-49d5-8db0-564289f26c26",
+    9: "1a574339-f3fc-49d5-8db0-564289f26c27",
+    10: "1a574339-f3fc-49d5-8db0-564289f26c28",
+    11: "1a574339-f3fc-49d5-8db0-564289f26c29",
+    12: "1a574339-f3fc-49d5-8db0-564289f26c30",
+    13: "1a574339-f3fc-49d5-8db0-564289f26c31",
+    14: "1a574339-f3fc-49d5-8db0-564289f26c32",
+    15: "1a574339-f3fc-49d5-8db0-564289f26c33",
+    16: "1a574339-f3fc-49d5-8db0-564289f26c34",
+    17: "1a574339-f3fc-49d5-8db0-564289f26c35",
+    18: "1a574339-f3fc-49d5-8db0-564289f26c36",
+    19: "1a574339-f3fc-49d5-8db0-564289f26c37",
+    20: "1a574339-f3fc-49d5-8db0-564289f26c38",
+  },
 };
+
+export const tags = [
+  {
+    id: ids.tagIds[1],
+    name: "sports",
+  },
+  {
+    id: ids.tagIds[2],
+    name: "fitness",
+  },
+  {
+    id: ids.tagIds[3],
+    name: "culture",
+  },
+  {
+    id: ids.tagIds[4],
+    name: "theatre",
+  },
+  {
+    id: ids.tagIds[5],
+    name: "academic",
+  },
+  {
+    id: ids.tagIds[6],
+    name: "music",
+  },
+  {
+    id: ids.tagIds[7],
+    name: "community",
+  },
+  {
+    id: ids.tagIds[8],
+    name: "tech",
+  },
+  {
+    id: ids.tagIds[9],
+    name: "food",
+  },
+  {
+    id: ids.tagIds[10],
+    name: "wellness",
+  },
+  {
+    id: ids.tagIds[11],
+    name: "science",
+  },
+  {
+    id: ids.tagIds[12],
+    name: "business",
+  },
+  {
+    id: ids.tagIds[13],
+    name: "engineering",
+  },
+  {
+    id: ids.tagIds[14],
+    name: "art",
+  },
+  {
+    id: ids.tagIds[15],
+    name: "games",
+  },
+  {
+    id: ids.tagIds[16],
+    name: "social",
+  },
+  {
+    id: ids.tagIds[17],
+    name: "software",
+  },
+  {
+    id: ids.tagIds[18],
+    name: "mechanical",
+  },
+  {
+    id: ids.tagIds[19],
+    name: "electrical",
+  },
+  {
+    id: ids.tagIds[20],
+    name: "outdoors",
+  },
+];
 
 export const institutes = [
   {
