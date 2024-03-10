@@ -237,6 +237,9 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 // POST SCHEMAS
 /////////////////////////////////////////
 
+/**
+ * Post Schema
+ */
 export const PostSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -249,6 +252,27 @@ export const PostSchema = z.object({
 });
 
 export type Post = z.infer<typeof PostSchema>;
+
+/**
+ * Create Post Schema
+ */
+export const PostCreateSchema = PostSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+  image: true, // Update value after image is created
+  organizationId: true, // get from req.params if creating verified post
+});
+
+export type PostCreateType = z.infer<typeof PostCreateSchema>;
+
+/**
+ * Update Post Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const PostUpdateSchema = PostSchema.partial();
+
+export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
 
 /////////////////////////////////////////
 // COMMENT SCHEMAS

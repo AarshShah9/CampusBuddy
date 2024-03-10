@@ -1,0 +1,279 @@
+import { AppPermissionName, EventStatus } from "@prisma/client";
+import {
+  PostCreateSchema,
+  PostUpdateSchema,
+  IdParamSchema,
+} from "../../shared/zodSchemas";
+import { NextFunction, Request, Response } from "express";
+import prisma from "../prisma/client";
+import { AppError, AppErrorName } from "../utils/AppError";
+import { checkUserPermission } from "../utils/checkUserPermission";
+import UploadToS3, {
+  deleteFromS3,
+  generateUniqueFileName,
+} from "../utils/S3Uploader";
+import { RequestExtended } from "../middleware/verifyAuth";
+
+// test Post
+export const postTest = async (req: Request, res: Response) => {
+  res.status(200).json({ message: "Post endpoint works" });
+};
+
+// Get all Posts
+export const getAllPosts = async (req: Request, res: Response) => {
+  try {
+    const allPosts = await prisma.post.findMany();
+    res.status(200).json({
+      message: "All posts",
+      data: allPosts,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Create new Post
+export const createPost = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    // Validate the Post data
+    const validatedPostData = PostCreateSchema.parse(req.body);
+
+    // if (!req.file) {
+    //   throw new AppError(
+    //     AppErrorName.FILE_UPLOAD_ERROR,
+    //     "No file uploaded.",
+    //     400,
+    //     true,
+    //   );
+    // }
+
+    // Start a transaction
+    const newPost = await prisma.$transaction(async (prisma) => {
+      // create post
+      return prisma.post.create({
+        data: {
+          ...validatedPostData,
+          userId: loggedInUserId!,
+        },
+      });
+
+      // const uniqueFileName = generateUniqueFileName(
+      //   req.file!.originalname,
+      //   post.id,
+      // );
+      // const path = `images/post/${uniqueFileName}`;
+      //
+      // await UploadToS3(req.file!, path);
+      //
+      // // Update event with image path after successful upload
+      // return prisma.post.update({
+      //   where: { id: post.id },
+      //   data: {
+      //     image: path,
+      //   },
+      // });
+    });
+
+    if (newPost) {
+      // Post created successfully
+      res.status(201).json({
+        message: "Post created successfully",
+        data: newPost,
+      });
+    } else {
+      // Throw an error if the event creation returned an empty result
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Post creation returned empty result.",
+        500,
+        true,
+      );
+    }
+  } catch (error: any) {
+    // hand error over to error handling middleware
+    next(error);
+  }
+};
+
+// Update Post
+export const updatePost = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    // Validate request id param
+    const postId = IdParamSchema.parse(req.params).id;
+
+    // Validate post data
+    const validatedUpdatePostData = PostUpdateSchema.parse(req.body);
+
+    // get the post from the database
+    const existingPost = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+    if (!existingPost) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post with id ${postId} not found`,
+        404,
+        true,
+      );
+    }
+
+    // Check if the user has permission to update the post details
+    const isCreatedByUser: boolean = existingPost.userId === loggedInUserId;
+    let hasPermission: boolean = false;
+
+    // Check if there is a group associated with the post data
+    if (existingPost.organizationId) {
+      // check if the user has permission to update the post
+      hasPermission = await checkUserPermission(
+        loggedInUserId!,
+        existingPost.organizationId,
+        AppPermissionName.MANAGE_POSTS,
+      );
+    }
+
+    if (!hasPermission && !isCreatedByUser) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to update post`,
+        403,
+        true,
+      );
+    }
+
+    if (req.file) {
+      // update the file
+      if (existingPost?.image) {
+        await deleteFromS3(existingPost.image);
+      }
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        postId,
+      );
+      const path = `images/post/${uniqueFileName}`;
+      await UploadToS3(req.file!, path);
+      validatedUpdatePostData.image = path;
+    }
+
+    // Update the post
+    const updatedPost = await prisma.post.update({
+      where: { id: postId },
+      data: {
+        ...validatedUpdatePostData,
+      },
+    });
+    // send back the updated post
+    if (updatedPost) {
+      // Post updated successfully
+      res.status(200).json({
+        message: "Post updated successfully",
+        data: updatedPost,
+      });
+    } else {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Post update returned empty result.",
+        500,
+        true,
+      );
+    }
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Delete post
+export const deletePost = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    // Validate request id param
+    const postId = IdParamSchema.parse(req.params).id;
+
+    // get the post from the database
+    const existingPost = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!existingPost) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    // Check if the user is the post's creator
+    const isCreatedByUser: boolean = existingPost.userId === loggedInUserId;
+
+    // Check if there is a group associated with the post data
+    if (existingPost.organizationId) {
+      // check if the user has permission to delete the post
+      const hasPermission = await checkUserPermission(
+        loggedInUserId!,
+        existingPost.organizationId,
+        AppPermissionName.MANAGE_POSTS,
+      );
+
+      // Check if the user has permission to manage posts or if they are the post creator
+      if (hasPermission || isCreatedByUser) {
+        // Delete the post
+        await prisma.post.delete({
+          where: { id: postId },
+        });
+      } else {
+        console.error(
+          `User with userId: ${loggedInUserId} does not have permission to delete the post with postId: ${postId}`,
+        );
+
+        throw new AppError(
+          AppErrorName.PERMISSION_ERROR,
+          `User does not have permission to delete post`,
+          403,
+          true,
+        );
+      }
+      // Post not associated with an organization, check if user is the one who created the post
+    } else if (isCreatedByUser) {
+      // Delete the post
+      await prisma.post.delete({
+        where: { id: postId },
+      });
+    } else {
+      console.error(
+        `User with userId: ${loggedInUserId} does not have permission to delete the post with postId: ${postId}`,
+      );
+
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to delete post`,
+        403,
+        true,
+      );
+    }
+    res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
