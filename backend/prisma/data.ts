@@ -79,12 +79,20 @@ export const ids = {
   },
 };
 
+export const locations = [
+  {
+    placeId: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
+    longitude: -114.0718831,
+    latitude: 51.04473309999999,
+  },
+];
+
 export const institutes = [
   {
     id: ids.instituteIds[1],
     name: "University of Calgary",
     domain: "ucalgary.ca",
-    location: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
+    locationPlaceId: locations[0].placeId,
   },
 ];
 
@@ -207,10 +215,10 @@ export const events = [
     userId: ids.userIds[3],
     title: "Event 1",
     description: "First event description.",
-    location: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
-    createdAt: "2023-10-10T09:00:00Z", // must be unique
-    startTime: "2023-12-01T09:00:00Z",
-    endTime: "2023-12-01T18:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T09:00:00Z", // must be unique
+    startTime: "2024-12-01T09:00:00Z",
+    endTime: "2024-12-01T18:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
     // Other event details
@@ -220,10 +228,10 @@ export const events = [
     userId: ids.userIds[1],
     title: "Event 2",
     description: "Second event description.",
-    location: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
-    createdAt: "2023-10-10T10:00:00Z",
-    startTime: "2023-12-15T10:00:00Z",
-    endTime: "2023-12-15T16:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T10:00:00Z",
+    startTime: "2024-12-15T10:00:00Z",
+    endTime: "2024-12-15T16:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
   },
@@ -232,10 +240,10 @@ export const events = [
     userId: ids.userIds[4],
     title: "Event 3",
     description: "Third event description.",
-    location: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
-    createdAt: "2023-10-10T11:00:00Z",
-    startTime: "2023-12-17T10:00:00Z",
-    endTime: "2023-12-17T16:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T11:00:00Z",
+    startTime: "2024-12-17T10:00:00Z",
+    endTime: "2024-12-17T16:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
   },
@@ -245,10 +253,10 @@ export const events = [
     title: "Event 4, Verified",
     organizationId: ids.organizationIds[1],
     description: "Fourth event description.",
-    location: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
-    createdAt: "2023-10-10T12:00:00Z",
-    startTime: "2023-12-17T12:30:00Z",
-    endTime: "2023-12-17T13:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T12:00:00Z",
+    startTime: "2024-12-17T12:30:00Z",
+    endTime: "2024-12-17T13:00:00Z",
     isPublic: true,
     status: EventStatus.Verified,
   },
@@ -323,7 +331,7 @@ export const posts = [
     userId: ids.userIds[3],
     title: "First Post",
     text: "This is the first post!",
-    createdAt: "2023-10-10T09:00:00Z",
+    createdAt: "2024-10-10T09:00:00Z",
     // Other post details
   },
   {
@@ -331,7 +339,7 @@ export const posts = [
     userId: ids.userIds[4],
     title: "Second Post",
     text: "Another post here!",
-    createdAt: "2023-10-10T10:00:00Z",
+    createdAt: "2024-10-10T10:00:00Z",
     // Other post details
   },
 ];
@@ -341,14 +349,14 @@ export const comments = [
     userId: ids.userIds[1],
     postId: ids.postIds[1],
     text: "This is the first comment!",
-    createdAt: "2023-10-10T18:00:00Z",
+    createdAt: "2024-10-10T18:00:00Z",
     // Other post details
   },
   {
     userId: ids.userIds[2],
     postId: ids.postIds[2],
     text: "Another post here!",
-    createdAt: "2023-10-10T19:00:00Z",
+    createdAt: "2024-10-10T19:00:00Z",
     // Other post details
   },
 ];
@@ -358,7 +366,7 @@ export const organizations = [
     id: ids.organizationIds[1],
     organizationName: "Group A",
     description: "Description for Group A.",
-    createdAt: "2023-06-11T02:00:00Z",
+    createdAt: "2024-06-11T02:00:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
   },
@@ -366,7 +374,7 @@ export const organizations = [
     id: ids.organizationIds[2],
     organizationName: "Group B",
     description: "Description for Group B.",
-    createdAt: "2023-07-03T14:30:00Z",
+    createdAt: "2024-07-03T14:30:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
   },
@@ -374,7 +382,7 @@ export const organizations = [
     id: ids.organizationIds[3],
     organizationName: "Group C",
     description: "Description for Group C.",
-    createdAt: "2023-07-15T10:30:00Z",
+    createdAt: "2024-07-15T10:30:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
   },
@@ -382,7 +390,7 @@ export const organizations = [
     id: ids.organizationIds[4],
     organizationName: "Group D",
     description: "Description for Group D.",
-    createdAt: "2023-07-15T11:31:00Z",
+    createdAt: "2024-07-15T11:31:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
   },
