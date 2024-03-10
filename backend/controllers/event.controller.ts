@@ -15,7 +15,10 @@ import UploadToS3, {
   generateUniqueFileName,
 } from "../utils/S3Uploader";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { getCoordinatesFromPlaceId } from "../utils/googleMapsApi";
+import {
+  getCoordinatesFromPlaceId,
+  getDistanceFromLatLonInKm,
+} from "../utils/googleMapsApi";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -63,12 +66,25 @@ export const createVerifiedEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // Create a verified event for an organization
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedEventData.location,
+      );
+
+      const location = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedEventData.location,
+        },
+      });
+
       const event = await prisma.event.create({
         data: {
           ...validatedEventData,
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
+          locationPlaceId: location.placeId,
         },
       });
 
@@ -549,12 +565,9 @@ export const getMainPageEvents = async (
       where: {
         id: userId,
       },
-      include: {
-        institution: true,
-      },
     });
 
-    if (!user) {
+    if (!user || !user.institutionId) {
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
         "User not found",
@@ -563,23 +576,68 @@ export const getMainPageEvents = async (
       );
     }
 
-    if (!user.institution) {
+    const userInstitution = await prisma.institution.findUnique({
+      where: {
+        id: user.institutionId,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    if (!userInstitution) {
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
-        "User institution not found",
+        "Institution not found",
         404,
         true,
       );
     }
 
-    const { lat, lng } = await getCoordinatesFromPlaceId(
-      user.institution.location,
-    );
-
     // All events returned here are in the user's location and are verified
     // TODO Events from organizations the user follows
 
     // Trending events [0-3 are featured at the top, 4-9 are trending]
+    const trendingEvents = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            status: EventStatus.Verified,
+          },
+          {
+            startTime: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      include: {
+        location: true,
+        eventResponses: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+    });
+
+    // check to get the events that are in 50km radius of the user's location
+    trendingEvents
+      .filter((event) => {
+        const distance = getDistanceFromLatLonInKm(
+          userInstitution.location.latitude,
+          userInstitution.location.longitude,
+          event.location.latitude,
+          event.location.longitude,
+        );
+        return distance <= 50;
+      })
+      // find the events that have the largest amount of eventResponses
+      .sort((a, b) => {
+        return b.eventResponses.length - a.eventResponses.length;
+      })
+      // get the first 10 events
+      .slice(0, 10);
+
     // Events that the user is attending
     const attendingEvents = await prisma.event.findMany({
       where: {
@@ -594,7 +652,7 @@ export const getMainPageEvents = async (
           },
           {
             endTime: {
-              gt: new Date(), // TODO need to handle timezones
+              gt: new Date(),
             },
           },
         ],
@@ -606,10 +664,11 @@ export const getMainPageEvents = async (
     });
 
     // Explore upcoming events
+
     // Explore verified organizations
 
     res.status(200).json({
-      data: { location: { lat, lng }, attendingEvents },
+      data: { attendingEvents, trendingEvents },
     });
   } catch (error: any) {
     next(error);
