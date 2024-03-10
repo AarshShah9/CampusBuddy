@@ -65,16 +65,16 @@ export const createVerifiedEvent = async (
 
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
-      // Create a verified event for an organization
+      // Create a verified event for an organization using the google maps api
       const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.location,
+        validatedEventData.locationPlaceId,
       );
 
       const location = await prisma.location.create({
         data: {
           latitude: lat,
           longitude: lng,
-          placeId: validatedEventData.location,
+          placeId: validatedEventData.locationPlaceId,
         },
       });
 
@@ -84,7 +84,6 @@ export const createVerifiedEvent = async (
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
-          locationPlaceId: location.placeId,
         },
       });
 
@@ -139,6 +138,19 @@ export const createEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // create event
+      // Create a verified event for an organization using the google maps api
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
+
+      const location = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedEventData.locationPlaceId,
+        },
+      });
+
       const event = await prisma.event.create({
         data: {
           ...validatedEventData,
@@ -250,6 +262,20 @@ export const updateEvent = async (
       const path = `images/events/${uniqueFileName}`;
       await UploadToS3(req.file!, path);
       validatedUpdateEventData.image = path;
+    }
+
+    if (validatedUpdateEventData.locationPlaceId) {
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedUpdateEventData.locationPlaceId,
+      );
+
+      const newLocation = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedUpdateEventData.locationPlaceId,
+        },
+      });
     }
 
     // Update the event
@@ -594,7 +620,6 @@ export const getMainPageEvents = async (
       );
     }
 
-    // All events returned here are in the user's location and are verified
     // TODO Events from organizations the user follows
 
     // Trending events [0-3 are featured at the top, 4-9 are trending]
@@ -663,12 +688,17 @@ export const getMainPageEvents = async (
       take: 10,
     });
 
-    // Explore upcoming events
+    // TODO Explore upcoming events
 
     // Explore verified organizations
+    const verifiedOrganizations = await prisma.organization.findMany({
+      where: {
+        institutionId: userInstitution.id,
+      },
+    });
 
     res.status(200).json({
-      data: { attendingEvents, trendingEvents },
+      data: { attendingEvents, trendingEvents, verifiedOrganizations },
     });
   } catch (error: any) {
     next(error);
