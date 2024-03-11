@@ -19,6 +19,7 @@ import {
   getCoordinatesFromPlaceId,
   getDistanceFromLatLonInKm,
 } from "../utils/googleMapsApi";
+import { defaultDistance } from "../utils/constants";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -654,7 +655,7 @@ export const getMainPageEvents = async (
           event.location.latitude,
           event.location.longitude,
         );
-        return distance <= 50;
+        return distance <= defaultDistance;
       })
       // find the events that have the largest amount of eventResponses
       .sort((a, b) => {
