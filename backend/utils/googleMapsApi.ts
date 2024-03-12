@@ -9,6 +9,17 @@ export async function getCoordinatesFromPlaceId(placeId: string) {
   }
 }
 
+export async function getPlaceNameFromPlaceId(placeId: string) {
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  try {
+    let response = await fetch(url);
+    let data: any = await response.json();
+    return data.result.name;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export function getDistanceFromLatLonInKm(
   lat1: number,
   lon1: number,

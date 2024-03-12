@@ -12,36 +12,19 @@ type Event = {
   picture: string;
 };
 
-type EventResponse = {
-  id: string;
-  userId: string;
-  organizationId: string;
-  createdAt: string;
+export type EventData = {
   title: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  isPublic: boolean;
-  status: string;
-  image: string;
-  locationPlaceId: string;
-};
-
-type institutionResponse = {
   id: string;
-  organizationName: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  status: string;
-  image: string;
-  institutionId: string;
+  items: EventItem[];
 };
 
-type MainEventPageResponse = {
-  attendingEvents: EventResponse[];
-  trendingEvents: EventResponse[];
-  verifiedOrganizations: institutionResponse[];
+export type EventItem = {
+  id: string;
+  title: string;
+  time?: string;
+  location?: string;
+  host?: string;
+  image: string;
 };
 
 type eventsContext = {

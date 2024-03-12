@@ -18,8 +18,10 @@ import { RequestExtended } from "../middleware/verifyAuth";
 import {
   getCoordinatesFromPlaceId,
   getDistanceFromLatLonInKm,
+  getPlaceNameFromPlaceId,
 } from "../utils/googleMapsApi";
 import { defaultDistance } from "../utils/constants";
+import { carouselImages, sampleEventData } from "../prisma/dummyData";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -70,12 +72,15 @@ export const createVerifiedEvent = async (
       const { lat, lng } = await getCoordinatesFromPlaceId(
         validatedEventData.locationPlaceId,
       );
-
+      const name = await getPlaceNameFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
       const location = await prisma.location.create({
         data: {
           latitude: lat,
           longitude: lng,
           placeId: validatedEventData.locationPlaceId,
+          name: name,
         },
       });
 
@@ -143,12 +148,15 @@ export const createEvent = async (
       const { lat, lng } = await getCoordinatesFromPlaceId(
         validatedEventData.locationPlaceId,
       );
-
+      const name = await getPlaceNameFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
       const location = await prisma.location.create({
         data: {
           latitude: lat,
           longitude: lng,
           placeId: validatedEventData.locationPlaceId,
+          name: name,
         },
       });
 
@@ -269,12 +277,15 @@ export const updateEvent = async (
       const { lat, lng } = await getCoordinatesFromPlaceId(
         validatedUpdateEventData.locationPlaceId,
       );
-
+      const name = await getPlaceNameFromPlaceId(
+        validatedUpdateEventData.locationPlaceId,
+      );
       const newLocation = await prisma.location.create({
         data: {
           latitude: lat,
           longitude: lng,
           placeId: validatedUpdateEventData.locationPlaceId,
+          name: name,
         },
       });
     }
@@ -621,10 +632,8 @@ export const getMainPageEvents = async (
       );
     }
 
-    // TODO Events from organizations the user follows
-
     // Trending events [0-3 are featured at the top, 4-9 are trending]
-    const trendingEvents = await prisma.event.findMany({
+    const events = await prisma.event.findMany({
       where: {
         AND: [
           {
@@ -647,7 +656,7 @@ export const getMainPageEvents = async (
     });
 
     // check to get the events that are in 50km radius of the user's location
-    trendingEvents
+    events
       .filter((event) => {
         const distance = getDistanceFromLatLonInKm(
           userInstitution.location.latitude,
@@ -660,9 +669,20 @@ export const getMainPageEvents = async (
       // find the events that have the largest amount of eventResponses
       .sort((a, b) => {
         return b.eventResponses.length - a.eventResponses.length;
-      })
-      // get the first 10 events
-      .slice(0, 10);
+      });
+
+    // Get the top 3 trending events
+    const topTrendingEvents = events.slice(0, 3);
+    // Get the top 10 trending events
+    const trendingEvents = events.slice(3, 10);
+    // get all the events happening today that don't include the top 10 trending events
+    const happeningToday = events.filter(
+      (event) => event.startTime.getDate() === new Date().getDate(),
+    );
+    const happeningTodayFiltered = happeningToday.filter(
+      (event) =>
+        !topTrendingEvents.includes(event) && !trendingEvents.includes(event),
+    );
 
     // Events that the user is attending
     const attendingEvents = await prisma.event.findMany({
@@ -683,13 +703,14 @@ export const getMainPageEvents = async (
           },
         ],
       },
+      include: {
+        location: true,
+      },
       orderBy: {
         endTime: "asc",
       },
       take: 10,
     });
-
-    // TODO Explore upcoming events
 
     // Explore verified organizations
     const verifiedOrganizations = await prisma.organization.findMany({
@@ -698,8 +719,85 @@ export const getMainPageEvents = async (
       },
     });
 
+    const reformattedAttendingEvents = {
+      title: "Attending",
+      id: "1",
+      items: attendingEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    // TODO: Upcoming events from following
+    const reformattedUpcomingEvents = {
+      title: "Upcoming Events From Following",
+      id: "2",
+      items: sampleEventData[1].items,
+    };
+
+    const reformattedTrendingEvents = {
+      title: "Trending Events",
+      id: "3",
+      items: trendingEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    const reformattedHappeningToday = {
+      title: "Happening Today",
+      id: "4",
+      items: happeningTodayFiltered.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    const reformattedExploreOrganizations = {
+      title: "Explore Verified Organizations",
+      id: "5",
+      items: verifiedOrganizations.map((organization) => {
+        return {
+          id: organization.id,
+          title: organization.organizationName,
+          host: null,
+          location: null,
+          image: organization.image,
+        };
+      }),
+    };
+
+    const startingEvents = topTrendingEvents.map((event) => {
+      return event.image;
+    });
+
     res.status(200).json({
-      data: { attendingEvents, trendingEvents, verifiedOrganizations },
+      message: "Main page events",
+      data: {
+        allEvents: [
+          reformattedAttendingEvents,
+          reformattedUpcomingEvents,
+          reformattedTrendingEvents,
+          reformattedHappeningToday,
+          reformattedExploreOrganizations,
+        ],
+        startingEvents: startingEvents,
+      },
     });
   } catch (error: any) {
     next(error);

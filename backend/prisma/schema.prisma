@@ -310,9 +310,11 @@ model TopicSubscription {
 }
 
 model Location {
-  placeId     String        @id
-  latitude    Float
-  longitude   Float
+  placeId   String @id
+  latitude  Float
+  longitude Float
+  name      String
+
   Institution Institution[]
   Event       Event[]
 }

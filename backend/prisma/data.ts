@@ -84,6 +84,7 @@ export const locations = [
     placeId: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
     longitude: -114.0718831,
     latitude: 51.04473309999999,
+    name: "Calgary",
   },
 ];
 
@@ -213,7 +214,7 @@ export const events = [
   {
     id: ids.eventIds[1],
     userId: ids.userIds[3],
-    title: "Event 1",
+    title: "Law School Info Night",
     description: "First event description.",
     locationPlaceId: locations[0].placeId,
     createdAt: "2024-10-10T09:00:00Z", // must be unique
@@ -221,12 +222,13 @@ export const events = [
     endTime: "2024-12-01T18:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/lawBook.png",
     // Other event details
   },
   {
     id: ids.eventIds[2],
     userId: ids.userIds[1],
-    title: "Event 2",
+    title: "Spikeball 4 Cause",
     description: "Second event description.",
     locationPlaceId: locations[0].placeId,
     createdAt: "2024-10-10T10:00:00Z",
@@ -234,6 +236,7 @@ export const events = [
     endTime: "2024-12-15T16:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/spikeball.jpg",
   },
   {
     id: ids.eventIds[3],
@@ -250,7 +253,7 @@ export const events = [
   {
     id: ids.eventIds[4],
     userId: ids.userIds[1],
-    title: "Event 4, Verified",
+    title: "Career Fair",
     organizationId: ids.organizationIds[1],
     description: "Fourth event description.",
     locationPlaceId: locations[0].placeId,
@@ -259,6 +262,7 @@ export const events = [
     endTime: "2024-12-17T13:00:00Z",
     isPublic: true,
     status: EventStatus.Verified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
 ];
 
@@ -369,14 +373,16 @@ export const organizations = [
     createdAt: "2024-06-11T02:00:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/hockey.png",
   },
   {
     id: ids.organizationIds[2],
-    organizationName: "Group B",
+    organizationName: "TechStart",
     description: "Description for Group B.",
     createdAt: "2024-07-03T14:30:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/techstartLogo.jpg",
   },
   {
     id: ids.organizationIds[3],
@@ -385,6 +391,7 @@ export const organizations = [
     createdAt: "2024-07-15T10:30:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
   {
     id: ids.organizationIds[4],
@@ -393,6 +400,7 @@ export const organizations = [
     createdAt: "2024-07-15T11:31:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
 ];
 

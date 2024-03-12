@@ -78,5 +78,11 @@ if (process.env.ENV === "dev") {
     );
 }
 
+process.on("SIGINT", function () {
+  console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
+  server.close();
+  process.exit(0);
+});
+
 export default app;
 export { server };

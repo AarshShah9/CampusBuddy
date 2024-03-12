@@ -1,27 +1,37 @@
 import LocationChip from "./LocationChip";
 import { StyleSheet, View, Image } from "react-native";
-import { Item } from "~/components/HorizontalScrollElement";
 import { ThemedText } from "./ThemedComponents";
 import useThemeContext from "~/hooks/useThemeContext";
+import { EventItem } from "~/contexts/eventsContext";
+import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 
-export default function EventHomeCard(props: Item) {
-    const { theme } = useThemeContext();
-    return (
-        <View style={styles.card}>
-            <View style={styles.cardCover}>
-                <Image style={{ width: '100%', height: '100%' }} source={{ uri: props.image }} />
-            </View>
-            <View style={{ paddingHorizontal: 0 }}>
-                <ThemedText style={styles.eventTitle}>{props.title}</ThemedText>
-                <View style={styles.eventDetailsContainer}>
-                    {!!props.time && <ThemedText style={styles.eventTime}>{props.time}</ThemedText>}
-                    <View>
-                        <LocationChip location={props.location} size="small" />
-                    </View>
-                </View>
-            </View>
+export default function EventHomeCard(props: EventItem) {
+  const { theme } = useThemeContext();
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardCover}>
+        <Image
+          style={{ width: "100%", height: "100%" }}
+          source={{ uri: props.image }}
+        />
+      </View>
+      <View style={{ paddingHorizontal: 0 }}>
+        <ThemedText style={styles.eventTitle}>{props.title}</ThemedText>
+        <View style={styles.eventDetailsContainer}>
+          {!!props.time && (
+            <ThemedText style={styles.eventTime}>
+              {convertUTCToLocalDate(props.time)}
+            </ThemedText>
+          )}
+          <View>
+            {props.location && (
+              <LocationChip location={props.location} size="small" />
+            )}
+          </View>
         </View>
-    );
+      </View>
+    </View>
+  );
 }
 
 // prettier-ignore
