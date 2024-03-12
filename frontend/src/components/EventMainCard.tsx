@@ -4,16 +4,10 @@ import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
 import { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { EventType } from "~/types/Events";
 
-type EventMainCardProps = {
-  title: string;
-  date: string;
-  location: string;
-  clubName: string;
-  picture: string;
-};
 
-export default function EventMainCard(props: EventMainCardProps) {
+export default function EventMainCard(props: EventType) {
   const navigation = useNavigation<any>();
   const openEventDetails = useCallback(() => {
     navigation.navigate('EventDetails', { 
@@ -21,16 +15,16 @@ export default function EventMainCard(props: EventMainCardProps) {
       date: props.date,
       location: props.location,
       clubName: props.clubName,
-      picture: props.picture 
+      picture: props.image,
     })
   }, [])
-
+    console.log("Props are:", props);
   return (
     <TouchableOpacity onPress={openEventDetails}>
     <Card style={styles.card}>
       <Card.Cover
         style={styles.cardCover}
-        source={{ uri: props.picture }}
+        source={{ uri: props.image }}
         resizeMode="cover"
       />
       <Card.Content style={styles.cardContent}>

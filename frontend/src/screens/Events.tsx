@@ -6,7 +6,7 @@ import useEventsContext from "~/hooks/useEventsContext";
 
 export default function Events() {
     const { dismissKeyboard } = useAppContext();
-    const { events } = useEventsContext();
+    const { searchPageEvents } = useEventsContext();
 
     return (
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -16,14 +16,15 @@ export default function Events() {
                         Events
                     </ThemedText>
                     <View style={{ paddingHorizontal: 20 }}>
-                        {events.map(event => 
+                        {searchPageEvents.map(event => 
                             <EventMainCard
                                 key={event.id}
-                                title={event.name}
+                                id={event.id}
+                                title={event.title}
                                 date={event.date}
                                 location={event.location}
                                 clubName={event.clubName}
-                                picture={event.picture}
+                                image={event.image}
                             />
                         )}
                     </View>
