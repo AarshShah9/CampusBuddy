@@ -4,13 +4,7 @@ import {
   BottomSheetModal,
 } from "@gorhom/bottom-sheet";
 import { useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableHighlight,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -75,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 0.8
+    borderBottomWidth: 0.8,
   },
   settingText: {
     fontSize: 16,

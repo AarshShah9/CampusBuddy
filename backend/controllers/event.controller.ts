@@ -20,8 +20,8 @@ import {
   getDistanceFromLatLonInKm,
   getPlaceNameFromPlaceId,
 } from "../utils/googleMapsApi";
-import { defaultDistance } from "../utils/constants";
-import { carouselImages, sampleEventData } from "../prisma/dummyData";
+import { defaultDistance } from "../constants";
+import { sampleEventData } from "../prisma/dummyData";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {

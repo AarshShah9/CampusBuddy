@@ -317,4 +317,6 @@ model Location {
 
   Institution Institution[]
   Event       Event[]
+
+  @@map("location")
 }
