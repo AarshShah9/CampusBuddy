@@ -16,10 +16,9 @@ export const verifyAuthentication = async (
   res: Response,
   next: NextFunction,
 ) => {
-  let authToken = req.headers.authorization?.split(" ")[1] ?? "";
-  const secret = process.env.JWT_SECRET as Secret;
-
   try {
+    let authToken = req.headers.authorization?.split(" ")[1] ?? "";
+    const secret = process.env.JWT_SECRET as Secret;
     const decoded = jwt.verify(authToken, secret) as loginJwtPayloadType;
     const result = loginJwtPayloadSchema.parse(decoded);
 

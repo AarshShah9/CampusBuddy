@@ -75,6 +75,7 @@ const allowedEndpoints = [
   "/api/events/organization/:id",
   "/api/events/recent/",
   "/api/events/:id",
+  "/api/events/mainPage",
 
   // Miscellaneous endpoints
   "/Test",
