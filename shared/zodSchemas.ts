@@ -432,7 +432,7 @@ export const InstitutionSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  location: z.string(),
+  locationPlaceId: z.string(),
   name: z
     .string()
     .min(3, { message: "Institution name must at least 3 characters " }),

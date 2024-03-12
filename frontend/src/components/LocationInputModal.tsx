@@ -64,7 +64,7 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
               color="black"
             />
             <GooglePlacesAutocomplete
-              onPress={async (data) => {
+              onPress={(data) => {
                 userLocation(data.place_id);
               }}
               styles={{
