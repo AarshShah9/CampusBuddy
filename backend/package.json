@@ -10,7 +10,7 @@
     "test": "jest --detectOpenHandles",
     "postinstall": "npx prisma generate",
     "clearJest": "jest --clearCache",
-    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
+    "dev": "tsc && concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
     "build": "tsc",
     "start": "node dist/backend/index.js"
   },
