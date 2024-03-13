@@ -2,13 +2,14 @@ import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
 import { Button, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { EventMapItem } from "~/contexts/eventsContext";
 
 type MapProps = {
   latitudeDelta?: number;
   longitudeDelta?: number;
   goBackButton?: boolean;
   currentLocation: LatLng;
-  events?: any;
+  events?: EventMapItem[];
 };
 
 type eventType = {
@@ -29,9 +30,17 @@ const Map = ({
   events,
 }: MapProps) => {
   const { goBack } = useNavigation();
+  const navigation = useNavigation<any>();
 
   const onBack = useCallback(() => {
     goBack();
+  }, []);
+
+  const openEventDetails = useCallback((index: number) => {
+    navigation.navigate("EventDetails", {
+      title: events?.[index].title,
+      // id: events?.[index].id, // TODO pass the id
+    });
   }, []);
 
   return (
@@ -48,7 +57,7 @@ const Map = ({
         showsUserLocation={true}
       >
         {events &&
-          events.map((event: any) => {
+          events.map((event: EventMapItem, index) => {
             return (
               <Marker
                 key={event.title}
@@ -56,7 +65,7 @@ const Map = ({
                   latitude: event.latitude,
                   longitude: event.longitude,
                 }}
-                onPress={event.onClick}
+                onPress={() => openEventDetails(index)}
                 title={event.title}
                 description={event.description}
               />

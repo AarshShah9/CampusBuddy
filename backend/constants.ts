@@ -41,4 +41,4 @@ export const defaultRolePermissions: Record<
 } as const; // make constant readonly
 
 // The radius to look for events around the user (institution)
-export const defaultDistance = 50;
+export const defaultDistance = 75;

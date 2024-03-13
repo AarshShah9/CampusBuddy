@@ -29,6 +29,14 @@ export type EventItem = {
   image: string;
 };
 
+export type EventMapItem = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  title: string;
+  description: string;
+};
+
 type eventsContext = {
   events: Event[];
   getMainEvents: () => Promise<any>;
@@ -69,7 +77,7 @@ export const EventsContextProvider = ({
 
   const getAllMapEvents = useCallback(async () => {
     try {
-      return await CBRequest("GET", "/api/events/");
+      return await CBRequest("GET", "/api/events/mapEvents");
     } catch (err) {
       console.log(err);
     }
