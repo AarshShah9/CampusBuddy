@@ -2,7 +2,7 @@ import { FlatList, View, Image, Dimensions, Text } from "react-native";
 import { carouselImages } from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { EventData } from "~/contexts/eventsContext";
@@ -21,6 +21,11 @@ export default function VerticalScrollComponent() {
       setStartingEvents(res.data.startingEvents);
       // stopLoading(); // TODO bring back loading
     });
+  }, []);
+
+  const generateImageURL = useCallback((image: string) => {
+    if (image.includes("cloudfront")) return image;
+    return `https://d2epenzoyf672m.cloudfront.net/${image}`;
   }, []);
 
   return (
@@ -50,7 +55,7 @@ export default function VerticalScrollComponent() {
               {startingEvents.map((image) => (
                 <Image
                   key={image}
-                  source={{ uri: image }}
+                  source={{ uri: generateImageURL(image) }}
                   style={{ width: screenWidth, height: 214 }}
                 />
               ))}

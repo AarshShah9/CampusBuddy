@@ -127,13 +127,13 @@ export default function StudentSignUp() {
                     inputSearchStyle={styles.inputSearchStyle}
                     iconStyle={styles.iconStyle}
                     data={institutions}
-                    search
+                    // search
                     onBlur={onBlur}
                     maxHeight={300}
                     labelField="name"
                     valueField="id"
                     placeholder="Select item"
-                    searchPlaceholder="Institution Name"
+                    // searchPlaceholder="Institution Name"
                     value={value}
                     onChange={(value) => {
                       onChange(value.id);

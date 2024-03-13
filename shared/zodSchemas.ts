@@ -93,8 +93,9 @@ export const EventCreateSchema = EventSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified event
+  image: true, // handled by the S3Uploader
+  isPublic: true, // default value is false
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],

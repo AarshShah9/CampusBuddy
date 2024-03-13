@@ -84,12 +84,19 @@ export const createVerifiedEvent = async (
         },
       });
 
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
+          isPublic: true,
         },
       });
 
@@ -160,11 +167,18 @@ export const createEvent = async (
         },
       });
 
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
+          isPublic: true,
         },
       });
 

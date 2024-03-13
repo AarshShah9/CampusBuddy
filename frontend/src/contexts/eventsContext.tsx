@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createContext, PropsWithChildren, useCallback } from "react";
 import { mockSearchEvents } from "~/mockData/EventData";
-import { CBRequest } from "~/lib/CBRequest";
+import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
+import { createEvent } from "~/screens/CreateEvent";
+import { ImagePickerAsset } from "expo-image-picker";
 
 type Event = {
   id: string;
@@ -30,6 +32,7 @@ export type EventItem = {
 type eventsContext = {
   events: Event[];
   getMainEvents: () => Promise<any>;
+  createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -50,8 +53,21 @@ export const EventsContextProvider = ({
     }
   }, []);
 
+  const createEvent = useCallback(
+    async (event: createEvent, image: ImagePickerAsset) => {
+      try {
+        return await uploadImageRequest("post", "/api/events/", image, {
+          body: event,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [],
+  );
+
   return (
-    <EventsContext.Provider value={{ events, getMainEvents }}>
+    <EventsContext.Provider value={{ events, getMainEvents, createEvent }}>
       {children}
     </EventsContext.Provider>
   );
