@@ -24,6 +24,7 @@ const deleteTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) =>
 
 export type userRegistrationData = {
   email: string;
+  username:string;
   institutionName: string;
   firstName: string;
   lastName: string;
@@ -49,17 +50,8 @@ export const AuthContextProvider = ({
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
-      const { email, institutionName, firstName, lastName, password } = data;
-      const data2 = {
-        institutionName,
-        username: "jtran",
-        firstName,
-        lastName,
-        email,
-        password,
-      };
-      console.log(email + institutionName + firstName);
-      let res = await CBRequest('POST', "/api/user/student",{body:data2})
+      const {institutionName, username, firstName, lastName, email, password } = data;
+      let res = await CBRequest('POST', "/api/user/student",{body:data})
     } catch (error) {
       console.log(error);
     }
@@ -68,6 +60,7 @@ export const AuthContextProvider = ({
   const signIn = useCallback(async (email: string, password: string) => {
     try {
       const jwt = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
+      console.log("Bitch here" + jwt.authToken);
       setAxiosTokenHeader(jwt.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {

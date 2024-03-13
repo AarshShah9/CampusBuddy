@@ -1,4 +1,6 @@
 import {
+  KeyboardAvoidingView,
+  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -16,19 +18,17 @@ import * as zod from "zod";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import { userRegistrationData } from "~/contexts/authContext";
-
-
-
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
-  const {registerUser} = useAuthContext();
-  
+  const { registerUser } = useAuthContext();
 
   const schema = zod.object({
     email: zod.string(),
+    username: zod.string(),
     institutionName: zod.string(),
     firstName: zod.string(),
     lastName: zod.string(),
@@ -61,103 +61,120 @@ export default function StudentSignUp() {
   const { dismissKeyboard } = useAppContext();
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <MainContainer>
-        <HeaderContainer>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Login")}
-            style={{ marginTop: "10%", marginLeft: "3%" }}
-            activeOpacity={0.7}
-          >
-            <AntDesign name="caretleft" size={24} color="white" />
-          </TouchableOpacity>
-          <HeaderText $textColor={theme.colors.tertiary}>
-            Student Sign Up
-          </HeaderText>
-        </HeaderContainer>
-        <OverlayContainer $color={theme.colors.tertiary}>
-          <FormContainer>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="Institution Email"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <MainContainer>
+          <HeaderContainer>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Login")}
+              style={{ marginTop: "10%", marginLeft: "3%" }}
+              activeOpacity={0.7}
+            >
+              <AntDesign name="caretleft" size={24} color="white" />
+            </TouchableOpacity>
+            <HeaderText $textColor={theme.colors.tertiary}>
+              Student Sign Up
+            </HeaderText>
+          </HeaderContainer>
+          <OverlayContainer $color={theme.colors.tertiary}>
+            <FormContainer>
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="Institution Email"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="email"
+              />
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="Username"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="username"
+              />
+              {errors.email && <Text>University Email is required.</Text>}
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="Institution Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="institutionName"
+              />
+              {errors.institutionName && (
+                <Text>Institution Name is required.</Text>
               )}
-              name="email"
-            />
-            {errors.email && <Text>University Email is required.</Text>}
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="Institution Name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="institutionName"
-            />
-            {errors.institutionName && <Text>Institution Name is required.</Text>}
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="First Name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="firstName"
-            />
-            {errors.firstName && <Text>Institution Name is required.</Text>}
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="Last Name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="lastName"
-            />
-            {errors.lastName && <Text>Institution Name is required.</Text>}
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="Password"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="password"
-            />
-            {errors.password && <Text>Institution Name is required.</Text>}
-            {/* <Controller
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="First Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="firstName"
+              />
+              {errors.firstName && <Text>Institution Name is required.</Text>}
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="Last Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="lastName"
+              />
+              {errors.lastName && <Text>Institution Name is required.</Text>}
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    label="Password"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+                name="password"
+              />
+              {errors.password && <Text>Institution Name is required.</Text>}
+              {/* <Controller
               control={control}
               rules={{
                 required: true,
@@ -173,55 +190,53 @@ export default function StudentSignUp() {
               name="rePassword"
             />
             {errors.rePassword && <Text>Institution Name is required.</Text>} */}
-            <StyledButton
-              mode="contained"
-              onPress={handleSubmit(onSubmit)}
-            >
-              <Text
-                style={{
-                  lineHeight: 30,
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: "white",
-                  fontFamily: "Nunito-Bold",
-                }}
-              >
-                Next
-              </Text>
-            </StyledButton>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 32,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: "Roboto-Reg",
-                  marginRight: 5,
-                }}
-              >
-                Sign up as an Organization
-              </Text>
-              <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+              <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
                 <Text
                   style={{
-                    color: theme.colors.primary,
-                    fontSize: 16,
-                    fontFamily: "Roboto-Reg",
+                    lineHeight: 30,
+                    fontSize: 24,
+                    fontWeight: "bold",
+                    color: "white",
+                    fontFamily: "Nunito-Bold",
                   }}
                 >
-                  here
+                  Next
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </FormContainer>
-        </OverlayContainer>
-      </MainContainer>
-    </TouchableWithoutFeedback>
+              </StyledButton>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 32,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: "Roboto-Reg",
+                    marginRight: 5,
+                  }}
+                >
+                  Sign up as an Organization
+                </Text>
+                <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+                  <Text
+                    style={{
+                      color: theme.colors.primary,
+                      fontSize: 16,
+                      fontFamily: "Roboto-Reg",
+                    }}
+                  >
+                    here
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </FormContainer>
+          </OverlayContainer>
+        </MainContainer>
+      </TouchableWithoutFeedback>
+   
   );
 }
 
@@ -260,6 +275,7 @@ const FormContainer = styled(View)`
     width: 90%;
     margin-top: 18%;
     height: 500px;
+   
 `;
 // prettier-ignore
 const InputField = styled(TextInput)`
