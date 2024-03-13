@@ -99,7 +99,7 @@ const sampleUsages = async () => {
     const data: EventCreateType = {
       title: "Test Event NEW",
       description: "Test Description",
-      location: "Test Location",
+      locationPlaceId: "Test Location",
       startTime: new Date(2025, 1, 2024, 1),
       endTime: new Date(2025, 1, 2024, 4),
       isPublic: true,

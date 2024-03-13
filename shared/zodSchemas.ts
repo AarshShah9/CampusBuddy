@@ -65,7 +65,7 @@ export const EventSchema = z.object({
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
   description: z.string().min(3).max(255).nullable(),
-  location: z.string().min(3).max(255),
+  locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
       required_error: "Please select a date and time",
@@ -456,6 +456,7 @@ export const InstitutionSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  locationPlaceId: z.string(),
   name: z
     .string()
     .min(3, { message: "Institution name must at least 3 characters " }),

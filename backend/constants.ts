@@ -39,3 +39,6 @@ export const defaultRolePermissions: Record<
   ],
   [UserRole.Member]: [AppPermissionName.CREATE_POSTS],
 } as const; // make constant readonly
+
+// The radius to look for events around the user (institution)
+export const defaultDistance = 50;
