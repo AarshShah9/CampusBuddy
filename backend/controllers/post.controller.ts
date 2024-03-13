@@ -1,4 +1,4 @@
-import { AppPermissionName, EventStatus } from "@prisma/client";
+import { AppPermissionName } from "@prisma/client";
 import {
   PostCreateSchema,
   PostUpdateSchema,
@@ -20,7 +20,11 @@ export const postTest = async (req: Request, res: Response) => {
 };
 
 // Get all Posts
-export const getAllPosts = async (req: Request, res: Response) => {
+export const getAllPosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const allPosts = await prisma.post.findMany();
     res.status(200).json({
@@ -28,8 +32,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
       data: allPosts,
     });
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    // hand error over to error handling middleware
+    next(error);
   }
 };
 
@@ -45,15 +49,6 @@ export const createPost = async (
     // Validate the Post data
     const validatedPostData = PostCreateSchema.parse(req.body);
 
-    // if (!req.file) {
-    //   throw new AppError(
-    //     AppErrorName.FILE_UPLOAD_ERROR,
-    //     "No file uploaded.",
-    //     400,
-    //     true,
-    //   );
-    // }
-
     // Start a transaction
     const newPost = await prisma.$transaction(async (prisma) => {
       // create post
@@ -63,23 +58,18 @@ export const createPost = async (
           userId: loggedInUserId!,
         },
       });
-
-      // const uniqueFileName = generateUniqueFileName(
-      //   req.file!.originalname,
-      //   post.id,
-      // );
-      // const path = `images/post/${uniqueFileName}`;
-      //
-      // await UploadToS3(req.file!, path);
-      //
-      // // Update event with image path after successful upload
-      // return prisma.post.update({
-      //   where: { id: post.id },
-      //   data: {
-      //     image: path,
-      //   },
-      // });
     });
+
+    // upload the image
+    if (req.file) {
+      const uniqueFileName = generateUniqueFileName(
+        req.file.originalname,
+        newPost.id,
+      );
+      const path = `images/post/${uniqueFileName}`;
+      await UploadToS3(req.file!, path);
+      newPost.image = path;
+    }
 
     if (newPost) {
       // Post created successfully
@@ -88,7 +78,7 @@ export const createPost = async (
         data: newPost,
       });
     } else {
-      // Throw an error if the event creation returned an empty result
+      // Throw an error if the post creation returned an empty result
       throw new AppError(
         AppErrorName.EMPTY_RESULT_ERROR,
         "Post creation returned empty result.",
@@ -96,6 +86,82 @@ export const createPost = async (
         true,
       );
     }
+  } catch (error: any) {
+    // hand error over to error handling middleware
+    next(error);
+  }
+};
+
+// Create Validated Post for Organizations
+export const createVerifiedPost = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+    // Validate request id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    // Validate the Post data with zod schema
+    const validatedPostData = PostCreateSchema.parse(req.body);
+
+    // Check if the user has permission to create a post
+    const hasPermission = await checkUserPermission(
+      loggedInUserId!,
+      organizationId,
+      AppPermissionName.CREATE_POSTS,
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to create post`,
+        403,
+        true,
+      );
+    }
+
+    if (!req.file) {
+      throw new AppError(
+        AppErrorName.FILE_UPLOAD_ERROR,
+        "No file uploaded.",
+        400,
+        true,
+      );
+    }
+
+    // Start a transaction
+    const newPost = await prisma.$transaction(async (prisma) => {
+      // Create a verified post for an organization
+      const post = await prisma.post.create({
+        data: {
+          ...validatedPostData,
+          organizationId,
+          userId: loggedInUserId!,
+        },
+      });
+
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        post.id,
+      );
+      const path = `images/events/${uniqueFileName}`;
+      await UploadToS3(req.file!, path);
+
+      // Update event with image path after successful upload
+      return prisma.post.update({
+        where: { id: post.id },
+        data: {
+          image: path,
+        },
+      });
+    });
+
+    // Post created successfully
+    res.status(201).json({
+      message: "Event created successfully",
+      data: newPost,
+    });
   } catch (error: any) {
     // hand error over to error handling middleware
     next(error);
