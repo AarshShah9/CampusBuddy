@@ -8,12 +8,16 @@ import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import useAppContext from "~/hooks/useAppContext";
+import useAuthContext from "~/hooks/useAuthContext";
+import { Dropdown } from "react-native-element-dropdown";
+import { StyleSheet } from "react-native";
+import { institution } from "~/contexts/authContext";
 
 type signUpSchool = {
   uniEmail: string;
@@ -24,19 +28,22 @@ type signUpSchool = {
   rePassword: string;
 };
 
+const schema = zod.object({
+  uniEmail: zod.string(),
+  uniName: zod.string(),
+  fName: zod.string(),
+  lName: zod.string(),
+  password: zod.string(),
+  rePassword: zod.string(),
+});
+
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
   const [valid, setValid] = useState(false);
-
-  const schema = zod.object({
-    uniEmail: zod.string(),
-    uniName: zod.string(),
-    fName: zod.string(),
-    lName: zod.string(),
-    password: zod.string(),
-    rePassword: zod.string(),
-  });
+  const [institutions, setInstitutions] = useState<institution[]>([]);
+  const { getInstitutions } = useAuthContext();
+  const { dismissKeyboard } = useAppContext();
 
   const {
     control,
@@ -57,8 +64,7 @@ export default function StudentSignUp() {
   const onSubmit = useCallback(
     (data: signUpSchool) => {
       console.log(data);
-      navigation.navigate("StudentSignUpInfo");
-      //validate()
+      // navigation.navigate("StudentSignUpInfo");
     },
     [navigation],
   );
@@ -68,7 +74,11 @@ export default function StudentSignUp() {
     // Add any navigation or logic here
   }, []);
 
-  const { dismissKeyboard } = useAppContext();
+  useEffect(() => {
+    getInstitutions().then((res) => {
+      setInstitutions(res.data);
+    });
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -109,12 +119,27 @@ export default function StudentSignUp() {
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  label="Institution Name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+                <>
+                  <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    iconStyle={styles.iconStyle}
+                    data={institutions}
+                    search
+                    onBlur={onBlur}
+                    maxHeight={300}
+                    labelField="name"
+                    valueField="id"
+                    placeholder="Select item"
+                    searchPlaceholder="Institution Name"
+                    value={value}
+                    onChange={(value) => {
+                      onChange(value.id);
+                    }}
+                  />
+                </>
               )}
               name="uniName"
             />
@@ -183,12 +208,7 @@ export default function StudentSignUp() {
               name="rePassword"
             />
             {errors.rePassword && <Text>Institution Name is required.</Text>}
-            <StyledButton
-              mode="contained"
-              onPress={() => {
-                console.log("Pressed");
-              }}
-            >
+            <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
               <Text
                 style={{
                   lineHeight: 30,
@@ -293,3 +313,29 @@ const StyledButton = styled(Button)`
     margin-top: 10px;
     justify-content: center;
 `;
+
+const styles = StyleSheet.create({
+  dropdown: {
+    margin: 12,
+    height: 50,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});

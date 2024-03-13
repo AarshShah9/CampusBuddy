@@ -197,6 +197,13 @@ export const getAllInstitutions = async (req: Request, res: Response) => {
 
   res.status(200).json({
     message: "All institutions",
-    data: allSchools,
+    data: [
+      ...allSchools.map((school) => {
+        return {
+          id: school.id,
+          name: school.name,
+        };
+      }),
+    ],
   });
 };
