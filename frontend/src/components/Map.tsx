@@ -1,5 +1,5 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { Button, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -7,7 +7,7 @@ type MapProps = {
   latitudeDelta?: number;
   longitudeDelta?: number;
   goBackButton?: boolean;
-  currentLocation?: LatLng;
+  currentLocation: LatLng;
   events?: any;
 };
 
@@ -40,8 +40,8 @@ const Map = ({
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={{
-          latitude: currentLocation?.latitude || 51.08660107358039,
-          longitude: currentLocation?.longitude || -114.12847416818332,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
           latitudeDelta,
           longitudeDelta,
         }}

@@ -345,6 +345,20 @@ export const getAllEvents = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllMapEvents = async (req: Request, res: Response) => {
+  try {
+    const allEvents = await prisma.event.findMany();
+
+    res.status(200).json({
+      message: "All events",
+      data: allEvents,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // Get all verified events
 export const getAllVerifiedEvents = async (
   req: Request,

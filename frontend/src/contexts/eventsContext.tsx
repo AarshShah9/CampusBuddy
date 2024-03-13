@@ -33,6 +33,7 @@ type eventsContext = {
   events: Event[];
   getMainEvents: () => Promise<any>;
   createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;
+  getAllMapEvents: () => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -66,8 +67,18 @@ export const EventsContextProvider = ({
     [],
   );
 
+  const getAllMapEvents = useCallback(async () => {
+    try {
+      return await CBRequest("GET", "/api/events/");
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
   return (
-    <EventsContext.Provider value={{ events, getMainEvents, createEvent }}>
+    <EventsContext.Provider
+      value={{ events, getMainEvents, createEvent, getAllMapEvents }}
+    >
       {children}
     </EventsContext.Provider>
   );

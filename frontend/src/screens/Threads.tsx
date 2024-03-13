@@ -1,38 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
-import { CBRequest } from "~/lib/CBRequest";
+import { useEffect, useState } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
+import useEventsContext from "~/hooks/useEventsContext";
 
 export default function Threads() {
-  const { getLocationPermission, getLocation } = useAppContext();
-  const [location, setLocation] = useState<Record<string, any>>({
-    latitude: 51.08660107358039,
-    longitude: -114.12847416818332,
-  });
-
-  const onClickHandler = useCallback(async () => {
-    CBRequest("GET", "/api/user/verify", {})
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const { location } = useAppContext();
+  const { getAllMapEvents } = useEventsContext();
+  const [events, setEvents] = useState<any>();
 
   useEffect(() => {
-    (async () => {
-      console.log("Getting location permission");
-      await getLocationPermission();
-      await getLocation();
-    })();
+    getAllMapEvents().then((res) => {
+      console.log("HEREEE!", res);
+      setEvents(res);
+    });
   }, []);
 
   return (
     <Map
       currentLocation={{
-        longitude: location.longitude,
-        latitude: location.latitude,
+        longitude: location?.coords?.longitude ?? 52,
+        latitude: location?.coords?.latitude ?? -110,
       }}
       events={[
         {
