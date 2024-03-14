@@ -6,6 +6,7 @@ import {
   eventTest,
   getAllEvents,
   getAllEventsByOrganization,
+  getAllMapEvents,
   getAllVerifiedEvents,
   getEventById,
   getEventByUserId,
@@ -22,6 +23,7 @@ router.get("/test", eventTest);
 router.use(verifyAuthentication); // Use auth middleware for all routes below
 router.get("/mainPage", getMainPageEvents);
 router.get("/", getAllEvents);
+router.get("/mapEvents", getAllMapEvents);
 router.get("/verified", getAllVerifiedEvents);
 router.get("/organization/:id", getAllEventsByOrganization);
 router.get("/recent/", getRecentEvents); // with pagination params

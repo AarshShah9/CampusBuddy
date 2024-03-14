@@ -84,12 +84,19 @@ export const createVerifiedEvent = async (
         },
       });
 
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
+          isPublic: true,
         },
       });
 
@@ -160,11 +167,18 @@ export const createEvent = async (
         },
       });
 
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
+          isPublic: true,
         },
       });
 
@@ -324,6 +338,86 @@ export const getAllEvents = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "All events",
       data: allEvents,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
+  try {
+    const userId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || !user.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    const userInstitution = await prisma.institution.findUnique({
+      where: {
+        id: user.institutionId,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    if (!userInstitution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution not found",
+        404,
+        true,
+      );
+    }
+
+    // Trending events [0-3 are featured at the top, 4-9 are trending]
+    const events = await prisma.event.findMany({
+      where: {
+        startTime: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    // check to get the events that are in 50km radius of the user's location
+    events.filter((event) => {
+      const distance = getDistanceFromLatLonInKm(
+        userInstitution.location.latitude,
+        userInstitution.location.longitude,
+        event.location.latitude,
+        event.location.longitude,
+      );
+      return distance <= defaultDistance;
+    });
+
+    res.status(200).json({
+      message: "All events",
+      data: [
+        ...events.map((event) => {
+          return {
+            id: event.id,
+            latitude: event.location.latitude,
+            longitude: event.location.longitude,
+            title: event.title,
+            description: event.description,
+          };
+        }),
+      ],
     });
   } catch (error) {
     console.error("Error fetching events:", error);
