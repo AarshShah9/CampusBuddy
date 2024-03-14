@@ -26,11 +26,16 @@ type userRegistrationData = {
   name: string;
   email: string;
 };
+export type institution = {
+  id: string;
+  name: string;
+};
 type authContext = {
   user: UserDataType | null;
   registerUser: (arg: userRegistrationData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
+  getInstitutions: () => Promise<any>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -72,6 +77,14 @@ export const AuthContextProvider = ({
     }
   }, []);
 
+  const getInstitutions = useCallback(async () => {
+    try {
+      return await CBRequest("GET", "/api/institution/getAllInstitutions", {});
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   useEffect(() => {
     const loadToken = async () => {
       const token = await getTokenFromSecureStore(TOKEN_KEY);
@@ -84,7 +97,9 @@ export const AuthContextProvider = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, registerUser, signIn, logOut }}>
+    <AuthContext.Provider
+      value={{ user, registerUser, signIn, logOut, getInstitutions }}
+    >
       {children}
     </AuthContext.Provider>
   );

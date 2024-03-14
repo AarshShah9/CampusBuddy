@@ -5,22 +5,22 @@ import Threads from "~/screens/Threads";
 const Stack = createNativeStackNavigator();
 
 export default function ThreadsGroup() {
-    const { theme } = useThemeContext();
-    
-    return (
-        <Stack.Navigator
-            screenOptions={{
-                headerTintColor: theme.colors.onSecondary,
-                headerStyle: {
-                    backgroundColor: theme.colors.primary,
-                },
-            }}
-        >
-            <Stack.Screen
-                name="ThreadsScreen"
-                component={Threads}
-                options={{ title: "Threads" }}
-            />
-        </Stack.Navigator>
-    );
+  const { theme } = useThemeContext();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerTintColor: theme.colors.onSecondary,
+        headerStyle: {
+          backgroundColor: theme.colors.primary,
+        },
+      }}
+    >
+      <Stack.Screen
+        name="ThreadsScreen"
+        component={Threads}
+        options={{ title: "Event Map" }}
+      />
+    </Stack.Navigator>
+  );
 }

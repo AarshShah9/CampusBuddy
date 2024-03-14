@@ -109,14 +109,17 @@ model PostTags {
 
 // CORE MODELS
 model Institution {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  domain        String         @unique
-  user          User[]
-  organizations Organization[]
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+  id              String         @id @default(uuid())
+  name            String         @unique
+  domain          String         @unique
+  user            User[]
+  organizations   Organization[]
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  location        Location       @relation(fields: [locationPlaceId], references: [placeId])
+  locationPlaceId String
 
+  @@index([locationPlaceId])
   @@map("institution")
 }
 
@@ -171,28 +174,30 @@ model Program {
 }
 
 model Event {
-  id             String              @id @default(uuid())
-  userId         String              @map("user_id")
-  organizationId String?             @map("organization_id")
-  createdAt      DateTime            @unique @default(now()) @map("created_at")
-  title          String              @db.VarChar(255)
-  description    String?             @db.VarChar(255)
-  location       String
-  startTime      DateTime            @map("start_time")
-  endTime        DateTime            @map("end_time")
-  isPublic       Boolean             @map("is_public")
-  status         EventStatus
-  image          String?
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventTags      EventTag[]
-  eventResponses UserEventResponse[]
+  id              String              @id @default(uuid())
+  userId          String              @map("user_id")
+  organizationId  String?             @map("organization_id")
+  createdAt       DateTime            @unique @default(now()) @map("created_at")
+  title           String              @db.VarChar(255)
+  description     String?             @db.VarChar(255)
+  location        Location            @relation(fields: [locationPlaceId], references: [placeId])
+  startTime       DateTime            @map("start_time")
+  endTime         DateTime            @map("end_time")
+  isPublic        Boolean             @map("is_public")
+  status          EventStatus
+  image           String?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventTags       EventTag[]
+  eventResponses  UserEventResponse[]
+  locationPlaceId String
 
   tags      Tag[]       @relation("EventTags")
   EventTags EventTags[]
 
   @@index([userId])
   @@index([organizationId])
+  @@index([locationPlaceId])
   @@map("event")
 }
 
@@ -357,4 +362,16 @@ model TopicSubscription {
   @@index([userId])
   @@index([topicId])
   @@map("topic_subscription")
+}
+
+model Location {
+  placeId   String @id
+  latitude  Float
+  longitude Float
+  name      String
+
+  Institution Institution[]
+  Event       Event[]
+
+  @@map("location")
 }

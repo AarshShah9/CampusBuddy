@@ -5,6 +5,7 @@ import {
   events,
   eventTags,
   institutes,
+  locations,
   organizationRolePermissions,
   organizations,
   permissions,
@@ -78,6 +79,13 @@ const load = async () => {
 
     await prisma.topicSubscription.deleteMany();
     console.log("Deleted records in the Topic Subscription table");
+
+    await prisma.location.deleteMany();
+    console.log("Deleted records in the Location table");
+
+    await prisma.location.createMany({
+      data: locations,
+    });
 
     await prisma.institution.createMany({
       data: institutes,

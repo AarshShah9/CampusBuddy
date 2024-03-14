@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
-import { BACKEND_URL } from "@env";
 import { ImagePickerAsset } from "expo-image-picker";
+import { BACKEND_URL } from "@env";
 import { Platform } from "react-native";
 
 const imageGetter = async () => {
@@ -75,6 +75,8 @@ const allowedEndpoints = [
   "/api/events/organization/:id",
   "/api/events/recent/",
   "/api/events/:id",
+  "/api/events/mainPage",
+  "/api/events/mapEvents",
 
   // Miscellaneous endpoints
   "/Test",
