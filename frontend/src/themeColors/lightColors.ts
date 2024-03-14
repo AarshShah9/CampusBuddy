@@ -21,7 +21,7 @@ const lightColors = {
     surface: "rgb(254, 251, 255)",
     onSurface: "rgb(27, 27, 31)",
     surfaceVariant: "rgb(235, 236, 246)",
-    onSurfaceVariant: "rgb(68, 71, 79)",
+    onSurfaceVariant: "rgb(0, 0, 0)", //"rgb(68, 71, 79)
     outline: "rgb(117, 119, 127)",
     outlineVariant: "rgb(196, 198, 208)",
     shadow: "rgb(0, 0, 0)",
@@ -39,7 +39,7 @@ const lightColors = {
     },
     surfaceDisabled: "rgba(27, 27, 31, 0.12)",
     onSurfaceDisabled: "rgba(27, 27, 31, 0.38)",
-    backdrop: "rgba(211, 211, 211, 0.5)",
+    backdrop: "rgba(48,48,51)", //rgba(211, 211, 211, 0.5)
   },
 };
 
