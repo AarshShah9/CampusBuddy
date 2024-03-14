@@ -1,6 +1,6 @@
 const darkColors = {
   colors: {
-    primary: "rgb(0, 45, 97)",
+    primary: "rgb(30, 75, 127)",
     onPrimary: "rgb(127, 127, 127)",
     primaryContainer: "rgb(0, 60, 235)",
     onPrimaryContainer: "rgb(0, 13, 32)",
