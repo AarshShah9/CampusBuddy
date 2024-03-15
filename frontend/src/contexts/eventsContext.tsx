@@ -104,7 +104,7 @@ export const EventsContextProvider = ({
 
   return (
     <EventsContext.Provider
-      value={{ getMainEvents, createEvent, getAllMapEvents } as eventsContext}
+      value={{ getMainEvents, createEvent, getAllMapEvents, searchPageEvents, homePageEvents, profilePageEvents }}
     >
       {children}
     </EventsContext.Provider>
