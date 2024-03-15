@@ -15,6 +15,13 @@ import UploadToS3, {
   generateUniqueFileName,
 } from "../utils/S3Uploader";
 import { RequestExtended } from "../middleware/verifyAuth";
+import {
+  getCoordinatesFromPlaceId,
+  getDistanceFromLatLonInKm,
+  getPlaceNameFromPlaceId,
+} from "../utils/googleMapsApi";
+import { defaultDistance } from "../constants";
+import { sampleEventData } from "../prisma/dummyData";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -61,13 +68,35 @@ export const createVerifiedEvent = async (
 
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
-      // Create a verified event for an organization
+      // Create a verified event for an organization using the google maps api
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
+      const name = await getPlaceNameFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
+      const location = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedEventData.locationPlaceId,
+          name: name,
+        },
+      });
+
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
+          isPublic: true,
         },
       });
 
@@ -122,11 +151,34 @@ export const createEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // create event
+      // Create a verified event for an organization using the google maps api
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
+      const name = await getPlaceNameFromPlaceId(
+        validatedEventData.locationPlaceId,
+      );
+      const location = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedEventData.locationPlaceId,
+          name: name,
+        },
+      });
+
+      // TODO add tags to event
+
       const event = await prisma.event.create({
         data: {
-          ...validatedEventData,
+          startTime: validatedEventData.startTime,
+          endTime: validatedEventData.endTime,
+          title: validatedEventData.title,
+          description: validatedEventData.description,
+          locationPlaceId: validatedEventData.locationPlaceId,
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
+          isPublic: true,
         },
       });
 
@@ -235,6 +287,23 @@ export const updateEvent = async (
       validatedUpdateEventData.image = path;
     }
 
+    if (validatedUpdateEventData.locationPlaceId) {
+      const { lat, lng } = await getCoordinatesFromPlaceId(
+        validatedUpdateEventData.locationPlaceId,
+      );
+      const name = await getPlaceNameFromPlaceId(
+        validatedUpdateEventData.locationPlaceId,
+      );
+      const newLocation = await prisma.location.create({
+        data: {
+          latitude: lat,
+          longitude: lng,
+          placeId: validatedUpdateEventData.locationPlaceId,
+          name: name,
+        },
+      });
+    }
+
     // Update the event
     const updatedEvent = await prisma.event.update({
       where: { id: eventId },
@@ -269,6 +338,86 @@ export const getAllEvents = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "All events",
       data: allEvents,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
+  try {
+    const userId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || !user.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    const userInstitution = await prisma.institution.findUnique({
+      where: {
+        id: user.institutionId,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    if (!userInstitution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution not found",
+        404,
+        true,
+      );
+    }
+
+    // Trending events [0-3 are featured at the top, 4-9 are trending]
+    const events = await prisma.event.findMany({
+      where: {
+        startTime: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    // check to get the events that are in 50km radius of the user's location
+    events.filter((event) => {
+      const distance = getDistanceFromLatLonInKm(
+        userInstitution.location.latitude,
+        userInstitution.location.longitude,
+        event.location.latitude,
+        event.location.longitude,
+      );
+      return distance <= defaultDistance;
+    });
+
+    res.status(200).json({
+      message: "All events",
+      data: [
+        ...events.map((event) => {
+          return {
+            id: event.id,
+            latitude: event.location.latitude,
+            longitude: event.location.longitude,
+            title: event.title,
+            description: event.description,
+          };
+        }),
+      ],
     });
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -531,6 +680,219 @@ export const deleteEvent = async (
       );
     }
     res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getMainPageEvents = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || !user.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    const userInstitution = await prisma.institution.findUnique({
+      where: {
+        id: user.institutionId,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    if (!userInstitution) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Institution not found",
+        404,
+        true,
+      );
+    }
+
+    // Trending events [0-3 are featured at the top, 4-9 are trending]
+    const events = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            status: EventStatus.Verified,
+          },
+          {
+            startTime: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      include: {
+        location: true,
+        eventResponses: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+    });
+
+    // check to get the events that are in 50km radius of the user's location
+    events
+      .filter((event) => {
+        const distance = getDistanceFromLatLonInKm(
+          userInstitution.location.latitude,
+          userInstitution.location.longitude,
+          event.location.latitude,
+          event.location.longitude,
+        );
+        return distance <= defaultDistance;
+      })
+      // find the events that have the largest amount of eventResponses
+      .sort((a, b) => {
+        return b.eventResponses.length - a.eventResponses.length;
+      });
+
+    // Get the top 3 trending events
+    const topTrendingEvents = events.slice(0, 3);
+    // Get the top 10 trending events
+    const trendingEvents = events.slice(3, 10);
+    // get all the events happening today that don't include the top 10 trending events
+    const happeningToday = events.filter(
+      (event) => event.startTime.getDate() === new Date().getDate(),
+    );
+    const happeningTodayFiltered = happeningToday.filter(
+      (event) =>
+        !topTrendingEvents.includes(event) && !trendingEvents.includes(event),
+    );
+
+    // Events that the user is attending
+    const attendingEvents = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            eventResponses: {
+              some: {
+                userId,
+                participationStatus: "Interested",
+              },
+            },
+          },
+          {
+            endTime: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      include: {
+        location: true,
+      },
+      orderBy: {
+        endTime: "asc",
+      },
+      take: 10,
+    });
+
+    // Explore verified organizations
+    const verifiedOrganizations = await prisma.organization.findMany({
+      where: {
+        institutionId: userInstitution.id,
+      },
+    });
+
+    const reformattedAttendingEvents = {
+      title: "Attending",
+      id: "1",
+      items: attendingEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    // TODO: Upcoming events from following
+    const reformattedUpcomingEvents = {
+      title: "Upcoming Events From Following",
+      id: "2",
+      items: sampleEventData[1].items,
+    };
+
+    const reformattedTrendingEvents = {
+      title: "Trending Events",
+      id: "3",
+      items: trendingEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    const reformattedHappeningToday = {
+      title: "Happening Today",
+      id: "4",
+      items: happeningTodayFiltered.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+        };
+      }),
+    };
+
+    const reformattedExploreOrganizations = {
+      title: "Explore Verified Organizations",
+      id: "5",
+      items: verifiedOrganizations.map((organization) => {
+        return {
+          id: organization.id,
+          title: organization.organizationName,
+          host: null,
+          location: null,
+          image: organization.image,
+        };
+      }),
+    };
+
+    const startingEvents = topTrendingEvents.map((event) => {
+      return event.image;
+    });
+
+    res.status(200).json({
+      message: "Main page events",
+      data: {
+        allEvents: [
+          reformattedAttendingEvents,
+          reformattedUpcomingEvents,
+          reformattedTrendingEvents,
+          reformattedHappeningToday,
+          reformattedExploreOrganizations,
+        ],
+        startingEvents: startingEvents,
+      },
+    });
   } catch (error: any) {
     next(error);
   }

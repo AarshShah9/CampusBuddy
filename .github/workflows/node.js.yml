@@ -44,6 +44,7 @@ jobs:
           echo JWT_SECRET=NA >> .env
           echo MAILER_EMAIL=NA >> .env
           echo MAILER_PASS=NA >> .env
+          echo GOOGLE_MAPS_API_KEY=NA >> .env
 
       - name: Install Root Dependencies
         run: npm ci

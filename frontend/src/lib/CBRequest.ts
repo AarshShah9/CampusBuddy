@@ -2,13 +2,11 @@ import { ImagePickerAsset } from "expo-image-picker";
 import axios, { Method } from "axios";
 import {
   AllowedEndpoints,
-  RequestArgs,
   generateUrl,
-  prepareImageData,
   imageGetter,
+  prepareImageData,
+  RequestArgs,
 } from "~/lib/requestHelpers";
-import { z } from "zod";
-import { EventCreateSchema } from "../../../shared/zodSchemas";
 
 /**
  * Performs an HTTP request to a specified endpoint using the provided method and options.
@@ -66,23 +64,19 @@ const uploadImageRequest = async (
   method: "post" | "patch",
   endpoint: AllowedEndpoints,
   selectedImage: ImagePickerAsset,
-  data: Record<string, any>,
   options: RequestArgs,
 ) => {
   try {
-    const formData = prepareImageData(selectedImage, data);
+    const formData = prepareImageData(selectedImage, options.body);
     const url = generateUrl(endpoint, options.params);
-    const response = await axios({
+    return await axios({
       method,
       url,
       data: formData,
       headers: { "Content-Type": "multipart/form-data" },
     });
-    alert("Image Uploaded Successfully!");
-    return response;
   } catch (err) {
     console.error(err);
-    alert("Something went wrong in the Upload Function!");
   }
 };
 
@@ -94,23 +88,19 @@ const sampleUsages = async () => {
       return;
     }
 
-    type EventCreateType = z.infer<typeof EventCreateSchema>;
+    // type EventCreateType = z.infer<typeof EventCreateSchema>;
 
-    const data: EventCreateType = {
+    const data = {
       title: "Test Event NEW",
       description: "Test Description",
-      location: "Test Location",
+      locationPlaceId: "Test Location",
       startTime: new Date(2025, 1, 2024, 1),
       endTime: new Date(2025, 1, 2024, 4),
       isPublic: true,
     };
-    await uploadImageRequest(
-      "post",
-      "/api/events/",
-      result.assets[0],
-      data,
-      {},
-    );
+    await uploadImageRequest("post", "/api/events/", result.assets[0], {
+      body: data,
+    });
   };
 };
 

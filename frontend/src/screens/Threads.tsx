@@ -1,23 +1,31 @@
-import { Button, View } from "react-native";
-import { ThemedText } from "~/components/ThemedComponents";
-import { useCallback } from "react";
-import { CBRequest } from "~/lib/CBRequest";
+import { useEffect, useState } from "react";
+import Map from "~/components/Map";
+import useAppContext from "~/hooks/useAppContext";
+import useEventsContext from "~/hooks/useEventsContext";
+import { EventMapItem } from "~/contexts/eventsContext";
 
 export default function Threads() {
-  const onClickHandler = useCallback(async () => {
-    CBRequest("GET", "/api/user/verify", {})
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const { location } = useAppContext();
+  const { getAllMapEvents } = useEventsContext();
+  const [events, setEvents] = useState<EventMapItem[]>();
+
+  useEffect(() => {
+    getAllMapEvents().then((res) => {
+      setEvents(res.data);
+    });
   }, []);
 
+  if (!location) {
+    return null;
+  }
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ThemedText>Threads</ThemedText>
-      <Button title={"TEST AUTH"} onPress={onClickHandler} />
-    </View>
+    <Map
+      currentLocation={{
+        longitude: location?.coords?.longitude,
+        latitude: location?.coords?.latitude,
+      }}
+      events={events}
+    />
   );
 }

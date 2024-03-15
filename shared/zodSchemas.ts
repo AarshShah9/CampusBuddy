@@ -65,7 +65,7 @@ export const EventSchema = z.object({
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
   description: z.string().min(3).max(255).nullable(),
-  location: z.string().min(3).max(255),
+  locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
       required_error: "Please select a date and time",
@@ -93,8 +93,9 @@ export const EventCreateSchema = EventSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified event
+  image: true, // handled by the S3Uploader
+  isPublic: true, // default value is false
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -237,6 +238,9 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 // POST SCHEMAS
 /////////////////////////////////////////
 
+/**
+ * Post Schema
+ */
 export const PostSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -249,6 +253,27 @@ export const PostSchema = z.object({
 });
 
 export type Post = z.infer<typeof PostSchema>;
+
+/**
+ * Create Post Schema
+ */
+export const PostCreateSchema = PostSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+  image: true, // Update value after image is created
+  organizationId: true, // get from req.params if creating verified post
+});
+
+export type PostCreateType = z.infer<typeof PostCreateSchema>;
+
+/**
+ * Update Post Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const PostUpdateSchema = PostSchema.partial();
+
+export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
 
 /////////////////////////////////////////
 // COMMENT SCHEMAS
@@ -432,6 +457,7 @@ export const InstitutionSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  locationPlaceId: z.string(),
   name: z
     .string()
     .min(3, { message: "Institution name must at least 3 characters " }),

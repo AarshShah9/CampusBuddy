@@ -8,6 +8,10 @@ import {
 } from "../../shared/zodSchemas";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
+import {
+  getCoordinatesFromPlaceId,
+  getPlaceNameFromPlaceId,
+} from "../utils/googleMapsApi";
 
 // create new Institution
 export const createInstitution = async (
@@ -27,7 +31,7 @@ export const createInstitution = async (
       );
     }
 
-    const { institutionName, institutionDomain } = req.body;
+    const { institutionName, institutionDomain, locationPlaceId } = req.body;
 
     const validName = institutionNameSchema.safeParse(institutionName);
     const validDomain = institutionDomainSchema.safeParse(institutionDomain);
@@ -49,16 +53,27 @@ export const createInstitution = async (
         true,
       );
     }
+    const { lat, lng } = await getCoordinatesFromPlaceId(locationPlaceId);
+
+    const location = await prisma.location.create({
+      data: {
+        placeId: locationPlaceId,
+        name: await getPlaceNameFromPlaceId(locationPlaceId),
+        longitude: lng,
+        latitude: lat,
+      },
+    });
 
     const newInstitution = await prisma.institution.create({
       data: {
         name: institutionName,
         domain: institutionDomain,
+        locationPlaceId: location.placeId,
       },
     });
 
     const message = {
-      from: "nomansanjari2001@gmail.com",
+      from: process.env.MAILER_EMAIL!,
       to: "mdnoman.sanjari@ucalgary.ca",
       subject: "Verify OTP - CampusBuddy",
       html: "New Institution created!",
@@ -182,6 +197,13 @@ export const getAllInstitutions = async (req: Request, res: Response) => {
 
   res.status(200).json({
     message: "All institutions",
-    data: allSchools,
+    data: [
+      ...allSchools.map((school) => {
+        return {
+          id: school.id,
+          name: school.name,
+        };
+      }),
+    ],
   });
 };
