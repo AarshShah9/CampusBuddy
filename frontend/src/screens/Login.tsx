@@ -66,7 +66,7 @@ export default function Login() {
           />
         </LogoContainer>
         <OverlayContainer $color={theme.colors.tertiary}>
-          <Header>{"Login"}</Header>
+          <Header $color={theme.colors.onPrimary}>{"Login"}</Header>
           <FormContainer>
             <Controller
               control={control}
@@ -79,6 +79,7 @@ export default function Login() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  style={{backgroundColor: theme.colors.tertiary}}
                 />
               )}
               name="email"
@@ -95,6 +96,7 @@ export default function Login() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  style={{backgroundColor: theme.colors.tertiary}}
                 />
               )}
               name="password"
@@ -181,7 +183,8 @@ const FormContainer = styled(View)`
     margin-right: auto;
 `;
 // prettier-ignore
-const Header = styled(Text)`
+const Header = styled(Text)<{ $color: string }>`
+    background-color: ${(props) => props.$color};
     font-size: 40px;
     font-weight: bold;
     margin-top: 64px;

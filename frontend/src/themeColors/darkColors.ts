@@ -9,7 +9,7 @@ const darkColors = {
     onSecondary: "rgb(50, 50, 50)",
     secondaryContainer: "transparent",
     onSecondaryContainer: "rgb(0, 13, 28)",
-    tertiary: "rgb(127, 127, 127)",
+    tertiary: "rgb(50, 50, 50)",
     onTertiary: "rgb(127, 127, 127)",
     tertiaryContainer: "rgb(0, 173, 203)",
     onTertiaryContainer: "rgb(0, 15, 18)",
