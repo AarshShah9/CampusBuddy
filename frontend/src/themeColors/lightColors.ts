@@ -1,6 +1,7 @@
 const lightColors = {
   colors: {
-    primary: "rgb(0, 90, 194)",
+    primary: "rgb(58, 134, 255)",
+    PrimaryHeader: "rgb(255, 255, 255)",
     onPrimary: "rgb(255, 255, 255)",
     primaryContainer: "rgb(216, 226, 255)",
     onPrimaryContainer: "rgb(0, 26, 65)",
