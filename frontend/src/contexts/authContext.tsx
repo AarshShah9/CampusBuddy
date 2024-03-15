@@ -28,18 +28,23 @@ type userRegistrationData = {
 };
 export type institution = {
   id: string;
-  orgName: string;
-  institution: string;
-  description: string;
-  password:string;
-
+  name: string;
 };
+export type  organizationInformation = {
+  orgEmail: string;
+  organizationName: string;
+  institutionId: string;
+  description: string;
+  password: string;
+  rePassword: string;
+}
 type authContext = {
   user: UserDataType | null;
   registerUser: (arg: userRegistrationData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
+  registerOrganization: (arg:organizationInformation) => Promise<void>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -61,9 +66,11 @@ export const AuthContextProvider = ({
     }
   }, []);
 
-  const registerOrganization = useCallback(async (data: institution) => {
+  const registerOrganization = useCallback(async (data: organizationInformation) => {
     try {
-      const { orgName, institution } = data;
+      const { organizationName, institutionId, description,  } = data;
+      let res = await CBRequest("POST","/api/orgs/", {body:data})
+      console.log(res);
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +117,7 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, registerUser, signIn, logOut, getInstitutions }}
+      value={{ user, registerUser, signIn, logOut, getInstitutions, registerOrganization}}
     >
       {children}
     </AuthContext.Provider>
