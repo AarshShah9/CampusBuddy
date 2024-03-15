@@ -28,7 +28,11 @@ type userRegistrationData = {
 };
 export type institution = {
   id: string;
-  name: string;
+  orgName: string;
+  institution: string;
+  description: string;
+  password:string;
+
 };
 type authContext = {
   user: UserDataType | null;
@@ -56,6 +60,14 @@ export const AuthContextProvider = ({
       console.log(error);
     }
   }, []);
+
+  const registerOrganization = useCallback(async (data: institution) => {
+    try {
+      const { orgName, institution } = data;
+    } catch (error) {
+      console.log(error);
+    }
+  },[])
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {

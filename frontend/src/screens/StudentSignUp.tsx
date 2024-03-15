@@ -7,7 +7,7 @@ import {
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
@@ -44,6 +44,7 @@ export default function StudentSignUp() {
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const { getInstitutions } = useAuthContext();
   const { dismissKeyboard } = useAppContext();
+  
 
   const {
     control,
@@ -71,6 +72,7 @@ export default function StudentSignUp() {
 
   const handlePress = useCallback(() => {
     console.log("Pressed");
+    navigation.dispatch(StackActions.replace("OrgSignUp"));
     // Add any navigation or logic here
   }, []);
 
@@ -130,7 +132,7 @@ export default function StudentSignUp() {
                     // search
                     onBlur={onBlur}
                     maxHeight={300}
-                    labelField="name"
+                    labelField="institution"
                     valueField="id"
                     placeholder="Select item"
                     // searchPlaceholder="Institution Name"

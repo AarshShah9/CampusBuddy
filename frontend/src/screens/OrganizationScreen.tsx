@@ -1,4 +1,4 @@
-import { View, Text, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { View, Text, Keyboard, TouchableWithoutFeedback, StyleSheet } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
@@ -8,11 +8,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
+import { Dropdown } from "react-native-element-dropdown";
+import { institution } from "~/contexts/authContext";
+import useAuthContext from "~/hooks/useAuthContext";
 
 type organizationInformation = {
     orgEmail: string,
     orgName: string,
-    address: string,
+    institution: string,
     password: string,
     rePassword:string,
 }
@@ -21,12 +24,13 @@ export default function OrganizationSignUp() {
     const { theme } = useThemeContext();
     const navigation = useNavigation<any>();
     const [valid, setValid] = useState(false);
+    const [institutions, setInstitutions] = useState<institution[]>([]);
+    const { getInstitutions } = useAuthContext();
 
     const schema = zod.object({
-        uniEmail: zod.string(),
-        uniName: zod.string(),
-        fName: zod.string(),
-        lName: zod.string(),
+        orgEmail: zod.string(),
+        orgName: zod.string(),
+        institution: zod.string(),
         password: zod.string(),
         rePassword: zod.string()
     });
@@ -35,7 +39,7 @@ export default function OrganizationSignUp() {
         defaultValues: {
             orgEmail: '',
             orgName: '',
-            address: '',
+            institution: '',
             password: '',
             rePassword: ''
         },
@@ -78,7 +82,7 @@ export default function OrganizationSignUp() {
                                     value={value}
                                 />
                             )}
-                            name="orgName"
+                            name="orgEmail"
                         />
                         {errors.orgEmail && <Text>An Email is required.</Text>}
                         <Controller
@@ -96,7 +100,38 @@ export default function OrganizationSignUp() {
                             )}
                             name="orgName"
                         />
-                        {errors.orgName && <Text>Institution Name is required.</Text>}
+                        {errors.orgName && <Text>Organization Name is required.</Text>}
+                        <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    iconStyle={styles.iconStyle}
+                    data={institutions}
+                    // search
+                    onBlur={onBlur}
+                    maxHeight={300}
+                    labelField="institution"
+                    valueField="id"
+                    placeholder="Select item"
+                    // searchPlaceholder="Institution Name"
+                    value={value}
+                    onChange={(value) => {
+                      onChange(value.id);
+                    }}
+                  />
+                </>
+              )}
+              name="institution"
+            />
+                        {errors.orgName && <Text>Organization Name is required.</Text>}
                         <Controller
                             control={control}
                             rules={{
@@ -132,9 +167,7 @@ export default function OrganizationSignUp() {
                        
                         <StyledButton
                             mode="contained"
-                            onPress={() => {
-                                console.log("Pressed")
-                            }}
+                            onPress={handleSubmit(onSubmit)}
                         >
                             <Text
                                 style={{lineHeight:30, fontSize: 24, fontWeight: "bold", color: "white" ,fontFamily:"Nunito-Bold" }}
@@ -221,3 +254,30 @@ const ClickLink = styled(Text) <{ $color: string }>`
   justify-content: center;
   align-items: center;
 `;
+
+const styles = StyleSheet.create({
+    dropdown: {
+      margin: 12,
+      height: 50,
+      borderBottomColor: "gray",
+      borderBottomWidth: 0.5,
+    },
+    icon: {
+      marginRight: 5,
+    },
+    placeholderStyle: {
+      fontSize: 16,
+    },
+    selectedTextStyle: {
+      fontSize: 16,
+    },
+    iconStyle: {
+      width: 20,
+      height: 20,
+    },
+    inputSearchStyle: {
+      height: 40,
+      fontSize: 16,
+    },
+  });
+  
