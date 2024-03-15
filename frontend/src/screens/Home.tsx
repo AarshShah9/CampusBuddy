@@ -1,8 +1,17 @@
-import React, { useEffect } from "react";
-import useLoadingContext from "~/hooks/useLoadingContext";
+import { useEffect } from "react";
 import VerticalScrollView from "~/components/VerticalScrollView";
-import useEventsContext from "~/hooks/useEventsContext";
+import usePushNotifications from "~/hooks/usePushNotifications";
 
 export default function Home() {
-  return <VerticalScrollView />;
+    const { expoPushToken, sendNotification } = usePushNotifications();
+
+    useEffect(() => {
+        sendNotification({
+            title: '🎉Welcome to Campus Buddy🎉',
+            body: `Your journey to a better campus experience just began!`
+        })
+        .catch(error => console.log('An error occured when trying to send a notification:\n', error))
+    }, [expoPushToken])
+
+    return <VerticalScrollView />;
 }
