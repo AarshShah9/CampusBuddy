@@ -34,9 +34,12 @@ class AppError extends ExtendableError {
 
 // Error names
 enum AppErrorName {
+  INVALID_INPUT_ERROR = "InvalidInputError",
   NOT_FOUND_ERROR = "NotFoundError",
+  RECORD_EXISTS_ERROR = "RecordExistsError",
   UNAUTHORIZED_ACCESS_ERROR = "UnauthorizedAccessError",
   FILE_UPLOAD_ERROR = "FileUploadError",
+  FILE_DELETE_ERROR = "FileDeleteError",
   VALIDATION_ERROR = "ValidationError",
   PERMISSION_ERROR = "PermissionError",
   EMPTY_RESULT_ERROR = "EmptyResultError",

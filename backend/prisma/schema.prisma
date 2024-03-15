@@ -11,100 +11,150 @@ datasource db {
   relationMode = "prisma"
 }
 
-model School {
-  id       Int       @id @default(autoincrement())
-  name     String
-  domain   String
-  students Student[]
-  users    User[]
-
-  @@map("school")
-}
-
-model Student {
-  id       Int     @id @default(autoincrement())
-  school   School  @relation(fields: [schoolID], references: [id])
-  schoolID Int
-  email    String
-  username String
-  name     String
-  password String
-  otp      String
-  jwt      String
-  status   Boolean
-
-  @@index([schoolID])
-  @@map("student")
-}
-
-model User {
-  id                Int                    @id @default(autoincrement())
-  username          String                 @unique
-  firstName         String                 @map("first_name")
-  lastName          String                 @map("last_name")
-  email             String                 @unique
-  password          String                 @map("password")
-  yearOfStudy       Int                    @map("year_of_study")
-  schoolId          Int                    @map("school_id")
-  isVerified        Boolean                @default(false) @map("is_verified")
-  profilePic        String?                @unique @map("profile_pic")
-  school            School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  events            Event[]
-  UserEventResponse UserEventResponse[]
-  posts             Post[]
-  comments          Comment[]
-  organizationRoles UserOrganizationRole[]
-  enrollments       Enrollment[]
-  subscriptions     TopicSubscription[]
-
-  otp    String
-  jwt    String
-  status Boolean
-
-  @@index([schoolId])
-  @@map("user")
-}
-
-model Event {
-  id             Int                 @id @default(autoincrement())
-  userId         Int                 @map("user_id")
-  organizationId Int?                @map("organization_id")
-  createdAt      DateTime            @unique @default(now()) @map("created_at")
-  title          String              @db.VarChar(255)
-  description    String?             @db.VarChar(255)
-  location       String
-  startTime      DateTime            @map("start_time")
-  endTime        DateTime            @map("end_time")
-  isPublic       Boolean             @map("is_public")
-  status         EventStatus
-  image          String?
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventTags      EventTag[]
-  eventResponses UserEventResponse[]
-
-  @@index([userId])
-  @@index([organizationId])
-  @@map("event")
-}
-
+// ENUMS
 enum EventStatus {
   Verified
   NonVerified
 }
 
+enum UserRole {
+  Owner
+  Admin
+  Moderator
+  Member
+}
+
+enum UserType {
+  Student // has email with proper domain, enrollment record(s)
+  PendingOrg // an org account that hasn't been approved yet by admins or existing org
+  ApprovedOrg
+  Admin // System level admin
+}
+
+enum OrganizationStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum UserOrgStatus {
+  Pending
+  Approved
+  Rejected // may not be necessary if we just delete the record instead
+  Banned
+}
+
 enum ParticipationStatus {
-  Going
   Interested
-  NotInterested
+}
+
+// many of these permissions may not apply to our application
+enum AppPermissionName {
+  CREATE_EVENTS
+  MANAGE_EVENTS // edit and cancel event
+  CREATE_POSTS
+  MANAGE_POSTS // remove user posts
+  MANAGE_MEMBERS // maybe ban/unban users?
+  APPROVE_MEMBER_REQUESTS // not sure if we need this
+  VIEW_ANALYTICS // view details about the organization
+  MANAGE_ORGANIZATION // edit org name, description, image, permissions
+  DELETE_ORGANIZATION
+}
+
+// CORE MODELS
+model Institution {
+  id              String         @id @default(uuid())
+  name            String         @unique
+  domain          String         @unique
+  user            User[]
+  organizations   Organization[]
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  location        Location       @relation(fields: [locationPlaceId], references: [placeId])
+  locationPlaceId String
+
+  @@index([locationPlaceId])
+  @@map("institution")
+}
+
+model User {
+  id                   String                 @id @default(uuid())
+  username             String                 @unique
+  firstName            String                 @map("first_name")
+  lastName             String                 @map("last_name")
+  email                String                 @unique
+  password             String                 @map("password")
+  profilePic           String?                @unique @map("profile_pic")
+  institutionId        String?                @map("institution_id")
+  accountType          UserType               @map("account_type")
+  institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  enrollments          Enrollment[]
+  posts                Post[]
+  comments             Comment[]
+  events               Event[]
+  UserEventResponse    UserEventResponse[]
+  subscriptions        TopicSubscription[]
+  UserOrganizationRole UserOrganizationRole[]
+
+  @@index([email])
+  @@index([institutionId])
+  @@map("user")
+}
+
+model Enrollment {
+  programId   String  @map("program_id")
+  userId      String  @map("user_id")
+  degreeType  String  @map("degree_type")
+  yearOfStudy Int     @map("year_of_study")
+  program     Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([programId, userId])
+  @@index([programId])
+  @@index([userId])
+  @@map("enrollment")
+}
+
+model Program {
+  id          String       @id @default(uuid())
+  programName String
+  department  String
+  enrollments Enrollment[]
+
+  @@map("program")
+}
+
+model Event {
+  id              String              @id @default(uuid())
+  userId          String              @map("user_id")
+  organizationId  String?             @map("organization_id")
+  createdAt       DateTime            @unique @default(now()) @map("created_at")
+  title           String              @db.VarChar(255)
+  description     String?             @db.VarChar(255)
+  location        Location            @relation(fields: [locationPlaceId], references: [placeId])
+  startTime       DateTime            @map("start_time")
+  endTime         DateTime            @map("end_time")
+  isPublic        Boolean             @map("is_public")
+  status          EventStatus
+  image           String?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventTags       EventTag[]
+  eventResponses  UserEventResponse[]
+  locationPlaceId String
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([locationPlaceId])
+  @@map("event")
 }
 
 model UserEventResponse {
-  userId              Int    @map("user_id")
-  eventId             Int    @map("event_id")
-  participationStatus String @map("participation_status")
-  user                User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event               Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId              String              @map("user_id")
+  eventId             String              @map("event_id")
+  participationStatus ParticipationStatus @map("participation_status")
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@id([userId, eventId])
   @@index([userId])
@@ -113,10 +163,10 @@ model UserEventResponse {
 }
 
 model Post {
-  id             Int           @id @default(autoincrement())
-  userId         Int           @map("user_id")
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
   image          String?
-  organizationId Int?          @map("organization_id")
+  organizationId String?       @map("organization_id")
   createdAt      DateTime      @unique @default(now()) @map("created_at")
   title          String
   text           String?
@@ -133,11 +183,11 @@ model Post {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @map("user_id")
+  userId    String   @map("user_id")
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int      @map("post_id")
+  postId    String   @map("post_id")
   createdAt DateTime @unique @default(now()) @map("created_at")
   text      String
 
@@ -146,32 +196,33 @@ model Comment {
   @@map("comment")
 }
 
-enum OrganizationStatus {
-  Pending
-  Verified
-}
-
 model Organization {
-  id                          Int                          @id @default(autoincrement())
+  id                          String                       @id @default(uuid())
   organizationName            String                       @unique @map("organization_name")
   description                 String?
   createdAt                   DateTime                     @unique @default(now()) @map("created_at")
+  updatedAt                   DateTime                     @updatedAt @map("updated_at")
   status                      OrganizationStatus           @default(Pending)
+  image                       String?
+  institutionId               String                       @map("institution_id")
+  institution                 Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   userOrganizationRoles       UserOrganizationRole[]
   userOrganizationPermissions OrganizationRolePermission[]
   events                      Event[]
   posts                       Post[]
 
+  @@index([institutionId])
   @@map("organization")
 }
 
 model UserOrganizationRole {
-  userId         Int          @map("user_id")
-  organizationId Int          @map("organization_id")
-  roleId         Int          @map("role_id")
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  userId         String        @map("user_id")
+  organizationId String        @map("organization_id")
+  roleId         String        @map("role_id")
+  status         UserOrgStatus
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, organizationId, roleId])
   @@index([userId])
@@ -180,16 +231,9 @@ model UserOrganizationRole {
   @@map("user_organization_role")
 }
 
-enum UserRole {
-  Owner
-  Admin
-  Moderator
-  Member
-}
-
 model Role {
-  id                          Int                          @id @default(autoincrement())
-  roleName                    UserRole                     @map("role_name")
+  id                          String                       @id @default(uuid())
+  roleName                    UserRole                     @unique @map("role_name")
   userOrganizationRoles       UserOrganizationRole[]
   organizationRolePermissions OrganizationRolePermission[]
 
@@ -197,9 +241,9 @@ model Role {
 }
 
 model OrganizationRolePermission {
-  organizationId Int          @map("organization_id")
-  roleId         Int          @map("role_id")
-  permissionId   Int          @map("permission_id")
+  organizationId String       @map("organization_id")
+  roleId         String       @map("role_id")
+  permissionId   String       @map("permission_id")
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission     Permission   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
@@ -211,51 +255,16 @@ model OrganizationRolePermission {
   @@map("organization_role_permission")
 }
 
-// many of these permissions may not apply to our application
-enum AppPermissionName {
-  CREATE_EVENTS
-  MANAGE_EVENTS // edit and cancel event
-  CREATE_POSTS
-  MANAGE_POSTS // remove user posts
-  MANAGE_MEMBERS // maybe ban/unban users?
-  APPROVE_MEMBER_REQUESTS // not sure if we need this 
-  VIEW_ANALYTICS // view details about the organization
-  MANAGE_ORGANIZATION // edit org name, description, image, permissions
-  DELETE_ORGANIZATION
-}
-
 model Permission {
-  id                          Int                          @id @default(autoincrement())
+  id                          String                       @id @default(uuid())
   permissionName              AppPermissionName            @map("permission_name")
   organizationRolePermissions OrganizationRolePermission[]
 
   @@map("permission")
 }
 
-model Enrollment {
-  programId  Int     @map("program_id")
-  userId     Int     @map("user_id")
-  degreeType String  @map("degree_type")
-  program    Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([programId, userId])
-  @@index([programId])
-  @@index([userId])
-  @@map("enrollment")
-}
-
-model Program {
-  id          Int          @id @default(autoincrement())
-  programName String
-  department  String
-  enrollments Enrollment[]
-
-  @@map("program")
-}
-
 model Topic {
-  id            Int                 @id @default(autoincrement())
+  id            String              @id @default(uuid())
   topicName     String              @unique @map("topic_name")
   eventTags     EventTag[]
   posts         PostTag[]
@@ -265,10 +274,10 @@ model Topic {
 }
 
 model EventTag {
-  eventId Int   @map("event_id")
-  topicId Int   @map("topic_id")
-  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  eventId String @map("event_id")
+  topicId String @map("topic_id")
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([eventId, topicId])
   @@index([eventId])
@@ -277,10 +286,10 @@ model EventTag {
 }
 
 model PostTag {
-  postId  Int   @map("post_id")
-  topicId Int   @map("topic_id")
-  post    Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  postId  String @map("post_id")
+  topicId String @map("topic_id")
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([postId, topicId])
   @@index([postId])
@@ -289,13 +298,25 @@ model PostTag {
 }
 
 model TopicSubscription {
-  userId  Int   @map("user_id")
-  topicId Int   @map("topic_id")
-  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  topic   Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId  String @map("user_id")
+  topicId String @map("topic_id")
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([userId, topicId])
   @@index([userId])
   @@index([topicId])
   @@map("topic_subscription")
+}
+
+model Location {
+  placeId   String @id
+  latitude  Float
+  longitude Float
+  name      String
+
+  Institution Institution[]
+  Event       Event[]
+
+  @@map("location")
 }

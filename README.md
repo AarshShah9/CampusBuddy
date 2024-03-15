@@ -77,11 +77,27 @@ To do this you will have to do the following on all of the commands.
 
 ### Database
 
+#### Useful Prisma Commands
 ```
-$ npx prisma db generate // reflect model chages locally (for nodejs, backend, ORM)
+$ npx prisma generate // reflect model chages locally (for nodejs, backend, ORM)
 $ npx prisma db push // push model changes to remote db instance
+$ npx prisma db seed // seed the database with data
+$ npx prisma studio // open the prisma studio GUI to view the database
 ```
 
+#### Running the database locally
+- Install Docker (https://www.docker.com/products/docker-desktop)
+- Make sure docker desktop is running
+- Run the following command in the root directory of the project
+```
+$ cd backend
+$ docker-compose up -d
+```
+- Set your .env file to the following:
+```
+DATABASE_URL=mysql://exampleuser:examplepassword@localhost:3307/exampledb
+```
+- Then the subsequent prisma commands can be run to reflect changes locally and push changes to the docker db instance (see above).
 
 ### IDE's
 
@@ -91,7 +107,7 @@ $ npx prisma db push // push model changes to remote db instance
 ### Code Formatting
 
 The project uses a common Prettier config file to maintain consistent code formatting. Install the Prettier extension and configure your IDE to use Prettier as your default code formatter and set it to format on save.
-
+- Please use `// prettier-ignore` to ignore Prettier formatting for all styled-components code.
 
 ### Git
 
@@ -124,4 +140,9 @@ npm run start
 ```
 - Then scan the QR code with your phone camera
 - The app should open up on your phone
+
+### Google Maps API
+- Refer to these docs:
+  - https://docs.expo.dev/versions/latest/sdk/map-view/
+
 

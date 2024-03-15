@@ -1,21 +1,25 @@
-import { AppPermissionName } from "@prisma/client";
+import { AppPermissionName, UserOrgStatus } from "@prisma/client";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "./AppError";
 
 // Utility function for checking if the user has the required permissions for an organization
 export const checkUserPermission = async (
-  userId: number,
-  organizationId: number,
+  userId: string,
+  organizationId: string,
   requiredPermission: AppPermissionName,
 ): Promise<boolean> => {
   try {
-    // Get the user's role in the organization
+    // Get the user's role in the organization if they are in good standing
     const userRole = await prisma.userOrganizationRole.findFirst({
-      where: { userId, organizationId },
+      where: {
+        userId,
+        organizationId,
+        status: UserOrgStatus.Approved, // user only has role's permissions if they are approved
+      },
     });
 
     if (!userRole) {
-      // The user is not a member of the organization
+      // The user is not an approved member of the organization
       return false;
     }
 
@@ -26,12 +30,10 @@ export const checkUserPermission = async (
     });
 
     // Check if the required permission matches any of the role permissions
-    const hasPermission = rolePermissions.some(
+    return rolePermissions.some(
       (rolePermission) =>
         rolePermission.permission.permissionName === requiredPermission,
     );
-
-    return hasPermission;
   } catch (error: any) {
     throw new AppError(
       AppErrorName.PRISMA_ERROR,
