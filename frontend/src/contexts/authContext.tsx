@@ -60,7 +60,6 @@ export const AuthContextProvider = ({
   const signIn = useCallback(async (email: string, password: string) => {
     try {
       const jwt = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
-      console.log("Bitch here" + jwt.authToken);
       setAxiosTokenHeader(jwt.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {
