@@ -3,6 +3,7 @@ import {
   EventStatus,
   OrganizationStatus,
   ParticipationStatus,
+  PostType,
   User,
   UserOrgStatus,
   UserRole,
@@ -333,17 +334,26 @@ export const posts = [
   {
     id: ids.postIds[1],
     userId: ids.userIds[3],
+    institutionId: ids.instituteIds[1],
     title: "First Post",
-    text: "This is the first post!",
+    description: "This is the first post!",
     createdAt: "2024-10-10T09:00:00Z",
+    expiresAt: "2024-10-10T18:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 5,
+
     // Other post details
   },
   {
     id: ids.postIds[2],
     userId: ids.userIds[4],
+    institutionId: ids.instituteIds[1],
     title: "Second Post",
-    text: "Another post here!",
+    description: "Another post here!",
     createdAt: "2024-10-10T10:00:00Z",
+    expiresAt: "2024-10-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 8,
     // Other post details
   },
 ];

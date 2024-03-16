@@ -1,4 +1,4 @@
-import { AppPermissionName } from "@prisma/client";
+import { AppPermissionName, PostType } from "@prisma/client";
 import {
   PostCreateSchema,
   PostUpdateSchema,
@@ -21,15 +21,50 @@ export const postTest = async (req: Request, res: Response) => {
 
 // Get all Posts
 export const getAllPosts = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const allPosts = await prisma.post.findMany();
+    const userId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId!,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${userId} not found.`,
+        404,
+        true,
+      );
+    }
+
+    const allPosts = await prisma.post.findMany({
+      where: {
+        institutionId: user.institutionId!,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     res.status(200).json({
       message: "All posts",
-      data: allPosts,
+      data: [
+        ...allPosts.map((post) => {
+          return {
+            id: post.id,
+            title: post.title,
+            description: post.description,
+            spotsLeft: post.numberOfSpotsLeft,
+            expiresAt: post.expiresAt,
+          };
+        }),
+      ],
     });
   } catch (error) {
     // hand error over to error handling middleware
@@ -38,38 +73,49 @@ export const getAllPosts = async (
 };
 
 // Create new Post
-export const createPost = async (
+export const createLookingForPost = async (
   req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const loggedInUserId = req.userId;
+    console.log(req.body);
 
     // Validate the Post data
     const validatedPostData = PostCreateSchema.parse(req.body);
 
     // Start a transaction
     const newPost = await prisma.$transaction(async (prisma) => {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: loggedInUserId!,
+        },
+      });
+
+      if (!user || !user.institutionId) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          `User with id ${loggedInUserId} not found or does not have an institution associated with it.`,
+          404,
+          true,
+        );
+      }
+
       // create post
       return prisma.post.create({
         data: {
-          ...validatedPostData,
           userId: loggedInUserId!,
+          institutionId: user.institutionId,
+          title: validatedPostData.title,
+          description: validatedPostData.description,
+          expiresAt: validatedPostData.expiresAt,
+          type: PostType.LookingFor,
+          numberOfSpots: validatedPostData.numberOfSpots,
+          numberOfSpotsLeft: validatedPostData.numberOfSpots,
         },
       });
     });
-
-    // upload the image
-    if (req.file) {
-      const uniqueFileName = generateUniqueFileName(
-        req.file.originalname,
-        newPost.id,
-      );
-      const path = `images/post/${uniqueFileName}`;
-      await UploadToS3(req.file!, path);
-      newPost.image = path;
-    }
 
     if (newPost) {
       // Post created successfully
@@ -86,82 +132,6 @@ export const createPost = async (
         true,
       );
     }
-  } catch (error: any) {
-    // hand error over to error handling middleware
-    next(error);
-  }
-};
-
-// Create Validated Post for Organizations
-export const createVerifiedPost = async (
-  req: RequestExtended,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const loggedInUserId = req.userId;
-    // Validate request id param
-    const organizationId = IdParamSchema.parse(req.params).id;
-
-    // Validate the Post data with zod schema
-    const validatedPostData = PostCreateSchema.parse(req.body);
-
-    // Check if the user has permission to create a post
-    const hasPermission = await checkUserPermission(
-      loggedInUserId!,
-      organizationId,
-      AppPermissionName.CREATE_POSTS,
-    );
-    if (!hasPermission) {
-      throw new AppError(
-        AppErrorName.PERMISSION_ERROR,
-        `User does not have permission to create post`,
-        403,
-        true,
-      );
-    }
-
-    if (!req.file) {
-      throw new AppError(
-        AppErrorName.FILE_UPLOAD_ERROR,
-        "No file uploaded.",
-        400,
-        true,
-      );
-    }
-
-    // Start a transaction
-    const newPost = await prisma.$transaction(async (prisma) => {
-      // Create a verified post for an organization
-      const post = await prisma.post.create({
-        data: {
-          ...validatedPostData,
-          organizationId,
-          userId: loggedInUserId!,
-        },
-      });
-
-      const uniqueFileName = generateUniqueFileName(
-        req.file!.originalname,
-        post.id,
-      );
-      const path = `images/events/${uniqueFileName}`;
-      await UploadToS3(req.file!, path);
-
-      // Update event with image path after successful upload
-      return prisma.post.update({
-        where: { id: post.id },
-        data: {
-          image: path,
-        },
-      });
-    });
-
-    // Post created successfully
-    res.status(201).json({
-      message: "Event created successfully",
-      data: newPost,
-    });
   } catch (error: any) {
     // hand error over to error handling middleware
     next(error);
