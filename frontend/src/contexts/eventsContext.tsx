@@ -42,6 +42,18 @@ export type EventMapItem = {
   description: string;
 };
 
+export type EventDetailsItem = {
+  id: string;
+  title: string;
+  description: string;
+  host: string;
+  location: string;
+  time: string;
+  image: string;
+  latitude: number;
+  longitude: number;
+};
+
 type eventsContext = {
   getMainEvents: () => Promise<any>;
   createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;
@@ -49,6 +61,7 @@ type eventsContext = {
   homePageEvents: EventType[];
   searchPageEvents: EventType[];
   profilePageEvents: EventType[];
+  getEventDetails: (id: string) => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -102,9 +115,29 @@ export const EventsContextProvider = ({
     }
   }, []);
 
+  const getEventDetails = useCallback(async (id: string) => {
+    try {
+      return await CBRequest("GET", "/api/events/:id", {
+        params: {
+          id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
   return (
     <EventsContext.Provider
-      value={{ getMainEvents, createEvent, getAllMapEvents, searchPageEvents, homePageEvents, profilePageEvents }}
+      value={{
+        getMainEvents,
+        createEvent,
+        getAllMapEvents,
+        searchPageEvents,
+        homePageEvents,
+        profilePageEvents,
+        getEventDetails,
+      }}
     >
       {children}
     </EventsContext.Provider>
@@ -112,12 +145,3 @@ export const EventsContextProvider = ({
 };
 
 export default EventsContext;
-
-//   type handleEventPressArg = {
-//     type: 'home' | 'search' | 'profile',
-//     id: string
-//   }
-//   const handleEventPress = ({ type, id }: handleEventPressArg) => {
-//     const events = type === 'home' ? homePageEvents : type === 'search' ? searchPageEvents : profilePageEvents
-//     const event = events.find(event => event.id === id)
-//   }
