@@ -38,8 +38,7 @@ const Map = ({
 
   const openEventDetails = useCallback((index: number) => {
     navigation.navigate("EventDetails", {
-      title: events?.[index].title,
-      // id: events?.[index].id, // TODO pass the id
+      id: events?.[index].id,
     });
   }, []);
 

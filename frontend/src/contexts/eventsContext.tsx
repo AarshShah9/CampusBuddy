@@ -62,6 +62,7 @@ type eventsContext = {
   searchPageEvents: EventType[];
   profilePageEvents: EventType[];
   getEventDetails: (id: string) => Promise<any>;
+  likeEvent: (id: string) => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -127,6 +128,18 @@ export const EventsContextProvider = ({
     }
   }, []);
 
+  const likeEvent = useCallback(async (id: string) => {
+    try {
+      return await CBRequest("POST", "/api/events/like/:id", {
+        params: {
+          id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
   return (
     <EventsContext.Provider
       value={{
@@ -137,6 +150,7 @@ export const EventsContextProvider = ({
         homePageEvents,
         profilePageEvents,
         getEventDetails,
+        likeEvent,
       }}
     >
       {children}

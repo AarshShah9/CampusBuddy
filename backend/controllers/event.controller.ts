@@ -1,4 +1,8 @@
-import { AppPermissionName, EventStatus } from "@prisma/client";
+import {
+  AppPermissionName,
+  EventStatus,
+  ParticipationStatus,
+} from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
   CursorPaginationDatetimeSchema,
@@ -448,7 +452,7 @@ export const getAllVerifiedEvents = async (
 
 // Get Event by Id
 export const getEventById = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -461,7 +465,15 @@ export const getEventById = async (
       where: {
         id: eventId,
       },
+      include: {
+        location: true,
+        eventResponses: true,
+      },
     });
+
+    const isLiked = event?.eventResponses.some(
+      (response) => response.userId === req.userId,
+    );
 
     if (!event) {
       // Throw error if event not found
@@ -477,7 +489,10 @@ export const getEventById = async (
 
     res.status(200).json({
       message: "Event found",
-      data: event,
+      data: {
+        ...event,
+        isLiked: isLiked,
+      },
     });
   } catch (error) {
     next(error);
@@ -893,6 +908,59 @@ export const getMainPageEvents = async (
         startingEvents: startingEvents,
       },
     });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const LikeEvent = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const eventId = IdParamSchema.parse(req.params).id;
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: true,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const userLikedEvent = event.eventResponses.some(
+      (response) => response.userId === userId,
+    );
+
+    if (userLikedEvent) {
+      await prisma.userEventResponse.deleteMany({
+        where: {
+          eventId,
+          userId,
+        },
+      });
+    } else {
+      await prisma.userEventResponse.create({
+        data: {
+          eventId,
+          userId: userId!,
+          participationStatus: ParticipationStatus.Interested,
+        },
+      });
+    }
+
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }

@@ -1,13 +1,8 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
-import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import styled from "styled-components";
 import Animated, {
   interpolate,
@@ -16,63 +11,71 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
-import MapComponentSmall from "~/components/MapComponentSmall";
-import LocationChip from "~/components/LocationChip";
 import useEventsContext from "~/hooks/useEventsContext";
-import { EventDetailsItem } from "~/contexts/eventsContext";
+import LocationChip from "~/components/LocationChip";
+import MapComponentSmall from "~/components/MapComponentSmall";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 
 const IMG_HEIGHT = 300;
 
 /**
  * This component is responsible for loading event details based on passed ID.
  */
+type EventDetailsProps = {
+  createdAt: string;
+  description: string;
+  endTime: string;
+  id: string;
+  image: string;
+  isPublic: boolean;
+  locationPlaceId: string;
+  organizationId: string;
+  startTime: string;
+  status: string;
+  title: string;
+  userId: string;
+  isLiked: boolean;
+  eventResponses: any[];
+  location: {
+    latitude: number;
+    longitude: number;
+    name: string;
+    placeId: string;
+  };
+};
 
 export default function EventDetails() {
   const { setOptions: setNavigationOptions } = useNavigation();
   const {
     params: { id },
   } = useRoute<any>();
-  const { getEventDetails } = useEventsContext();
-  const  [eventData, setEventData] = useState<EventDetailsItem[]>();
-
-  useEffect(() => {
-    getEventDetails("79bc4af0-c551-11ee-83fd-6f8d6c450910").then((res) => {
-      console.log(res);
-    });
-  }, []);
-
-  //   const [eventData, setEventData] = useState({
-  //       title,
-  //       date,
-  //       location,
-  //       mainImg: picture,
-  //       clubIcon: "",
-  //       clubName,
-  //       detail:
-  //       attendance: 200,
-  //       longitude: -122.4324,
-  //       latitude: 37.78825,
-  //   });
-
-  // Do something before the screen is mounted
-  //   useLayoutEffect(() => {
-  //     setNavigationOptions({ headerTitle: `${eventData.title}` });
-  //   }, []);
-
-  const [isLiked, setIsLiked] = useState(false);
+  const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
+  const navigation = useNavigation<any>();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  const navigation = useNavigation<any>();
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [eventData, setEventData] = useState<EventDetailsProps>();
+  // EventDetailsItem
+
+  useEffect(() => {
+    getEventDetails(id).then((res) => {
+      setEventData(res.data);
+      setIsLiked(res.data.isLiked);
+    });
+  }, [id]);
 
   // Function adds the event to users fav list.
   const userLiked = useCallback(() => {
-    setIsLiked(!isLiked);
-  }, [isLiked]);
+    likeEvent(id).then(() => {
+      setIsLiked(!isLiked); // Todo optimistic update
+    });
+  }, [isLiked, id, likeEvent]);
 
   const returnPrevPage = useCallback(() => {
     navigation.goBack();
-  }, []);
+  }, [navigation]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -105,7 +108,7 @@ export default function EventDetails() {
           <Entypo
             name="heart"
             size={28}
-            // color={isLiked ? theme.colors.onliked : theme.colors.unLiked}
+            color={isLiked ? "red" : "white"} // TODO use theme context
           />
         </TouchableOpacity>
       </HeaderContainer>
@@ -115,10 +118,10 @@ export default function EventDetails() {
         style={{ height: "100%", backgroundColor: "white" }}
         scrollEventThrottle={16}
       >
-        {/* <Animated.Image
+        <Animated.Image
           style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
-          source={{ uri: eventData.mainImg }}
-        /> */}
+          source={{ uri: eventData?.image }}
+        />
         <View
           style={{
             height: 100,
@@ -136,7 +139,7 @@ export default function EventDetails() {
                 marginBottom: 5,
               }}
             >
-              {/* {eventData.title} */}
+              {eventData?.title}
             </Text>
             <Text
               style={{
@@ -145,9 +148,11 @@ export default function EventDetails() {
                 marginBottom: 5,
               }}
             >
-              {/* {eventData.date} */}
+              {convertUTCToTimeAndDate(eventData?.startTime)}
             </Text>
-            {/* <LocationChip location={eventData.location} /> */}
+            {eventData?.location.name && (
+              <LocationChip location={eventData?.location.name} />
+            )}
           </EDetails>
           <EClubDetails>
             <Image
@@ -184,7 +189,7 @@ export default function EventDetails() {
           <Text
             style={{ fontFamily: "Roboto-Medium", fontSize: 16, marginLeft: 5 }}
           >
-            {/* Attendance: {eventData.attendance} */}
+            Attendance: {eventData?.eventResponses.length}
           </Text>
         </View>
         <View
@@ -201,16 +206,18 @@ export default function EventDetails() {
           <Text
             style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
           >
-            {/* {eventData.detail} */}
+            {eventData?.description}
           </Text>
         </View>
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {/* <MapComponentSmall
-            latitude={eventData.latitude}
-            longitude={eventData.longitude}
-          /> */}
+          {eventData?.location && (
+            <MapComponentSmall
+              latitude={eventData?.location.latitude}
+              longitude={eventData?.location.longitude}
+            />
+          )}
         </View>
         <View
           style={{

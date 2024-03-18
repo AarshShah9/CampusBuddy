@@ -12,6 +12,7 @@ import {
   getEventByUserId,
   getMainPageEvents,
   getRecentEvents,
+  LikeEvent,
   updateEvent,
 } from "../controllers/event.controller";
 import { upload } from "../utils/S3Uploader";
@@ -29,6 +30,7 @@ router.get("/organization/:id", getAllEventsByOrganization);
 router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
 router.get("/user/:id", getEventByUserId);
+router.post("/like/:id", LikeEvent);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
 router.post("/", upload.single("file"), createEvent);
