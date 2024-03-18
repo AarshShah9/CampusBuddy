@@ -1,18 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
-import { createContext, PropsWithChildren, useCallback } from "react";
-import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
-import { createEvent } from "~/screens/CreateEvent";
+import { createContext, PropsWithChildren } from "react";
 import { ImagePickerAsset } from "expo-image-picker";
 import {
+  createEvent,
+  getAllMapEvents,
+  getEventDetails,
   getHomePageEvents,
+  getMainEvents,
   getProfilePageEvents,
   getSearchPageEvents,
+  likeEvent,
 } from "~/lib/apiFunctions/Events";
 import { EventType } from "~/types/Events";
+import { createEventType } from "~/screens/CreateEvent";
 
 type eventsContext = {
   getMainEvents: () => Promise<any>;
-  createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;
+  createEvent: (
+    event: createEventType,
+    image: ImagePickerAsset,
+  ) => Promise<any>;
   getAllMapEvents: () => Promise<any>;
   homePageEvents: EventType[];
   searchPageEvents: EventType[];
@@ -42,59 +49,6 @@ export const EventsContextProvider = ({
     queryFn: getProfilePageEvents,
     initialData: [],
   });
-
-  const getMainEvents = useCallback(async () => {
-    try {
-      return await CBRequest("GET", "/api/events/mainPage");
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const createEvent = useCallback(
-    async (event: createEvent, image: ImagePickerAsset) => {
-      try {
-        return await uploadImageRequest("post", "/api/events/", image, {
-          body: event,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [],
-  );
-
-  const getAllMapEvents = useCallback(async () => {
-    try {
-      return await CBRequest("GET", "/api/events/mapEvents");
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const getEventDetails = useCallback(async (id: string) => {
-    try {
-      return await CBRequest("GET", "/api/events/:id", {
-        params: {
-          id,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const likeEvent = useCallback(async (id: string) => {
-    try {
-      return await CBRequest("POST", "/api/events/like/:id", {
-        params: {
-          id,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
 
   return (
     <EventsContext.Provider
