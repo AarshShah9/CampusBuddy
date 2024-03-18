@@ -13,6 +13,7 @@ import {
   postTags,
   programs,
   roles,
+  tags,
   topics,
   topicSubscriptions,
   userEventResponses,
@@ -30,6 +31,9 @@ const load = async () => {
 
     await prisma.user.deleteMany();
     console.log("Deleted records in the User table");
+
+    await prisma.tag.deleteMany();
+    console.log("Delete records in the Tag table");
 
     await prisma.event.deleteMany();
     console.log("Deleted records in the Event table");
@@ -95,6 +99,11 @@ const load = async () => {
       data: users,
     });
     console.log("Added User data");
+
+    await prisma.tag.createMany({
+      data: tags,
+    });
+    console.log("Added Tag data");
 
     await prisma.event.createMany({
       data: events,
