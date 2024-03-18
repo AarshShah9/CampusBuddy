@@ -63,7 +63,7 @@ export const AuthContextProvider = ({
       setAxiosTokenHeader(jwt.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {
-      console.log(error);
+      console.log('An error occured while trying to sign in:\n', error);
     }
   }, []);
 
