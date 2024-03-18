@@ -10,50 +10,6 @@ import {
 } from "~/lib/apiFunctions/Events";
 import { EventType } from "~/types/Events";
 
-type Event = {
-  id: string;
-  name: string;
-  date: string;
-  location: string;
-  clubName: string;
-  picture: string;
-};
-
-export type EventData = {
-  title: string;
-  id: string;
-  items: EventItem[];
-};
-
-export type EventItem = {
-  id: string;
-  title: string;
-  time?: string;
-  location?: string;
-  host?: string;
-  image: string;
-};
-
-export type EventMapItem = {
-  id: string;
-  latitude: number;
-  longitude: number;
-  title: string;
-  description: string;
-};
-
-export type EventDetailsItem = {
-  id: string;
-  title: string;
-  description: string;
-  host: string;
-  location: string;
-  time: string;
-  image: string;
-  latitude: number;
-  longitude: number;
-};
-
 type eventsContext = {
   getMainEvents: () => Promise<any>;
   createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;

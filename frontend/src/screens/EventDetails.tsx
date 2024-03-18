@@ -15,34 +15,13 @@ import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
+import { EventDetailsProps } from "~/types/Events";
 
 const IMG_HEIGHT = 300;
 
 /**
  * This component is responsible for loading event details based on passed ID.
  */
-type EventDetailsProps = {
-  createdAt: string;
-  description: string;
-  endTime: string;
-  id: string;
-  image: string;
-  isPublic: boolean;
-  locationPlaceId: string;
-  organizationId: string;
-  startTime: string;
-  status: string;
-  title: string;
-  userId: string;
-  isLiked: boolean;
-  eventResponses: any[];
-  location: {
-    latitude: number;
-    longitude: number;
-    name: string;
-    placeId: string;
-  };
-};
 
 export default function EventDetails() {
   const { setOptions: setNavigationOptions } = useNavigation();
