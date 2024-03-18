@@ -3,6 +3,7 @@ import { RequestExtended } from "../middleware/verifyAuth";
 import prisma from "../prisma/client";
 import cosineSimilarity from "../utils/cosineSimilarity";
 import normalizeTags from "../utils/normalizeTags";
+import { getDistanceFromLatLonInKm } from "../utils/googleMapsApi";
 
 export const recommendEvents = async (
   req: RequestExtended,
@@ -11,6 +12,10 @@ export const recommendEvents = async (
 ) => {
   // modify during integration
   const loggedInUserId = req.body.userId;
+
+  const latitude = req.body.latitude;
+  const longitude = req.body.longitude;
+
   const user = await prisma.user.findUnique({
     where: {
       id: loggedInUserId,
@@ -29,6 +34,7 @@ export const recommendEvents = async (
     const allEvents = await prisma.event.findMany({
       include: {
         tags: true,
+        location: true,
       },
     });
 
@@ -48,6 +54,28 @@ export const recommendEvents = async (
 
     const similarityArray = Array.from(recommendationMap.entries());
     similarityArray.sort((a, b) => b[1] - a[1]);
+
+    // sorting similarityArray according to distance
+    similarityArray.sort((a, b) => {
+      const eventA = allEvents.find((event) => event.id === a[0]);
+      const eventB = allEvents.find((event) => event.id === b[0]);
+      if (eventA && eventB) {
+        const distanceA = getDistanceFromLatLonInKm(
+          latitude,
+          longitude,
+          eventA.location.latitude,
+          eventA.location.longitude,
+        );
+        const distanceB = getDistanceFromLatLonInKm(
+          latitude,
+          longitude,
+          eventB.location.latitude,
+          eventB.location.longitude,
+        );
+        return distanceA - distanceB;
+      }
+      return 0;
+    });
 
     res.status(200).json({ similarityArray });
   }
