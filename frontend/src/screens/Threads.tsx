@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
 import useEventsContext from "~/hooks/useEventsContext";
-import { EventMapItem } from "~/contexts/eventsContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import { EventMapItem } from "~/types/Events";
 
 export default function Threads() {
   const { location } = useAppContext();
@@ -16,8 +16,10 @@ export default function Threads() {
     getAllMapEvents().then((res) => {
       setEvents(res.data);
     });
-    stopLoading();
-  }, []);
+    if (location) {
+      stopLoading();
+    }
+  }, [location]);
 
   if (!location) {
     return null;

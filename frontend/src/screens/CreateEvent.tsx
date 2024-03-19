@@ -1,10 +1,10 @@
 import {
-  View,
-  Text,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { AntDesign } from "@expo/vector-icons";
@@ -18,19 +18,19 @@ import Animated, {
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import { z } from "zod";
 import { Button } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import { useCallback, useState } from "react";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
-import { z } from "zod";
 import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 
 const IMG_HEIGHT = 300;
 
-export type createEvent = z.infer<typeof schema>;
+export type createEventType = z.infer<typeof schema>;
 
 // React Hook Related
 const schema = zod.object({
@@ -57,7 +57,7 @@ export default function CreateEvent() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<createEvent>({
+  } = useForm<createEventType>({
     defaultValues: {
       title: "",
       date: new Date(),
@@ -73,7 +73,7 @@ export default function CreateEvent() {
   //Functions
 
   // Handle submission of user data
-  const onSubmit = useCallback((data: createEvent) => {
+  const onSubmit = useCallback((data: createEventType) => {
     createEvent(data, image!)
       .then((r) => {
         alert("Event Created");

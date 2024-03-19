@@ -2,7 +2,7 @@ import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
 import { Button, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { EventMapItem } from "~/contexts/eventsContext";
+import { EventMapItem } from "~/types/Events";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -36,12 +36,14 @@ const Map = ({
     goBack();
   }, []);
 
-  const openEventDetails = useCallback((index: number) => {
-    navigation.navigate("EventDetails", {
-      title: events?.[index].title,
-      // id: events?.[index].id, // TODO pass the id
-    });
-  }, []);
+  const openEventDetails = useCallback(
+    (index: number) => {
+      navigation.navigate("EventDetails", {
+        id: events?.[index].id,
+      });
+    },
+    [events, navigation],
+  );
 
   return (
     <View style={styles.container}>

@@ -1,55 +1,39 @@
 import { useQuery } from "@tanstack/react-query";
-import { createContext, PropsWithChildren, useCallback, useState } from "react";
-import { mockSearchEvents } from "~/mockData/EventData";
-import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
-import { createEvent } from "~/screens/CreateEvent";
+import { createContext, PropsWithChildren } from "react";
 import { ImagePickerAsset } from "expo-image-picker";
-
-type Event = {
-  id: string;
-  name: string;
-  date: string;
-  location: string;
-  clubName: string;
-  picture: string;
-};
-
-export type EventData = {
-  title: string;
-  id: string;
-  items: EventItem[];
-};
-
-export type EventItem = {
-  id: string;
-  title: string;
-  time?: string;
-  location?: string;
-  host?: string;
-  image: string;
-};
-
-export type EventMapItem = {
-  id: string;
-  latitude: number;
-  longitude: number;
-  title: string;
-  description: string;
-};
-
-type lookingForDetail = {
-  title: string;
-  description: string;
-  numberOfSpots: number;
-  expiresAt: Date;
-};
+import {
+  createEvent,
+  createPost,
+  getAllMapEvents,
+  getAllPosts,
+  getEventDetails,
+  getHomePageEvents,
+  getMainEvents,
+  getProfilePageEvents,
+  getSearchPageEvents,
+  likeEvent,
+} from "~/lib/apiFunctions/Events";
+import {
+  EventDetailsProps,
+  EventType,
+  lookingForDetail,
+  SearchPageEventType,
+} from "~/types/Events";
+import { createEventType } from "~/screens/CreateEvent";
 
 type eventsContext = {
-  events: Event[];
   getMainEvents: () => Promise<any>;
-  createEvent: (event: createEvent, image: ImagePickerAsset) => Promise<any>;
+  createEvent: (
+    event: createEventType,
+    image: ImagePickerAsset,
+  ) => Promise<any>;
   createPost: (post: lookingForDetail) => Promise<any>; // fix any on post type
   getAllMapEvents: () => Promise<any>;
+  homePageEvents: EventType[];
+  searchPageEvents: SearchPageEventType[];
+  profilePageEvents: EventType[];
+  getEventDetails: (id: string) => Promise<EventDetailsProps>;
+  likeEvent: (id: string) => Promise<any>;
   getAllPosts: () => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
@@ -57,66 +41,35 @@ const EventsContext = createContext<eventsContext | null>(null);
 export const EventsContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const { data: events } = useQuery({
-    queryKey: ["events"],
-    queryFn: async () => mockSearchEvents,
+  const { data: homePageEvents } = useQuery({
+    queryKey: ["home-page-events"],
+    queryFn: getHomePageEvents,
     initialData: [],
   });
 
-  const getMainEvents = useCallback(async () => {
-    try {
-      return await CBRequest("GET", "/api/events/mainPage");
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  const { data: searchPageEvents } = useQuery({
+    queryKey: ["search-page-events"],
+    queryFn: getSearchPageEvents,
+    initialData: [],
+  });
 
-  const createPost = useCallback(async (post: any) => {
-    try {
-      return await CBRequest("POST", "/api/post/", {
-        body: post,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const createEvent = useCallback(
-    async (event: createEvent, image: ImagePickerAsset) => {
-      try {
-        return await uploadImageRequest("post", "/api/events/", image, {
-          body: event,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [],
-  );
-
-  const getAllMapEvents = useCallback(async () => {
-    try {
-      return await CBRequest("GET", "/api/events/mapEvents");
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const getAllPosts = useCallback(async () => {
-    try {
-      return await CBRequest("GET", "/api/post/");
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  const { data: profilePageEvents } = useQuery({
+    queryKey: ["profile-page-events"],
+    queryFn: getProfilePageEvents,
+    initialData: [],
+  });
 
   return (
     <EventsContext.Provider
       value={{
-        events,
         getMainEvents,
         createEvent,
         getAllMapEvents,
+        searchPageEvents,
+        homePageEvents,
+        profilePageEvents,
+        getEventDetails,
+        likeEvent,
         createPost,
         getAllPosts,
       }}

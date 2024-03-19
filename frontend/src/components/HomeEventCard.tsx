@@ -1,36 +1,49 @@
 import LocationChip from "./LocationChip";
-import { StyleSheet, View, Image } from "react-native";
+import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "./ThemedComponents";
 import useThemeContext from "~/hooks/useThemeContext";
-import { EventItem } from "~/contexts/eventsContext";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
+import { EventItem } from "~/types/Events";
+import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 
 export default function EventHomeCard(props: EventItem) {
-  const { theme } = useThemeContext();
+  const navigation = useNavigation<any>();
+  const openEventDetails = useCallback(() => {
+    if (!props.event) {
+      return;
+    }
+    navigation.navigate("EventDetails", {
+      id: props.id,
+    });
+  }, [props]);
+
   return (
-    <View style={styles.card}>
-      <View style={styles.cardCover}>
-        <Image
-          style={{ width: "100%", height: "100%" }}
-          source={{ uri: props.image }}
-        />
-      </View>
-      <View style={{ paddingHorizontal: 0 }}>
-        <ThemedText style={styles.eventTitle}>{props.title}</ThemedText>
-        <View style={styles.eventDetailsContainer}>
-          {!!props.time && (
-            <ThemedText style={styles.eventTime}>
-              {convertUTCToLocalDate(props.time)}
-            </ThemedText>
-          )}
-          <View>
-            {props.location && (
-              <LocationChip location={props.location} size="small" />
+    <TouchableOpacity onPress={openEventDetails}>
+      <View style={styles.card}>
+        <View style={styles.cardCover}>
+          <Image
+            style={{ width: "100%", height: "100%" }}
+            source={{ uri: props.image }}
+          />
+        </View>
+        <View style={{ paddingHorizontal: 0 }}>
+          <ThemedText style={styles.eventTitle}>{props.title}</ThemedText>
+          <View style={styles.eventDetailsContainer}>
+            {!!props.time && (
+              <ThemedText style={styles.eventTime}>
+                {convertUTCToLocalDate(props.time)}
+              </ThemedText>
             )}
+            <View>
+              {props.location && (
+                <LocationChip location={props.location} size="small" />
+              )}
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
