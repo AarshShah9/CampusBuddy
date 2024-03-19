@@ -132,7 +132,7 @@ export default function StudentSignUp() {
                     // search
                     onBlur={onBlur}
                     maxHeight={300}
-                    labelField="institution"
+                    labelField="name"
                     valueField="id"
                     placeholder="Select item"
                     // searchPlaceholder="Institution Name"
