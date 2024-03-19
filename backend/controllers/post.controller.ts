@@ -80,7 +80,6 @@ export const createLookingForPost = async (
 ) => {
   try {
     const loggedInUserId = req.userId;
-    console.log(req.body);
 
     // Validate the Post data
     const validatedPostData = PostCreateSchema.parse(req.body);
