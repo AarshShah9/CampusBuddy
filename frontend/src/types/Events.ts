@@ -52,6 +52,7 @@ export type EventItem = {
   location?: string;
   host?: string;
   image: string;
+  event: boolean;
 };
 
 export type EventMapItem = {
@@ -79,4 +80,10 @@ export type lookingForDetail = {
   description: string;
   numberOfSpots: number;
   expiresAt: Date;
+};
+
+export type CarousalItem = {
+  id: string;
+  title: string;
+  image: string;
 };

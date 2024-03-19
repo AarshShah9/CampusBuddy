@@ -839,6 +839,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -860,6 +861,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -874,6 +876,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -888,12 +891,13 @@ export const getMainPageEvents = async (
           host: null,
           location: null,
           image: organization.image,
+          event: false,
         };
       }),
     };
 
     const startingEvents = topTrendingEvents.map((event) => {
-      return event.image;
+      return { image: event.image, id: event.id, title: event.title };
     });
 
     res.status(200).json({

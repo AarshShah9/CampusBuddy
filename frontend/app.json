@@ -36,7 +36,12 @@
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
-    }
-
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6fdddfb2-ae12-471d-ac8a-feaff7a00ee5"
+      }
+    },
+    "owner": "campusbuddy"
   }
 }

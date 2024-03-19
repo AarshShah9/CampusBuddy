@@ -36,11 +36,14 @@ const Map = ({
     goBack();
   }, []);
 
-  const openEventDetails = useCallback((index: number) => {
-    navigation.navigate("EventDetails", {
-      id: events?.[index].id,
-    });
-  }, []);
+  const openEventDetails = useCallback(
+    (index: number) => {
+      navigation.navigate("EventDetails", {
+        id: events?.[index].id,
+      });
+    },
+    [events, navigation],
+  );
 
   return (
     <View style={styles.container}>
