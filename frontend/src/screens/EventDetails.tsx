@@ -21,10 +21,9 @@ const IMG_HEIGHT = 300;
 
 /**
  * This component is responsible for loading event details based on passed ID.
- */
+ * */
 
 export default function EventDetails() {
-  const { setOptions: setNavigationOptions } = useNavigation();
   const {
     params: { id },
   } = useRoute<any>();

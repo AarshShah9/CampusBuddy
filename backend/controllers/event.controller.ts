@@ -336,8 +336,9 @@ export const updateEvent = async (
 };
 
 // Get all Events
-export const getAllEvents = async (req: Request, res: Response) => {
+export const getAllEvents = async (req: RequestExtended, res: Response) => {
   try {
+    const userId = req.userId;
     const allEvents = await prisma.event.findMany();
     res.status(200).json({
       message: "All events",
