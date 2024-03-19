@@ -1,6 +1,7 @@
 import { CBRequest, uploadImageRequest } from "../CBRequest";
 import { ImagePickerAsset } from "expo-image-picker";
 import { createEventType } from "~/screens/CreateEvent";
+import { useCallback } from "react";
 
 export async function getHomePageEvents() {
   return [];
@@ -60,6 +61,24 @@ export const likeEvent = async (id: string) => {
       params: {
         id,
       },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const getAllPosts = async () => {
+  try {
+    return await CBRequest("GET", "/api/post/");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const createPost = async (post: any) => {
+  try {
+    return await CBRequest("POST", "/api/post/", {
+      body: post,
     });
   } catch (err) {
     console.log(err);

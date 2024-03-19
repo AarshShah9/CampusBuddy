@@ -73,3 +73,10 @@ export type EventDetailsItem = {
   latitude: number;
   longitude: number;
 };
+
+export type lookingForDetail = {
+  title: string;
+  description: string;
+  numberOfSpots: number;
+  expiresAt: Date;
+};
