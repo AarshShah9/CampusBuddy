@@ -72,6 +72,7 @@ model Institution {
   updatedAt       DateTime       @updatedAt @map("updated_at")
   location        Location       @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
+  posts           Post[]
 
   @@index([locationPlaceId])
   @@map("institution")
@@ -163,23 +164,40 @@ model UserEventResponse {
 }
 
 model Post {
-  id             String        @id @default(uuid())
-  userId         String        @map("user_id")
-  image          String?
-  organizationId String?       @map("organization_id")
-  createdAt      DateTime      @unique @default(now()) @map("created_at")
-  title          String
-  text           String?
-  public         Boolean       @default(true)
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String  @id @default(uuid())
+  userId         String  @map("user_id")
+  organizationId String? @map("organization_id")
+
+  image       String?
+  createdAt   DateTime  @unique @default(now()) @map("created_at")
+  title       String
+  description String?
+  public      Boolean   @default(true)
+  expiresAt   DateTime? @map("expires_at")
+
+  numberOfSpots     Int? @map("number_of_spots")
+  numberOfSpotsLeft Int? @map("number_of_spots_left")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  type PostType
 
   comments Comment[]
   postTags PostTag[]
 
+  institutionId String      @map("institution_id")
+  Institution   Institution @relation(fields: [institutionId], references: [id])
+
   @@index([userId])
   @@index([organizationId])
+  @@index([institutionId])
   @@map("post")
+}
+
+enum PostType {
+  LookingFor
+  Thread
 }
 
 model Comment {

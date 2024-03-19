@@ -246,9 +246,18 @@ export const PostSchema = z.object({
   userId: z.string().uuid(),
   image: z.string().nullable(),
   organizationId: z.string().uuid().nullable(),
-  createdAt: z.coerce.date(),
+  createdAt: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
   title: z.string(),
-  text: z.string().nullable(),
+  description: z.string().nullable(),
+  numberOfSpots: z.number().int().min(1),
+  expiresAt: z.coerce.date(),
   public: z.boolean(),
 });
 
@@ -263,6 +272,7 @@ export const PostCreateSchema = PostSchema.omit({
   createdAt: true, // default value is current date, handled by the db
   image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified post
+  public: true, // default value is false
 });
 
 export type PostCreateType = z.infer<typeof PostCreateSchema>;

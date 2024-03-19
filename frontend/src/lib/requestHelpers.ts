@@ -78,6 +78,10 @@ const allowedEndpoints = [
   "/api/events/mainPage",
   "/api/events/mapEvents",
 
+  // Post-related endpoints
+  "/api/post/test",
+  "/api/post/",
+
   // Miscellaneous endpoints
   "/Test",
   "/api/upload",
