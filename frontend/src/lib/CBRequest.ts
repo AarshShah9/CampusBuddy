@@ -25,7 +25,7 @@ const CBRequest = async (
   endpoint: AllowedEndpoints,
   options: RequestArgs = {},
 ) => {
-  // Extend any provided headers with a testing-related header (should be removed in production).
+  // TODO Extend any provided headers with a testing-related header (should be removed in production).
   const headers = {
     ...options.headers,
     "ngrok-skip-browser-warning": "skip", // Indicate this is for bypassing specific ngrok warnings during development/testing.
