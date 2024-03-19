@@ -13,7 +13,7 @@ import {
   getSearchPageEvents,
   likeEvent,
 } from "~/lib/apiFunctions/Events";
-import { EventType, lookingForDetail } from "~/types/Events";
+import { EventDetailsProps, EventType, lookingForDetail } from "~/types/Events";
 import { createEventType } from "~/screens/CreateEvent";
 
 type eventsContext = {
@@ -27,7 +27,7 @@ type eventsContext = {
   homePageEvents: EventType[];
   searchPageEvents: EventType[];
   profilePageEvents: EventType[];
-  getEventDetails: (id: string) => Promise<any>;
+  getEventDetails: (id: string) => Promise<EventDetailsProps>;
   likeEvent: (id: string) => Promise<any>;
   getAllPosts: () => Promise<any>;
 };

@@ -2,7 +2,7 @@ import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
 import { Button, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { EventMapItem } from "~/contexts/eventsContext";
+import { EventMapItem } from "~/types/Events";
 
 type MapProps = {
   latitudeDelta?: number;

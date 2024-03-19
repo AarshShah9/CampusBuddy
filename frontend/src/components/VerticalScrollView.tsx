@@ -5,7 +5,7 @@ import Carousel from "pinar";
 import { useCallback, useEffect, useState } from "react";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useEventsContext from "~/hooks/useEventsContext";
-import { EventData } from "~/contexts/eventsContext";
+import { EventData } from "~/types/Events";
 
 export default function VerticalScrollComponent() {
   const screenWidth = Dimensions.get("window").width;

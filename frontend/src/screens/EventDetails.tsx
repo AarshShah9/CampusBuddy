@@ -16,6 +16,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { EventDetailsProps } from "~/types/Events";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const IMG_HEIGHT = 300;
 
@@ -33,23 +34,36 @@ export default function EventDetails() {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
 
-  const [isLiked, setIsLiked] = useState(false);
-  const [eventData, setEventData] = useState<EventDetailsProps>();
-  // EventDetailsItem
+  const { data: eventData, refetch } = useQuery({
+    queryKey: ["event-details", id],
+    queryFn: () => getEventDetails(id),
+  });
 
-  useEffect(() => {
-    getEventDetails(id).then((res) => {
-      setEventData(res.data);
-      setIsLiked(res.data.isLiked);
-    });
-  }, [id]);
+  const likeMutation = useMutation({
+    mutationFn: async ({
+      id,
+      previousState,
+    }: {
+      id: string;
+      previousState: boolean;
+    }) => {
+      await likeEvent(id);
+      refetch();
+    },
+  });
 
-  // Function adds the event to users fav list.
+  // TODO fix optimistic updates
+  const isOptimistic =
+    likeMutation.variables &&
+    (likeMutation.isPending ? !likeMutation.variables.previousState : false);
+
+  const isLiked = isOptimistic
+    ? !likeMutation.variables?.previousState
+    : eventData?.isLiked;
+
   const userLiked = useCallback(() => {
-    likeEvent(id).then(() => {
-      setIsLiked(!isLiked); // Todo optimistic update
-    });
-  }, [isLiked, id, likeEvent]);
+    likeMutation.mutate({ id, previousState: eventData?.isLiked! });
+  }, [id, likeEvent, eventData?.isLiked]);
 
   const returnPrevPage = useCallback(() => {
     navigation.goBack();
@@ -87,6 +101,7 @@ export default function EventDetails() {
             name="heart"
             size={28}
             color={isLiked ? "red" : "white"} // TODO use theme context
+            style={{ opacity: isOptimistic ? 0.5 : 1 }}
           />
         </TouchableOpacity>
       </HeaderContainer>

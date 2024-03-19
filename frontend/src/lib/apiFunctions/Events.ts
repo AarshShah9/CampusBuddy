@@ -45,13 +45,16 @@ export const getAllMapEvents = async () => {
 
 export const getEventDetails = async (id: string) => {
   try {
-    return await CBRequest("GET", "/api/events/:id", {
-      params: {
-        id,
-      },
-    });
+    return (
+      await CBRequest("GET", "/api/events/:id", {
+        params: {
+          id,
+        },
+      })
+    ).data;
   } catch (err) {
     console.log(err);
+    return null;
   }
 };
 
