@@ -338,8 +338,14 @@ export const updateEvent = async (
 // Get all Events
 export const getAllEvents = async (req: RequestExtended, res: Response) => {
   try {
-    const userId = req.userId;
-    const allEvents = await prisma.event.findMany();
+    // TODO use the algorithm
+    // GET all events including the location
+    const allEvents = await prisma.event.findMany({
+      include: {
+        location: true,
+        organization: true,
+      },
+    });
     res.status(200).json({
       message: "All events",
       data: allEvents,
@@ -469,6 +475,7 @@ export const getEventById = async (
       include: {
         location: true,
         eventResponses: true,
+        organization: true,
       },
     });
 

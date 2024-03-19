@@ -3,7 +3,7 @@ export type EventType = {
   title: string;
   date: string;
   location: string;
-  clubName: string;
+  clubName?: string;
   image: string;
 };
 
@@ -22,6 +22,47 @@ export type EventDetailsProps = {
   userId: string;
   isLiked: boolean;
   eventResponses: any[];
+  location: {
+    latitude: number;
+    longitude: number;
+    name: string;
+    placeId: string;
+  };
+  organization?: {
+    createdAt: string;
+    description: string;
+    id: string;
+    image: string;
+    institutionId: string;
+    organizationName: string;
+    status: string;
+    updatedAt: string;
+  };
+};
+
+export type SearchPageEventType = {
+  createdAt: string;
+  description: string;
+  endTime: string;
+  id: string;
+  image: string;
+  isPublic: boolean;
+  locationPlaceId: string;
+  organizationId: string;
+  organization?: {
+    createdAt: string;
+    description: string;
+    id: string;
+    image: string;
+    institutionId: string;
+    organizationName: string;
+    status: string;
+    updatedAt: string;
+  };
+  startTime: string;
+  status: string;
+  title: string;
+  userId: string;
   location: {
     latitude: number;
     longitude: number;

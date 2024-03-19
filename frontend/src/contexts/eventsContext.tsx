@@ -13,7 +13,12 @@ import {
   getSearchPageEvents,
   likeEvent,
 } from "~/lib/apiFunctions/Events";
-import { EventDetailsProps, EventType, lookingForDetail } from "~/types/Events";
+import {
+  EventDetailsProps,
+  EventType,
+  lookingForDetail,
+  SearchPageEventType,
+} from "~/types/Events";
 import { createEventType } from "~/screens/CreateEvent";
 
 type eventsContext = {
@@ -25,7 +30,7 @@ type eventsContext = {
   createPost: (post: lookingForDetail) => Promise<any>; // fix any on post type
   getAllMapEvents: () => Promise<any>;
   homePageEvents: EventType[];
-  searchPageEvents: EventType[];
+  searchPageEvents: SearchPageEventType[];
   profilePageEvents: EventType[];
   getEventDetails: (id: string) => Promise<EventDetailsProps>;
   likeEvent: (id: string) => Promise<any>;

@@ -15,7 +15,6 @@ import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { EventDetailsProps } from "~/types/Events";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 const IMG_HEIGHT = 300;
@@ -159,7 +158,7 @@ export default function EventDetails() {
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
             <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
-              {/* {eventData.clubName} */}
+              {eventData?.organization?.organizationName}
             </Text>
           </EClubDetails>
         </View>
