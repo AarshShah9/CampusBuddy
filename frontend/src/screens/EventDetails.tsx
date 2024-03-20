@@ -24,7 +24,7 @@ const IMG_HEIGHT = 300;
  * */
 
 export default function EventDetails() {
-  let {
+  const {
     params: { id, map },
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
@@ -255,19 +255,6 @@ export default function EventDetails() {
     </MainContainer>
   );
 }
-
-// prettier-ignore
-const StyledButton = styled(Button)`
-    border-radius: 8px;
-    width: 100%;
-    height: 48px;
-    font-size: 25px;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
-    justify-content: center;
-`;
 
 const styles = StyleSheet.create({
   AttendButton: {

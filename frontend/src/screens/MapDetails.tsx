@@ -1,25 +1,14 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
-import { Button } from "react-native-paper";
+import { TouchableOpacity, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import React, { useCallback } from "react";
+import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
 import Animated, {
-  interpolate,
   useAnimatedRef,
-  useAnimatedStyle,
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
-import useEventsContext from "~/hooks/useEventsContext";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import Map from "~/components/Map";
-
-const IMG_HEIGHT = 300;
-
-/**
- * This component is responsible for loading event details based on passed ID.
- * */
 
 export default function MapDetails() {
   let {
@@ -27,8 +16,6 @@ export default function MapDetails() {
   } = useRoute<any>();
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffSet = useScrollViewOffset(scrollRef);
 
   const returnPrevPage = useCallback(() => {
     navigation.goBack();
