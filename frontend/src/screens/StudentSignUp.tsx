@@ -53,7 +53,7 @@ export default function StudentSignUp() {
     (data: userRegistrationData) => {
       console.log(data);
       registerUser(data)
-      // navigation.navigate("StudentSignUpInfo");
+      navigation.dispatch(StackActions.replace("ConfirmEmail"));
     },
     [navigation],
   );
