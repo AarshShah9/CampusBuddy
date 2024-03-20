@@ -34,8 +34,6 @@ export default function MapDetails() {
     navigation.goBack();
   }, [navigation]);
 
-  console.log(eventData);
-
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
@@ -68,36 +66,4 @@ const HeaderContainer = styled(View)`
     padding: 0 20px;
     flex-direction: row;
     align-items: center
-`;
-// prettier-ignore
-const EDetails = styled(View)`
-    margin-left: 10px;
-    margin-top: 20px;
-`;
-// prettier-ignore
-const EClubDetails = styled(View)`
-    margin-right: 10px;
-    margin-top: 25px;
-    align-items: center;
-`;
-// prettier-ignore
-const TagContainer = styled(View)`
-    background-color: #b0cfff;
-    width: 90%;
-    border-radius: 8px;
-    flex-direction: row;
-    padding: 5px;
-    margin-bottom: 5px;
-`;
-// prettier-ignore
-const StyledButton = styled(Button)`
-    border-radius: 8px;
-    width: 100%;
-    height: 48px;
-    font-size: 25px;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
-    justify-content: center;
 `;
