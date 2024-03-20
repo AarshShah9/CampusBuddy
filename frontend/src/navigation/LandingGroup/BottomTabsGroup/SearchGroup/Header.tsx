@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  Modal,
+  Animated,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,14 +20,15 @@ import {
 } from "react";
 import useAppContext from "~/hooks/useAppContext";
 import { ThemedText, ThemedTextInput } from "~/components/ThemedComponents";
-import { Animated } from "react-native";
 
 const SearchArea = ({
   setIsFocused,
   animateWidth,
+  setModalVisible,
 }: {
   setIsFocused: Dispatch<SetStateAction<boolean>>;
   animateWidth: Animated.AnimatedInterpolation<number>;
+  setModalVisible: Dispatch<SetStateAction<boolean>>;
 }) => {
   const { theme } = useThemeContext();
 
@@ -39,8 +42,20 @@ const SearchArea = ({
 
   const { dismissKeyboard } = useAppContext();
 
-  const onFocus = () => setIsFocused(true);
-  const onBlur = () => setIsFocused(false);
+  const onFocus = () => {
+    setIsFocused(true);
+    setModalVisible(true);
+  };
+
+  const onBlur = () => {
+    setIsFocused(false);
+    setModalVisible(false);
+  };
+
+  const onPress = () => {
+    dismissKeyboard();
+    setIsFocused(false);
+  };
 
   return (
     <Animated.View
@@ -49,7 +64,6 @@ const SearchArea = ({
         { width: animateWidth, backgroundColor: `${theme.colors.background}` },
       ]}
     >
-      {/*<TouchableOpacity onPress={dismissKeyboard}>*/}
       <TouchableOpacity>
         <AntDesign name="search1" size={20} color={theme.colors.text} />
       </TouchableOpacity>
@@ -61,6 +75,9 @@ const SearchArea = ({
         onChangeText={updateFilterWord}
         onFocus={onFocus}
         onBlur={onBlur}
+        autoCapitalize={"none"}
+        autoComplete={"off"}
+        autoCorrect={false}
       />
       {filterWord !== "" && (
         <TouchableOpacity onPress={clearSearchArea}>
@@ -74,9 +91,11 @@ const SearchArea = ({
 export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
-  const { dismissKeyboard } = useAppContext();
   const [isFocused, setIsFocused] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const animateWidth = useRef(new Animated.Value(100)).current;
+
+  const { dismissKeyboard } = useAppContext();
 
   const triggerAnimation = (focus: boolean) => {
     const duration = focus ? 150 : 300; // Faster when focused, slower when blurred
@@ -92,50 +111,72 @@ export default function Header() {
   }, [isFocused]);
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-        setIsFocused(false);
-      }}
-    >
-      <View
-        style={[
-          styles.headerContainer,
-          {
-            backgroundColor: theme.colors.primary,
-            paddingTop: insets.top,
-            paddingBottom: 10,
-          },
-        ]}
-      >
-        <View style={styles.searchArea}>
-          <SearchArea
-            setIsFocused={setIsFocused}
-            animateWidth={animateWidth.interpolate({
-              inputRange: [75, 100],
-              outputRange: ["75%", "100%"],
-            })}
-          />
-          {isFocused && (
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                Keyboard.dismiss();
-                setIsFocused(false);
-              }}
-            >
-              <ThemedText style={{ color: theme.colors.text }}>
-                Cancel
-              </ThemedText>
-            </TouchableOpacity>
-          )}
+    <View>
+      <TouchableWithoutFeedback>
+        <View
+          style={[
+            styles.headerContainer,
+            {
+              backgroundColor: theme.colors.primary,
+              paddingTop: insets.top,
+              paddingBottom: 10,
+            },
+          ]}
+        >
+          <View style={styles.searchArea}>
+            <SearchArea
+              setIsFocused={setIsFocused}
+              animateWidth={animateWidth.interpolate({
+                inputRange: [75, 100],
+                outputRange: ["75%", "100%"],
+              })}
+              setModalVisible={setModalVisible}
+            />
+            {isFocused && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setIsFocused(false);
+                }}
+              >
+                <ThemedText style={{ color: theme.colors.text }}>
+                  Cancel
+                </ThemedText>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+      {/*<Modal*/}
+      {/*  animationType="slide"*/}
+      {/*  transparent={false}*/}
+      {/*  visible={modalVisible}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*    setModalVisible(false);*/}
+      {/*    setIsFocused(false);*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <View style={styles.modalView}>*/}
+      {/*    /!* Content of your dropdown goes here *!/*/}
+      {/*    <ThemedText style={styles.modalText}>Dropdown Content</ThemedText>*/}
+      {/*  </View>*/}
+      {/*</Modal>*/}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
   headerContainer: {
     alignItems: "center",
     paddingHorizontal: 20,
