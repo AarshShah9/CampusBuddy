@@ -1,6 +1,5 @@
 import {
-  KeyboardAvoidingView,
-  Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -18,7 +17,6 @@ import * as zod from "zod";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import { userRegistrationData } from "~/contexts/authContext";
-import { ScrollView } from "react-native-gesture-handler";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
@@ -108,7 +106,7 @@ export default function StudentSignUp() {
                 name="username"
               />
               {errors.email && <Text>University Email is required.</Text>}
-              <Controller
+              {/* <Controller
                 control={control}
                 rules={{
                   required: true,
@@ -122,7 +120,37 @@ export default function StudentSignUp() {
                   />
                 )}
                 name="institutionName"
-              />
+              /> */}
+              <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    iconStyle={styles.iconStyle}
+                    data={institutions}
+                    // search
+                    onBlur={onBlur}
+                    maxHeight={300}
+                    labelField="name"
+                    valueField="id"
+                    placeholder="Select item"
+                    // searchPlaceholder="Institution Name"
+                    value={value}
+                    onChange={(value) => {
+                      onChange(value.id);
+                    }}
+                  />
+                </>
+              )}
+              name="institutionName"
+            />
               {errors.institutionName && (
                 <Text>Institution Name is required.</Text>
               )}
@@ -297,3 +325,42 @@ const StyledButton = styled(Button)`
     margin-top: 10px;
     justify-content: center;
 `;
+
+const styles = StyleSheet.create({
+  dropdown: {
+    margin: 12,
+    height: 50,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+  },
+  overlayContainer: {
+    alignItems: "center",
+    height: "85%",
+    width: "100%",
+    borderTopLeftRadius: 76,
+    backgroundColor:"white",
+  },
+  icon: {
+    marginRight: 5,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputBox:{
+    width:350,
+    height:55,
+    borderRadius: 8,
+
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});
