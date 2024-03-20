@@ -1,36 +1,26 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { env } from "../utils/validateEnv";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import prisma from "../prisma/client";
 import { z } from "zod";
+import { loginJwtPayloadSchema } from "../../shared/zodSchemas";
 
 export interface RequestExtended extends Request {
   userId?: string;
 }
 
-const MyJwtPayloadSchema = z.object({
-  id: z.string().uuid(),
-  username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  password: z.string(),
-  institutionName: z.string(),
-});
-
-type MyJwtPayload = JwtPayload & z.infer<typeof MyJwtPayloadSchema>;
+export type loginJwtPayloadType = JwtPayload &
+  z.infer<typeof loginJwtPayloadSchema>;
 
 export const verifyAuthentication = async (
   req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
-  let authToken = req.headers.authorization?.split(" ")[1] ?? "";
-  const secret = env.JWT_SECRET;
-
   try {
-    const decoded = jwt.verify(authToken, secret) as MyJwtPayload;
-    const result = MyJwtPayloadSchema.parse(decoded);
+    let authToken = req.headers.authorization?.split(" ")[1] ?? "";
+    const secret = process.env.JWT_SECRET as Secret;
+    const decoded = jwt.verify(authToken, secret) as loginJwtPayloadType;
+    const result = loginJwtPayloadSchema.parse(decoded);
 
     // Check if the user exists
     const userExists = await prisma.user.findUnique({

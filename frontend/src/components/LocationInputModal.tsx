@@ -1,32 +1,35 @@
 import {
-  View,
+  Modal,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
-  Modal,
+  View,
 } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { GOOGLE_MAPS_API_KEY, ENV } from "@env";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useCallback, useState } from "react";
 import useThemeContext from "~/hooks/useThemeContext";
 
 export default function LocationInputModal(props: { controllerOnChange: any }) {
-  const [location, setLocation] = useState("Search");
+  const [location, setLocation] = useState<Record<string, any>>({
+    description: "Search",
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const { theme } = useThemeContext();
   const showModal = useCallback(() => {
     setModalVisible(!modalVisible);
   }, [modalVisible]);
+
   const userLocation = useCallback(
-    (text: string) => {
-      setLocation(text);
+    (value: Record<string, any>) => {
+      setLocation(value);
       setModalVisible(false);
-      props.controllerOnChange(text);
-      
+      props.controllerOnChange(value.place_id);
     },
     [location],
   );
+
   return (
     <View>
       <TouchableWithoutFeedback onPress={showModal}>
@@ -37,7 +40,7 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
             size={24}
             color="black"
           />
-          <Text style={styles.textStyle}>{location}</Text>
+          <Text style={styles.textStyle}>{location?.description ?? ""}</Text>
         </View>
       </TouchableWithoutFeedback>
       <Modal visible={modalVisible}>
@@ -65,7 +68,7 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
             />
             <GooglePlacesAutocomplete
               onPress={(data) => {
-                userLocation(data.description);
+                userLocation(data);
               }}
               styles={{
                 textInput: {

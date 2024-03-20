@@ -3,6 +3,7 @@ import {
   EventStatus,
   OrganizationStatus,
   ParticipationStatus,
+  PostType,
   User,
   UserOrgStatus,
   UserRole,
@@ -19,6 +20,8 @@ export const ids = {
     6: "db3679a4-c550-11ee-83fd-6f8d6c450910",
     7: "db3679a5-c550-11ee-83fd-6f8d6c450910",
     8: "db3679a6-c550-11ee-83fd-6f8d6c450910",
+    9: "db3679a7-c550-11ee-83fd-6f8d6c450910",
+    10: "db3679a8-c550-11ee-83fd-6f8d6c450910",
   },
   eventIds: {
     1: "79bc4af0-c551-11ee-83fd-6f8d6c450910",
@@ -77,11 +80,21 @@ export const ids = {
   },
 };
 
+export const locations = [
+  {
+    placeId: "ChIJ1T-EnwNwcVMROrZStrE7bSY",
+    longitude: -114.0718831,
+    latitude: 51.04473309999999,
+    name: "Calgary",
+  },
+];
+
 export const institutes = [
   {
     id: ids.instituteIds[1],
     name: "University of Calgary",
     domain: "ucalgary.ca",
+    locationPlaceId: locations[0].placeId,
   },
 ];
 
@@ -121,13 +134,13 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[4],
-    username: "tiffany_smalls",
-    firstName: "Tiffany",
-    lastName: "Smalls",
-    email: "tiffany@example.com",
-    password: "hashed-password4560",
-    institutionId: ids.instituteIds[1],
-    accountType: UserType.ApprovedOrg,
+    username: "CampusBuddyAdmin",
+    firstName: "Aarsh",
+    lastName: "Shah",
+    email: "aarsh@live.ca",
+    password: "password123",
+    institutionId: null,
+    accountType: UserType.Admin,
     profilePic: null,
   },
   {
@@ -174,58 +187,83 @@ export const users: User[] = [
     accountType: UserType.PendingOrg,
     profilePic: null,
   },
+  {
+    id: ids.userIds[9],
+    username: "g_scott",
+    firstName: "Gary",
+    lastName: "Scott",
+    email: "g_scott@example.com",
+    password: "hashed-password1111",
+    institutionId: ids.instituteIds[1],
+    accountType: UserType.PendingOrg,
+    profilePic: null,
+  },
+  {
+    id: ids.userIds[10],
+    username: "m_galvan",
+    firstName: "Michael",
+    lastName: "Galvan",
+    email: "m_galvan@example.com",
+    password: "hashed-password1112",
+    institutionId: ids.instituteIds[1],
+    accountType: UserType.PendingOrg,
+    profilePic: null,
+  },
 ];
 
 export const events = [
   {
     id: ids.eventIds[1],
     userId: ids.userIds[3],
-    title: "Event 1",
+    title: "Law School Info Night",
     description: "First event description.",
-    location: "Event Location 1",
-    createdAt: "2023-10-10T09:00:00Z", // must be unique
-    startTime: "2023-12-01T09:00:00Z",
-    endTime: "2023-12-01T18:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T09:00:00Z", // must be unique
+    startTime: "2024-12-01T09:00:00Z",
+    endTime: "2024-12-01T18:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/lawBook.png",
     // Other event details
   },
   {
     id: ids.eventIds[2],
     userId: ids.userIds[1],
-    title: "Event 2",
+    title: "Spikeball 4 Cause",
     description: "Second event description.",
-    location: "Event Location 2",
-    createdAt: "2023-10-10T10:00:00Z",
-    startTime: "2023-12-15T10:00:00Z",
-    endTime: "2023-12-15T16:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T10:00:00Z",
+    startTime: "2024-12-15T10:00:00Z",
+    endTime: "2024-12-15T16:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/spikeball.jpg",
   },
   {
     id: ids.eventIds[3],
     userId: ids.userIds[4],
     title: "Event 3",
     description: "Third event description.",
-    location: "Event Location 3",
-    createdAt: "2023-10-10T11:00:00Z",
-    startTime: "2023-12-17T10:00:00Z",
-    endTime: "2023-12-17T16:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T11:00:00Z",
+    startTime: "2024-12-17T10:00:00Z",
+    endTime: "2024-12-17T16:00:00Z",
     isPublic: true,
     status: EventStatus.NonVerified,
   },
   {
     id: ids.eventIds[4],
     userId: ids.userIds[1],
-    title: "Event 4, Verified",
+    title: "Career Fair",
     organizationId: ids.organizationIds[1],
     description: "Fourth event description.",
-    location: "Event Location 4",
-    createdAt: "2023-10-10T12:00:00Z",
-    startTime: "2023-12-17T12:30:00Z",
-    endTime: "2023-12-17T13:00:00Z",
+    locationPlaceId: locations[0].placeId,
+    createdAt: "2024-10-10T12:00:00Z",
+    startTime: "2024-12-17T12:30:00Z",
+    endTime: "2024-12-17T13:00:00Z",
     isPublic: true,
     status: EventStatus.Verified,
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
 ];
 
@@ -296,17 +334,26 @@ export const posts = [
   {
     id: ids.postIds[1],
     userId: ids.userIds[3],
+    institutionId: ids.instituteIds[1],
     title: "First Post",
-    text: "This is the first post!",
-    createdAt: "2023-10-10T09:00:00Z",
+    description: "This is the first post!",
+    createdAt: "2024-10-10T09:00:00Z",
+    expiresAt: "2024-10-10T18:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 5,
+
     // Other post details
   },
   {
     id: ids.postIds[2],
     userId: ids.userIds[4],
+    institutionId: ids.instituteIds[1],
     title: "Second Post",
-    text: "Another post here!",
-    createdAt: "2023-10-10T10:00:00Z",
+    description: "Another post here!",
+    createdAt: "2024-10-10T10:00:00Z",
+    expiresAt: "2024-10-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 8,
     // Other post details
   },
 ];
@@ -316,14 +363,14 @@ export const comments = [
     userId: ids.userIds[1],
     postId: ids.postIds[1],
     text: "This is the first comment!",
-    createdAt: "2023-10-10T18:00:00Z",
+    createdAt: "2024-10-10T18:00:00Z",
     // Other post details
   },
   {
     userId: ids.userIds[2],
     postId: ids.postIds[2],
     text: "Another post here!",
-    createdAt: "2023-10-10T19:00:00Z",
+    createdAt: "2024-10-10T19:00:00Z",
     // Other post details
   },
 ];
@@ -333,33 +380,37 @@ export const organizations = [
     id: ids.organizationIds[1],
     organizationName: "Group A",
     description: "Description for Group A.",
-    createdAt: "2023-06-11T02:00:00Z",
+    createdAt: "2024-06-11T02:00:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/hockey.png",
   },
   {
     id: ids.organizationIds[2],
-    organizationName: "Group B",
+    organizationName: "TechStart",
     description: "Description for Group B.",
-    createdAt: "2023-07-03T14:30:00Z",
+    createdAt: "2024-07-03T14:30:00Z",
     status: OrganizationStatus.Approved,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/techstartLogo.jpg",
   },
   {
     id: ids.organizationIds[3],
     organizationName: "Group C",
     description: "Description for Group C.",
-    createdAt: "2023-07-15T10:30:00Z",
+    createdAt: "2024-07-15T10:30:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
   {
     id: ids.organizationIds[4],
     organizationName: "Group D",
     description: "Description for Group D.",
-    createdAt: "2023-07-15T11:31:00Z",
+    createdAt: "2024-07-15T11:31:00Z",
     status: OrganizationStatus.Pending,
     institutionId: ids.instituteIds[1],
+    image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
   },
 ];
 
@@ -400,6 +451,19 @@ export const userOrganizationRoles = [
     userId: ids.userIds[8],
     organizationId: ids.organizationIds[1],
     roleId: ids.roleIds[UserRole.Moderator],
+    status: UserOrgStatus.Pending,
+  },
+  // Pending owners
+  {
+    userId: ids.userIds[9],
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    status: UserOrgStatus.Pending,
+  },
+  {
+    userId: ids.userIds[10],
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
     status: UserOrgStatus.Pending,
   },
 ];

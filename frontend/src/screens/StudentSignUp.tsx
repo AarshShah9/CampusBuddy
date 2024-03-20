@@ -9,7 +9,7 @@ import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,16 @@ import * as zod from "zod";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import { userRegistrationData } from "~/contexts/authContext";
+import { Dropdown } from "react-native-element-dropdown";
+
+const schema = zod.object({
+  uniEmail: zod.string(),
+  uniName: zod.string(),
+  fName: zod.string(),
+  lName: zod.string(),
+  password: zod.string(),
+  rePassword: zod.string(),
+});
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
@@ -32,6 +42,9 @@ export default function StudentSignUp() {
     lastName: zod.string(),
     password: zod.string(),
   });
+  const [institutions, setInstitutions] = useState<institution[]>([]);
+  const { getInstitutions } = useAuthContext();
+  const { dismissKeyboard } = useAppContext();
 
   const {
     control,
@@ -56,7 +69,11 @@ export default function StudentSignUp() {
     // Add any navigation or logic here
   }, []);
 
-  const { dismissKeyboard } = useAppContext();
+  useEffect(() => {
+    getInstitutions().then((res) => {
+      setInstitutions(res.data);
+    });
+  }, []);
 
   return (
       <TouchableWithoutFeedback onPress={dismissKeyboard}>

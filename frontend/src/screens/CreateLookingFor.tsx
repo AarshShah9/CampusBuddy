@@ -13,49 +13,65 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import ItemTag from "~/components/ItemTags";
+import useEventsContext from "~/hooks/useEventsContext";
+import { useNavigation } from "@react-navigation/native";
+
+// React Hook Section
+const schema = zod.object({
+  title: zod.string(),
+  tags: zod.string().array().optional(),
+  description: zod.string(),
+  numberOfSpots: zod.string(),
+  expiryDate: zod.date(),
+});
 
 type lookingForDetail = {
   title: string;
-  tags: string[];
+  tags?: string[];
   description: string;
-  location: string;
-  numOfSpots: string;
+  numberOfSpots: string;
   expiryDate: Date;
 };
 
 export default function CreateLookingFor() {
   const { theme } = useThemeContext();
-
-  // React Hook Section
-  const schema = zod.object({
-    title: zod.string(),
-    tags: zod.string().array(),
-    description: zod.string(),
-    location: zod.string(),
-    numOfSpots: zod.string(),
-    expiryDate: zod.date(),
-  });
+  const { createPost } = useEventsContext();
+  const navigation = useNavigation<any>();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<lookingForDetail>({
     defaultValues: {
       title: "",
       tags: [],
       description: "",
-      location: "",
-      numOfSpots: "",
+      numberOfSpots: "0",
       expiryDate: new Date(),
     },
     resolver: zodResolver(schema),
   });
 
-  //Functions
   // Handles submission of user data
   const onSubmit = (data: lookingForDetail) => {
     console.log(data);
+    createPost({
+      title: data.title,
+      description: data.description,
+      numberOfSpots: parseInt(data.numberOfSpots),
+      expiresAt: data.expiryDate,
+    })
+      .then((r) => {
+        alert("Event Created");
+        reset();
+        navigation.navigate("Home");
+      })
+      .catch((e) => {
+        console.log(e);
+        alert("Error creating event");
+      });
   };
 
   return (
@@ -158,12 +174,13 @@ export default function CreateLookingFor() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 keyboardType="numeric"
+                // TODO restrict to whole numbers
                 placeholder="0"
                 value={value}
               />
             </View>
           )}
-          name="numOfSpots"
+          name="numberOfSpots"
         />
         <Controller
           control={control}
@@ -193,17 +210,16 @@ export default function CreateLookingFor() {
               <DateTimePicker
                 style={{ marginRight: 10 }}
                 value={value}
-                mode={"date"}
-                is24Hour={true}
-                onChange={(event, date) => {
-                  onChange(date);
+                mode={"datetime"}
+                onChange={(event, time) => {
+                  onChange(time);
                 }}
               />
             </View>
           )}
           name="expiryDate"
         />
-        <View style={{ marginTop: 150 }}>
+        <View style={{ marginTop: 100 }}>
           <Button
             style={{
               width: 300,

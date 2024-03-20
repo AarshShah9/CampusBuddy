@@ -41,7 +41,12 @@ export const ApprovalStatusSchema = OrganizationStatusSchema.extract([
   "Rejected",
 ]);
 
-export const UserType = z.enum(["Student", "PendingOrg", "ApprovedOrg"]);
+export const UserType = z.enum([
+  "Student",
+  "PendingOrg",
+  "ApprovedOrg",
+  "Admin",
+]);
 
 ///////////////////////////////
 // EVENT SCHEMAS
@@ -60,7 +65,7 @@ export const EventSchema = z.object({
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
   description: z.string().min(3).max(255).nullable(),
-  location: z.string().min(3).max(255),
+  locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
       required_error: "Please select a date and time",
@@ -88,8 +93,9 @@ export const EventCreateSchema = EventSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified event
+  image: true, // handled by the S3Uploader
+  isPublic: true, // default value is false
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -120,10 +126,12 @@ export const UserSchema = z.object({
     .min(8, { message: "Password must be greater than 8 characters long" }),
   profilePic: z.string().nullable(),
   accountType: UserType,
-  institutionName: z.string(),
+  institutionId: z.string().uuid().nullable(),
 });
 
-export type User = z.infer<typeof UserSchema>;
+export type UserType = z.infer<typeof UserSchema>;
+
+export type UserWithoutPasswordType = Omit<UserType, "password">;
 
 export const UserCreateSchema = UserSchema.omit({
   id: true,
@@ -162,7 +170,7 @@ export const OrganizationSchema = z.object({
   image: z.string().nullable(),
 });
 
-export type Organization = z.infer<typeof OrganizationSchema>;
+export type OrganizationType = z.infer<typeof OrganizationSchema>;
 
 // Create a new schema based on OrganizationSchema
 export const OrganizationCreateSchema = OrganizationSchema.omit({
@@ -198,6 +206,9 @@ export const OrganizationApprovalSchema = z.object({
   decision: ApprovalStatusSchema,
   rejectionReason: z.string().optional(),
 });
+export type OrganizationApprovalType = z.infer<
+  typeof OrganizationApprovalSchema
+>;
 
 /////////////////////////////////////////
 // SCHOOL SCHEMAS
@@ -227,18 +238,52 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 // POST SCHEMAS
 /////////////////////////////////////////
 
+/**
+ * Post Schema
+ */
 export const PostSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   image: z.string().nullable(),
   organizationId: z.string().uuid().nullable(),
-  createdAt: z.coerce.date(),
+  createdAt: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
   title: z.string(),
-  text: z.string().nullable(),
+  description: z.string().nullable(),
+  numberOfSpots: z.number().int().min(1),
+  expiresAt: z.coerce.date(),
   public: z.boolean(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
+
+/**
+ * Create Post Schema
+ */
+export const PostCreateSchema = PostSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+  image: true, // Update value after image is created
+  organizationId: true, // get from req.params if creating verified post
+  public: true, // default value is false
+});
+
+export type PostCreateType = z.infer<typeof PostCreateSchema>;
+
+/**
+ * Update Post Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const PostUpdateSchema = PostSchema.partial();
+
+export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
 
 /////////////////////////////////////////
 // COMMENT SCHEMAS
@@ -422,6 +467,7 @@ export const InstitutionSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  locationPlaceId: z.string(),
   name: z
     .string()
     .min(3, { message: "Institution name must at least 3 characters " }),
@@ -482,6 +528,11 @@ export const deleteSchema = z.object({
 
 export const tokenSchema = z.object({
   token: z.string(),
+});
+
+export const loginJwtPayloadSchema = UserSchema.omit({
+  profilePic: true,
+  accountType: true,
 });
 
 // For signing up with a new organization

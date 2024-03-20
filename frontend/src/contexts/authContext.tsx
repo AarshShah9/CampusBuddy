@@ -30,11 +30,16 @@ export type userRegistrationData = {
   lastName: string;
   password: string;
 };
+export type institution = {
+  id: string;
+  name: string;
+};
 type authContext = {
   user: UserDataType | null;
   registerUser: (arg: userRegistrationData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
+  getInstitutions: () => Promise<any>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -63,7 +68,7 @@ export const AuthContextProvider = ({
       setAxiosTokenHeader(jwt.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
     } catch (error) {
-      console.log(error);
+      console.log('An error occured while trying to sign in:\n', error);
     }
   }, []);
 
@@ -72,6 +77,14 @@ export const AuthContextProvider = ({
       await deleteTokenFromSecureStore(TOKEN_KEY);
       removeAxiosTokenHeader();
       setUser(null);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const getInstitutions = useCallback(async () => {
+    try {
+      return await CBRequest("GET", "/api/institution/getAllInstitutions", {});
     } catch (error) {
       console.log(error);
     }
@@ -89,7 +102,9 @@ export const AuthContextProvider = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, registerUser, signIn, logOut }}>
+    <AuthContext.Provider
+      value={{ user, registerUser, signIn, logOut, getInstitutions }}
+    >
       {children}
     </AuthContext.Provider>
   );

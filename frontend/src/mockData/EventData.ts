@@ -28,7 +28,8 @@ export const sampleEventData = [
         title: "Volleyball Tournament",
         time: "Jan 14",
         location: "UofC Kines Block",
-        image: "https://d2epenzoyf672m.cloudfront.net/pfp/basketball_tournament.jpg",
+        image:
+          "https://d2epenzoyf672m.cloudfront.net/pfp/basketball_tournament.jpg",
       },
       {
         id: "4",
@@ -177,4 +178,4 @@ export const carouselImages = [
   "https://d2epenzoyf672m.cloudfront.net/pfp/hockey.png",
   "https://d2epenzoyf672m.cloudfront.net/pfp/techstartLogo.jpg",
   "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
-]
+];

@@ -28,6 +28,7 @@ enum UserType {
   Student // has email with proper domain, enrollment record(s)
   PendingOrg // an org account that hasn't been approved yet by admins or existing org
   ApprovedOrg
+  Admin // System level admin
 }
 
 enum OrganizationStatus {
@@ -62,14 +63,18 @@ enum AppPermissionName {
 
 // CORE MODELS
 model Institution {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  domain        String         @unique
-  user          User[]
-  organizations Organization[]
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+  id              String         @id @default(uuid())
+  name            String         @unique
+  domain          String         @unique
+  user            User[]
+  organizations   Organization[]
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  location        Location       @relation(fields: [locationPlaceId], references: [placeId])
+  locationPlaceId String
+  posts           Post[]
 
+  @@index([locationPlaceId])
   @@map("institution")
 }
 
@@ -121,25 +126,27 @@ model Program {
 }
 
 model Event {
-  id             String              @id @default(uuid())
-  userId         String              @map("user_id")
-  organizationId String?             @map("organization_id")
-  createdAt      DateTime            @unique @default(now()) @map("created_at")
-  title          String              @db.VarChar(255)
-  description    String?             @db.VarChar(255)
-  location       String
-  startTime      DateTime            @map("start_time")
-  endTime        DateTime            @map("end_time")
-  isPublic       Boolean             @map("is_public")
-  status         EventStatus
-  image          String?
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventTags      EventTag[]
-  eventResponses UserEventResponse[]
+  id              String              @id @default(uuid())
+  userId          String              @map("user_id")
+  organizationId  String?             @map("organization_id")
+  createdAt       DateTime            @unique @default(now()) @map("created_at")
+  title           String              @db.VarChar(255)
+  description     String?             @db.VarChar(255)
+  location        Location            @relation(fields: [locationPlaceId], references: [placeId])
+  startTime       DateTime            @map("start_time")
+  endTime         DateTime            @map("end_time")
+  isPublic        Boolean             @map("is_public")
+  status          EventStatus
+  image           String?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventTags       EventTag[]
+  eventResponses  UserEventResponse[]
+  locationPlaceId String
 
   @@index([userId])
   @@index([organizationId])
+  @@index([locationPlaceId])
   @@map("event")
 }
 
@@ -157,23 +164,40 @@ model UserEventResponse {
 }
 
 model Post {
-  id             String        @id @default(uuid())
-  userId         String        @map("user_id")
-  image          String?
-  organizationId String?       @map("organization_id")
-  createdAt      DateTime      @unique @default(now()) @map("created_at")
-  title          String
-  text           String?
-  public         Boolean       @default(true)
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String  @id @default(uuid())
+  userId         String  @map("user_id")
+  organizationId String? @map("organization_id")
+
+  image       String?
+  createdAt   DateTime  @unique @default(now()) @map("created_at")
+  title       String
+  description String?
+  public      Boolean   @default(true)
+  expiresAt   DateTime? @map("expires_at")
+
+  numberOfSpots     Int? @map("number_of_spots")
+  numberOfSpotsLeft Int? @map("number_of_spots_left")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  type PostType
 
   comments Comment[]
   postTags PostTag[]
 
+  institutionId String      @map("institution_id")
+  Institution   Institution @relation(fields: [institutionId], references: [id])
+
   @@index([userId])
   @@index([organizationId])
+  @@index([institutionId])
   @@map("post")
+}
+
+enum PostType {
+  LookingFor
+  Thread
 }
 
 model Comment {
@@ -301,4 +325,16 @@ model TopicSubscription {
   @@index([userId])
   @@index([topicId])
   @@map("topic_subscription")
+}
+
+model Location {
+  placeId   String @id
+  latitude  Float
+  longitude Float
+  name      String
+
+  Institution Institution[]
+  Event       Event[]
+
+  @@map("location")
 }

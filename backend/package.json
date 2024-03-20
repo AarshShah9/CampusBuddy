@@ -8,8 +8,9 @@
   },
   "scripts": {
     "test": "jest --detectOpenHandles",
+    "postinstall": "npx prisma generate",
     "clearJest": "jest --clearCache",
-    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
+    "dev": "tsc && concurrently \"tsc --watch\" \"nodemon -q dist/backend/index.js\"",
     "build": "tsc",
     "start": "node dist/backend/index.js"
   },
@@ -20,7 +21,7 @@
     "@aws-sdk/client-s3": "^3.485.0",
     "@aws-sdk/lib-storage": "^3.485.0",
     "@ngrok/ngrok": "^0.9.1",
-    "@prisma/client": "^5.8.1",
+    "@prisma/client": "^5.11.0",
     "@types/body-parser": "^1.19.5",
     "@types/network-interfaces": "^1.1.2",
     "bcrypt": "^5.1.1",

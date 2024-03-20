@@ -9,8 +9,8 @@ import event from "./routes/event.routes";
 import institution from "./routes/institution.routes";
 import user from "./routes/user.routes";
 import org from "./routes/org.routes";
-import UploadToS3, { upload } from "./utils/S3Uploader";
-import { env, validateEnv } from "./utils/validateEnv";
+import post from "./routes/post.routes";
+import { validateEnv } from "./utils/validateEnv";
 
 const app = express();
 const result = dotenv.config();
@@ -22,7 +22,7 @@ try {
   throw new Error("Failed to validate environment variables" + error);
 }
 
-const port = env.PORT;
+const port = process.env.PORT;
 
 // middleware
 app.use(
@@ -52,32 +52,12 @@ app.use("/api/user", user);
 app.use("/api/institution", institution);
 app.use("/api/events", event);
 app.use("/api/orgs", org);
+app.use("/api/post", post);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
   res.json({ message: "Hello World!" });
 });
-
-// Deprecated - Only for testing purposes
-app.post(
-  "/api/upload",
-  upload.single("file"),
-  async (req: Request, res: Response) => {
-    if (!req.file) {
-      return res.status(400).send("No file uploaded.");
-    }
-
-    try {
-      // Would need to generate a proper path here
-      const path = `new/path/${req.file.originalname}`;
-      await UploadToS3(req.file, path);
-      res.status(200).send("File uploaded successfully");
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error uploading the file");
-    }
-  },
-);
 
 // Global error handling middleware - Must be the last middleware
 app.use(errorHandler);
@@ -87,18 +67,24 @@ const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-if (env.ENV === "dev") {
+if (process.env.ENV === "dev") {
   ngrok
     .forward({
       addr: port,
-      authtoken: env.NGROK_AUTHTOKEN,
-      domain: env.URL,
+      authtoken: process.env.NGROK_AUTHTOKEN,
+      domain: process.env.URL,
       schemes: ["http", "https"],
     })
     .then((listener) =>
       console.log(`Ingress established at: ${listener.url()}`),
     );
 }
+
+process.on("SIGINT", function () {
+  console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
+  server.close();
+  process.exit(0);
+});
 
 export default app;
 export { server };

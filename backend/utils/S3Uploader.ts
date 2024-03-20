@@ -11,10 +11,10 @@ const unlinkAsync = promisify(fs.unlink);
 const UploadToS3 = async (file: Express.Multer.File, path: string) => {
   try {
     // AWS Credentials and bucket information
-    const accessKeyId = env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
-    const region = env.AWS_REGION;
-    const Bucket = env.AWS_BUCKET_NAME;
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID!;
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY!;
+    const region = process.env.AWS_REGION!;
+    const Bucket = process.env.AWS_BUCKET_NAME!;
 
     // Initialize S3 Client
     const s3Client = new S3Client({
@@ -58,10 +58,10 @@ const UploadToS3 = async (file: Express.Multer.File, path: string) => {
 const deleteFromS3 = async (path: string) => {
   try {
     // AWS Credentials and bucket information
-    const accessKeyId = env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
-    const region = env.AWS_REGION;
-    const Bucket = env.AWS_BUCKET_NAME;
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID!;
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY!;
+    const region = process.env.AWS_REGION!;
+    const Bucket = process.env.AWS_BUCKET_NAME!;
 
     // Initialize S3 Client
     const s3Client = new S3Client({

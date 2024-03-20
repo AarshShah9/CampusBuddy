@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
@@ -17,10 +18,11 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button, Checkbox } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import LocationInputModal from "~/components/LocationInputModal";
+import { imageGetter } from "~/lib/requestHelpers";
 
 const IMG_HEIGHT = 300;
 type marketPlaceDetail = {
@@ -33,25 +35,26 @@ type marketPlaceDetail = {
   location: string;
 };
 
+// React Hook Form Section
+const schema = zod.object({
+  image: zod.string(),
+  itemName: zod.string(),
+  price: zod.string(),
+  condition: zod.string(),
+  description: zod.string(),
+  tags: zod.string().array(),
+  location: zod.string(),
+});
+
 export default function CreateMarketplace() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
-
+  const [selectedImage, setSelectedImage] = useState<string>();
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
   };
-  // React Hook Form Section
-  const schema = zod.object({
-    image: zod.string(),
-    itemName: zod.string(),
-    price: zod.string(),
-    condition: zod.string(),
-    description: zod.string(),
-    tags: zod.string().array(),
-    location: zod.string(),
-  });
 
   const {
     control,
@@ -97,6 +100,15 @@ export default function CreateMarketplace() {
     };
   });
 
+  const addPhoto = useCallback(async () => {
+    const result = await imageGetter();
+    if (result.canceled) {
+      setSelectedImage(undefined);
+      return;
+    }
+    setSelectedImage(result.assets[0].uri);
+  }, []);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -111,31 +123,47 @@ export default function CreateMarketplace() {
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
           {/* View holds the icon for user to click to upload their own image */}
-          <View
-            style={{
-              width: 100,
-              height: 100,
-              backgroundColor: "grey",
-              borderRadius: 8,
-              justifyContent: "center",
-            }}
-          >
-            <Feather
-              style={{ marginLeft: "auto", marginRight: "auto" }}
-              name="image"
-              size={24}
-              color="black"
-            />
-            <Text
-              style={{
-                marginLeft: "auto",
-                marginRight: "auto",
-                color: "white",
-              }}
-            >
-              Add Image
-            </Text>
-          </View>
+          <TouchableOpacity onPress={addPhoto}>
+            {!selectedImage && (
+              <View
+                style={{
+                  width: 100,
+                  height: 100,
+                  backgroundColor: "grey",
+                  borderRadius: 8,
+                  justifyContent: "center",
+                }}
+              >
+                <Feather
+                  style={{ marginLeft: "auto", marginRight: "auto" }}
+                  name="image"
+                  size={24}
+                  color="black"
+                />
+                <Text
+                  style={{
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    color: "white",
+                  }}
+                >
+                  Add Image
+                </Text>
+              </View>
+            )}
+            {selectedImage && (
+              <Animated.Image
+                source={{ uri: selectedImage }}
+                style={[
+                  {
+                    width: 100,
+                    height: 100,
+                    borderRadius: 8,
+                  },
+                ]}
+              />
+            )}
+          </TouchableOpacity>
           {/* View holds all the Controllers for user to enter their information */}
           <View>
             <Controller

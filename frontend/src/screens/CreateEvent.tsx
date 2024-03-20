@@ -1,10 +1,10 @@
 import {
-  View,
-  Text,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { AntDesign } from "@expo/vector-icons";
@@ -18,47 +18,52 @@ import Animated, {
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import { z } from "zod";
 import { Button } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import LocationInputModal from "~/components/LocationInputModal";
+import { imageGetter } from "~/lib/requestHelpers";
+import useEventsContext from "~/hooks/useEventsContext";
+import { ImagePickerAsset } from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 
 const IMG_HEIGHT = 300;
 
-type createEvent = {
-  eventName: string;
-  date: Date;
-  time: Date;
-  location: string;
-  tags: string[];
-  description: string;
-};
+export type createEventType = z.infer<typeof schema>;
+
+// React Hook Related
+const schema = zod.object({
+  title: zod.string(),
+  date: zod.date(),
+  startTime: zod.date(),
+  endTime: zod.date(),
+  locationPlaceId: zod.string(),
+  tags: zod.string().array(),
+  description: zod.string(),
+});
 // Component is responsible for allowing users to create a new event page
 export default function CreateEvent() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-
-  // React Hook Related
-  const schema = zod.object({
-    eventName: zod.string(),
-    date: zod.date(),
-    time: zod.date(),
-    location: zod.string(),
-    tags: zod.string().array(),
-    description: zod.string(),
-  });
+  const [selectedImage, setSelectedImage] = useState<string>();
+  const [image, setImage] = useState<ImagePickerAsset>();
+  const { createEvent } = useEventsContext();
+  const navigation = useNavigation<any>();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<createEvent>({
+    reset,
+  } = useForm<createEventType>({
     defaultValues: {
-      eventName: "",
+      title: "",
       date: new Date(),
-      time: new Date(),
-      location: "",
+      startTime: new Date(),
+      endTime: new Date(),
+      locationPlaceId: "",
       tags: [],
       description: "",
     },
@@ -68,8 +73,17 @@ export default function CreateEvent() {
   //Functions
 
   // Handle submission of user data
-  const onSubmit = useCallback((data: createEvent) => {
-    console.log(data);
+  const onSubmit = useCallback((data: createEventType) => {
+    createEvent(data, image!)
+      .then((r) => {
+        alert("Event Created");
+        // clear form and navigate to event page
+        reset();
+        navigation.navigate("Home");
+      })
+      .catch((e) => {
+        alert("Error creating event");
+      });
   }, []);
 
   //  Animation of scroll image
@@ -94,6 +108,15 @@ export default function CreateEvent() {
     };
   });
 
+  const addPhoto = useCallback(async () => {
+    const result = await imageGetter();
+    if (result.canceled) {
+      return;
+    }
+    setSelectedImage(result.assets[0].uri);
+    setImage(result.assets[0]);
+  }, []);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -109,7 +132,11 @@ export default function CreateEvent() {
         {/* View houses the image component, and icon for uploading images */}
         <View>
           <Animated.Image
-            source={require("~/assets/images/lightGreyImage.png")}
+            source={
+              selectedImage
+                ? { uri: selectedImage }
+                : require("~/assets/images/lightGreyImage.png")
+            }
             style={[
               {
                 width: "100%",
@@ -117,7 +144,7 @@ export default function CreateEvent() {
               },
               imageAnimatedStyle,
             ]}
-          ></Animated.Image>
+          />
           <AntDesign
             style={{
               position: "absolute",
@@ -128,6 +155,7 @@ export default function CreateEvent() {
             name="upload"
             size={24}
             color="black"
+            onPress={addPhoto}
           />
         </View>
         {/* View houses the controllers for each field */}
@@ -156,7 +184,7 @@ export default function CreateEvent() {
                 />
               </View>
             )}
-            name="eventName"
+            name="title"
           />
           <View style={{ marginLeft: 15 }}>
             <Controller
@@ -181,20 +209,19 @@ export default function CreateEvent() {
                       fontSize: 16,
                     }}
                   >
-                    Date *
+                    Start Time*
                   </Text>
                   <DateTimePicker
                     style={{ marginRight: 10 }}
                     value={value}
-                    mode={"date"}
-                    is24Hour={true}
-                    onChange={(event, date) => {
-                      onChange(date);
+                    mode={"datetime"}
+                    onChange={(event, time) => {
+                      onChange(time);
                     }}
                   />
                 </View>
               )}
-              name="date"
+              name="startTime"
             />
             <Controller
               control={control}
@@ -209,7 +236,7 @@ export default function CreateEvent() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     marginTop: 25,
-                    marginBottom: 15,
+                    marginBottom: 25,
                   }}
                 >
                   <Text
@@ -218,20 +245,19 @@ export default function CreateEvent() {
                       fontSize: 16,
                     }}
                   >
-                    Time*
+                    End Time*
                   </Text>
                   <DateTimePicker
                     style={{ marginRight: 10 }}
                     value={value}
-                    mode={"time"}
-                    is24Hour={true}
+                    mode={"datetime"}
                     onChange={(event, time) => {
                       onChange(time);
                     }}
                   />
                 </View>
               )}
-              name="time"
+              name="endTime"
             />
             <Controller
               control={control}
@@ -252,7 +278,7 @@ export default function CreateEvent() {
                   <LocationInputModal controllerOnChange={onChange} />
                 </View>
               )}
-              name="location"
+              name="locationPlaceId"
             />
 
             <Controller
@@ -261,7 +287,7 @@ export default function CreateEvent() {
                 required: true,
               }}
               render={({ field: { onChange } }) => (
-                <View>
+                <View style={style.tagInput}>
                   <Text
                     style={{
                       marginBottom: 3,
@@ -342,6 +368,9 @@ const style = StyleSheet.create({
     borderRadius: 8,
     borderColor: "grey",
     padding: 10,
+  },
+  tagInput: {
+    width: 368,
   },
   eventTextInput: {
     width: 350,
