@@ -25,9 +25,6 @@ const prisma = new PrismaClient();
 
 const load = async () => {
   try {
-    await prisma.institution.deleteMany();
-    console.log("Deleted records in the Institution table");
-
     await prisma.user.deleteMany();
     console.log("Deleted records in the User table");
 
@@ -75,6 +72,9 @@ const load = async () => {
 
     await prisma.topicSubscription.deleteMany();
     console.log("Deleted records in the Topic Subscription table");
+
+    await prisma.institution.deleteMany();
+    console.log("Deleted records in the Institution table");
 
     await prisma.location.deleteMany();
     console.log("Deleted records in the Location table");

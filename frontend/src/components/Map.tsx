@@ -1,8 +1,9 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
-import { Button, View } from "react-native";
+import { View, Button, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { EventMapItem } from "~/types/Events";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -10,14 +11,6 @@ type MapProps = {
   goBackButton?: boolean;
   currentLocation: LatLng;
   events?: EventMapItem[];
-};
-
-type eventType = {
-  latitude: number;
-  longitude: number;
-  title: string;
-  description: string;
-  onClick: () => void;
 };
 
 // This is a simple map component that displays a map with a marker at the given latitude and longitude.
@@ -63,20 +56,42 @@ const Map = ({
             return (
               <Marker
                 key={event.title}
-                coordinate={{
-                  latitude: event.latitude,
-                  longitude: event.longitude,
-                }}
+                coordinate={adjustPosition(event, index, events)}
                 onPress={() => openEventDetails(index)}
-                title={event.title}
-                description={event.description}
-              />
+              >
+                <View style={circleStyles.circleStyle}>
+                  <MaterialIcons name="event-available" size={24} color="red" />
+                </View>
+              </Marker>
             );
           })}
       </MapView>
       {goBackButton && <Button title={"Back"} onPress={onBack} />}
     </View>
   );
+};
+
+const adjustPosition = (
+  event: EventMapItem,
+  index: number,
+  events: EventMapItem[],
+) => {
+  const adjustment = 0.0001; // Small adjustment value
+  let duplicates = events.filter(
+    (e) => e.latitude === event.latitude && e.longitude === event.longitude,
+  );
+  if (duplicates.length > 1) {
+    let angle = (360 / duplicates.length) * index; // distribute evenly in a circle
+    return {
+      latitude: event.latitude + adjustment * Math.cos(angle * (Math.PI / 180)),
+      longitude:
+        event.longitude + adjustment * Math.sin(angle * (Math.PI / 180)),
+    };
+  }
+  return {
+    latitude: event.latitude,
+    longitude: event.longitude,
+  };
 };
 
 // prettier-ignore
@@ -89,5 +104,21 @@ const styles = {
     height: "100%",
   },
 };
+
+const circleStyles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  circleStyle: {
+    backgroundColor: "white", // TODO change to theme color based on dark/light mode
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 
 export default Map;
