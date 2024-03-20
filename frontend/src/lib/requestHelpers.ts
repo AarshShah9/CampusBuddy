@@ -56,6 +56,7 @@ const allowedEndpoints = [
   "/api/user/removeUser/:id",
   "/api/user/getAllUsers",
   "/api/user/updateUser/:id",
+  "/api/user/student",
 
   // Organization-related endpoints
   "/api/orgs/test",

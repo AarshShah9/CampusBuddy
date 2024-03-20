@@ -8,7 +8,7 @@ import {
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
@@ -69,7 +69,7 @@ export default function OrganizationSignUp() {
   const onSubmit = (data: organizationInformation) => {
     console.log(data)
     registerOrganization(data)
-    navigation.navigate("OrgCreationConfirmation")
+    navigation.dispatch(StackActions.replace("OrgCreationConfirmation"));
   };
 
   return (
