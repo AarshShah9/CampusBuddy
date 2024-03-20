@@ -68,7 +68,9 @@ export const AuthContextProvider = ({
 
   const registerOrganization = useCallback(async (data: organizationInformation) => {
     try {
+      // Takes in 3 param, org name, institute id and description of org
       const { organizationName, institutionId, description,  } = data;
+      // Makes call to backend to register orginization 
       let res = await CBRequest("POST","/api/orgs/", {body:data})
       console.log(res);
     } catch (error) {

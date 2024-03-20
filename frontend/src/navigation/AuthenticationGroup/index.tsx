@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthContextProvider } from "~/contexts/authContext";
 import Login from "~/screens/Login";
+import OrgCreationConfirmation from "~/screens/OrgCreationConfirmation";
 import OrganizationSignUp from "~/screens/OrganizationScreen";
 import StudentSignUp from "~/screens/StudentSignUp";
 
@@ -13,6 +14,7 @@ export default function AuthenticationGroup() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="StudentSignUp" component={StudentSignUp} />
         <Stack.Screen name="OrgSignUp" component={OrganizationSignUp}/>
+        <Stack.Screen name="OrgCreationConfirmation" component={OrgCreationConfirmation}/>
       </Stack.Navigator>
     </AuthContextProvider>
   );

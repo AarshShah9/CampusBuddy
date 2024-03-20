@@ -67,10 +67,9 @@ export default function OrganizationSignUp() {
   }, []);
 
   const onSubmit = (data: organizationInformation) => {
-    console.log(data);
+    console.log(data)
     registerOrganization(data)
-    //navigation.navigate("StudentSignUpInfo")
-    //validate()
+    navigation.navigate("OrgCreationConfirmation")
   };
 
   return (
