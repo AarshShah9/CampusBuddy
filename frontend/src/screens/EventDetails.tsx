@@ -24,8 +24,8 @@ const IMG_HEIGHT = 300;
  * */
 
 export default function EventDetails() {
-  const {
-    params: { id },
+  let {
+    params: { id, map },
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
@@ -204,7 +204,7 @@ export default function EventDetails() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {eventData?.location && (
+          {eventData?.location && (map === undefined ? true : map) && (
             <MapComponentSmall
               latitude={eventData?.location.latitude}
               longitude={eventData?.location.longitude}

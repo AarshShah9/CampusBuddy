@@ -1,6 +1,7 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type MapComponentProps = {
   latitude: number;
@@ -23,33 +24,48 @@ const Map = ({
   title,
   description,
 }: MapComponentProps) => {
-  latitudeDelta = latitudeDelta || 0.01;
-  longitudeDelta = longitudeDelta || 0.01;
+  latitudeDelta = latitudeDelta || 0.045;
+  longitudeDelta = longitudeDelta || 0.045;
+
+  const onMapPress = useCallback(() => {
+    // todo create a model to show the map in full screen
+    console.log("Map pressed");
+  }, []);
 
   return (
-    <View>
-      <View style={styles.mapBox}>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={{
-            latitude,
-            longitude,
-            latitudeDelta,
-            longitudeDelta,
-          }}
-        >
-          <Marker
-            coordinate={{
+    <TouchableOpacity onPress={onMapPress}>
+      <View>
+        <View style={styles.mapBox}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={{
               latitude,
               longitude,
+              latitudeDelta,
+              longitudeDelta,
             }}
-            title={title}
-            description={description}
-          />
-        </MapView>
+            scrollEnabled={false}
+            zoomEnabled={false}
+            pitchEnabled={false}
+            rotateEnabled={false}
+            zoomTapEnabled={false}
+            zoomControlEnabled={false}
+          >
+            <Marker
+              coordinate={{
+                latitude,
+                longitude,
+              }}
+            >
+              <View style={circleStyles.circleStyle}>
+                <MaterialIcons name="event-available" size={24} color="red" />
+              </View>
+            </Marker>
+          </MapView>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 const styles = StyleSheet.create({
@@ -59,14 +75,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mapBox: {
-    width: 350,
-    height: 200,
+    width: 350, // TODO make this responsive to screen size
+    height: 150, // TODO make this responsive to screen size
     borderRadius: 10,
-    overflow: "hidden", // Ensure the map respects the border radius
+    overflow: "hidden",
   },
   map: {
     width: "100%",
     height: "100%",
+  },
+});
+
+const circleStyles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  circleStyle: {
+    backgroundColor: "white", // TODO change to theme color based on dark/light mode
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

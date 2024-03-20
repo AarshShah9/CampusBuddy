@@ -33,6 +33,7 @@ const Map = ({
     (index: number) => {
       navigation.navigate("EventDetails", {
         id: events?.[index].id,
+        map: false,
       });
     },
     [events, navigation],
@@ -76,7 +77,7 @@ const adjustPosition = (
   index: number,
   events: EventMapItem[],
 ) => {
-  const adjustment = 0.0001; // Small adjustment value
+  const adjustment = 0.0003; // Small adjustment value
   let duplicates = events.filter(
     (e) => e.latitude === event.latitude && e.longitude === event.longitude,
   );
