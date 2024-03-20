@@ -2,14 +2,13 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 type MapComponentProps = {
   latitude: number;
   longitude: number;
   latitudeDelta?: number;
   longitudeDelta?: number;
-  title?: string;
-  description?: string;
 };
 
 /*
@@ -18,54 +17,42 @@ type MapComponentProps = {
  */
 const Map = ({
   latitude,
-  latitudeDelta,
-  longitudeDelta,
+  latitudeDelta = 0.045,
+  longitudeDelta = 0.045,
   longitude,
-  title,
-  description,
 }: MapComponentProps) => {
-  latitudeDelta = latitudeDelta || 0.045;
-  longitudeDelta = longitudeDelta || 0.045;
-
-  const onMapPress = useCallback(() => {
-    // todo create a model to show the map in full screen
-    console.log("Map pressed");
-  }, []);
-
   return (
-    <TouchableOpacity onPress={onMapPress}>
-      <View>
-        <View style={styles.mapBox}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={{
+    <View>
+      <View style={styles.mapBox}>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          initialRegion={{
+            latitude,
+            longitude,
+            latitudeDelta,
+            longitudeDelta,
+          }}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          pitchEnabled={false}
+          rotateEnabled={false}
+          zoomTapEnabled={false}
+          zoomControlEnabled={false}
+        >
+          <Marker
+            coordinate={{
               latitude,
               longitude,
-              latitudeDelta,
-              longitudeDelta,
             }}
-            scrollEnabled={false}
-            zoomEnabled={false}
-            pitchEnabled={false}
-            rotateEnabled={false}
-            zoomTapEnabled={false}
-            zoomControlEnabled={false}
           >
-            <Marker
-              coordinate={{
-                latitude,
-                longitude,
-              }}
-            >
-              <View style={circleStyles.circleStyle}>
-                <MaterialIcons name="event-available" size={24} color="red" />
-              </View>
-            </Marker>
-          </MapView>
-        </View>
+            <View style={circleStyles.circleStyle}>
+              <MaterialIcons name="event-available" size={24} color="red" />
+            </View>
+          </Marker>
+        </MapView>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 const styles = StyleSheet.create({

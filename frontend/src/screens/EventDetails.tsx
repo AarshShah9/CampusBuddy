@@ -51,6 +51,19 @@ export default function EventDetails() {
     },
   });
 
+  const onMapPress = useCallback(() => {
+    navigation.navigate("MapDetails", {
+      eventData: [
+        {
+          title: eventData?.title,
+          description: eventData?.description,
+          latitude: eventData?.location.latitude,
+          longitude: eventData?.location.longitude,
+        },
+      ],
+    });
+  }, [eventData, navigation]);
+
   // TODO fix optimistic updates
   const isOptimistic =
     likeMutation.variables &&
@@ -205,10 +218,12 @@ export default function EventDetails() {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           {eventData?.location && (map === undefined ? true : map) && (
-            <MapComponentSmall
-              latitude={eventData?.location.latitude}
-              longitude={eventData?.location.longitude}
-            />
+            <TouchableOpacity onPress={onMapPress}>
+              <MapComponentSmall
+                latitude={eventData?.location.latitude}
+                longitude={eventData?.location.longitude}
+              />
+            </TouchableOpacity>
           )}
         </View>
         <View

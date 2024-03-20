@@ -8,7 +8,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 type MapProps = {
   latitudeDelta?: number;
   longitudeDelta?: number;
-  goBackButton?: boolean;
+  showInfo?: boolean;
   currentLocation: LatLng;
   events?: EventMapItem[];
 };
@@ -16,21 +16,17 @@ type MapProps = {
 // This is a simple map component that displays a map with a marker at the given latitude and longitude.
 // This fills the entire screen and has a back button to return to the previous screen.
 const Map = ({
-  latitudeDelta = 0.01,
-  longitudeDelta = 0.01,
-  goBackButton = false,
+  latitudeDelta = 0.04,
+  longitudeDelta = 0.04,
+  showInfo = false,
   currentLocation,
   events,
 }: MapProps) => {
-  const { goBack } = useNavigation();
   const navigation = useNavigation<any>();
-
-  const onBack = useCallback(() => {
-    goBack();
-  }, []);
 
   const openEventDetails = useCallback(
     (index: number) => {
+      if (showInfo) return;
       navigation.navigate("EventDetails", {
         id: events?.[index].id,
         map: false,
@@ -56,7 +52,9 @@ const Map = ({
           events.map((event: EventMapItem, index) => {
             return (
               <Marker
-                key={event.title}
+                key={index}
+                title={showInfo ? event.title : ""}
+                description={showInfo ? event.description : ""}
                 coordinate={adjustPosition(event, index, events)}
                 onPress={() => openEventDetails(index)}
               >
@@ -67,7 +65,6 @@ const Map = ({
             );
           })}
       </MapView>
-      {goBackButton && <Button title={"Back"} onPress={onBack} />}
     </View>
   );
 };
