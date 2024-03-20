@@ -4,6 +4,7 @@ import {
   OrganizationStatus,
   ParticipationStatus,
   PostType,
+  Condition,
   User,
   UserOrgStatus,
   UserRole,
@@ -61,6 +62,10 @@ export const ids = {
   postIds: {
     1: "20909dd0-c553-11ee-83fd-6f8d6c450910",
     2: "20909dd1-c553-11ee-83fd-6f8d6c450910",
+  },
+  itemIds: {
+    1: "376a4ee0-e6df-11ee-bd3d-0242ac120002",
+    2: "376a5160-e6df-11ee-bd3d-0242ac120002",
   },
   commentIds: {
     1: "37e11780-c553-11ee-83fd-6f8d6c450910",
@@ -355,6 +360,28 @@ export const posts = [
     type: PostType.LookingFor,
     numberOfSpots: 8,
     // Other post details
+  },
+];
+export const items = [
+  {
+    id: ids.itemIds[1],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "iPhone 14 Pro",
+    description: "Brand New phone, do not use anymore, 95% Battery Health",
+    price: 700,
+    createdAt: "2024-10-10T09:00:00Z",
+    condition: Condition.Used_Like_New,
+  },
+  {
+    id: ids.itemIds[2],
+    userId: ids.userIds[2],
+    institutionId: ids.instituteIds[1],
+    title: "Outdoor Bicycle",
+    description: "Brand New bike, small scratches, needs a bit of tuning",
+    price: 600,
+    createdAt: "2024-10-10T10:00:00Z",
+    condition: Condition.Used_Fair,
   },
 ];
 

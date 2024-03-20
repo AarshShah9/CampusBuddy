@@ -73,6 +73,7 @@ model Institution {
   location        Location       @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
   posts           Post[]
+  item            Item[]
 
   @@index([locationPlaceId])
   @@map("institution")
@@ -91,6 +92,7 @@ model User {
   institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   enrollments          Enrollment[]
   posts                Post[]
+  item                 Item[]
   comments             Comment[]
   events               Event[]
   UserEventResponse    UserEventResponse[]
@@ -187,7 +189,7 @@ model Post {
   postTags PostTag[]
 
   institutionId String      @map("institution_id")
-  Institution   Institution @relation(fields: [institutionId], references: [id])
+  Institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([organizationId])
@@ -337,4 +339,30 @@ model Location {
   Event       Event[]
 
   @@map("location")
+}
+
+model Item {
+  id            String       @id @default(uuid())
+  userId        String       @map("user_id")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institutionId String       @map("institution_id")
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  price       Int
+  createdAt   DateTime  @unique @default(now()) @map("created_at")
+  condition   Condition
+  image       String?
+
+  @@index([userId])
+  @@index([institutionId])
+  @@map("item")
+}
+
+enum Condition {
+  New
+  Used_Like_New
+  Used_Good
+  Used_Fair
 }

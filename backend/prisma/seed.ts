@@ -11,6 +11,7 @@ import {
   permissions,
   posts,
   postTags,
+  items,
   programs,
   roles,
   topics,
@@ -39,6 +40,9 @@ const load = async () => {
 
     await prisma.post.deleteMany();
     console.log("Deleted records in the Post table");
+
+    await prisma.item.deleteMany();
+    console.log("Deleted records in the Item table");
 
     await prisma.comment.deleteMany();
     console.log("Deleted records in the Comment table");
@@ -110,6 +114,11 @@ const load = async () => {
       data: posts,
     });
     console.log("Added Post data");
+
+    await prisma.item.createMany({
+      data: items,
+    });
+    console.log("Added Item data");
 
     await prisma.comment.createMany({
       data: comments,

@@ -286,6 +286,55 @@ export const PostUpdateSchema = PostSchema.partial();
 export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
 
 /////////////////////////////////////////
+// ITEM SCHEMAS
+/////////////////////////////////////////
+export const ConditionSchema = z.enum([
+  "New",
+  "Used_Like_New",
+  "Used_Good",
+  "Used_Fair",
+]);
+/**
+ * Item Schema
+ */
+export const ItemSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  image: z.string().nullable(),
+  //institutionId: z.string().uuid().nullable(),
+  createdAt: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
+  title: z.string(),
+  description: z.string().nullable(),
+  price: z.number().int().min(1),
+  condition: ConditionSchema,
+});
+
+export type Item = z.infer<typeof ItemSchema>;
+
+/**
+ * Create Item Schema
+ */
+export const ItemCreateSchema = ItemSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+  image: true, // Update value after image is created
+  institutionId: true, // get from req.params if creating item
+});
+/**
+ * Update Item Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const ItemUpdateSchema = ItemSchema.partial();
+
+/////////////////////////////////////////
 // COMMENT SCHEMAS
 /////////////////////////////////////////
 
