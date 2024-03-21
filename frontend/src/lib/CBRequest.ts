@@ -5,6 +5,7 @@ import {
   generateUrl,
   imageGetter,
   prepareImageData,
+  prepareImagesData,
   RequestArgs,
 } from "~/lib/requestHelpers";
 
@@ -81,28 +82,25 @@ const uploadImageRequest = async (
   }
 };
 
-const sampleUsages = async () => {
-  const pickImage = async () => {
-    const result = await imageGetter();
-
-    if (result.canceled) {
-      return;
-    }
-
-    // type EventCreateType = z.infer<typeof EventCreateSchema>;
-
-    const data = {
-      title: "Test Event NEW",
-      description: "Test Description",
-      locationPlaceId: "Test Location",
-      startTime: new Date(2025, 1, 2024, 1),
-      endTime: new Date(2025, 1, 2024, 4),
-      isPublic: true,
-    };
-    await uploadImageRequest("post", "/api/events/", result.assets[0], {
-      body: data,
+const uploadImagesRequest = async (
+  method: "post" | "patch",
+  endpoint: AllowedEndpoints,
+  selectedImages: ImagePickerAsset[],
+  options: RequestArgs,
+) => {
+  try {
+    const formData = prepareImagesData(selectedImages, options.body);
+    const url = generateUrl(endpoint, options.params);
+    return await axios({
+      method,
+      url,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
     });
-  };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
-export { uploadImageRequest, CBRequest };
+export { uploadImageRequest, CBRequest, uploadImagesRequest };

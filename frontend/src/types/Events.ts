@@ -134,3 +134,12 @@ export type AttendeeResponse = {
   name: string;
   image: string;
 };
+
+export type MarketPlaceItem = {
+  itemName: string;
+  price: string;
+  condition: string;
+  description: string;
+  // tags?: string[];
+  // location?: string;
+};

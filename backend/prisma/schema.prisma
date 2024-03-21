@@ -353,11 +353,21 @@ model Item {
   price       Int
   createdAt   DateTime  @unique @default(now()) @map("created_at")
   condition   Condition
-  image       String?
+  Image       Image[]
 
   @@index([userId])
   @@index([institutionId])
   @@map("item")
+}
+
+model Image {
+  id     String @id @default(uuid())
+  itemId String @map("item_id")
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  url    String
+
+  @@index([itemId])
+  @@map("image")
 }
 
 enum Condition {

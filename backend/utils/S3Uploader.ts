@@ -2,7 +2,6 @@ import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs";
 import { promisify } from "util";
-import { env } from "./validateEnv";
 import { AppError, AppErrorName } from "./AppError";
 import multer from "multer";
 

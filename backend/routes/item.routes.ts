@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/test", itemTest);
 router.use(verifyAuthentication); // Use auth middleware for all routes below
 router.get("/", getAllItems);
-router.post("/", createItem);
+router.post("/", upload.array("file", 10), createItem);
 router.patch("/:id", upload.single("file"), updateItem);
 router.delete("/:id", deleteItem);
 export default router;

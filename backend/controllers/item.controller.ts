@@ -40,56 +40,59 @@ export const createItem = async (
   next: NextFunction,
 ) => {
   try {
-    const loggedInUserId = req.userId;
-
-    // Validate the Item data
-    const validatedItemData = ItemCreateSchema.parse(req.body);
-
-    // Start a transaction
-    const newItem = await prisma.$transaction(async (prisma) => {
-      const user = await prisma.user.findUnique({
-        where: {
-          id: loggedInUserId!,
-        },
-      });
-
-      if (!user || !user.institutionId) {
-        throw new AppError(
-          AppErrorName.NOT_FOUND_ERROR,
-          `User with id ${loggedInUserId} not found or does not have an institution associated with it.`,
-          404,
-          true,
-        );
-      }
-
-      // create item
-      return prisma.item.create({
-        data: {
-          userId: loggedInUserId!,
-          institutionId: user.institutionId,
-          title: validatedItemData.title,
-          description: validatedItemData.description,
-          price: validatedItemData.price,
-          condition: validatedItemData.condition,
-        },
-      });
-    });
-
-    if (newItem) {
-      // Item created successfully
-      res.status(201).json({
-        message: "Item created successfully",
-        data: newItem,
-      });
-    } else {
-      // Throw an error if the item creation returned an empty result
-      throw new AppError(
-        AppErrorName.EMPTY_RESULT_ERROR,
-        "Item creation returned empty result.",
-        500,
-        true,
-      );
-    }
+    console.log("req.body", req.body);
+    console.log("req.file", req.files);
+    return res.status(200).json({ message: "Item created successfully" });
+    // const loggedInUserId = req.userId;
+    //
+    // // Validate the Item data
+    // const validatedItemData = ItemCreateSchema.parse(req.body);
+    //
+    // // Start a transaction
+    // const newItem = await prisma.$transaction(async (prisma) => {
+    //   const user = await prisma.user.findUnique({
+    //     where: {
+    //       id: loggedInUserId!,
+    //     },
+    //   });
+    //
+    //   if (!user || !user.institutionId) {
+    //     throw new AppError(
+    //       AppErrorName.NOT_FOUND_ERROR,
+    //       `User with id ${loggedInUserId} not found or does not have an institution associated with it.`,
+    //       404,
+    //       true,
+    //     );
+    //   }
+    //
+    //   // create item
+    //   return prisma.item.create({
+    //     data: {
+    //       userId: loggedInUserId!,
+    //       institutionId: user.institutionId,
+    //       title: validatedItemData.title,
+    //       description: validatedItemData.description,
+    //       price: validatedItemData.price,
+    //       condition: validatedItemData.condition,
+    //     },
+    //   });
+    // });
+    //
+    // if (newItem) {
+    //   // Item created successfully
+    //   res.status(201).json({
+    //     message: "Item created successfully",
+    //     data: newItem,
+    //   });
+    // } else {
+    //   // Throw an error if the item creation returned an empty result
+    //   throw new AppError(
+    //     AppErrorName.EMPTY_RESULT_ERROR,
+    //     "Item creation returned empty result.",
+    //     500,
+    //     true,
+    //   );
+    // }
   } catch (error: any) {
     // hand error over to error handling middleware
     next(error);

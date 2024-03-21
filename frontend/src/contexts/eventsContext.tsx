@@ -3,6 +3,7 @@ import { createContext, PropsWithChildren } from "react";
 import { ImagePickerAsset } from "expo-image-picker";
 import {
   createEvent,
+  createMarketPlaceItem,
   createPost,
   getAllMapEvents,
   getAllPosts,
@@ -19,6 +20,7 @@ import {
   EventDetailsProps,
   EventType,
   lookingForDetail,
+  MarketPlaceItem,
   SearchPageEventType,
 } from "~/types/Events";
 import { createEventType } from "~/screens/CreateEvent";
@@ -38,6 +40,10 @@ type eventsContext = {
   likeEvent: (id: string) => Promise<any>;
   getAllPosts: () => Promise<any>;
   getAttendees: (id: string) => Promise<AttendeeResponse[]>;
+  createMarketPlaceItem: (
+    item: MarketPlaceItem,
+    images?: ImagePickerAsset[],
+  ) => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -76,6 +82,7 @@ export const EventsContextProvider = ({
         createPost,
         getAllPosts,
         getAttendees,
+        createMarketPlaceItem,
       }}
     >
       {children}
