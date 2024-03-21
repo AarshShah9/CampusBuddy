@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#ccc",
     width: "100%",
+    alignSelf: "center",
+    opacity: 0.2,
   },
   list: {
     backgroundColor: "white",

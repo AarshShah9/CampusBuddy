@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import React, { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export function RenderAttendee({ item }: { item: AttendeeResponse }) {
   const navigation = useNavigation<any>();
@@ -12,14 +13,16 @@ export function RenderAttendee({ item }: { item: AttendeeResponse }) {
     },
     [navigation],
   );
+  const imageSource = item.image ? { uri: generateImageURL(item.image) } : null;
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => onUserPress(item.id)}>
+      {imageSource ? (
+        <Image source={imageSource} style={styles.profilePic} />
+      ) : (
+        <MaterialIcons name="person" size={50} color="#333" />
+      )}
       <Text style={styles.name}>{item.name}</Text>
-      <Image
-        source={{ uri: generateImageURL(item.image) }}
-        style={styles.profilePic}
-      />
     </TouchableOpacity>
   );
 }
@@ -27,7 +30,7 @@ export function RenderAttendee({ item }: { item: AttendeeResponse }) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: 10,
     backgroundColor: "#fff",
@@ -35,6 +38,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     color: "#333",
+    fontWeight: "bold",
+    paddingLeft: 15,
   },
   profilePic: {
     width: 50,
