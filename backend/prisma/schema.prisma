@@ -96,6 +96,7 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
+  pushTokens           PushToken[]
 
   @@index([email])
   @@index([institutionId])
@@ -337,4 +338,15 @@ model Location {
   Event       Event[]
 
   @@map("location")
+}
+
+model PushToken {
+  userId    String @map("user_id")
+  pushToken String @map("push_token")
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, pushToken])
+  @@unique([userId, pushToken]) 
+  @@index([userId])
+  @@map("push_token")
 }
