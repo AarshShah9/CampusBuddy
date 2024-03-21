@@ -17,8 +17,10 @@ import {
   generateJWT,
   verify,
   loginAsAdmin,
+  uploadProfilePic,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
+import { upload } from "../utils/S3Uploader";
 
 const router = express.Router();
 
@@ -34,10 +36,12 @@ router.get("/verify/organization/:id/:token", verifyExistingOrgSignup);
 router.post("/loginUser", loginUser);
 router.post("/logoutUser", verifyAuthentication, logoutUser);
 router.post("/resetPassword", resetPassword); // should we be authenticated?
-router.get("/", verifyAuthentication, getAllUsers);
-router.get("/me", verifyAuthentication, getLoggedInUser);
-router.get("/:id", verifyAuthentication, getUserById);
-router.patch("/me", verifyAuthentication, updateUser);
-router.delete("/:id", verifyAuthentication, removeUserById);
+router.use(verifyAuthentication); // Use auth middleware for all routes below
+router.get("/", getAllUsers);
+router.get("/me", getLoggedInUser);
+router.get("/:id", getUserById);
+router.patch("/me", updateUser);
+router.delete("/:id", removeUserById);
+router.post("/profilePicture", upload.single("file"), uploadProfilePic);
 
 export default router;

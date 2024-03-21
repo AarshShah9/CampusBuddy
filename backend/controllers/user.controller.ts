@@ -20,6 +20,7 @@ import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
 import { thankYouMessage } from "../utils/emails";
+import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
 
 const jwtSecret = process.env.JWT_SECRET as Secret;
 
@@ -860,9 +861,30 @@ export const verify = async (req: Request, res: Response) => {
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
-  const authToken = jwt.sign(users[0] as JwtPayload, jwtSecret);
+  const user = await prisma.user.findUnique({
+    where: {
+      id: users[0].id,
+    },
+  });
 
-  res.status(200).json({ authToken });
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User doesn't exist",
+    });
+  }
+
+  const authToken = jwt.sign(user as JwtPayload, jwtSecret);
+
+  res.status(200).json({
+    authToken,
+    data: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      image: user.profilePic,
+    },
+  });
 };
 
 export const loginAsAdmin = async (req: Request, res: Response) => {
@@ -916,5 +938,65 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
     res.status(200).json({ authToken });
   } catch (error) {
     res.status(500).json({ message: `Internal server error - ${error}` });
+  }
+};
+
+export const uploadProfilePic = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    if (!req.file) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "No file uploaded",
+        400,
+        true,
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const updatedUser = await prisma.$transaction(async (prisma) => {
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        user.id,
+      );
+      const path = `images/profilePictures/${uniqueFileName}`;
+
+      await UploadToS3(req.file!, path);
+
+      return prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePic: path,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: "Profile picture updated successfully",
+      data: {
+        image: updatedUser.profilePic,
+      },
+    });
+  } catch (error: any) {
+    next(error);
   }
 };

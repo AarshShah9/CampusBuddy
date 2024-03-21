@@ -3,10 +3,19 @@ import { Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
 import MenuIcon from "./MenuIcon";
+import useAuthContext from "~/hooks/useAuthContext";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import { MaterialIcons } from "@expo/vector-icons";
+import React from "react";
 
 export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
+  const { user } = useAuthContext();
+
+  const imageSource = user?.image
+    ? { uri: generateImageURL(user.image) }
+    : null;
 
   return (
     <View
@@ -27,10 +36,14 @@ export default function Header() {
             }}
           >
             <View style={styles.profilePicContainer}>
-              <Image
-                style={{ width: "100%", height: "100%" }}
-                source={require("~/assets/images/peterparker.jpg")}
-              />
+              {imageSource ? (
+                <Image
+                  style={{ width: "100%", height: "100%" }}
+                  source={{ uri: user?.image }}
+                />
+              ) : (
+                <MaterialIcons name="person" size={50} color="#333" />
+              )}
             </View>
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
@@ -44,7 +57,9 @@ export default function Header() {
           <MenuIcon />
         </View>
         <View style={styles.lowerSection}>
-          <Text style={{ fontWeight: "bold" }}>Peter Parker</Text>
+          <Text style={{ fontWeight: "bold" }}>
+            {user?.firstName} {user?.lastName}
+          </Text>
           <Text>{`Mechanical Engineering`}</Text>
         </View>
       </View>
