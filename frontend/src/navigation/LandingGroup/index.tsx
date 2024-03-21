@@ -6,6 +6,7 @@ import EventDetails from "~/screens/EventDetails";
 import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
+import Attendees from "~/screens/Attendees";
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,17 @@ export default function TopTabsGroup() {
           <Stack.Screen
             name="MapDetails"
             component={MapDetails}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              presentation: "modal",
+              headerStyle: { backgroundColor: theme.colors.primary },
+            }}
+          />
+          <Stack.Screen
+            name="Attendees"
+            component={Attendees}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,

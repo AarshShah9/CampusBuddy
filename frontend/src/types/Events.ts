@@ -128,3 +128,9 @@ export type CarousalItem = {
   title: string;
   image: string;
 };
+
+export type AttendeeResponse = {
+  id: string;
+  name: string;
+  image: string;
+};

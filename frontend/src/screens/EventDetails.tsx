@@ -102,6 +102,10 @@ export default function EventDetails() {
     };
   });
 
+  const seeAttendees = useCallback(() => {
+    navigation.navigate("Attendees", { id });
+  }, [navigation, id]);
+
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
@@ -175,28 +179,35 @@ export default function EventDetails() {
             </Text>
           </EClubDetails>
         </View>
-        <View
-          style={{
-            borderTopColor: "#B0CFFF",
-            borderTopWidth: 1,
-            flexDirection: "row",
-            height: 50,
-            backgroundColor: "white",
-            alignItems: "center",
-          }}
-        >
-          <Ionicons
-            name="people-outline"
-            size={30}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-          <Text
-            style={{ fontFamily: "Roboto-Medium", fontSize: 16, marginLeft: 5 }}
+        <TouchableOpacity onPress={seeAttendees}>
+          <View
+            style={{
+              borderTopColor: "#B0CFFF",
+              borderTopWidth: 1,
+              flexDirection: "row",
+              height: 50,
+              backgroundColor: "white",
+              alignItems: "center",
+            }}
           >
-            Attendance: {eventData?.eventResponses.length}
-          </Text>
-        </View>
+            <Ionicons
+              name="people-outline"
+              size={30}
+              color="black"
+              style={{ marginLeft: 10 }}
+            />
+
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+                marginLeft: 5,
+              }}
+            >
+              Attendance: {eventData?.eventResponses.length}{" "}
+            </Text>
+          </View>
+        </TouchableOpacity>
         <View
           style={{
             backgroundColor: "white",
