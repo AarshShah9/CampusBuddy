@@ -97,6 +97,12 @@ export const locations = [
     latitude: 51.04473309999999,
     name: "Calgary",
   },
+  {
+    placeId: "ChIJT4ox6w5vcVMRZiOpVJka3KA",
+    longitude: -114.1304021,
+    latitude: 51.0801184,
+    name: "ICT Building",
+  },
 ];
 
 export const institutes = [
@@ -390,6 +396,7 @@ export const items = [
     price: 700,
     createdAt: "2024-10-10T09:00:00Z",
     condition: "Used_Like_New",
+    locationPlaceId: locations[1].placeId,
   },
   {
     id: ids.itemIds[2],
@@ -400,6 +407,7 @@ export const items = [
     price: 600,
     createdAt: "2024-10-10T10:00:00Z",
     condition: "Used_Fair",
+    locationPlaceId: locations[1].placeId,
   },
 ];
 

@@ -25,6 +25,7 @@ import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
 import { useNavigation } from "@react-navigation/native";
 import { z } from "zod";
+import useLoadingContext from "~/hooks/useLoadingContext";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -32,8 +33,8 @@ const schema = zod.object({
   price: zod.string(),
   condition: zod.string(),
   description: zod.string(),
+  locationPlaceId: zod.string(),
   // tags: zod.string().array(),
-  // location: zod.string(),
 });
 
 export default function CreateMarketplace() {
@@ -42,6 +43,7 @@ export default function CreateMarketplace() {
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
   const { createMarketPlaceItem } = useEventsContext();
+  const { startLoading, stopLoading } = useLoadingContext();
   const navigation = useNavigation<any>();
 
   const handleCheckboxToggle = (item: string) => {
@@ -59,12 +61,14 @@ export default function CreateMarketplace() {
       price: "",
       condition: "",
       description: "",
+      locationPlaceId: "",
     },
     // resolver: zodResolver(schema),
   });
 
   // Handle submission of data to backend
   const onSubmit = (data: MarketPlaceItem) => {
+    startLoading();
     createMarketPlaceItem(data, selectedImages)
       .then((r) => {
         if (r.status !== 201) {
@@ -73,6 +77,7 @@ export default function CreateMarketplace() {
         reset();
         setSelectedImages(undefined);
         setCheckedItem(null);
+        stopLoading();
         alert("item Created");
         navigation.navigate("Home");
       })
@@ -401,28 +406,27 @@ export default function CreateMarketplace() {
             {/*  )}*/}
             {/*  name="tags"*/}
             {/*/>*/}
-            {/*  TODO BRING BACK IF WE NEED?*/}
-            {/*<Controller*/}
-            {/*  control={control}*/}
-            {/*  rules={{*/}
-            {/*    required: true,*/}
-            {/*  }}*/}
-            {/*  render={({ field: { onChange, onBlur, value } }) => (*/}
-            {/*    <View style={{ marginBottom: 15 }}>*/}
-            {/*      <Text*/}
-            {/*        style={{*/}
-            {/*          marginBottom: 3,*/}
-            {/*          fontFamily: "Nunito-Medium",*/}
-            {/*          fontSize: 16,*/}
-            {/*        }}*/}
-            {/*      >*/}
-            {/*        Location**/}
-            {/*      </Text>*/}
-            {/*      <LocationInputModal controllerOnChange={onChange} />*/}
-            {/*    </View>*/}
-            {/*  )}*/}
-            {/*  name="location"*/}
-            {/*/>*/}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={{ marginBottom: 15 }}>
+                  <Text
+                    style={{
+                      marginBottom: 3,
+                      fontFamily: "Nunito-Medium",
+                      fontSize: 16,
+                    }}
+                  >
+                    Location*
+                  </Text>
+                  <LocationInputModal controllerOnChange={onChange} />
+                </View>
+              )}
+              name="locationPlaceId"
+            />
           </View>
         </View>
         <View style={{ marginTop: 50, marginBottom: 50 }}>

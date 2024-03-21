@@ -337,6 +337,7 @@ model Location {
 
   Institution Institution[]
   Event       Event[]
+  Item        Item[]
 
   @@map("location")
 }
@@ -355,8 +356,12 @@ model Item {
   condition   String?  @map("condition")
   Image       Image[]
 
+  location        Location @relation(fields: [locationPlaceId], references: [placeId])
+  locationPlaceId String
+
   @@index([userId])
   @@index([institutionId])
+  @@index([locationPlaceId])
   @@map("item")
 }
 

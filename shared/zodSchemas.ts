@@ -312,6 +312,7 @@ export const ItemSchema = z.object({
   description: z.string().nullable(),
   price: z.coerce.number().min(1),
   condition: z.string(),
+  locationPlaceId: z.string(),
 });
 
 export type Item = z.infer<typeof ItemSchema>;

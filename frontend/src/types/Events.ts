@@ -140,6 +140,6 @@ export type MarketPlaceItem = {
   price: string;
   condition: string;
   description: string;
+  locationPlaceId: string;
   // tags?: string[];
-  // location?: string;
 };
