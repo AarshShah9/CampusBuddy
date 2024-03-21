@@ -288,20 +288,18 @@ export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
 /////////////////////////////////////////
 // ITEM SCHEMAS
 /////////////////////////////////////////
-export const ConditionSchema = z.enum([
-  "New",
-  "Used_Like_New",
-  "Used_Good",
-  "Used_Fair",
-]);
+// export const ConditionSchema = z.enum([
+//   "New",
+//   "Used_Like_New",
+//   "Used_Good",
+//   "Used_Fair",
+// ]);
 /**
  * Item Schema
  */
 export const ItemSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
-  image: z.string().nullable(),
-  //institutionId: z.string().uuid().nullable(),
   createdAt: z.coerce
     .date({
       required_error: "Please select a date and time",
@@ -312,8 +310,8 @@ export const ItemSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  price: z.number().int().min(1),
-  condition: ConditionSchema,
+  price: z.coerce.number().min(1),
+  condition: z.string(),
 });
 
 export type Item = z.infer<typeof ItemSchema>;
@@ -325,8 +323,6 @@ export const ItemCreateSchema = ItemSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
-  institutionId: true, // get from req.params if creating item
 });
 /**
  * Update Item Schema

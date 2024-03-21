@@ -5,7 +5,6 @@ import {
 } from "../CBRequest";
 import { ImagePickerAsset } from "expo-image-picker";
 import { createEventType } from "~/screens/CreateEvent";
-import { useCallback } from "react";
 import { MarketPlaceItem } from "~/types/Events";
 
 export async function getHomePageEvents() {

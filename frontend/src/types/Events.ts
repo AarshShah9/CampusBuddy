@@ -136,7 +136,7 @@ export type AttendeeResponse = {
 };
 
 export type MarketPlaceItem = {
-  itemName: string;
+  title: string;
   price: string;
   condition: string;
   description: string;

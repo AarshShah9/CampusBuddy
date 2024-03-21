@@ -4,7 +4,6 @@ import {
   OrganizationStatus,
   ParticipationStatus,
   PostType,
-  Condition,
   User,
   UserOrgStatus,
   UserRole,
@@ -82,6 +81,12 @@ export const ids = {
     2: "f6700560-c5f5-11ee-83fd-6f8d6c450910",
     3: "f6700561-c5f5-11ee-83fd-6f8d6c450910",
     4: "f6700562-c5f5-11ee-83fd-6f8d6c450910",
+  },
+  imageIds: {
+    1: "018e6294-e53a-73b7-bf04-aca8524ebf91",
+    2: "018e6295-0c32-722b-b2de-aae793e11db1",
+    3: "018e6295-257e-7a2a-a393-59d51c342c24",
+    4: "018e6295-3efb-7adb-8342-cf05070d31ec",
   },
 };
 
@@ -362,6 +367,19 @@ export const posts = [
     // Other post details
   },
 ];
+
+export const images = [
+  {
+    id: ids.imageIds[1],
+    url: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    itemId: ids.itemIds[1],
+  },
+  {
+    id: ids.imageIds[2],
+    url: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    itemId: ids.itemIds[2],
+  },
+];
 export const items = [
   {
     id: ids.itemIds[1],
@@ -371,7 +389,7 @@ export const items = [
     description: "Brand New phone, do not use anymore, 95% Battery Health",
     price: 700,
     createdAt: "2024-10-10T09:00:00Z",
-    condition: Condition.Used_Like_New,
+    condition: "Used_Like_New",
   },
   {
     id: ids.itemIds[2],
@@ -381,7 +399,7 @@ export const items = [
     description: "Brand New bike, small scratches, needs a bit of tuning",
     price: 600,
     createdAt: "2024-10-10T10:00:00Z",
-    condition: Condition.Used_Fair,
+    condition: "Used_Fair",
   },
 ];
 

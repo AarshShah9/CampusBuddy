@@ -351,8 +351,8 @@ model Item {
   title       String
   description String?
   price       Int
-  createdAt   DateTime  @unique @default(now()) @map("created_at")
-  condition   Condition
+  createdAt   DateTime @unique @default(now()) @map("created_at")
+  condition   String?  @map("condition")
   Image       Image[]
 
   @@index([userId])
@@ -370,9 +370,9 @@ model Image {
   @@map("image")
 }
 
-enum Condition {
-  New
-  Used_Like_New
-  Used_Good
-  Used_Fair
-}
+// enum Condition {
+//   New
+//   Used_Like_New
+//   Used_Good
+//   Used_Fair
+// }

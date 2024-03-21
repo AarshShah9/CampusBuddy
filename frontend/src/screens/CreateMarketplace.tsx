@@ -24,11 +24,11 @@ import { ImagePickerAsset } from "expo-image-picker";
 import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
 import { useNavigation } from "@react-navigation/native";
+import { z } from "zod";
 
 // React Hook Form Section
 const schema = zod.object({
-  image: zod.string(),
-  itemName: zod.string(),
+  title: zod.string(),
   price: zod.string(),
   condition: zod.string(),
   description: zod.string(),
@@ -55,7 +55,7 @@ export default function CreateMarketplace() {
     reset,
   } = useForm<MarketPlaceItem>({
     defaultValues: {
-      itemName: "",
+      title: "",
       price: "",
       condition: "",
       description: "",
@@ -70,8 +70,10 @@ export default function CreateMarketplace() {
         if (r.status !== 201) {
           throw new Error("Error creating item");
         }
-        alert("item Created");
         reset();
+        setSelectedImages(undefined);
+        setCheckedItem(null);
+        alert("item Created");
         navigation.navigate("Home");
       })
       .catch((e) => {
@@ -244,7 +246,7 @@ export default function CreateMarketplace() {
                   />
                 </View>
               )}
-              name="itemName"
+              name="title"
             />
             <Controller
               control={control}
@@ -265,8 +267,11 @@ export default function CreateMarketplace() {
                   <TextInput
                     style={style.priceInput}
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={(text) =>
+                      onChange(text.replace(/[^0-9]/g, ""))
+                    }
                     value={value}
+                    keyboardType="numeric"
                   />
                 </View>
               )}
