@@ -3,9 +3,7 @@ import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/typ
 import type { PropsWithChildren } from "react";
 import { createContext, useCallback, useRef } from "react";
 import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
-import authContext from "~/contexts/authContext";
 import useAuthContext from "~/hooks/useAuthContext";
-import { UserDataType } from "~/types/User";
 import { imageGetter } from "~/lib/requestHelpers";
 import useLoadingContext from "~/hooks/useLoadingContext";
 

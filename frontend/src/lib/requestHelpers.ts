@@ -12,6 +12,25 @@ const imageGetter = async () => {
   });
 };
 
+const imageGetterV2 = async ({
+  circle = false,
+  multiple = false,
+  allowEditing = false,
+  maxSize = 10,
+} = {}) => {
+  const aspectRatio: [number, number] = circle ? [1, 1] : [4, 3];
+  if (multiple) allowEditing = false;
+
+  return await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: allowEditing,
+    aspect: aspectRatio,
+    quality: 1,
+    allowsMultipleSelection: multiple,
+    selectionLimit: multiple ? maxSize : 1,
+  });
+};
+
 /**
  * Prepares the image data for uploading by creating a FormData object.
  *
@@ -130,5 +149,6 @@ export {
   RequestArgs,
   generateUrl,
   ImagePicker,
+  imageGetterV2,
   allowedEndpoints,
 };

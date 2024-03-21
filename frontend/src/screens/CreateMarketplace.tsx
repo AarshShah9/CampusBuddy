@@ -6,6 +6,8 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  Alert,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
@@ -22,7 +24,7 @@ import { useCallback, useState } from "react";
 import { Button, Checkbox } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import LocationInputModal from "~/components/LocationInputModal";
-import { imageGetter } from "~/lib/requestHelpers";
+import { imageGetter, imageGetterV2 } from "~/lib/requestHelpers";
 
 const IMG_HEIGHT = 300;
 type marketPlaceDetail = {
@@ -49,9 +51,8 @@ const schema = zod.object({
 export default function CreateMarketplace() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffSet = useScrollViewOffset(scrollRef);
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string>();
+  const [selectedImages, setSelectedImages] = useState<string[]>();
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
   };
@@ -73,40 +74,77 @@ export default function CreateMarketplace() {
     resolver: zodResolver(schema),
   });
 
-  // Functions
   // Handle submission of data to backend
   const onSubmit = (data: marketPlaceDetail) => {
     console.log(data);
   };
-  // Handle animating image when uploaded, may be scrapped and not needed
-  const imageAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffSet.value,
-            [-IMG_HEIGHT, 0, IMG_HEIGHT],
-            [-IMG_HEIGHT / 2, 0, IMG_HEIGHT * 0.75],
-          ),
-        },
-        {
-          scale: interpolate(
-            scrollOffSet.value,
-            [-IMG_HEIGHT, 0, IMG_HEIGHT],
-            [3, 1, 1],
-          ),
-        },
-      ],
-    };
-  });
 
   const addPhoto = useCallback(async () => {
-    const result = await imageGetter();
-    if (result.canceled) {
-      setSelectedImage(undefined);
+    // Calculate the remaining number of images that can be selected
+    const remainingImagesCount =
+      10 - (selectedImages ? selectedImages.length : 0);
+
+    const result = await imageGetterV2({
+      multiple: true,
+      allowEditing: false,
+      maxSize: remainingImagesCount,
+    });
+
+    if (result.canceled || !result.assets) {
       return;
     }
-    setSelectedImage(result.assets[0].uri);
+
+    const newImages = result.assets.map((asset) => asset.uri);
+
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        return [...currentImages, ...newImages].slice(0, 10);
+      }
+      return newImages;
+    });
+  }, [selectedImages]);
+
+  const replacePhoto = useCallback(async (index: number) => {
+    const result = await imageGetterV2({ multiple: false });
+    if (result.canceled || !result.assets) {
+      return;
+    }
+
+    // Update the image at the specific index
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        const updatedImages = [...currentImages];
+        updatedImages[index] = result.assets[0].uri;
+        return updatedImages;
+      }
+      return currentImages;
+    });
+  }, []);
+
+  const showDeleteMenu = (index: number) => {
+    Alert.alert(
+      "Delete Image",
+      "Do you want to delete this image?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "Delete", onPress: () => deleteImage(index) },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  const deleteImage = useCallback((index: number) => {
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        const updatedImages = [...currentImages];
+        updatedImages.splice(index, 1);
+        return updatedImages;
+      }
+      return currentImages;
+    });
   }, []);
 
   return (
@@ -123,47 +161,65 @@ export default function CreateMarketplace() {
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
           {/* View holds the icon for user to click to upload their own image */}
-          <TouchableOpacity onPress={addPhoto}>
-            {!selectedImage && (
-              <View
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity onPress={addPhoto} style={{ marginRight: 10 }}>
+              {!selectedImages && (
+                <View
+                  style={{
+                    width: 100,
+                    height: 100,
+                    backgroundColor: "grey",
+                    borderRadius: 8,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Feather name="image" size={24} color="black" />
+                  <Text style={{ color: "white", paddingTop: 10 }}>
+                    Add Image
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {selectedImages &&
+              selectedImages.map((uri, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => replacePhoto(index)}
+                  onLongPress={() => showDeleteMenu(index)}
+                  style={{ marginRight: 10 }}
+                >
+                  <Animated.Image
+                    source={{ uri }}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 8,
+                    }}
+                  />
+                </TouchableOpacity>
+              ))}
+            {selectedImages && selectedImages.length < 10 && (
+              <TouchableOpacity
+                onPress={addPhoto}
                 style={{
                   width: 100,
                   height: 100,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 10,
                   backgroundColor: "grey",
                   borderRadius: 8,
-                  justifyContent: "center",
                 }}
               >
-                <Feather
-                  style={{ marginLeft: "auto", marginRight: "auto" }}
-                  name="image"
-                  size={24}
-                  color="black"
-                />
-                <Text
-                  style={{
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    color: "white",
-                  }}
-                >
+                <Feather name="plus-circle" size={24} color="white" />
+                <Text style={{ color: "white", paddingTop: 10 }}>
                   Add Image
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
-            {selectedImage && (
-              <Animated.Image
-                source={{ uri: selectedImage }}
-                style={[
-                  {
-                    width: 100,
-                    height: 100,
-                    borderRadius: 8,
-                  },
-                ]}
-              />
-            )}
-          </TouchableOpacity>
+          </ScrollView>
           {/* View holds all the Controllers for user to enter their information */}
           <View>
             <Controller
