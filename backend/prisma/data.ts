@@ -113,7 +113,7 @@ export const users: User[] = [
     password: "hashed-password123",
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
-    profilePic: null,
+    profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
   },
   {
     id: ids.userIds[2],

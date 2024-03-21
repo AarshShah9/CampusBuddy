@@ -77,6 +77,7 @@ const uploadImageRequest = async (
     });
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 

@@ -1,4 +1,4 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
@@ -25,7 +25,7 @@ const IMG_HEIGHT = 300;
 
 export default function EventDetails() {
   const {
-    params: { id },
+    params: { id, map },
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
@@ -50,6 +50,19 @@ export default function EventDetails() {
       refetch();
     },
   });
+
+  const onMapPress = useCallback(() => {
+    navigation.navigate("MapDetails", {
+      eventData: [
+        {
+          title: eventData?.title,
+          description: eventData?.description,
+          latitude: eventData?.location.latitude,
+          longitude: eventData?.location.longitude,
+        },
+      ],
+    });
+  }, [eventData, navigation]);
 
   // TODO fix optimistic updates
   const isOptimistic =
@@ -88,6 +101,10 @@ export default function EventDetails() {
       ],
     };
   });
+
+  const seeAttendees = useCallback(() => {
+    navigation.navigate("Attendees", { id });
+  }, [navigation, id]);
 
   return (
     <MainContainer color={theme.colors.primary}>
@@ -162,28 +179,35 @@ export default function EventDetails() {
             </Text>
           </EClubDetails>
         </View>
-        <View
-          style={{
-            borderTopColor: "#B0CFFF",
-            borderTopWidth: 1,
-            flexDirection: "row",
-            height: 50,
-            backgroundColor: "white",
-            alignItems: "center",
-          }}
-        >
-          <Ionicons
-            name="people-outline"
-            size={30}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-          <Text
-            style={{ fontFamily: "Roboto-Medium", fontSize: 16, marginLeft: 5 }}
+        <TouchableOpacity onPress={seeAttendees}>
+          <View
+            style={{
+              borderTopColor: "#B0CFFF",
+              borderTopWidth: 1,
+              flexDirection: "row",
+              height: 50,
+              backgroundColor: "white",
+              alignItems: "center",
+            }}
           >
-            Attendance: {eventData?.eventResponses.length}
-          </Text>
-        </View>
+            <Ionicons
+              name="people-outline"
+              size={30}
+              color="black"
+              style={{ marginLeft: 10 }}
+            />
+
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+                marginLeft: 5,
+              }}
+            >
+              Attendance: {eventData?.eventResponses.length}{" "}
+            </Text>
+          </View>
+        </TouchableOpacity>
         <View
           style={{
             backgroundColor: "white",
@@ -204,11 +228,13 @@ export default function EventDetails() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {eventData?.location && (
-            <MapComponentSmall
-              latitude={eventData?.location.latitude}
-              longitude={eventData?.location.longitude}
-            />
+          {eventData?.location && (map === undefined ? true : map) && (
+            <TouchableOpacity onPress={onMapPress}>
+              <MapComponentSmall
+                latitude={eventData?.location.latitude}
+                longitude={eventData?.location.longitude}
+              />
+            </TouchableOpacity>
           )}
         </View>
         <View
@@ -216,10 +242,13 @@ export default function EventDetails() {
             paddingBottom: 60,
             marginLeft: "auto",
             marginRight: "auto",
-            width: "80%",
+            width: "90%",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <StyledButton mode="contained">
+          <Button mode="contained" style={styles.AttendButton}>
             <Text
               style={{
                 lineHeight: 30,
@@ -231,12 +260,26 @@ export default function EventDetails() {
             >
               Attend
             </Text>
-          </StyledButton>
+          </Button>
         </View>
       </Animated.ScrollView>
     </MainContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  AttendButton: {
+    borderRadius: 8,
+    width: "100%",
+    height: 48,
+    fontSize: 25,
+    fontWeight: "bold",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginTop: 10,
+    justifyContent: "center",
+  },
+});
 
 // prettier-ignore
 const MainContainer = styled(View) <{ color: string }>`
@@ -271,16 +314,4 @@ const TagContainer = styled(View)`
     flex-direction: row;
     padding: 5px;
     margin-bottom: 5px;
-`;
-// prettier-ignore
-const StyledButton = styled(Button)`
-    border-radius: 8px;
-    width: 100%;
-    height: 48px;
-    font-size: 25px;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
-    justify-content: center;
 `;

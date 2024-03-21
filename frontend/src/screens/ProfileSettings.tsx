@@ -42,6 +42,7 @@ export default function ProfileSettings() {
       index={0}
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
+      handleIndicatorStyle={{ backgroundColor: "grey" }} // todo change this to use theme
       backgroundStyle={{ borderRadius: 20 }} // play around with the number to find a suitable one
     >
       <View style={styles.contentContainer}>
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 0.8
+    borderBottomWidth: 0.8,
   },
   settingText: {
     fontSize: 16,

@@ -56,6 +56,8 @@ const allowedEndpoints = [
   "/api/user/removeUser/:id",
   "/api/user/getAllUsers",
   "/api/user/updateUser/:id",
+  "/api/user/profilePicture",
+  "/api/user/deleteProfilePicture",
 
   // Organization-related endpoints
   "/api/orgs/test",
@@ -78,6 +80,7 @@ const allowedEndpoints = [
   "/api/events/mainPage",
   "/api/events/mapEvents",
   "/api/events/like/:id",
+  "/api/events/attendees/:id",
 
   // Post-related endpoints
   "/api/post/test",
