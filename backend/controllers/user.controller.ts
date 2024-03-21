@@ -977,6 +977,10 @@ export const uploadProfilePic = async (
     }
 
     const updatedUser = await prisma.$transaction(async (prisma) => {
+      if (user.profilePic) {
+        await deleteFromS3(user.profilePic);
+      }
+
       const uniqueFileName = generateUniqueFileName(
         req.file!.originalname,
         user.id,

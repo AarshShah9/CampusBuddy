@@ -6,16 +6,22 @@ import MenuIcon from "./MenuIcon";
 import useAuthContext from "~/hooks/useAuthContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect } from "react";
+import useProfileContext from "~/hooks/useProfileContext";
 
 export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
+  const { openPictureModal } = useProfileContext();
+  const [imageSource, setImageSource] = React.useState<any>(null);
 
-  const imageSource = user?.image
-    ? { uri: generateImageURL(user.image) }
-    : null;
+  useEffect(() => {
+    const imageSource = user?.image
+      ? { uri: generateImageURL(user.image) }
+      : null;
+    setImageSource(imageSource);
+  }, [user]);
 
   return (
     <View
@@ -30,19 +36,17 @@ export default function Header() {
     >
       <View style={styles.headerCard}>
         <View style={styles.upperSection}>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("Update profile");
-            }}
-          >
+          <TouchableOpacity onPress={openPictureModal}>
             <View style={styles.profilePicContainer}>
               {imageSource ? (
                 <Image
                   style={{ width: "100%", height: "100%" }}
-                  source={{ uri: user?.image }}
+                  source={{ uri: imageSource.uri }}
                 />
               ) : (
-                <MaterialIcons name="person" size={50} color="#333" />
+                <View style={styles.iconContainer}>
+                  <MaterialIcons name="person" size={50} color="grey" />
+                </View>
               )}
             </View>
           </TouchableOpacity>
@@ -87,6 +91,9 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 50,
+    backgroundColor: "#FFF", // Ensure background color for consistency
+    justifyContent: "center", // Center vertically inside the circle
+    alignItems: "center", // Center horizontally inside the circle
     overflow: "hidden",
   },
   miniInfoContainer: {
@@ -98,5 +105,11 @@ const styles = StyleSheet.create({
   },
   lowerSection: {
     marginTop: 10,
+  },
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
   },
 });

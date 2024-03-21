@@ -1,6 +1,6 @@
 export type UserDataType = {
   id: string;
-  image: string;
+  image?: string;
   firstName: string;
   lastName: string;
 };
