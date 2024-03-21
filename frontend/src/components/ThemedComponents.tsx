@@ -29,7 +29,15 @@ export const ThemedTextInput = ({ style, ...props }: TextInputProps) => {
     style,
   ];
 
-  return <TextInput {...props} style={stylesList} />;
+  return (
+    <TextInput
+      {...props}
+      style={stylesList}
+      autoComplete={"off"}
+      autoCapitalize={"none"}
+      autoCorrect={false}
+    />
+  );
 };
 // prettier-ignore
 export const MainContainer = styled(View)<{ $primary: string }>`

@@ -87,3 +87,17 @@ export const createPost = async (post: any) => {
     console.log(err);
   }
 };
+
+export const getAttendees = async (id: string) => {
+  try {
+    return (
+      await CBRequest("GET", "/api/events/attendees/:id", {
+        params: {
+          id,
+        },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

@@ -6,6 +6,7 @@ import {
   createPost,
   getAllMapEvents,
   getAllPosts,
+  getAttendees,
   getEventDetails,
   getHomePageEvents,
   getMainEvents,
@@ -14,6 +15,7 @@ import {
   likeEvent,
 } from "~/lib/apiFunctions/Events";
 import {
+  AttendeeResponse,
   EventDetailsProps,
   EventType,
   lookingForDetail,
@@ -35,6 +37,7 @@ type eventsContext = {
   getEventDetails: (id: string) => Promise<EventDetailsProps>;
   likeEvent: (id: string) => Promise<any>;
   getAllPosts: () => Promise<any>;
+  getAttendees: (id: string) => Promise<AttendeeResponse[]>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -72,6 +75,7 @@ export const EventsContextProvider = ({
         likeEvent,
         createPost,
         getAllPosts,
+        getAttendees,
       }}
     >
       {children}
