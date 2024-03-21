@@ -18,6 +18,7 @@ import {
   verify,
   loginAsAdmin,
   uploadProfilePic,
+  removeProfilePic,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 import { upload } from "../utils/S3Uploader";
@@ -43,5 +44,6 @@ router.get("/:id", getUserById);
 router.patch("/me", updateUser);
 router.delete("/:id", removeUserById);
 router.post("/profilePicture", upload.single("file"), uploadProfilePic);
+router.delete("/profilePicture", removeProfilePic);
 
 export default router;

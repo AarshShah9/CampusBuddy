@@ -20,7 +20,10 @@ import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
 import { thankYouMessage } from "../utils/emails";
-import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
+import UploadToS3, {
+  deleteFromS3,
+  generateUniqueFileName,
+} from "../utils/S3Uploader";
 
 const jwtSecret = process.env.JWT_SECRET as Secret;
 
@@ -994,6 +997,50 @@ export const uploadProfilePic = async (
       message: "Profile picture updated successfully",
       data: {
         image: updatedUser.profilePic,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const removeProfilePic = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    if (!user || !user.profilePic) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found or has no profile picture`,
+        404,
+        true,
+      );
+    }
+
+    await prisma.$transaction(async (prisma) => {
+      await deleteFromS3(user.profilePic!);
+      return prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePic: null,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: "Profile picture removed successfully",
+      data: {
+        image: null,
       },
     });
   } catch (error: any) {
