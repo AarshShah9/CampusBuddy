@@ -12,6 +12,25 @@ const imageGetter = async () => {
   });
 };
 
+const imageGetterV2 = async ({
+  circle = false,
+  multiple = false,
+  allowEditing = false,
+  maxSize = 10,
+} = {}) => {
+  const aspectRatio: [number, number] = circle ? [1, 1] : [4, 3];
+  if (multiple) allowEditing = false;
+
+  return await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: allowEditing,
+    aspect: aspectRatio,
+    quality: 1,
+    allowsMultipleSelection: multiple,
+    selectionLimit: multiple ? maxSize : 1,
+  });
+};
+
 /**
  * Prepares the image data for uploading by creating a FormData object.
  *
@@ -44,6 +63,44 @@ const prepareImageData = (
   return formData;
 };
 
+/**
+ * Prepares the image data for uploading by creating a FormData object.
+ *
+ * @param selectedImages - The images selected by the user.
+ * @param data - Additional data to be sent with the images.
+ * @return The FormData object containing the images and additional data.
+ */
+const prepareImagesData = (
+  selectedImages: ImagePickerAsset[],
+  data: Record<string, any>,
+): FormData => {
+  const formData = new FormData();
+
+  selectedImages.forEach((selectedImage, index) => {
+    const uri =
+      Platform.OS === "android"
+        ? selectedImage.uri
+        : selectedImage.uri.replace("file://", "");
+    const filename = selectedImage.uri.split("/").pop();
+    const match = /\.(\w+)$/.exec(filename as string);
+    const type = `image/${match ? match[1] : "jpeg"}`;
+
+    formData.append("file", {
+      uri,
+      name: `image${index + 1}.${match ? match[1] : "jpeg"}`,
+      type,
+    } as any);
+  });
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value instanceof Date) {
+      value = value.toISOString();
+    }
+    formData.append(key, value);
+  });
+
+  return formData;
+};
 // List of allowed API endpoints to ensure valid endpoint usage in requests
 const allowedEndpoints = [
   // User-related endpoints
@@ -85,6 +142,7 @@ const allowedEndpoints = [
   // Post-related endpoints
   "/api/post/test",
   "/api/post/",
+  "/api/item/",
 
   // Miscellaneous endpoints
   "/Test",
@@ -130,5 +188,7 @@ export {
   RequestArgs,
   generateUrl,
   ImagePicker,
+  imageGetterV2,
   allowedEndpoints,
+  prepareImagesData,
 };
