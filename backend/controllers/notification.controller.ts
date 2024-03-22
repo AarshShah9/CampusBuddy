@@ -4,8 +4,8 @@ import { RequestExtended } from "../middleware/verifyAuth";
 import { PushTokenSchema } from "../../shared/zodSchemas";
 import {
   EventWithResponses,
-  createAndSendEventNotifications,
-  getEventsWithinTimeDifference,
+  sendEventNotifications,
+  getEventsWithinTimeRange,
   pushNotificationTest,
 } from "../services/pushNotification.service";
 import { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
@@ -38,6 +38,7 @@ export const storePushToken = async (
   try {
     const loggedInUserId = req.userId;
     const { pushToken } = PushTokenSchema.parse(req.body);
+    console.log("expoPushToken: ", pushToken);
 
     // Create a new push token for the user
     await prisma.pushToken.create({
@@ -68,16 +69,30 @@ export const storePushToken = async (
   }
 };
 
-// TODO: take tme parameter
-export const sendUpcomingEventReminders = async (
-  req: RequestExtended,
+export const sendUpcomingEventRemindersTest = async (
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const timeFrameInMinutes = 60 * 24; // event happening within 1 day
+    // send notification for events happening in less than 12 hours but no fewer than 6 hours from now
+    const scheduleIntervalInMinutes: number = 6 * 60;
+    const reminderOffsetInMinutes: number = 12 * 60; // Approximately how long before an event starts to send notification
+    if (scheduleIntervalInMinutes >= reminderOffsetInMinutes) {
+      console.error(
+        "Error sending event reminders: Invalid time interval or offset",
+      );
+      return;
+    }
+    const now = new Date();
+    // toTime is the latest time before an event starts for which a notification will be sent out
+    const toTime = new Date(now.getTime() + reminderOffsetInMinutes * 60000);
+    const fromTime = new Date(
+      toTime.getTime() - scheduleIntervalInMinutes * 60000,
+    );
+
     const upcomingEventsWithResponses: EventWithResponses[] =
-      await getEventsWithinTimeDifference(timeFrameInMinutes);
+      await getEventsWithinTimeRange(fromTime, toTime);
 
     if (upcomingEventsWithResponses.length === 0) {
       console.log("No upcoming events");
@@ -88,7 +103,7 @@ export const sendUpcomingEventReminders = async (
       return;
     }
 
-    const tickets: ExpoPushTicket[] = await createAndSendEventNotifications(
+    const tickets: ExpoPushTicket[] = await sendEventNotifications(
       upcomingEventsWithResponses,
     );
     res.status(200).json({
@@ -99,29 +114,3 @@ export const sendUpcomingEventReminders = async (
     next(error);
   }
 };
-
-// export const getUpcomingEventsTest = async (
-//   req: RequestExtended,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   try {
-//     const timeFrameInMinutes: number = 60 * 24;
-//     const currentTime = new Date();
-//     const endTimeFrame = new Date(
-//       currentTime.getTime() + timeFrameInMinutes * 60000,
-//     );
-
-//     const upcomingEvents = await prisma.event.findMany({
-//       where: {
-//         startTime: {
-//           gte: currentTime,
-//           lt: endTimeFrame,
-//         },
-//       },
-//     });
-//     res.status(200).json({ success: true, data: upcomingEvents });
-//   } catch (error: any) {
-//     next(error);
-//   }
-// };

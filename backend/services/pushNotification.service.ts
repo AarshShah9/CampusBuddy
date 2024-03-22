@@ -64,7 +64,6 @@ export const sendPushNotifications = async (
   for (let chunk of chunks) {
     try {
       let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-      console.log(ticketChunk);
       tickets.push(...ticketChunk);
     } catch (error) {
       console.error("Error sending push notifications: ", error);
@@ -118,18 +117,15 @@ export const retrievePushReceipts = async (tickets: ExpoPushTicket[]) => {
   }
 };
 
-export async function getEventsWithinTimeDifference(
-  minutes: number,
+export async function getEventsWithinTimeRange(
+  fromTime: Date,
+  toTime: Date,
 ): Promise<EventWithResponses[]> {
-  const currentTime = new Date();
-  const timeDifference = minutes * 60 * 1000; // Convert minutes to milliseconds
-  const endTimeFrame = new Date(currentTime.getTime() + timeDifference);
-
   const upcomingEvents = await prisma.event.findMany({
     where: {
       startTime: {
-        gte: currentTime,
-        lt: endTimeFrame,
+        gte: fromTime,
+        lt: toTime,
       },
     },
     include: {
@@ -169,7 +165,34 @@ export async function getEventsWithinTimeDifference(
   return formattedEvents;
 }
 
-export async function createAndSendEventNotifications(
+// Sends the formatted time before the event starts
+function constructEventReminderNotification(
+  event: EventWithResponses,
+): SendPushNotificationProps {
+  // Create a notification specific to this event
+  let startsIn = "Starts in ";
+  const timeDifference: string = calculateTimeDifference(event.event.startTime);
+  if (timeDifference === "") {
+    startsIn = "Event expired";
+  } else {
+    startsIn += timeDifference;
+  }
+
+  const pushNotificationProps: SendPushNotificationProps = {
+    title: event.event.title,
+    body: startsIn,
+    data: {
+      eventId: event.event.id,
+    },
+    subtitle: "",
+    sound: "default",
+    priority: "default",
+  };
+
+  return pushNotificationProps;
+}
+
+export async function sendEventNotifications(
   events: EventWithResponses[],
 ): Promise<ExpoPushTicket[]> {
   const tickets: ExpoPushTicket[] = [];
@@ -183,27 +206,8 @@ export async function createAndSendEventNotifications(
       pushTokens.push(...user.pushTokens);
     }
 
-    // Create a notification specific to this event
-    let startsIn = "Event starts in ";
-    const timeDifference: string = calculateTimeDifference(
-      event.event.startTime,
-    );
-    if (timeDifference === "") {
-      startsIn = "Event expired";
-    } else {
-      startsIn += timeDifference;
-    }
-
-    const pushNotificationProps: SendPushNotificationProps = {
-      title: `Event Reminder: ${event.event.title}`,
-      body: startsIn,
-      data: {
-        eventId: event.event.id,
-      },
-      subtitle: "",
-      sound: "default",
-      priority: "default",
-    };
+    // create the notification properties
+    const pushNotificationProps = constructEventReminderNotification(event);
 
     // Send push notifications for this event
     try {

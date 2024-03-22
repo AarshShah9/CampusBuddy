@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  sendUpcomingEventReminders,
+  sendUpcomingEventRemindersTest,
   storePushToken,
   testNotification,
 } from "../controllers/notification.controller";
@@ -11,6 +11,6 @@ const router = express.Router();
 router.get("/test/:pushToken", testNotification);
 router.post("/storePushToken", verifyAuthentication, storePushToken);
 
-router.get("/sendUpcomingEventReminders", sendUpcomingEventReminders); // TODO: remove, for testing
+router.get("/sendUpcomingEventReminders", sendUpcomingEventRemindersTest); // TODO: remove, for testing
 
 export default router;
