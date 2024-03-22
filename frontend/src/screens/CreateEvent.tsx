@@ -76,6 +76,9 @@ export default function CreateEvent() {
   const onSubmit = useCallback((data: createEventType) => {
     createEvent(data, image!)
       .then((r) => {
+        if (r.status !== 201) {
+          throw new Error("Error creating event");
+        }
         alert("Event Created");
         // clear form and navigate to event page
         reset();

@@ -977,3 +977,50 @@ export const LikeEvent = async (
     next(error);
   }
 };
+
+export const getAttendees = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const eventId = IdParamSchema.parse(req.params).id;
+
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const attendees = event.eventResponses.map((response) => {
+      return {
+        id: response.userId,
+        name: response.user.firstName + " " + response.user.lastName,
+        image: response.user.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      message: "Event attendees",
+      data: attendees,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
