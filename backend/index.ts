@@ -10,6 +10,7 @@ import institution from "./routes/institution.routes";
 import user from "./routes/user.routes";
 import org from "./routes/org.routes";
 import post from "./routes/post.routes";
+import notification from "./routes/notification.routes";
 import { validateEnv } from "./utils/validateEnv";
 
 const app = express();
@@ -53,6 +54,7 @@ app.use("/api/institution", institution);
 app.use("/api/events", event);
 app.use("/api/orgs", org);
 app.use("/api/post", post);
+app.use("/api/notification", notification);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
