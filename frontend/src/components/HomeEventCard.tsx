@@ -6,6 +6,7 @@ import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function EventHomeCard(props: EventItem) {
   const navigation = useNavigation<any>();
@@ -24,7 +25,7 @@ export default function EventHomeCard(props: EventItem) {
         <View style={styles.cardCover}>
           <Image
             style={{ width: "100%", height: "100%" }}
-            source={{ uri: props.image }}
+            source={{ uri: generateImageURL(props.image) }}
           />
         </View>
         <View style={{ paddingHorizontal: 0 }}>

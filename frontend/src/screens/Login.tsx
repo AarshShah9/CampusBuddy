@@ -66,7 +66,7 @@ export default function Login() {
           />
         </LogoContainer>
         <OverlayContainer $color={theme.colors.tertiary}>
-          <Header $color={theme.colors.onPrimary}>{"Login"}</Header>
+          <Header $color={theme.colors.primary}>{"Login"}</Header>
           <FormContainer>
             <Controller
               control={control}
@@ -184,7 +184,7 @@ const FormContainer = styled(View)`
 `;
 // prettier-ignore
 const Header = styled(Text)<{ $color: string }>`
-    background-color: ${(props) => props.$color};
+    color: ${(props) => props.$color};
     font-size: 40px;
     font-weight: bold;
     margin-top: 64px;
