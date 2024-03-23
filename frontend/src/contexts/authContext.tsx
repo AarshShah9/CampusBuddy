@@ -72,7 +72,6 @@ export const AuthContextProvider = ({
     async (data: organizationInformation) => {
       try {
         // Makes call to backend to register organization
-        console.log(data);
         let res = await CBRequest("POST", "/api/user/organization/new", {
           body: {
             organization: {
@@ -90,7 +89,6 @@ export const AuthContextProvider = ({
             },
           },
         });
-        console.log(res);
       } catch (error) {
         console.log(error);
       }
