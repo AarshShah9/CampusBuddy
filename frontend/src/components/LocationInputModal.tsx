@@ -8,10 +8,13 @@ import {
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useThemeContext from "~/hooks/useThemeContext";
 
-export default function LocationInputModal(props: { controllerOnChange: any }) {
+export default function LocationInputModal(props: {
+  controllerOnChange: (value: string) => void;
+  reset: boolean;
+}) {
   const [location, setLocation] = useState<Record<string, any>>({
     description: "Search",
   });
@@ -29,6 +32,10 @@ export default function LocationInputModal(props: { controllerOnChange: any }) {
     },
     [location],
   );
+
+  useEffect(() => {
+    setLocation({ description: "Search" });
+  }, [props.reset]);
 
   return (
     <View>

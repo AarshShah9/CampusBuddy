@@ -42,6 +42,7 @@ export default function CreateMarketplace() {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
+  const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createMarketPlaceItem } = useEventsContext();
   const { startLoading, stopLoading } = useLoadingContext();
   const navigation = useNavigation<any>();
@@ -77,6 +78,7 @@ export default function CreateMarketplace() {
         reset();
         setSelectedImages(undefined);
         setCheckedItem(null);
+        setResetLocationValue(!resetLocationValue);
         stopLoading();
         alert("item Created");
         navigation.navigate("Home");
@@ -422,7 +424,10 @@ export default function CreateMarketplace() {
                   >
                     Location*
                   </Text>
-                  <LocationInputModal controllerOnChange={onChange} />
+                  <LocationInputModal
+                    controllerOnChange={onChange}
+                    reset={resetLocationValue}
+                  />
                 </View>
               )}
               name="locationPlaceId"

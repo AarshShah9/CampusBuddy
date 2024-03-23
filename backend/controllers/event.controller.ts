@@ -73,20 +73,29 @@ export const createVerifiedEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -156,20 +165,28 @@ export const createEvent = async (
     const newEvent = await prisma.$transaction(async (prisma) => {
       // create event
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -292,20 +309,28 @@ export const updateEvent = async (
     }
 
     if (validatedUpdateEventData.locationPlaceId) {
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const newLocation = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedUpdateEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedUpdateEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
     }
 
     // Update the event

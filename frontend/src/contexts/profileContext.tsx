@@ -49,7 +49,7 @@ export const ProfileContextProvider = ({
         return;
       }
       const image = result.assets[0];
-      startLoading();
+      closeModal();
       const res = await uploadImageRequest(
         "post",
         "/api/user/profilePicture",
@@ -62,11 +62,9 @@ export const ProfileContextProvider = ({
         }
         return { ...prev, image: res.data.data.image };
       });
-      stopLoading();
       closeModal();
     } catch (error) {
       console.log(error);
-      stopLoading();
       alert("An error occurred while trying to delete the picture");
     }
     closeModal();
