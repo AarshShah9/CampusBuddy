@@ -21,7 +21,7 @@ This repo houses the CampusBuddy Tech Start project. We're aiming to build an ap
 - Ajaypal Sallh (Front-end/ UI Developer)
 - Noman Sanjari (Backend Developer)
 - JC Pretorius (Backend Developer)
-- Stalin Cunha (Backend Developer)
+- Stalin D'Cunha (Backend Developer)
 
 ## Timeline/ Roadmap
 - Ideation/ Tech Mapping

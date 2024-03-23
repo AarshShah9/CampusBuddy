@@ -1,4 +1,8 @@
-import { AppPermissionName, EventStatus } from "@prisma/client";
+import {
+  AppPermissionName,
+  EventStatus,
+  ParticipationStatus,
+} from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
   CursorPaginationDatetimeSchema,
@@ -69,20 +73,29 @@ export const createVerifiedEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -152,20 +165,28 @@ export const createEvent = async (
     const newEvent = await prisma.$transaction(async (prisma) => {
       // create event
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -288,20 +309,28 @@ export const updateEvent = async (
     }
 
     if (validatedUpdateEventData.locationPlaceId) {
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const newLocation = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedUpdateEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedUpdateEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
     }
 
     // Update the event
@@ -332,9 +361,16 @@ export const updateEvent = async (
 };
 
 // Get all Events
-export const getAllEvents = async (req: Request, res: Response) => {
+export const getAllEvents = async (req: RequestExtended, res: Response) => {
   try {
-    const allEvents = await prisma.event.findMany();
+    // TODO use the algorithm
+    // GET all events including the location
+    const allEvents = await prisma.event.findMany({
+      include: {
+        location: true,
+        organization: true,
+      },
+    });
     res.status(200).json({
       message: "All events",
       data: allEvents,
@@ -448,7 +484,7 @@ export const getAllVerifiedEvents = async (
 
 // Get Event by Id
 export const getEventById = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   next: NextFunction,
 ) => {
@@ -461,7 +497,16 @@ export const getEventById = async (
       where: {
         id: eventId,
       },
+      include: {
+        location: true,
+        eventResponses: true,
+        organization: true,
+      },
     });
+
+    const isLiked = event?.eventResponses.some(
+      (response) => response.userId === req.userId,
+    );
 
     if (!event) {
       // Throw error if event not found
@@ -477,7 +522,10 @@ export const getEventById = async (
 
     res.status(200).json({
       message: "Event found",
-      data: event,
+      data: {
+        ...event,
+        isLiked: isLiked,
+      },
     });
   } catch (error) {
     next(error);
@@ -823,6 +871,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -844,6 +893,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -858,6 +908,7 @@ export const getMainPageEvents = async (
           time: event.startTime,
           location: event.location.name,
           image: event.image,
+          event: true,
         };
       }),
     };
@@ -872,12 +923,13 @@ export const getMainPageEvents = async (
           host: null,
           location: null,
           image: organization.image,
+          event: false,
         };
       }),
     };
 
     const startingEvents = topTrendingEvents.map((event) => {
-      return event.image;
+      return { image: event.image, id: event.id, title: event.title };
     });
 
     res.status(200).json({
@@ -892,6 +944,106 @@ export const getMainPageEvents = async (
         ],
         startingEvents: startingEvents,
       },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const LikeEvent = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const eventId = IdParamSchema.parse(req.params).id;
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: true,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const userLikedEvent = event.eventResponses.some(
+      (response) => response.userId === userId,
+    );
+
+    if (userLikedEvent) {
+      await prisma.userEventResponse.deleteMany({
+        where: {
+          eventId,
+          userId,
+        },
+      });
+    } else {
+      await prisma.userEventResponse.create({
+        data: {
+          eventId,
+          userId: userId!,
+          participationStatus: ParticipationStatus.Interested,
+        },
+      });
+    }
+
+    res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getAttendees = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const eventId = IdParamSchema.parse(req.params).id;
+
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const attendees = event.eventResponses.map((response) => {
+      return {
+        id: response.userId,
+        name: response.user.firstName + " " + response.user.lastName,
+        image: response.user.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      message: "Event attendees",
+      data: attendees,
     });
   } catch (error: any) {
     next(error);

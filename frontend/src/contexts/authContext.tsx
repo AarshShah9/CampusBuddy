@@ -43,11 +43,12 @@ export type  organizationInformation = {
   rePassword: string;
 }
 type authContext = {
-  user: UserDataType | null;
+  user?: UserDataType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
+  setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
   registerOrganization: (arg:organizationInformation) => Promise<void>;
 };
 const AuthContext = createContext<authContext | null>(null);
@@ -55,12 +56,7 @@ const AuthContext = createContext<authContext | null>(null);
 export const AuthContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const [user, setUser] = useState<UserDataType | null>({
-    id: "1",
-    name: "",
-    email: "",
-    icon: "#",
-  });
+  const [user, setUser] = useState<UserDataType>();
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
@@ -75,7 +71,7 @@ export const AuthContextProvider = ({
     try {
       // Takes in 3 param, org name, institute id and description of org
       const { organizationName, institutionId, description,  } = data;
-      // Makes call to backend to register orginization 
+      // Makes call to backend to register orginization
       let res = await CBRequest("POST","/api/orgs/", {body:data})
       console.log(res);
     } catch (error) {
@@ -85,11 +81,12 @@ export const AuthContextProvider = ({
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      const jwt = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
-      setAxiosTokenHeader(jwt.authToken as string);
-      await setTokenInSecureStore(TOKEN_KEY, jwt.authToken as string);
+      const res = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
+      setAxiosTokenHeader(res.authToken as string);
+      await setTokenInSecureStore(TOKEN_KEY, res.authToken as string);
+      setUser(res.data);
     } catch (error) {
-      console.log(error);
+      console.log("An error occured while trying to sign in:\n", error);
     }
   }, []);
 
@@ -97,7 +94,7 @@ export const AuthContextProvider = ({
     try {
       await deleteTokenFromSecureStore(TOKEN_KEY);
       removeAxiosTokenHeader();
-      setUser(null);
+      setUser(undefined);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +121,7 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, registerUser, signIn, logOut, getInstitutions, registerOrganization}}
+      value={{ user, registerUser, signIn, logOut, getInstitutions, registerOrganization, setUser }}
     >
       {children}
     </AuthContext.Provider>

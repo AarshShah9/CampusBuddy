@@ -1,10 +1,10 @@
 import {
-  View,
-  Text,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { AntDesign } from "@expo/vector-icons";
@@ -18,19 +18,20 @@ import Animated, {
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
+import { z } from "zod";
 import { Button } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import { useCallback, useState } from "react";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
-import { z } from "zod";
 import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+import useLoadingContext from "~/hooks/useLoadingContext";
 
 const IMG_HEIGHT = 300;
 
-export type createEvent = z.infer<typeof schema>;
+export type createEventType = z.infer<typeof schema>;
 
 // React Hook Related
 const schema = zod.object({
@@ -49,15 +50,17 @@ export default function CreateEvent() {
   const scrollOffSet = useScrollViewOffset(scrollRef);
   const [selectedImage, setSelectedImage] = useState<string>();
   const [image, setImage] = useState<ImagePickerAsset>();
+  const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createEvent } = useEventsContext();
   const navigation = useNavigation<any>();
+  const { startLoading, stopLoading } = useLoadingContext();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<createEvent>({
+  } = useForm<createEventType>({
     defaultValues: {
       title: "",
       date: new Date(),
@@ -73,18 +76,29 @@ export default function CreateEvent() {
   //Functions
 
   // Handle submission of user data
-  const onSubmit = useCallback((data: createEvent) => {
-    createEvent(data, image!)
-      .then((r) => {
-        alert("Event Created");
-        // clear form and navigate to event page
-        reset();
-        navigation.navigate("Home");
-      })
-      .catch((e) => {
-        alert("Error creating event");
-      });
-  }, []);
+  const onSubmit = useCallback(
+    (data: createEventType) => {
+      startLoading();
+      createEvent(data, image!)
+        .then((r) => {
+          if (r.status !== 201) {
+            throw new Error("Error creating event");
+          }
+          alert("Event Created");
+          // clear form and navigate to event page
+          setImage(undefined);
+          setSelectedImage(undefined);
+          setResetLocationValue(!resetLocationValue);
+          reset();
+          stopLoading();
+          navigation.navigate("Home");
+        })
+        .catch((e) => {
+          alert("Error creating event");
+        });
+    },
+    [resetLocationValue, image, createEvent, reset, navigation],
+  );
 
   //  Animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -275,7 +289,10 @@ export default function CreateEvent() {
                   >
                     Location*
                   </Text>
-                  <LocationInputModal controllerOnChange={onChange} />
+                  <LocationInputModal
+                    controllerOnChange={onChange}
+                    reset={resetLocationValue}
+                  />
                 </View>
               )}
               name="locationPlaceId"

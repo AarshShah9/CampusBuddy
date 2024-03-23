@@ -1,14 +1,14 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 type MapComponentProps = {
   latitude: number;
   longitude: number;
   latitudeDelta?: number;
   longitudeDelta?: number;
-  title?: string;
-  description?: string;
 };
 
 /*
@@ -17,15 +17,10 @@ type MapComponentProps = {
  */
 const Map = ({
   latitude,
-  latitudeDelta,
-  longitudeDelta,
+  latitudeDelta = 0.045,
+  longitudeDelta = 0.045,
   longitude,
-  title,
-  description,
 }: MapComponentProps) => {
-  latitudeDelta = latitudeDelta || 0.01;
-  longitudeDelta = longitudeDelta || 0.01;
-
   return (
     <View>
       <View style={styles.mapBox}>
@@ -38,15 +33,23 @@ const Map = ({
             latitudeDelta,
             longitudeDelta,
           }}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          pitchEnabled={false}
+          rotateEnabled={false}
+          zoomTapEnabled={false}
+          zoomControlEnabled={false}
         >
           <Marker
             coordinate={{
               latitude,
               longitude,
             }}
-            title={title}
-            description={description}
-          />
+          >
+            <View style={circleStyles.circleStyle}>
+              <MaterialIcons name="event-available" size={24} color="red" />
+            </View>
+          </Marker>
         </MapView>
       </View>
     </View>
@@ -59,14 +62,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mapBox: {
-    width: 350,
-    height: 200,
+    width: 350, // TODO make this responsive to screen size
+    height: 150, // TODO make this responsive to screen size
     borderRadius: 10,
-    overflow: "hidden", // Ensure the map respects the border radius
+    overflow: "hidden",
   },
   map: {
     width: "100%",
     height: "100%",
+  },
+});
+
+const circleStyles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  circleStyle: {
+    backgroundColor: "white", // TODO change to theme color based on dark/light mode
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
