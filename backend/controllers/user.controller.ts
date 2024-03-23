@@ -19,7 +19,7 @@ import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
-import { thankYouMessage } from "../utils/emails";
+import { alreadyVerifiedMessage, thankYouMessage } from "../utils/emails";
 import UploadToS3, {
   deleteFromS3,
   generateUniqueFileName,
@@ -760,12 +760,10 @@ export const verifyNewOrgSignup = async (
     });
 
     if (userExists) {
-      throw new AppError(
-        AppErrorName.RECORD_EXISTS_ERROR,
-        "User already exists",
-        400,
-        true,
-      );
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(alreadyVerifiedMessage);
+      res.end();
+      return;
     }
     if (!validatedUserData.institutionId) {
       throw new AppError(
@@ -811,10 +809,10 @@ export const verifyNewOrgSignup = async (
       validatedorganizationData,
       newUser.id,
     );
-    res.status(200).json({
-      message: `JWT verified and a new org user was created as the pending owner of the organization: ${newOrganization?.organizationName}`,
-      data: { user: newUser, organization: newOrganization },
-    });
+
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.write(thankYouMessage);
+    res.end();
   } catch (error) {
     next(error);
   }

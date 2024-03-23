@@ -37,11 +37,14 @@ export type institution = {
 export type organizationInformation = {
   orgEmail: string;
   organizationName: string;
+  firstName: string;
+  lastName: string;
   institutionId: string;
   description: string;
   password: string;
-  rePassword: string;
+  rePassword?: string;
 };
+
 type authContext = {
   user?: UserDataType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
@@ -69,7 +72,24 @@ export const AuthContextProvider = ({
     async (data: organizationInformation) => {
       try {
         // Makes call to backend to register organization
-        let res = await CBRequest("POST", "/api/orgs/", { body: data });
+        console.log(data);
+        let res = await CBRequest("POST", "/api/user/organization/new", {
+          body: {
+            organization: {
+              organizationName: data.organizationName,
+              description: data.description,
+              institutionId: data.institutionId,
+            },
+
+            user: {
+              institutionId: data.institutionId,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.orgEmail,
+              password: data.password,
+            },
+          },
+        });
         console.log(res);
       } catch (error) {
         console.log(error);

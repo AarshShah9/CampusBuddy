@@ -28,10 +28,9 @@ export default function OrgCreationConfirmation() {
               width: 300,
               fontSize: 30,
               color: "white",
-              fontFamily: "Roboto-Bold",
             }}
           >
-            {"Thank you for your\n registration!"}
+            {"Thank you for your\n registration! Please verify your email"}
           </Text>
           <Text
             style={{
@@ -40,13 +39,12 @@ export default function OrgCreationConfirmation() {
               marginRight: "auto",
               textAlign: "center",
               width: 300,
-              fontSize: 24,
+              fontSize: 20,
               color: "white",
-              fontFamily: "Roboto-Regular",
             }}
           >
             We're glad you're here! Before you can start, our team will have to
-            verify you.
+            verify you. You will receive an email once your account is ready.
           </Text>
         </View>
         <Button
@@ -64,7 +62,6 @@ export default function OrgCreationConfirmation() {
           <Text
             style={{
               color: "white",
-              fontFamily: "Roboto-Bold",
               fontSize: 24,
               lineHeight: 30,
             }}

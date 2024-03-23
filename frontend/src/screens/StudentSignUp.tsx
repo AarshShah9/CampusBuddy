@@ -24,20 +24,40 @@ import { institution } from "~/contexts/authContext";
 import { userRegistrationData } from "~/contexts/authContext";
 import ErrorText from "~/components/ErrorText";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import { validDomains } from "~/lib/constants";
 
-const schema = zod.object({
-  email: zod.string(),
-  institutionId: zod.string(),
-  firstName: zod.string(),
-  lastName: zod.string(),
-  password: zod.string().min(8),
-  rePassword: zod.string(),
-});
+const schema = zod
+  .object({
+    email: zod
+      .string()
+      .email({ message: "Invalid email format" })
+      .refine(
+        (email) => {
+          const domain = email.substring(email.lastIndexOf("@"));
+          return validDomains.includes(domain);
+        },
+        { message: "Email domain is not from a valid domain" },
+      ),
+    institutionId: zod.string(),
+    firstName: zod.string(),
+    lastName: zod.string(),
+    password: zod
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    rePassword: zod.string(),
+  })
+  .refine((data) => data.password === data.rePassword, {
+    message: "Passwords do not match",
+    path: ["rePassword"],
+  });
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const navigation = useNavigation<any>();
-  const [valid, setValid] = useState(false);
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const { getInstitutions, registerUser } = useAuthContext();
   const { dismissKeyboard } = useAppContext();
@@ -70,7 +90,7 @@ export default function StudentSignUp() {
   );
 
   const handlePress = useCallback(() => {
-    navigation.dispatch(StackActions.replace("OrgSignUp"));
+    navigation.dispatch(StackActions.push("OrgSignUp"));
   }, []);
 
   useEffect(() => {
@@ -243,7 +263,7 @@ export default function StudentSignUp() {
                 <Controller
                   control={control}
                   rules={{
-                    required: true,
+                    required: "Password confirmation is required.",
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
@@ -257,6 +277,10 @@ export default function StudentSignUp() {
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
+                      autoCorrect={false}
+                      autoCapitalize={"none"}
+                      autoComplete={"off"}
+                      textContentType={"password"}
                       style={{ backgroundColor: theme.colors.tertiary }}
                     />
                   )}
@@ -273,7 +297,7 @@ export default function StudentSignUp() {
                       fontFamily: "Nunito-Bold",
                     }}
                   >
-                    Next
+                    Submit
                   </Text>
                 </StyledButton>
                 <View
