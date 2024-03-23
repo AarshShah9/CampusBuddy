@@ -5,6 +5,7 @@ import { limitTextToMax } from "~/lib/helperFunctions";
 import { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { EventType } from "~/types/Events";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function EventMainCard(props: EventType) {
   const navigation = useNavigation<any>();
@@ -19,7 +20,7 @@ export default function EventMainCard(props: EventType) {
       <Card style={styles.card}>
         <Card.Cover
           style={styles.cardCover}
-          source={{ uri: props.image }}
+          source={{ uri: generateImageURL(props.image) }}
           resizeMode="cover"
         />
         <Card.Content style={styles.cardContent}>

@@ -16,6 +16,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 const IMG_HEIGHT = 300;
 
@@ -129,7 +130,7 @@ export default function EventDetails() {
       >
         <Animated.Image
           style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
-          source={{ uri: eventData?.image }}
+          source={{ uri: generateImageURL(eventData?.image) }}
         />
         <View
           style={{
