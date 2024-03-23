@@ -1,4 +1,4 @@
-import { Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -25,7 +25,7 @@ const IMG_HEIGHT = 300;
 
 export default function EventDetails() {
     const {
-        params: { id },
+        params: { id, map },
     } = useRoute<any>();
     const { getEventDetails, likeEvent } = useEventsContext();
     const { theme, inDarkMode } = useThemeContext();
@@ -33,7 +33,7 @@ export default function EventDetails() {
     const scrollRef = useAnimatedRef<Animated.ScrollView>();
     const scrollOffSet = useScrollViewOffset(scrollRef);
 
-    
+
 
     const { data: eventData, refetch } = useQuery({
         queryKey: ["event-details", id],
@@ -53,7 +53,18 @@ export default function EventDetails() {
         },
     });
 
-    // TODO fix optimistic updates
+    const onMapPress = useCallback(() => {
+    navigation.navigate("MapDetails", {
+      eventData: [
+        {
+          title: eventData?.title,
+          description: eventData?.description,
+          latitude: eventData?.location.latitude,
+          longitude: eventData?.location.longitude,
+        },
+      ],
+    });
+  }, [eventData, navigation]);// TODO fix optimistic updates
     const isOptimistic =
         likeMutation.variables &&
         (likeMutation.isPending ? !likeMutation.variables.previousState : false);
@@ -91,6 +102,10 @@ export default function EventDetails() {
         };
     });
 
+    const seeAttendees = useCallback(() => {
+        navigation.navigate("Attendees", { id });
+    }, [navigation, id]);
+
     return (
         <View style={[styles.mainContainer, { backgroundColor: theme.colors.primary }]}>
             <View style={styles.headerContainer}>
@@ -120,7 +135,7 @@ export default function EventDetails() {
                         style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
                         source={{ uri: eventData?.image }}
                     />
-                </LoadingSkeleton> 
+                </LoadingSkeleton>
                 <View
                     style={{
                         height: 100,
@@ -183,6 +198,7 @@ export default function EventDetails() {
                         </LoadingSkeleton>
                     </View>
                 </View>
+                <TouchableOpacity onPress={seeAttendees}>
                 <View
                     style={{
                         borderTopColor: "#B0CFFF",
@@ -203,10 +219,11 @@ export default function EventDetails() {
                         <Text
                             style={{ fontFamily: "Roboto-Medium", fontSize: 16, marginLeft: 5 }}
                         >
-                            Attendance: {eventData?.eventResponses.length}
+                            Attendance: {eventData?.eventResponses.length}{" "}
                         </Text>
                     </LoadingSkeleton>
                 </View>
+                </TouchableOpacity>
                 <View
                     style={{
                         backgroundColor: "white",
@@ -221,7 +238,7 @@ export default function EventDetails() {
                 >
                     <LoadingSkeleton show={!eventData} width={"100%"} height={200}>
                         <Text
-                            style={{ fontFamily: "Roboto-Reg", fontSize: 16 }}
+                            style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
                         >
                             {eventData?.description}
                         </Text>
@@ -230,11 +247,13 @@ export default function EventDetails() {
                 <View
                     style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
                 >
-                    {eventData?.location && (
-                        <MapComponentSmall
-                            latitude={eventData?.location.latitude}
-                            longitude={eventData?.location.longitude}
-                        />
+                    {eventData?.location && (map === undefined ? true : map) && (
+                        <TouchableOpacity onPress={onMapPress}>
+                            <MapComponentSmall
+                                latitude={eventData?.location.latitude}
+                                longitude={eventData?.location.longitude}
+                            />
+                        </TouchableOpacity>
                     )}
                 </View>
                 <View
@@ -243,6 +262,10 @@ export default function EventDetails() {
                         marginLeft: "auto",
                         marginRight: "auto",
                         width: "80%",
+                        // width: "90%",
+                        // flex: 1,
+                        // justifyContent: "center",
+                        // alignItems: "center",
                     }}
                 >
                     <Button style={styles.attendButton} mode="contained">
@@ -295,5 +318,5 @@ const styles = StyleSheet.create({
         marginRight: "auto",
         marginTop: 10,
         justifyContent: "center"
-    }
+    },
 })

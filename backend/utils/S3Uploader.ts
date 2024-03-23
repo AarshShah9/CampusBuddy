@@ -2,12 +2,12 @@ import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs";
 import { promisify } from "util";
-import { env } from "./validateEnv";
 import { AppError, AppErrorName } from "./AppError";
 import multer from "multer";
 
 const unlinkAsync = promisify(fs.unlink);
 
+// TODO Make bulk upload/ delete more efficient.
 const UploadToS3 = async (file: Express.Multer.File, path: string) => {
   try {
     // AWS Credentials and bucket information

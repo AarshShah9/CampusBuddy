@@ -73,14 +73,14 @@ model Institution {
   location        Location       @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
   posts           Post[]
+  item            Item[]
 
   @@index([locationPlaceId])
   @@map("institution")
 }
 
 model User {
-  id                   String                 @id @default(uuid())
-  username             String                 @unique
+  id                   String                 @id @unique @default(uuid())
   firstName            String                 @map("first_name")
   lastName             String                 @map("last_name")
   email                String                 @unique
@@ -91,6 +91,7 @@ model User {
   institution          Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   enrollments          Enrollment[]
   posts                Post[]
+  item                 Item[]
   comments             Comment[]
   events               Event[]
   UserEventResponse    UserEventResponse[]
@@ -187,7 +188,7 @@ model Post {
   postTags PostTag[]
 
   institutionId String      @map("institution_id")
-  Institution   Institution @relation(fields: [institutionId], references: [id])
+  Institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([organizationId])
@@ -335,6 +336,47 @@ model Location {
 
   Institution Institution[]
   Event       Event[]
+  Item        Item[]
 
   @@map("location")
 }
+
+model Item {
+  id            String       @id @default(uuid())
+  userId        String       @map("user_id")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institutionId String       @map("institution_id")
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  price       Int
+  createdAt   DateTime @unique @default(now()) @map("created_at")
+  condition   String?  @map("condition")
+  Image       Image[]
+
+  location        Location @relation(fields: [locationPlaceId], references: [placeId])
+  locationPlaceId String
+
+  @@index([userId])
+  @@index([institutionId])
+  @@index([locationPlaceId])
+  @@map("item")
+}
+
+model Image {
+  id     String @id @default(uuid())
+  itemId String @map("item_id")
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  url    String
+
+  @@index([itemId])
+  @@map("image")
+}
+
+// enum Condition {
+//   New
+//   Used_Like_New
+//   Used_Good
+//   Used_Fair
+// }

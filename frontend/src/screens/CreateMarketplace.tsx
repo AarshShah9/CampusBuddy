@@ -6,52 +6,47 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  Alert,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from "react-native-reanimated";
+import Animated, { useAnimatedRef } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { Button, Checkbox } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import LocationInputModal from "~/components/LocationInputModal";
-import { imageGetter } from "~/lib/requestHelpers";
-
-const IMG_HEIGHT = 300;
-type marketPlaceDetail = {
-  image: string;
-  itemName: string;
-  price: string;
-  condition: string;
-  description: string;
-  tags: string[];
-  location: string;
-};
+import { imageGetterV2 } from "~/lib/requestHelpers";
+import { ImagePickerAsset } from "expo-image-picker";
+import useEventsContext from "~/hooks/useEventsContext";
+import { MarketPlaceItem } from "~/types/Events";
+import { useNavigation } from "@react-navigation/native";
+import { z } from "zod";
+import useLoadingContext from "~/hooks/useLoadingContext";
 
 // React Hook Form Section
 const schema = zod.object({
-  image: zod.string(),
-  itemName: zod.string(),
+  title: zod.string(),
   price: zod.string(),
   condition: zod.string(),
   description: zod.string(),
-  tags: zod.string().array(),
-  location: zod.string(),
+  locationPlaceId: zod.string(),
+  // tags: zod.string().array(),
 });
 
 export default function CreateMarketplace() {
   const { theme } = useThemeContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffSet = useScrollViewOffset(scrollRef);
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string>();
+  const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
+  const [resetLocationValue, setResetLocationValue] = useState(false);
+  const { createMarketPlaceItem } = useEventsContext();
+  const { startLoading, stopLoading } = useLoadingContext();
+  const navigation = useNavigation<any>();
+
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
   };
@@ -60,53 +55,103 @@ export default function CreateMarketplace() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<marketPlaceDetail>({
+    reset,
+  } = useForm<MarketPlaceItem>({
     defaultValues: {
-      image: "",
-      itemName: "",
+      title: "",
       price: "",
       condition: "",
       description: "",
-      tags: [],
-      location: "",
+      locationPlaceId: "",
     },
-    resolver: zodResolver(schema),
+    // resolver: zodResolver(schema),
   });
 
-  // Functions
   // Handle submission of data to backend
-  const onSubmit = (data: marketPlaceDetail) => {
-    console.log(data);
+  const onSubmit = (data: MarketPlaceItem) => {
+    startLoading();
+    createMarketPlaceItem(data, selectedImages)
+      .then((r) => {
+        if (r.status !== 201) {
+          throw new Error("Error creating item");
+        }
+        reset();
+        setSelectedImages(undefined);
+        setCheckedItem(null);
+        setResetLocationValue(!resetLocationValue);
+        stopLoading();
+        alert("item Created");
+        navigation.navigate("Home");
+      })
+      .catch((e) => {
+        alert("Error creating event");
+      });
   };
-  // Handle animating image when uploaded, may be scrapped and not needed
-  const imageAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffSet.value,
-            [-IMG_HEIGHT, 0, IMG_HEIGHT],
-            [-IMG_HEIGHT / 2, 0, IMG_HEIGHT * 0.75],
-          ),
-        },
-        {
-          scale: interpolate(
-            scrollOffSet.value,
-            [-IMG_HEIGHT, 0, IMG_HEIGHT],
-            [3, 1, 1],
-          ),
-        },
-      ],
-    };
-  });
 
   const addPhoto = useCallback(async () => {
-    const result = await imageGetter();
-    if (result.canceled) {
-      setSelectedImage(undefined);
+    // Calculate the remaining number of images that can be selected
+    const remainingImagesCount =
+      10 - (selectedImages ? selectedImages.length : 0);
+
+    const result = await imageGetterV2({
+      multiple: true,
+      allowEditing: false,
+      maxSize: remainingImagesCount,
+    });
+
+    if (result.canceled || !result.assets) {
       return;
     }
-    setSelectedImage(result.assets[0].uri);
+
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        return [...currentImages, ...result.assets].slice(0, 10);
+      }
+      return result.assets;
+    });
+  }, [selectedImages]);
+
+  const replacePhoto = useCallback(async (index: number) => {
+    const result = await imageGetterV2({ multiple: false });
+    if (result.canceled || !result.assets) {
+      return;
+    }
+
+    // Update the image at the specific index
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        const updatedImages = [...currentImages];
+        updatedImages[index] = result.assets[0];
+        return updatedImages;
+      }
+      return currentImages;
+    });
+  }, []);
+
+  const showDeleteMenu = (index: number) => {
+    Alert.alert(
+      "Delete Image",
+      "Do you want to delete this image?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "Delete", onPress: () => deleteImage(index) },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  const deleteImage = useCallback((index: number) => {
+    setSelectedImages((currentImages) => {
+      if (currentImages) {
+        const updatedImages = [...currentImages];
+        updatedImages.splice(index, 1);
+        return updatedImages;
+      }
+      return currentImages;
+    });
   }, []);
 
   return (
@@ -123,47 +168,65 @@ export default function CreateMarketplace() {
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
           {/* View holds the icon for user to click to upload their own image */}
-          <TouchableOpacity onPress={addPhoto}>
-            {!selectedImage && (
-              <View
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity onPress={addPhoto} style={{ marginRight: 10 }}>
+              {!selectedImages && (
+                <View
+                  style={{
+                    width: 100,
+                    height: 100,
+                    backgroundColor: "grey",
+                    borderRadius: 8,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Feather name="image" size={24} color="black" />
+                  <Text style={{ color: "white", paddingTop: 10 }}>
+                    Add Image
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {selectedImages &&
+              selectedImages.map((image, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => replacePhoto(index)}
+                  onLongPress={() => showDeleteMenu(index)}
+                  style={{ marginRight: 10 }}
+                >
+                  <Animated.Image
+                    source={{ uri: image.uri }}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 8,
+                    }}
+                  />
+                </TouchableOpacity>
+              ))}
+            {selectedImages && selectedImages.length < 10 && (
+              <TouchableOpacity
+                onPress={addPhoto}
                 style={{
                   width: 100,
                   height: 100,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 10,
                   backgroundColor: "grey",
                   borderRadius: 8,
-                  justifyContent: "center",
                 }}
               >
-                <Feather
-                  style={{ marginLeft: "auto", marginRight: "auto" }}
-                  name="image"
-                  size={24}
-                  color="black"
-                />
-                <Text
-                  style={{
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    color: "white",
-                  }}
-                >
+                <Feather name="plus-circle" size={24} color="white" />
+                <Text style={{ color: "white", paddingTop: 10 }}>
                   Add Image
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
-            {selectedImage && (
-              <Animated.Image
-                source={{ uri: selectedImage }}
-                style={[
-                  {
-                    width: 100,
-                    height: 100,
-                    borderRadius: 8,
-                  },
-                ]}
-              />
-            )}
-          </TouchableOpacity>
+          </ScrollView>
           {/* View holds all the Controllers for user to enter their information */}
           <View>
             <Controller
@@ -190,7 +253,7 @@ export default function CreateMarketplace() {
                   />
                 </View>
               )}
-              name="itemName"
+              name="title"
             />
             <Controller
               control={control}
@@ -211,8 +274,11 @@ export default function CreateMarketplace() {
                   <TextInput
                     style={style.priceInput}
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={(text) =>
+                      onChange(text.replace(/[^0-9]/g, ""))
+                    }
                     value={value}
+                    keyboardType="numeric"
                   />
                 </View>
               )}
@@ -320,27 +386,28 @@ export default function CreateMarketplace() {
               )}
               name="description"
             />
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange } }) => (
-                <View style={{ marginTop: 15 }}>
-                  <Text
-                    style={{
-                      marginBottom: 3,
-                      fontFamily: "Nunito-Medium",
-                      fontSize: 16,
-                    }}
-                  >
-                    Tags*
-                  </Text>
-                  <ItemTag controllerOnChange={onChange} />
-                </View>
-              )}
-              name="tags"
-            />
+            {/*  TODO BRING BACK IF WE NEED?*/}
+            {/*<Controller*/}
+            {/*  control={control}*/}
+            {/*  rules={{*/}
+            {/*    required: true,*/}
+            {/*  }}*/}
+            {/*  render={({ field: { onChange } }) => (*/}
+            {/*    <View style={{ marginTop: 15 }}>*/}
+            {/*      <Text*/}
+            {/*        style={{*/}
+            {/*          marginBottom: 3,*/}
+            {/*          fontFamily: "Nunito-Medium",*/}
+            {/*          fontSize: 16,*/}
+            {/*        }}*/}
+            {/*      >*/}
+            {/*        Tags**/}
+            {/*      </Text>*/}
+            {/*      <ItemTag controllerOnChange={onChange} />*/}
+            {/*    </View>*/}
+            {/*  )}*/}
+            {/*  name="tags"*/}
+            {/*/>*/}
             <Controller
               control={control}
               rules={{
@@ -357,10 +424,13 @@ export default function CreateMarketplace() {
                   >
                     Location*
                   </Text>
-                  <LocationInputModal controllerOnChange={onChange} />
+                  <LocationInputModal
+                    controllerOnChange={onChange}
+                    reset={resetLocationValue}
+                  />
                 </View>
               )}
-              name="location"
+              name="locationPlaceId"
             />
           </View>
         </View>

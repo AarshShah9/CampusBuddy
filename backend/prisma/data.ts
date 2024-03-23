@@ -62,6 +62,10 @@ export const ids = {
     1: "20909dd0-c553-11ee-83fd-6f8d6c450910",
     2: "20909dd1-c553-11ee-83fd-6f8d6c450910",
   },
+  itemIds: {
+    1: "376a4ee0-e6df-11ee-bd3d-0242ac120002",
+    2: "376a5160-e6df-11ee-bd3d-0242ac120002",
+  },
   commentIds: {
     1: "37e11780-c553-11ee-83fd-6f8d6c450910",
     2: "37e11781-c553-11ee-83fd-6f8d6c450910",
@@ -78,6 +82,12 @@ export const ids = {
     3: "f6700561-c5f5-11ee-83fd-6f8d6c450910",
     4: "f6700562-c5f5-11ee-83fd-6f8d6c450910",
   },
+  imageIds: {
+    1: "018e6294-e53a-73b7-bf04-aca8524ebf91",
+    2: "018e6295-0c32-722b-b2de-aae793e11db1",
+    3: "018e6295-257e-7a2a-a393-59d51c342c24",
+    4: "018e6295-3efb-7adb-8342-cf05070d31ec",
+  },
 };
 
 export const locations = [
@@ -86,6 +96,12 @@ export const locations = [
     longitude: -114.0718831,
     latitude: 51.04473309999999,
     name: "Calgary",
+  },
+  {
+    placeId: "ChIJT4ox6w5vcVMRZiOpVJka3KA",
+    longitude: -114.1304021,
+    latitude: 51.0801184,
+    name: "ICT Building",
   },
 ];
 
@@ -101,18 +117,16 @@ export const institutes = [
 export const users: User[] = [
   {
     id: ids.userIds[1],
-    username: "john_doe",
     firstName: "John",
     lastName: "Doe",
     email: "john@example.com",
     password: "hashed-password123",
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
-    profilePic: null,
+    profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
   },
   {
     id: ids.userIds[2],
-    username: "jane_smith",
     firstName: "Jane",
     lastName: "Smith",
     email: "jane@example.com",
@@ -123,7 +137,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[3],
-    username: "tom_dee",
     firstName: "Tom",
     lastName: "Dee",
     email: "tom@example.com",
@@ -134,7 +147,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[4],
-    username: "CampusBuddyAdmin",
     firstName: "Aarsh",
     lastName: "Shah",
     email: "aarsh@live.ca",
@@ -145,7 +157,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[5],
-    username: "Wooki",
     firstName: "Wendy",
     lastName: "Kim",
     email: "wendyk@example.com",
@@ -156,7 +167,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[6],
-    username: "d_smith",
     firstName: "Doug",
     lastName: "Smith",
     email: "d_smith@example.com",
@@ -167,7 +177,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[7],
-    username: "k_stock",
     firstName: "Kamil",
     lastName: "Stock",
     email: "k_stock@example.com",
@@ -178,7 +187,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[8],
-    username: "p_johnson",
     firstName: "Peter",
     lastName: "Johnson",
     email: "p_johnson@example.com",
@@ -189,7 +197,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[9],
-    username: "g_scott",
     firstName: "Gary",
     lastName: "Scott",
     email: "g_scott@example.com",
@@ -200,7 +207,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[10],
-    username: "m_galvan",
     firstName: "Michael",
     lastName: "Galvan",
     email: "m_galvan@example.com",
@@ -355,6 +361,43 @@ export const posts = [
     type: PostType.LookingFor,
     numberOfSpots: 8,
     // Other post details
+  },
+];
+
+export const images = [
+  {
+    id: ids.imageIds[1],
+    url: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    itemId: ids.itemIds[1],
+  },
+  {
+    id: ids.imageIds[2],
+    url: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    itemId: ids.itemIds[2],
+  },
+];
+export const items = [
+  {
+    id: ids.itemIds[1],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "iPhone 14 Pro",
+    description: "Brand New phone, do not use anymore, 95% Battery Health",
+    price: 700,
+    createdAt: "2024-10-10T09:00:00Z",
+    condition: "Used_Like_New",
+    locationPlaceId: locations[1].placeId,
+  },
+  {
+    id: ids.itemIds[2],
+    userId: ids.userIds[2],
+    institutionId: ids.instituteIds[1],
+    title: "Outdoor Bicycle",
+    description: "Brand New bike, small scratches, needs a bit of tuning",
+    price: 600,
+    createdAt: "2024-10-10T10:00:00Z",
+    condition: "Used_Fair",
+    locationPlaceId: locations[1].placeId,
   },
 ];
 

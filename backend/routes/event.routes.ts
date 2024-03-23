@@ -8,6 +8,7 @@ import {
   getAllEventsByOrganization,
   getAllMapEvents,
   getAllVerifiedEvents,
+  getAttendees,
   getEventById,
   getEventByUserId,
   getMainPageEvents,
@@ -31,6 +32,7 @@ router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
 router.get("/user/:id", getEventByUserId);
 router.post("/like/:id", LikeEvent);
+router.get("/attendees/:id", getAttendees);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
 router.post("/", upload.single("file"), createEvent);

@@ -128,3 +128,18 @@ export type CarousalItem = {
   title: string;
   image: string;
 };
+
+export type AttendeeResponse = {
+  id: string;
+  name: string;
+  image: string;
+};
+
+export type MarketPlaceItem = {
+  title: string;
+  price: string;
+  condition: string;
+  description: string;
+  locationPlaceId: string;
+  // tags?: string[];
+};

@@ -19,7 +19,11 @@ import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
-import { thankYouMessage } from "../utils/emails";
+import { alreadyVerifiedMessage, thankYouMessage } from "../utils/emails";
+import UploadToS3, {
+  deleteFromS3,
+  generateUniqueFileName,
+} from "../utils/S3Uploader";
 
 const jwtSecret = process.env.JWT_SECRET as Secret;
 
@@ -30,7 +34,7 @@ export const signupAsStudent = async (
   next: NextFunction,
 ) => {
   try {
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -91,7 +95,6 @@ export const signupAsStudent = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -187,7 +190,6 @@ export const verifyStudentSignup = async (
     // Create new student
     const newStudent = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -242,7 +244,6 @@ export const loginUser = async (
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
         institutionId: existingUser.institution.id,
-        username: existingUser.username,
         firstName: existingUser.firstName,
         lastName: existingUser.lastName,
         email: existingUser.email,
@@ -411,7 +412,7 @@ export const signupWithExistingOrg = async (
     const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate request body
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -471,7 +472,6 @@ export const signupWithExistingOrg = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -516,7 +516,7 @@ export const signupAsNewOrg = async (
     // NOTE!: request data nested in req.body.user and req.body.organization
 
     // Validate the new user data
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body.user);
 
     // Validate the new organization data
@@ -570,7 +570,6 @@ export const signupAsNewOrg = async (
       organization: OrganizationCreateType;
     } = {
       user: {
-        username,
         firstName,
         lastName,
         email,
@@ -704,7 +703,6 @@ export const verifyExistingOrgSignup = async (
       // Create a new Org user
       newUser = await tx.user.create({
         data: {
-          username: validatedUserData.username,
           firstName: validatedUserData.firstName,
           lastName: validatedUserData.lastName,
           email: validatedUserData.email,
@@ -762,12 +760,10 @@ export const verifyNewOrgSignup = async (
     });
 
     if (userExists) {
-      throw new AppError(
-        AppErrorName.RECORD_EXISTS_ERROR,
-        "User already exists",
-        400,
-        true,
-      );
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(alreadyVerifiedMessage);
+      res.end();
+      return;
     }
     if (!validatedUserData.institutionId) {
       throw new AppError(
@@ -799,7 +795,6 @@ export const verifyNewOrgSignup = async (
     // Create the new Org user
     const newUser = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -814,10 +809,10 @@ export const verifyNewOrgSignup = async (
       validatedorganizationData,
       newUser.id,
     );
-    res.status(200).json({
-      message: `JWT verified and a new org user was created as the pending owner of the organization: ${newOrganization?.organizationName}`,
-      data: { user: newUser, organization: newOrganization },
-    });
+
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.write(thankYouMessage);
+    res.end();
   } catch (error) {
     next(error);
   }
@@ -860,9 +855,30 @@ export const verify = async (req: Request, res: Response) => {
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
-  const authToken = jwt.sign(users[0] as JwtPayload, jwtSecret);
+  const user = await prisma.user.findUnique({
+    where: {
+      id: users[0].id,
+    },
+  });
 
-  res.status(200).json({ authToken });
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User doesn't exist",
+    });
+  }
+
+  const authToken = jwt.sign(user as JwtPayload, jwtSecret);
+
+  res.status(200).json({
+    authToken,
+    data: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      image: user.profilePic,
+    },
+  });
 };
 
 export const loginAsAdmin = async (req: Request, res: Response) => {
@@ -902,7 +918,6 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
     const loginTokenPayload: loginJwtPayloadType = {
       id: existingUser.id,
       institutionId: null,
-      username: existingUser.username,
       firstName: existingUser.firstName,
       lastName: existingUser.lastName,
       email: existingUser.email,
@@ -916,5 +931,113 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
     res.status(200).json({ authToken });
   } catch (error) {
     res.status(500).json({ message: `Internal server error - ${error}` });
+  }
+};
+
+export const uploadProfilePic = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    if (!req.file) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "No file uploaded",
+        400,
+        true,
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const updatedUser = await prisma.$transaction(async (prisma) => {
+      if (user.profilePic) {
+        await deleteFromS3(user.profilePic);
+      }
+
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        user.id,
+      );
+      const path = `images/profilePictures/${uniqueFileName}`;
+
+      await UploadToS3(req.file!, path);
+
+      return prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePic: path,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: "Profile picture updated successfully",
+      data: {
+        image: updatedUser.profilePic,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const removeProfilePic = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    if (!user || !user.profilePic) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found or has no profile picture`,
+        404,
+        true,
+      );
+    }
+
+    await prisma.$transaction(async (prisma) => {
+      await deleteFromS3(user.profilePic!);
+      return prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePic: null,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: "Profile picture removed successfully",
+      data: {
+        image: null,
+      },
+    });
+  } catch (error: any) {
+    next(error);
   }
 };
