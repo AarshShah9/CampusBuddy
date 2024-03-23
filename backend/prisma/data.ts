@@ -117,7 +117,6 @@ export const institutes = [
 export const users: User[] = [
   {
     id: ids.userIds[1],
-    username: "john_doe",
     firstName: "John",
     lastName: "Doe",
     email: "john@example.com",
@@ -128,7 +127,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[2],
-    username: "jane_smith",
     firstName: "Jane",
     lastName: "Smith",
     email: "jane@example.com",
@@ -139,7 +137,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[3],
-    username: "tom_dee",
     firstName: "Tom",
     lastName: "Dee",
     email: "tom@example.com",
@@ -150,7 +147,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[4],
-    username: "CampusBuddyAdmin",
     firstName: "Aarsh",
     lastName: "Shah",
     email: "aarsh@live.ca",
@@ -161,7 +157,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[5],
-    username: "Wooki",
     firstName: "Wendy",
     lastName: "Kim",
     email: "wendyk@example.com",
@@ -172,7 +167,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[6],
-    username: "d_smith",
     firstName: "Doug",
     lastName: "Smith",
     email: "d_smith@example.com",
@@ -183,7 +177,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[7],
-    username: "k_stock",
     firstName: "Kamil",
     lastName: "Stock",
     email: "k_stock@example.com",
@@ -194,7 +187,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[8],
-    username: "p_johnson",
     firstName: "Peter",
     lastName: "Johnson",
     email: "p_johnson@example.com",
@@ -205,7 +197,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[9],
-    username: "g_scott",
     firstName: "Gary",
     lastName: "Scott",
     email: "g_scott@example.com",
@@ -216,7 +207,6 @@ export const users: User[] = [
   },
   {
     id: ids.userIds[10],
-    username: "m_galvan",
     firstName: "Michael",
     lastName: "Galvan",
     email: "m_galvan@example.com",

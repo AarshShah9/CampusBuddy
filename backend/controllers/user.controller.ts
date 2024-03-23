@@ -34,7 +34,7 @@ export const signupAsStudent = async (
   next: NextFunction,
 ) => {
   try {
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -95,7 +95,6 @@ export const signupAsStudent = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -191,7 +190,6 @@ export const verifyStudentSignup = async (
     // Create new student
     const newStudent = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -246,7 +244,6 @@ export const loginUser = async (
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
         institutionId: existingUser.institution.id,
-        username: existingUser.username,
         firstName: existingUser.firstName,
         lastName: existingUser.lastName,
         email: existingUser.email,
@@ -415,7 +412,7 @@ export const signupWithExistingOrg = async (
     const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate request body
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -475,7 +472,6 @@ export const signupWithExistingOrg = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -520,7 +516,7 @@ export const signupAsNewOrg = async (
     // NOTE!: request data nested in req.body.user and req.body.organization
 
     // Validate the new user data
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body.user);
 
     // Validate the new organization data
@@ -574,7 +570,6 @@ export const signupAsNewOrg = async (
       organization: OrganizationCreateType;
     } = {
       user: {
-        username,
         firstName,
         lastName,
         email,
@@ -708,7 +703,6 @@ export const verifyExistingOrgSignup = async (
       // Create a new Org user
       newUser = await tx.user.create({
         data: {
-          username: validatedUserData.username,
           firstName: validatedUserData.firstName,
           lastName: validatedUserData.lastName,
           email: validatedUserData.email,
@@ -803,7 +797,6 @@ export const verifyNewOrgSignup = async (
     // Create the new Org user
     const newUser = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -927,7 +920,6 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
     const loginTokenPayload: loginJwtPayloadType = {
       id: existingUser.id,
       institutionId: null,
-      username: existingUser.username,
       firstName: existingUser.firstName,
       lastName: existingUser.lastName,
       email: existingUser.email,

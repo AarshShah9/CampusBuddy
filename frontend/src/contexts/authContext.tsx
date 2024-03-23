@@ -24,24 +24,24 @@ const deleteTokenFromSecureStore = async (key: TOKEN_KEY_TYPE) =>
 
 export type userRegistrationData = {
   email: string;
-  username:string;
   institutionId: string;
   firstName: string;
   lastName: string;
   password: string;
+  rePassword?: string;
 };
 export type institution = {
   id: string;
   name: string;
 };
-export type  organizationInformation = {
+export type organizationInformation = {
   orgEmail: string;
   organizationName: string;
   institutionId: string;
   description: string;
   password: string;
   rePassword: string;
-}
+};
 type authContext = {
   user?: UserDataType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
@@ -49,7 +49,7 @@ type authContext = {
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
   setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
-  registerOrganization: (arg:organizationInformation) => Promise<void>;
+  registerOrganization: (arg: organizationInformation) => Promise<void>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -60,24 +60,23 @@ export const AuthContextProvider = ({
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
-      const {institutionId, username, firstName, lastName, email, password } = data;
-      console.log(data)
-      let res = await CBRequest('POST', "/api/user/student",{body:data})
+      let res = await CBRequest("POST", "/api/user/student", { body: data });
     } catch (error) {
       console.log(error);
     }
   }, []);
-  const registerOrganization = useCallback(async (data: organizationInformation) => {
-    try {
-      // Takes in 3 param, org name, institute id and description of org
-      const { organizationName, institutionId, description,  } = data;
-      // Makes call to backend to register orginization
-      let res = await CBRequest("POST","/api/orgs/", {body:data})
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
-  },[])
+  const registerOrganization = useCallback(
+    async (data: organizationInformation) => {
+      try {
+        // Makes call to backend to register organization
+        let res = await CBRequest("POST", "/api/orgs/", { body: data });
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [],
+  );
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
@@ -121,7 +120,15 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, registerUser, signIn, logOut, getInstitutions, registerOrganization, setUser }}
+      value={{
+        user,
+        registerUser,
+        signIn,
+        logOut,
+        getInstitutions,
+        registerOrganization,
+        setUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,5 +1,8 @@
 import {
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -14,9 +17,11 @@ import { StackActions, useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
+import { Keyboard } from "react-native";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 type loginForm = {
   email: string;
@@ -25,8 +30,10 @@ type loginForm = {
 
 export default function Login() {
   const { theme } = useThemeContext();
+  const { dismissKeyboard } = useAppContext();
   const navigation = useNavigation<any>();
   const { signIn } = useAuthContext();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const schema = zod.object({
     email: zod.string(),
@@ -54,105 +61,145 @@ export default function Login() {
     [navigation],
   );
 
-  const { dismissKeyboard } = useAppContext();
+  useEffect(() => {
+    let keyboardShowListener: EmitterSubscription;
+    let keyboardHideListener: EmitterSubscription;
+
+    if (Platform.OS === "ios") {
+      keyboardShowListener = Keyboard.addListener("keyboardWillShow", () =>
+        setIsKeyboardVisible(true),
+      );
+      keyboardHideListener = Keyboard.addListener("keyboardWillHide", () =>
+        setIsKeyboardVisible(false),
+      );
+    } else {
+      keyboardShowListener = Keyboard.addListener("keyboardDidShow", () =>
+        setIsKeyboardVisible(true),
+      );
+      keyboardHideListener = Keyboard.addListener("keyboardDidHide", () =>
+        setIsKeyboardVisible(false),
+      );
+    }
+
+    return () => {
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
+    };
+  }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <MainContainer $primary={theme.colors.primary}>
-        <LogoContainer>
-          <Image
-            style={{ marginTop: 42 }}
-            source={require("~/assets/Campus_Buddy_Logo.png")}
-          />
-        </LogoContainer>
-        <OverlayContainer $color={theme.colors.tertiary}>
-          <Header>{"Login"}</Header>
-          <FormContainer>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  placeholder="Email"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="email"
-            />
-            {errors.email && <Text>Email is required.</Text>}
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputField
-                  placeholder="Password"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-              name="password"
-            />
-            {errors.password && <Text>Password is required.</Text>}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
+    >
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <MainContainer $primary={theme.colors.primary}>
+          {/*  only show the logo if the keyboard is hidden */}
+          <LogoContainer>
+            {!isKeyboardVisible && (
+              <Image
+                style={{ marginTop: 42 }}
+                source={require("~/assets/Campus_Buddy_Logo.png")}
+              />
+            )}
+          </LogoContainer>
+          <OverlayContainer $color={theme.colors.tertiary}>
+            <Header>{"Login"}</Header>
+            <FormContainer>
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    placeholder="Email"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    autoCorrect={false}
+                    autoCapitalize={"none"}
+                    autoComplete={"off"}
+                    style={{ backgroundColor: theme.colors.tertiary }}
+                  />
+                )}
+                name="email"
+              />
+              {errors.email && <Text>Email is required.</Text>}
+              <Controller
+                control={control}
+                rules={{
+                  required: true,
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputField
+                    placeholder="Password"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    autoCorrect={false}
+                    autoCapitalize={"none"}
+                    autoComplete={"off"}
+                    style={{ backgroundColor: theme.colors.tertiary }}
+                  />
+                )}
+                name="password"
+              />
+              {errors.password && <Text>Password is required.</Text>}
 
-            <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
-              <Text
+              <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
+                <Text
+                  style={{
+                    lineHeight: 30,
+                    fontSize: 24,
+                    fontWeight: "bold",
+                    color: "white",
+                    fontFamily: "Nunito-Bold",
+                  }}
+                >
+                  Login
+                </Text>
+              </StyledButton>
+              <View
                 style={{
-                  lineHeight: 30,
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: "white",
-                  fontFamily: "Nunito-Bold",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 64,
+                  marginLeft: "auto",
+                  marginRight: "auto",
                 }}
-              >
-                Login
-              </Text>
-            </StyledButton>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 64,
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              <Text
-                style={{
-                  marginRight: 5,
-                  fontSize: 16,
-                  fontFamily: "Roboto-Reg",
-                }}
-              >
-                Don't have an account?
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("StudentSignUp");
-                }}
-                activeOpacity={0.7}
               >
                 <Text
                   style={{
-                    color: theme.colors.primary,
+                    marginRight: 5,
+                    fontSize: 16,
                     fontFamily: "Roboto-Reg",
                   }}
                 >
-                  Sign up
+                  Don't have an account?
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </FormContainer>
-        </OverlayContainer>
-      </MainContainer>
-    </TouchableWithoutFeedback>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("StudentSignUp");
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.primary,
+                      fontFamily: "Roboto-Reg",
+                    }}
+                  >
+                    Sign up
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </FormContainer>
+          </OverlayContainer>
+        </MainContainer>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 

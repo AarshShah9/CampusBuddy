@@ -28,7 +28,6 @@ export default function EmailConfirmationNotice() {
               width: 400,
               fontSize: 36,
               color: "white",
-              fontFamily: "Roboto-Bold",
             }}
           >
             {"Email Confirmation"}
@@ -42,10 +41,11 @@ export default function EmailConfirmationNotice() {
               width: 300,
               fontSize: 20,
               color: "white",
-              fontFamily: "Roboto-Regular",
             }}
           >
-            {"We have sent an email to the one you provided to confirm the validity of your email address. After recieving the email follow the link provided to complete your registration."}
+            {
+              "We have sent an email to the one you provided to confirm the validity of your email address. After recieving the email follow the link provided to complete your registration."
+            }
           </Text>
         </View>
         <Button
@@ -63,7 +63,6 @@ export default function EmailConfirmationNotice() {
           <Text
             style={{
               color: "white",
-              fontFamily: "Roboto-Regular",
               fontSize: 24,
               lineHeight: 30,
             }}

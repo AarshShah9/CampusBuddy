@@ -10,14 +10,15 @@ const Stack = createNativeStackNavigator();
 
 export default function AuthenticationGroup() {
   return (
-    <AuthContextProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="StudentSignUp" component={StudentSignUp} />
-        <Stack.Screen name="OrgSignUp" component={OrganizationSignUp}/>
-        <Stack.Screen name="OrgCreationConfirmation" component={OrgCreationConfirmation}/>
-        <Stack.Screen name="ConfirmEmail" component={EmailConfirmationNotice}/>
-      </Stack.Navigator>
-    </AuthContextProvider>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="StudentSignUp" component={StudentSignUp} />
+      <Stack.Screen name="OrgSignUp" component={OrganizationSignUp} />
+      <Stack.Screen
+        name="OrgCreationConfirmation"
+        component={OrgCreationConfirmation}
+      />
+      <Stack.Screen name="ConfirmEmail" component={EmailConfirmationNotice} />
+    </Stack.Navigator>
   );
 }

@@ -117,7 +117,6 @@ export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  username: z.string().min(3).max(20),
   firstName: z.string().min(2).max(20),
   lastName: z.string().min(2).max(20),
   email: z.string().email({ message: "Invalid email address" }).min(5),

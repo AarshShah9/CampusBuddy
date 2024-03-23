@@ -80,8 +80,7 @@ model Institution {
 }
 
 model User {
-  id                   String                 @id @default(uuid())
-  username             String                 @unique
+  id                   String                 @id @unique @default(uuid())
   firstName            String                 @map("first_name")
   lastName             String                 @map("last_name")
   email                String                 @unique

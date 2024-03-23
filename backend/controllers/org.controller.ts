@@ -453,7 +453,9 @@ export const getAllPendingOrgUsers = async (
         },
         user: {
           select: {
-            username: true,
+            firstName: true,
+            lastName: true,
+            email: true,
             accountType: true,
           },
         },
@@ -566,9 +568,9 @@ export const manageMembershipRequest = async (
     }
 
     res.status(200).json({
-      message: `Role request of user: ${requestingUser!.username} for ${
-        organization.organizationName
-      } as a ${
+      message: `Role request of user: ${requestingUser!.firstName} ${
+        requestingUser!.lastName
+      } for ${organization.organizationName} as a ${
         role.roleName
       } has been ${validatedMembershipApprovalData.decision.toLowerCase()}`,
     });
