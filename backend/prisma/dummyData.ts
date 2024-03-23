@@ -22,6 +22,7 @@ export const sampleEventData = [
         time: "Jan 4",
         location: "UofC Kines Block",
         image: "https://d2epenzoyf672m.cloudfront.net/pfp/bouldering.jpg",
+        event: true,
       },
       {
         id: "3",
@@ -30,6 +31,7 @@ export const sampleEventData = [
         location: "UofC Kines Block",
         image:
           "https://d2epenzoyf672m.cloudfront.net/pfp/basketball_tournament.jpg",
+        event: true,
       },
       {
         id: "4",
@@ -37,6 +39,7 @@ export const sampleEventData = [
         time: "Jan 15",
         location: "MacHall",
         image: "https://d2epenzoyf672m.cloudfront.net/pfp/networkingWeb.png",
+        event: true,
       },
     ],
   },

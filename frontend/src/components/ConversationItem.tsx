@@ -12,7 +12,7 @@ import { ThemedText } from "~/components/ThemedComponents";
 import useChatContext from "~/hooks/useChatContext";
 import useChatsSearchContext from "~/hooks/useChatsSearchContext";
 import useThemeContext from "~/hooks/useThemeContext";
-import { getUserDataApi } from "~/lib/apiFunctions";
+import { getUserDataApi } from "~/lib/apiFunctions/User";
 import {
     passesFilterCondition,
     getProperTimeUpdated,

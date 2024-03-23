@@ -93,8 +93,9 @@ export const EventCreateSchema = EventSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
-  image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified event
+  image: true, // handled by the S3Uploader
+  isPublic: true, // default value is false
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -237,18 +238,98 @@ export type UserEventResponse = z.infer<typeof UserEventResponseSchema>;
 // POST SCHEMAS
 /////////////////////////////////////////
 
+/**
+ * Post Schema
+ */
 export const PostSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   image: z.string().nullable(),
   organizationId: z.string().uuid().nullable(),
-  createdAt: z.coerce.date(),
+  createdAt: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
   title: z.string(),
-  text: z.string().nullable(),
+  description: z.string().nullable(),
+  numberOfSpots: z.number().int().min(1),
+  expiresAt: z.coerce.date(),
   public: z.boolean(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
+
+/**
+ * Create Post Schema
+ */
+export const PostCreateSchema = PostSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+  image: true, // Update value after image is created
+  organizationId: true, // get from req.params if creating verified post
+  public: true, // default value is false
+});
+
+export type PostCreateType = z.infer<typeof PostCreateSchema>;
+
+/**
+ * Update Post Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const PostUpdateSchema = PostSchema.partial();
+
+export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
+
+/////////////////////////////////////////
+// ITEM SCHEMAS
+/////////////////////////////////////////
+// export const ConditionSchema = z.enum([
+//   "New",
+//   "Used_Like_New",
+//   "Used_Good",
+//   "Used_Fair",
+// ]);
+/**
+ * Item Schema
+ */
+export const ItemSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  createdAt: z.coerce
+    .date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime string",
+    })
+    .refine((value) => value > new Date(), {
+      message: "Start time must be in the future",
+    }),
+  title: z.string(),
+  description: z.string().nullable(),
+  price: z.coerce.number().min(1),
+  condition: z.string(),
+  locationPlaceId: z.string(),
+});
+
+export type Item = z.infer<typeof ItemSchema>;
+
+/**
+ * Create Item Schema
+ */
+export const ItemCreateSchema = ItemSchema.omit({
+  id: true, // Default value autoincrement
+  userId: true, // get from authtoken
+  createdAt: true, // default value is current date, handled by the db
+});
+/**
+ * Update Item Schema
+ * partial makes all fields optional, useful for update (patch request)
+ */
+export const ItemUpdateSchema = ItemSchema.partial();
 
 /////////////////////////////////////////
 // COMMENT SCHEMAS

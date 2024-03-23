@@ -11,6 +11,7 @@ import {
   permissions,
   posts,
   postTags,
+  items,
   programs,
   roles,
   topics,
@@ -18,6 +19,7 @@ import {
   userEventResponses,
   userOrganizationRoles,
   users,
+  images,
 } from "./data";
 import { hashPassword } from "../utils/hasher";
 
@@ -25,9 +27,6 @@ const prisma = new PrismaClient();
 
 const load = async () => {
   try {
-    await prisma.institution.deleteMany();
-    console.log("Deleted records in the Institution table");
-
     await prisma.user.deleteMany();
     console.log("Deleted records in the User table");
 
@@ -39,6 +38,12 @@ const load = async () => {
 
     await prisma.post.deleteMany();
     console.log("Deleted records in the Post table");
+
+    await prisma.image.deleteMany();
+    console.log("Deleted records in the User table");
+
+    await prisma.item.deleteMany();
+    console.log("Deleted records in the Item table");
 
     await prisma.comment.deleteMany();
     console.log("Deleted records in the Comment table");
@@ -76,6 +81,9 @@ const load = async () => {
     await prisma.topicSubscription.deleteMany();
     console.log("Deleted records in the Topic Subscription table");
 
+    await prisma.institution.deleteMany();
+    console.log("Deleted records in the Institution table");
+
     await prisma.location.deleteMany();
     console.log("Deleted records in the Location table");
 
@@ -110,6 +118,16 @@ const load = async () => {
       data: posts,
     });
     console.log("Added Post data");
+
+    await prisma.image.createMany({
+      data: images,
+    });
+    console.log("Added Image data");
+
+    await prisma.item.createMany({
+      data: items,
+    });
+    console.log("Added Item data");
 
     await prisma.comment.createMany({
       data: comments,

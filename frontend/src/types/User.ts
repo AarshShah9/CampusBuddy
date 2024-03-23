@@ -1,6 +1,6 @@
 export type UserDataType = {
   id: string;
-  icon: string;
-  name: string;
-  email: string;
+  image?: string;
+  firstName: string;
+  lastName: string;
 };

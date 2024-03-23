@@ -1,3 +1,4 @@
+// TODO combine these two functions into one to reduce the number of API calls
 export async function getCoordinatesFromPlaceId(placeId: string) {
   const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${process.env.GOOGLE_MAPS_API_KEY}`;
   try {
