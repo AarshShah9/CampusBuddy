@@ -165,3 +165,44 @@ export const thankYouMessage = `
     </body>
     </html>
 `;
+
+export const alreadyVerifiedMessage = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Already Verified</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f3f4f6;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .already-verified {
+                text-align: center;
+                background-color: #fff;
+                padding: 50px;
+                box-shadow: 0 5px 15px rgba(0,0,0,.1);
+                border-radius: 5px;
+            }
+            .already-verified h1 {
+                color: #333;
+            }
+            .already-verified p {
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="already-verified">
+            <h1>Already Verified</h1>
+            <p>Your account has already been verified.</p>
+        </div>
+    </body>
+    </html>
+`;
