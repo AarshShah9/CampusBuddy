@@ -58,20 +58,28 @@ export const createItem = async (
         );
       }
 
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedItemData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedItemData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedItemData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedItemData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedItemData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedItemData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // create item
       const newItem = await prisma.item.create({
@@ -82,7 +90,7 @@ export const createItem = async (
           description: validatedItemData.description,
           price: validatedItemData.price,
           condition: validatedItemData.condition,
-          locationPlaceId: location.placeId,
+          locationPlaceId: validatedItemData.locationPlaceId,
         },
       });
 
