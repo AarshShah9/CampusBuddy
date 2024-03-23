@@ -15,7 +15,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Skeleton } from "moti/skeleton";
+import LoadingSkeleton from "~/components/LoadingSkeleton";
 
 const IMG_HEIGHT = 300;
 
@@ -28,10 +28,12 @@ export default function EventDetails() {
         params: { id },
     } = useRoute<any>();
     const { getEventDetails, likeEvent } = useEventsContext();
-    const { theme } = useThemeContext();
+    const { theme, inDarkMode } = useThemeContext();
     const navigation = useNavigation<any>();
     const scrollRef = useAnimatedRef<Animated.ScrollView>();
     const scrollOffSet = useScrollViewOffset(scrollRef);
+
+    
 
     const { data: eventData, refetch } = useQuery({
         queryKey: ["event-details", id],
@@ -110,7 +112,7 @@ export default function EventDetails() {
                 style={{ height: "100%", backgroundColor: "white" }}
                 scrollEventThrottle={16}
             >
-                <Skeleton 
+                <LoadingSkeleton
                     show={!eventData} radius="square"
                     width={"100%"} height={250}
                 >
@@ -118,7 +120,7 @@ export default function EventDetails() {
                         style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
                         source={{ uri: eventData?.image }}
                     />
-                </Skeleton> 
+                </LoadingSkeleton> 
                 <View
                     style={{
                         height: 100,
@@ -129,7 +131,7 @@ export default function EventDetails() {
                     }}
                 >
                     <View style={styles.eDetails}>
-                        <Skeleton 
+                        <LoadingSkeleton
                             show={!eventData}
                             width={180} height={16}
                         >
@@ -142,8 +144,8 @@ export default function EventDetails() {
                             >
                                 {eventData?.title}
                             </Text>
-                        </Skeleton>
-                        <Skeleton 
+                        </LoadingSkeleton>
+                        <LoadingSkeleton
                             show={!eventData}
                             width={150} height={16}
                         >
@@ -156,12 +158,12 @@ export default function EventDetails() {
                             >
                                 {convertUTCToTimeAndDate(eventData?.startTime)}
                             </Text>
-                        </Skeleton>
-                        <Skeleton show={!eventData} width={120} height={16}>
+                        </LoadingSkeleton>
+                        <LoadingSkeleton show={!eventData} width={120} height={16}>
                             {eventData?.location.name && (
                                 <LocationChip location={eventData?.location.name} />
                             )}
-                        </Skeleton>
+                        </LoadingSkeleton>
                     </View>
                     <View style={styles.eClubDetails}>
                         <Image
@@ -174,11 +176,11 @@ export default function EventDetails() {
                             }}
                             source={require("~/assets/Campus_Buddy_Logo.png")}
                         />
-                        <Skeleton show={!eventData} width={60} height={16}>
+                        <LoadingSkeleton show={!eventData} width={60} height={16}>
                             <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
                                 {eventData?.organization?.organizationName}
                             </Text>
-                        </Skeleton>
+                        </LoadingSkeleton>
                     </View>
                 </View>
                 <View
@@ -197,13 +199,13 @@ export default function EventDetails() {
                         color="black"
                         style={{ marginLeft: 10 }}
                     />
-                    <Skeleton show={!eventData} width={120} height={16}>
+                    <LoadingSkeleton show={!eventData} width={120} height={16}>
                         <Text
                             style={{ fontFamily: "Roboto-Medium", fontSize: 16, marginLeft: 5 }}
                         >
                             Attendance: {eventData?.eventResponses.length}
                         </Text>
-                    </Skeleton>
+                    </LoadingSkeleton>
                 </View>
                 <View
                     style={{
@@ -217,13 +219,13 @@ export default function EventDetails() {
                         paddingTop: 10
                     }}
                 >
-                    <Skeleton show={!eventData} width={"100%"} height={200}>
+                    <LoadingSkeleton show={!eventData} width={"100%"} height={200}>
                         <Text
                             style={{ fontFamily: "Roboto-Reg", fontSize: 16 }}
                         >
                             {eventData?.description}
                         </Text>
-                    </Skeleton>
+                    </LoadingSkeleton>
                 </View>
                 <View
                     style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
