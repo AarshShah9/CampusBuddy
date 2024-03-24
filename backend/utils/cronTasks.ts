@@ -4,7 +4,7 @@ import {
   EventWithResponses,
   sendEventNotifications,
   getEventsWithinTimeRange,
-} from "../services/pushNotification.service.js";
+} from "../services/pushNotification.service";
 
 // Send out event reminders, repeats every hour
 export const upcomingEventReminderTask = cron.schedule(
