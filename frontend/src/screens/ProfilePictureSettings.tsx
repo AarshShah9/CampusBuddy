@@ -3,7 +3,7 @@ import {
   BottomSheetBackdropProps,
   BottomSheetModal,
 } from "@gorhom/bottom-sheet";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";

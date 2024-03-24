@@ -26,8 +26,8 @@ import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
 import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const IMG_HEIGHT = 300;
 
@@ -52,7 +52,7 @@ export default function CreateEvent() {
   const [image, setImage] = useState<ImagePickerAsset>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createEvent } = useEventsContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {
@@ -91,13 +91,13 @@ export default function CreateEvent() {
           setResetLocationValue(!resetLocationValue);
           reset();
           stopLoading();
-          navigation.navigate("Home");
+          navigateTo({ page: "Home" });
         })
         .catch((e) => {
           alert("Error creating event");
         });
     },
-    [resetLocationValue, image, createEvent, reset, navigation],
+    [resetLocationValue, image, createEvent, reset],
   );
 
   //  Animation of scroll image

@@ -14,9 +14,9 @@ import ListLoader from "~/components/ListLoader";
 import { useCallback, useState } from "react";
 import { initialNumberOfConversations } from "~/lib/helperFunctions";
 import { ThemedTextInput } from "~/components/ThemedComponents";
-import useChatsSearchContext from "~/hooks/useChatsSearchContext";
+import useSearchBarContext from "~/hooks/useSearchBarContext";
 import useChatsContext from "~/hooks/useChatsContext";
-import { ChatsSearchContextProvider } from "~/contexts/chatsSearchContext";
+import { SearchBarContextProvider } from "~/contexts/searchBarContext";
 import useAppContext from "~/hooks/useAppContext";
 
 const CoversationsArea = () => {
@@ -71,8 +71,7 @@ const CoversationsArea = () => {
 const SearchArea = () => {
     const { theme } = useThemeContext();
 
-    const { filterWord, setFilterWord, clearSearchArea } =
-        useChatsSearchContext();
+    const { filterWord, setFilterWord, clearSearchArea } = useSearchBarContext();
 
     const { dismissKeyboard } = useAppContext();
 
@@ -116,10 +115,10 @@ export default function Chats() {
     return (
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View style={{ flex: 1 }}>
-                <ChatsSearchContextProvider>
+                <SearchBarContextProvider>
                     <SearchArea />
                     <CoversationsArea />
-                </ChatsSearchContextProvider>
+                </SearchBarContextProvider>
             </View>
         </TouchableWithoutFeedback>
     );

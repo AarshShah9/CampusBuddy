@@ -1,8 +1,6 @@
-import * as React from "react";
 import { Card, Text } from "react-native-paper";
 import styled from "styled-components/native";
 import LocationChip from "./LocationChip";
-import { useFonts } from "expo-font";
 import useThemeContext from "~/hooks/useThemeContext";
 
 // Sets the Props for the component

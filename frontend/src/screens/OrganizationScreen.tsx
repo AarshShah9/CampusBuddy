@@ -13,7 +13,6 @@ import {
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
@@ -24,6 +23,7 @@ import { institution, organizationInformation } from "~/contexts/authContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import ErrorText from "~/components/ErrorText";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const schema = zod
   .object({
@@ -53,7 +53,6 @@ export default function OrganizationSignUp() {
   let lastStep = 2;
 
   const { theme } = useThemeContext();
-  const navigation = useNavigation();
   const [valid, setValid] = useState(false);
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const [step, setStep] = useState(1);
@@ -75,11 +74,12 @@ export default function OrganizationSignUp() {
     });
   }, []);
 
+  const { replaceStackWith, navigateBack } = useNavigationContext();
   const onSubmit = (data: organizationInformation) => {
     startLoading();
     registerOrganization(data).then(() => {
       stopLoading();
-      navigation.dispatch(StackActions.replace("OrgCreationConfirmation"));
+      replaceStackWith("OrgCreationConfirmation");
     });
   };
 
@@ -88,7 +88,7 @@ export default function OrganizationSignUp() {
       setStep(1);
       return;
     }
-    navigation.goBack();
+    navigateBack();
   };
 
   const onNext = async () => {

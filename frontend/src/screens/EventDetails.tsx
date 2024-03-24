@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
+import { useRoute } from "@react-navigation/native";
+import { useCallback } from "react";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import styled from "styled-components";
 import Animated, {
@@ -16,6 +16,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const IMG_HEIGHT = 300;
 
@@ -25,11 +26,11 @@ const IMG_HEIGHT = 300;
 
 export default function EventDetails() {
   const {
-    params: { id, map },
+    params: { id, map = true },
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
 
@@ -52,17 +53,19 @@ export default function EventDetails() {
   });
 
   const onMapPress = useCallback(() => {
-    navigation.navigate("MapDetails", {
-      eventData: [
-        {
-          title: eventData?.title,
-          description: eventData?.description,
-          latitude: eventData?.location.latitude,
-          longitude: eventData?.location.longitude,
-        },
-      ],
-    });
-  }, [eventData, navigation]);
+    if(eventData) {
+      navigateTo({ page: "MapDetails",
+        eventData: [
+          {
+            title: eventData.title,
+            description: eventData.description,
+            latitude: eventData.location.latitude,
+            longitude: eventData.location.longitude,
+          },
+        ],
+      });
+    }
+  }, [eventData]);
 
   // TODO fix optimistic updates
   const isOptimistic =
@@ -76,10 +79,6 @@ export default function EventDetails() {
   const userLiked = useCallback(() => {
     likeMutation.mutate({ id, previousState: eventData?.isLiked! });
   }, [id, likeEvent, eventData?.isLiked]);
-
-  const returnPrevPage = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -103,13 +102,13 @@ export default function EventDetails() {
   });
 
   const seeAttendees = useCallback(() => {
-    navigation.navigate("Attendees", { id });
-  }, [navigation, id]);
+    navigateTo({ page: "Attendees", id });
+  }, [id]);
 
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
-        <TouchableOpacity onPress={returnPrevPage}>
+        <TouchableOpacity onPress={navigateBack}>
           <AntDesign name="caretleft" size={24} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={userLiked}>
@@ -228,7 +227,7 @@ export default function EventDetails() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {eventData?.location && (map === undefined ? true : map) && (
+          {eventData?.location && map && (
             <TouchableOpacity onPress={onMapPress}>
               <MapComponentSmall
                 latitude={eventData?.location.latitude}

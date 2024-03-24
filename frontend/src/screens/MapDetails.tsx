@@ -1,30 +1,23 @@
 import { TouchableOpacity, View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
-import Animated, {
-  useAnimatedRef,
-  useScrollViewOffset,
-} from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
 import Map from "~/components/Map";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function MapDetails() {
   let {
     params: { eventData },
   } = useRoute<any>();
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
 
-  const returnPrevPage = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+  const { navigateBack } = useNavigationContext();
 
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
-        <TouchableOpacity onPress={returnPrevPage}>
+        <TouchableOpacity onPress={navigateBack}>
           <AntDesign name="caretleft" size={24} color="white" />
         </TouchableOpacity>
       </HeaderContainer>
