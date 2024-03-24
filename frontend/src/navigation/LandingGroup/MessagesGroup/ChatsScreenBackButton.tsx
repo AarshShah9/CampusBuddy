@@ -1,10 +1,10 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCallback } from "react";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function BackButton() {
-    const { navigateTo } = useAppContext();
+    const { navigateTo } = useNavigationContext();
 
     const goBackToHome = useCallback(() => {
         navigateTo({ page: 'Home' })

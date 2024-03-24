@@ -4,10 +4,10 @@ import { ThemedText } from "./ThemedComponents";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
 import { useCallback } from "react";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function EventHomeCard(props: EventItem) {
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
   const openEventDetails = useCallback(() => {
     if (!props.event) {
       return;

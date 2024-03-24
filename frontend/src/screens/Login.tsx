@@ -21,6 +21,7 @@ import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import { Keyboard } from "react-native";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type loginForm = {
   email: string;
@@ -29,7 +30,8 @@ type loginForm = {
 
 export default function Login() {
   const { theme } = useThemeContext();
-  const { dismissKeyboard, navigateTo, replaceStackWith } = useAppContext();
+  const { dismissKeyboard } = useAppContext();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
   const { signIn } = useAuthContext();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 

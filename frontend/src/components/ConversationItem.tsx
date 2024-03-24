@@ -8,8 +8,8 @@ import {
     TouchableHighlight,
 } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
-import useAppContext from "~/hooks/useAppContext";
 import useChatContext from "~/hooks/useChatContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 import useSearchBarContext from "~/hooks/useSearchBarContext";
 import useThemeContext from "~/hooks/useThemeContext";
 import { getUserDataApi } from "~/lib/apiFunctions/User";
@@ -36,7 +36,7 @@ export default function ConversationItem({
     timeUpdated,
 }: Props) {
     const { openConversation, getNumberOfUnreadMessages } = useChatContext();
-    const { navigateTo } = useAppContext();
+    const { navigateTo } = useNavigationContext();
     const { theme } = useThemeContext();
 
     const [fetchedData, setFetchedData] = useState({

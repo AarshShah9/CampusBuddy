@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import Map from "~/components/Map";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function MapDetails() {
   let {
@@ -12,7 +12,7 @@ export default function MapDetails() {
   } = useRoute<any>();
   const { theme } = useThemeContext();
 
-  const { navigateBack } = useAppContext();
+  const { navigateBack } = useNavigationContext();
 
   return (
     <MainContainer color={theme.colors.primary}>

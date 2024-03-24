@@ -14,7 +14,7 @@ import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import ItemTag from "~/components/ItemTags";
 import useEventsContext from "~/hooks/useEventsContext";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 // React Hook Section
 const schema = zod.object({
@@ -36,7 +36,7 @@ type lookingForDetail = {
 export default function CreateLookingFor() {
   const { theme } = useThemeContext();
   const { createPost } = useEventsContext();
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
 
   const {
     control,

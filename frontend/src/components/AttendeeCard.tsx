@@ -3,10 +3,10 @@ import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useCallback } from "react";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export function RenderAttendee({ item }: { item: AttendeeResponse }) {
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
 
   const onUserPress = useCallback(
     (id: string) => {

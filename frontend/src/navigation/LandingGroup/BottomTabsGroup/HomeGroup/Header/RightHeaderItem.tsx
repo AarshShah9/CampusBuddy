@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { TouchableOpacity } from "react-native";
 import { useCallback } from "react";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from '~/hooks/useNavigationContext';
 
 export default function RightHeaderItem() {
     const { theme } = useThemeContext();
-    const { navigateTo } = useAppContext();
+    const { navigateTo } = useNavigationContext();
     const goToMessages = useCallback(() => {
         navigateTo({ page: 'Messages' })
     }, [])

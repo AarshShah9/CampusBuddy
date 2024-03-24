@@ -1,9 +1,9 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useCallback } from "react";
-import { View, Button, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { EventMapItem } from "~/types/Events";
 import { MaterialIcons } from "@expo/vector-icons";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -22,7 +22,7 @@ const Map = ({
   currentLocation,
   events,
 }: MapProps) => {
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
 
   const openEventDetails = useCallback(
     (index: number) => {

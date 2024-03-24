@@ -12,7 +12,7 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { CarousalItem, EventData } from "~/types/Events";
 import { generateImageURL } from "~/lib/CDNFunctions";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function VerticalScrollComponent() {
   const screenWidth = Dimensions.get("window").width;
@@ -30,7 +30,7 @@ export default function VerticalScrollComponent() {
     });
   }, []);
 
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
 
   const openEventDetails = useCallback(
     (id: string) => {

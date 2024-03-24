@@ -2,7 +2,7 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function SplashScreen() {
     const { width, height } = Dimensions.get("window");
@@ -30,7 +30,7 @@ export default function SplashScreen() {
         loadData();
     }, []);
 
-    const { replaceStackWith } = useAppContext();
+    const { replaceStackWith } = useNavigationContext();
 
     useEffect(() => {
         if (!loading && fontsLoaded) {

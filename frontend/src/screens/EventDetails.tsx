@@ -16,7 +16,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const IMG_HEIGHT = 300;
 
@@ -30,7 +30,7 @@ export default function EventDetails() {
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
-  const { navigateTo, navigateBack } = useAppContext();
+  const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
 

@@ -2,11 +2,11 @@ import { View, Image, Text } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
 import { useCallback } from "react";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function EmailConfirmationNotice() {
   const { theme } = useThemeContext();
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
 
   const navigateToLogin = useCallback(() => {
     navigateTo({ page: "Login" });

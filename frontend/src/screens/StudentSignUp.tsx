@@ -24,6 +24,7 @@ import { userRegistrationData } from "~/contexts/authContext";
 import ErrorText from "~/components/ErrorText";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { validDomains } from "~/lib/constants";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const schema = zod
   .object({
@@ -58,7 +59,8 @@ export default function StudentSignUp() {
   const { theme } = useThemeContext();
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const { getInstitutions, registerUser } = useAuthContext();
-  const { dismissKeyboard, navigateTo, replaceStackWith } = useAppContext();
+  const { dismissKeyboard } = useAppContext();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {

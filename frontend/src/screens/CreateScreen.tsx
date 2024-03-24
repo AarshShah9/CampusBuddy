@@ -6,7 +6,7 @@ import CreateEvent from "./CreateEvent";
 import CreateLookingFor from "./CreateLookingFor";
 import CreateMarketplace from "./CreateMarketplace";
 import { MaterialIcons } from "@expo/vector-icons";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -18,7 +18,7 @@ const pages = [
 export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");
-  const { navigateBack } = useAppContext();
+  const { navigateBack } = useNavigationContext();
 
   return (
     <View style={{ backgroundColor: theme.colors.primary, flex: 1 }}>

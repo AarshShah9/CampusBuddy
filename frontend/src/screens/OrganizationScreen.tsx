@@ -23,7 +23,7 @@ import { institution, organizationInformation } from "~/contexts/authContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import ErrorText from "~/components/ErrorText";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const schema = zod
   .object({
@@ -74,7 +74,7 @@ export default function OrganizationSignUp() {
     });
   }, []);
 
-  const { replaceStackWith, navigateBack } = useAppContext();
+  const { replaceStackWith, navigateBack } = useNavigationContext();
   const onSubmit = (data: organizationInformation) => {
     startLoading();
     registerOrganization(data).then(() => {

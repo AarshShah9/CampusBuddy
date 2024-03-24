@@ -4,10 +4,10 @@ import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
 import { useCallback } from "react";
 import { EventType } from "~/types/Events";
-import useAppContext from "~/hooks/useAppContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function EventMainCard(props: EventType) {
-  const { navigateTo } = useAppContext();
+  const { navigateTo } = useNavigationContext();
   const openEventDetails = useCallback(() => {
     navigateTo({ page: "EventDetails", id: props.id });
   }, []);
