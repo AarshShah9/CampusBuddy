@@ -19,18 +19,21 @@ import {
   loginAsAdmin,
   uploadProfilePic,
   removeProfilePic,
+  profilePageData,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 import { upload } from "../utils/S3Uploader";
 
 const router = express.Router();
 
+router.get("/profile", verifyAuthentication, profilePageData);
+
 router.get("/token", generateJWT); // TODO - Remove this endpoint - for testing only
 router.get("/verify", verifyAuthentication, verify);
 router.post("/loginAdmin", loginAsAdmin);
 router.post("/student", signupAsStudent);
-router.post("/organization/new/", signupAsNewOrg);
-router.post("/organization/:id/", signupWithExistingOrg);
+router.post("/organization/new", signupAsNewOrg);
+router.post("/organization/:id", signupWithExistingOrg);
 router.get("/verify/student/:token", verifyStudentSignup);
 router.get("/verify/organization/new/:token", verifyNewOrgSignup);
 router.get("/verify/organization/:id/:token", verifyExistingOrgSignup);

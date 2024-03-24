@@ -7,7 +7,7 @@ import { BooleanSchema } from "./utils";
 
 export const EventStatusSchema = z.enum(["Verified", "NonVerified"]);
 
-export const ParticipationStatusSchema = z.enum(["Interested"]);
+export const ParticipationStatusSchema = z.enum(["Interested", "Going"]);
 
 export const OrganizationStatusSchema = z.enum([
   "Pending",
@@ -117,7 +117,6 @@ export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  username: z.string().min(3).max(20),
   firstName: z.string().min(2).max(20),
   lastName: z.string().min(2).max(20),
   email: z.string().email({ message: "Invalid email address" }).min(5),
@@ -591,3 +590,7 @@ export const PushTokenSchema = z.object({
 });
 
 export type PushTokenType = z.infer<typeof PushTokenSchema>;
+
+export const updateParticipantStatusSchema = z.object({
+  status: ParticipationStatusSchema,
+});

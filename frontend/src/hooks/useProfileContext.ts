@@ -6,7 +6,7 @@ export default function useProfileContext() {
 
     if (!contextValues)
         throw new Error(
-            "useProfileContext must be used within a ProfileContextProvider wrapped around the app",
+            "useProfileContext must be used within a ProfileContextProvider",
         );
 
     return contextValues;

@@ -2,6 +2,7 @@ import {
   AppPermissionName,
   EventStatus,
   ParticipationStatus,
+  State,
 } from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
@@ -73,20 +74,29 @@ export const createVerifiedEvent = async (
     // Start a transaction
     const newEvent = await prisma.$transaction(async (prisma) => {
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -156,20 +166,28 @@ export const createEvent = async (
     const newEvent = await prisma.$transaction(async (prisma) => {
       // create event
       // Create a verified event for an organization using the google maps api
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedEventData.locationPlaceId,
-      );
-      const location = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
 
       // TODO add tags to event
 
@@ -292,20 +310,28 @@ export const updateEvent = async (
     }
 
     if (validatedUpdateEventData.locationPlaceId) {
-      const { lat, lng } = await getCoordinatesFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const name = await getPlaceNameFromPlaceId(
-        validatedUpdateEventData.locationPlaceId,
-      );
-      const newLocation = await prisma.location.create({
-        data: {
-          latitude: lat,
-          longitude: lng,
+      const existingLocation = await prisma.location.findUnique({
+        where: {
           placeId: validatedUpdateEventData.locationPlaceId,
-          name: name,
         },
       });
+
+      if (!existingLocation) {
+        const { lat, lng } = await getCoordinatesFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const name = await getPlaceNameFromPlaceId(
+          validatedUpdateEventData.locationPlaceId,
+        );
+        const location = await prisma.location.create({
+          data: {
+            latitude: lat,
+            longitude: lng,
+            placeId: validatedUpdateEventData.locationPlaceId,
+            name: name,
+          },
+        });
+      }
     }
 
     // Update the event
@@ -416,19 +442,51 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
       return distance <= defaultDistance;
     });
 
+    const marketPlaceItems = await prisma.item.findMany({
+      where: {
+        state: State.Available,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    marketPlaceItems.filter((item) => {
+      const distance = getDistanceFromLatLonInKm(
+        userInstitution.location.latitude,
+        userInstitution.location.longitude,
+        item.location.latitude,
+        item.location.longitude,
+      );
+      return distance <= defaultDistance;
+    });
+
     res.status(200).json({
       message: "All events",
-      data: [
-        ...events.map((event) => {
-          return {
-            id: event.id,
-            latitude: event.location.latitude,
-            longitude: event.location.longitude,
-            title: event.title,
-            description: event.description,
-          };
-        }),
-      ],
+      data: {
+        events: [
+          ...events.map((event) => {
+            return {
+              id: event.id,
+              latitude: event.location.latitude,
+              longitude: event.location.longitude,
+              title: event.title,
+              description: event.description,
+            };
+          }),
+        ],
+        items: [
+          ...marketPlaceItems.map((item) => {
+            return {
+              id: item.id,
+              latitude: item.location.latitude,
+              longitude: item.location.longitude,
+              title: item.title,
+              description: item.description,
+            };
+          }),
+        ],
+      },
     });
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -480,7 +538,15 @@ export const getEventById = async (
     });
 
     const isLiked = event?.eventResponses.some(
-      (response) => response.userId === req.userId,
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Interested",
+    );
+
+    const isAttending = event?.eventResponses.some(
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Going",
     );
 
     if (!event) {
@@ -499,7 +565,11 @@ export const getEventById = async (
       message: "Event found",
       data: {
         ...event,
+        attendees: event.eventResponses.filter(
+          (response) => response.participationStatus === "Going",
+        ).length,
         isLiked: isLiked,
+        isAttending: isAttending,
       },
     });
   } catch (error) {
@@ -952,7 +1022,9 @@ export const LikeEvent = async (
     }
 
     const userLikedEvent = event.eventResponses.some(
-      (response) => response.userId === userId,
+      (response) =>
+        response.userId === userId &&
+        response.participationStatus === "Interested",
     );
 
     if (userLikedEvent) {
@@ -960,6 +1032,7 @@ export const LikeEvent = async (
         where: {
           eventId,
           userId,
+          participationStatus: ParticipationStatus.Interested,
         },
       });
     } else {
@@ -992,6 +1065,9 @@ export const getAttendees = async (
       },
       include: {
         eventResponses: {
+          where: {
+            participationStatus: "Going",
+          },
           include: {
             user: true,
           },
@@ -1020,6 +1096,61 @@ export const getAttendees = async (
       message: "Event attendees",
       data: attendees,
     });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const attendEvent = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const eventId = IdParamSchema.parse(req.params).id;
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: true,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const userLikedEvent = event.eventResponses.some(
+      (response) =>
+        response.userId === userId && response.participationStatus === "Going",
+    );
+
+    if (userLikedEvent) {
+      await prisma.userEventResponse.deleteMany({
+        where: {
+          eventId,
+          userId,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    } else {
+      await prisma.userEventResponse.create({
+        data: {
+          eventId,
+          userId: userId!,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    }
+
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }

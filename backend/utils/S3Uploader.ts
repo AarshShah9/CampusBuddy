@@ -7,6 +7,7 @@ import multer from "multer";
 
 const unlinkAsync = promisify(fs.unlink);
 
+// TODO Make bulk upload/ delete more efficient.
 const UploadToS3 = async (file: Express.Multer.File, path: string) => {
   try {
     // AWS Credentials and bucket information

@@ -11,21 +11,19 @@ import {
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import Animated, { useAnimatedRef } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { Button, Checkbox } from "react-native-paper";
-import ItemTag from "~/components/ItemTags";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
 import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
 import { z } from "zod";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -42,9 +40,10 @@ export default function CreateMarketplace() {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
+  const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createMarketPlaceItem } = useEventsContext();
   const { startLoading, stopLoading } = useLoadingContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
 
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
@@ -77,9 +76,10 @@ export default function CreateMarketplace() {
         reset();
         setSelectedImages(undefined);
         setCheckedItem(null);
+        setResetLocationValue(!resetLocationValue);
         stopLoading();
         alert("item Created");
-        navigation.navigate("Home");
+        navigateTo({ page: "Home" });
       })
       .catch((e) => {
         alert("Error creating event");
@@ -422,7 +422,10 @@ export default function CreateMarketplace() {
                   >
                     Location*
                   </Text>
-                  <LocationInputModal controllerOnChange={onChange} />
+                  <LocationInputModal
+                    controllerOnChange={onChange}
+                    reset={resetLocationValue}
+                  />
                 </View>
               )}
               name="locationPlaceId"

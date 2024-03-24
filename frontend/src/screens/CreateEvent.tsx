@@ -26,7 +26,8 @@ import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
 import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
+import useLoadingContext from "~/hooks/useLoadingContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const IMG_HEIGHT = 300;
 
@@ -49,8 +50,10 @@ export default function CreateEvent() {
   const scrollOffSet = useScrollViewOffset(scrollRef);
   const [selectedImage, setSelectedImage] = useState<string>();
   const [image, setImage] = useState<ImagePickerAsset>();
+  const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createEvent } = useEventsContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
+  const { startLoading, stopLoading } = useLoadingContext();
 
   const {
     control,
@@ -73,21 +76,29 @@ export default function CreateEvent() {
   //Functions
 
   // Handle submission of user data
-  const onSubmit = useCallback((data: createEventType) => {
-    createEvent(data, image!)
-      .then((r) => {
-        if (r.status !== 201) {
-          throw new Error("Error creating event");
-        }
-        alert("Event Created");
-        // clear form and navigate to event page
-        reset();
-        navigation.navigate("Home");
-      })
-      .catch((e) => {
-        alert("Error creating event");
-      });
-  }, []);
+  const onSubmit = useCallback(
+    (data: createEventType) => {
+      startLoading();
+      createEvent(data, image!)
+        .then((r) => {
+          if (r.status !== 201) {
+            throw new Error("Error creating event");
+          }
+          alert("Event Created");
+          // clear form and navigate to event page
+          setImage(undefined);
+          setSelectedImage(undefined);
+          setResetLocationValue(!resetLocationValue);
+          reset();
+          stopLoading();
+          navigateTo({ page: "Home" });
+        })
+        .catch((e) => {
+          alert("Error creating event");
+        });
+    },
+    [resetLocationValue, image, createEvent, reset],
+  );
 
   //  Animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -278,7 +289,10 @@ export default function CreateEvent() {
                   >
                     Location*
                   </Text>
-                  <LocationInputModal controllerOnChange={onChange} />
+                  <LocationInputModal
+                    controllerOnChange={onChange}
+                    reset={resetLocationValue}
+                  />
                 </View>
               )}
               name="locationPlaceId"

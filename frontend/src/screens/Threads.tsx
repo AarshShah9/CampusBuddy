@@ -10,11 +10,13 @@ export default function Threads() {
   const { startLoading, stopLoading } = useLoadingContext();
   const { getAllMapEvents } = useEventsContext();
   const [events, setEvents] = useState<EventMapItem[]>();
+  const [items, setItems] = useState<EventMapItem[]>();
 
   useEffect(() => {
     startLoading();
     getAllMapEvents().then((res) => {
-      setEvents(res.data);
+      setEvents(res.data.events);
+      setItems(res.data.items);
     });
     if (location) {
       stopLoading();
@@ -32,6 +34,7 @@ export default function Threads() {
         latitude: location?.coords?.latitude,
       }}
       events={events}
+      items={items}
     />
   );
 }
