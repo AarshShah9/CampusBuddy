@@ -11,7 +11,7 @@ import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useQuery } from "@tanstack/react-query";
-import { RenderAttendee } from "~/components/AttendeeCard";
+import AttendeeCard from "~/components/AttendeeCard";
 import { SearchArea } from "~/components/SearchArea";
 import useNavigationContext from "~/hooks/useNavigationContext";
 
@@ -52,7 +52,7 @@ export default function Attendees() {
 
       <FlatList
         data={filteredAttendees}
-        renderItem={({ item }) => <RenderAttendee item={item} />}
+        renderItem={({ item }) => <AttendeeCard item={item} />}
         keyExtractor={(item) => item.id}
         style={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
