@@ -3,18 +3,16 @@ import {
   View,
   Image,
   Dimensions,
-  Text,
   TouchableOpacity,
 } from "react-native";
-import { carouselImages } from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
 import { useCallback, useEffect, useState } from "react";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { CarousalItem, EventData } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import useAppContext from "~/hooks/useAppContext";
 
 export default function VerticalScrollComponent() {
   const screenWidth = Dimensions.get("window").width;
@@ -32,14 +30,13 @@ export default function VerticalScrollComponent() {
     });
   }, []);
 
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useAppContext();
+
   const openEventDetails = useCallback(
     (id: string) => {
-      navigation.navigate("EventDetails", {
-        id,
-      });
+      navigateTo({ page: "EventDetails", id });
     },
-    [events, navigation],
+    [events],
   );
 
   return (

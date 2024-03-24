@@ -23,9 +23,9 @@ import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
 import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
 import { z } from "zod";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import useAppContext from "~/hooks/useAppContext";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -45,7 +45,7 @@ export default function CreateMarketplace() {
   const [resetLocationValue, setResetLocationValue] = useState(false);
   const { createMarketPlaceItem } = useEventsContext();
   const { startLoading, stopLoading } = useLoadingContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useAppContext();
 
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
@@ -81,7 +81,7 @@ export default function CreateMarketplace() {
         setResetLocationValue(!resetLocationValue);
         stopLoading();
         alert("item Created");
-        navigation.navigate("Home");
+        navigateTo({ page: "Home" });
       })
       .catch((e) => {
         alert("Error creating event");

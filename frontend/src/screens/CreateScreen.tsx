@@ -5,8 +5,8 @@ import { useState } from "react";
 import CreateEvent from "./CreateEvent";
 import CreateLookingFor from "./CreateLookingFor";
 import CreateMarketplace from "./CreateMarketplace";
-import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import useAppContext from "~/hooks/useAppContext";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -18,12 +18,12 @@ const pages = [
 export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");
-  const navigation = useNavigation<any>();
+  const { navigateBack } = useAppContext();
 
   return (
     <View style={{ backgroundColor: theme.colors.primary, flex: 1 }}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={navigation.goBack}>
+        <TouchableOpacity onPress={navigateBack}>
           <MaterialIcons
             name="cancel"
             size={24}

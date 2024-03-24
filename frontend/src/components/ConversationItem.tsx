@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
@@ -9,8 +8,9 @@ import {
     TouchableHighlight,
 } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
+import useAppContext from "~/hooks/useAppContext";
 import useChatContext from "~/hooks/useChatContext";
-import useChatsSearchContext from "~/hooks/useChatsSearchContext";
+import useSearchBarContext from "~/hooks/useSearchBarContext";
 import useThemeContext from "~/hooks/useThemeContext";
 import { getUserDataApi } from "~/lib/apiFunctions/User";
 import {
@@ -36,7 +36,7 @@ export default function ConversationItem({
     timeUpdated,
 }: Props) {
     const { openConversation, getNumberOfUnreadMessages } = useChatContext();
-    const { navigate } = useNavigation<any>();
+    const { navigateTo } = useAppContext();
     const { theme } = useThemeContext();
 
     const [fetchedData, setFetchedData] = useState({
@@ -56,13 +56,13 @@ export default function ConversationItem({
     }, [userId]);
 
     const onPressHandler = () => {
-        navigate("ChatScreen", { userId, userName, icon });
+        navigateTo({ page: "ChatScreen", userId, userName, icon });
         openConversation(userId);
     };
 
     const numUnreadMessages = getNumberOfUnreadMessages(userId, unreadMessages);
 
-    const { filterWord } = useChatsSearchContext();
+    const { filterWord } = useSearchBarContext();
 
     if (!passesFilterCondition(userName, filterWord)) return null;
 

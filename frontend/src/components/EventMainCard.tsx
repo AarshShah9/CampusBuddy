@@ -3,15 +3,13 @@ import { Card, Text } from "react-native-paper";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
 import { useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { EventType } from "~/types/Events";
+import useAppContext from "~/hooks/useAppContext";
 
 export default function EventMainCard(props: EventType) {
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useAppContext();
   const openEventDetails = useCallback(() => {
-    navigation.navigate("EventDetails", {
-      id: props.id,
-    });
+    navigateTo({ page: "EventDetails", id: props.id });
   }, []);
 
   return (

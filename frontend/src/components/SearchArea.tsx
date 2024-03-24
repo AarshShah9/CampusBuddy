@@ -1,5 +1,5 @@
 import useThemeContext from "~/hooks/useThemeContext";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import useAppContext from "~/hooks/useAppContext";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";

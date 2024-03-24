@@ -13,7 +13,6 @@ import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
@@ -30,8 +29,7 @@ type loginForm = {
 
 export default function Login() {
   const { theme } = useThemeContext();
-  const { dismissKeyboard } = useAppContext();
-  const navigation = useNavigation<any>();
+  const { dismissKeyboard, navigateTo, replaceStackWith } = useAppContext();
   const { signIn } = useAuthContext();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
@@ -56,9 +54,9 @@ export default function Login() {
     (data: loginForm) => {
       console.log(data);
       signIn(data.email, data.password);
-      navigation.dispatch(StackActions.replace("LandingGroup"));
+      replaceStackWith('LandingGroup')
     },
-    [navigation],
+    [],
   );
 
   useEffect(() => {
@@ -181,7 +179,7 @@ export default function Login() {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("StudentSignUp");
+                    navigateTo({ page: "StudentSignUp" });
                   }}
                   activeOpacity={0.7}
                 >

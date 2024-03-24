@@ -1,17 +1,18 @@
 import { AttendeeResponse } from "~/types/Events";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import React, { useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
+import useAppContext from "~/hooks/useAppContext";
 
 export function RenderAttendee({ item }: { item: AttendeeResponse }) {
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useAppContext();
+
   const onUserPress = useCallback(
     (id: string) => {
-      navigation.navigate("UserProfile", { id });
+      navigateTo({ page: 'UserProfile', id })
     },
-    [navigation],
+    [navigateTo],
   );
   const imageSource = item.image ? { uri: generateImageURL(item.image) } : null;
 

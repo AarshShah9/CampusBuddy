@@ -1,21 +1,18 @@
 import LocationChip from "./LocationChip";
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "./ThemedComponents";
-import useThemeContext from "~/hooks/useThemeContext";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
+import useAppContext from "~/hooks/useAppContext";
 
 export default function EventHomeCard(props: EventItem) {
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useAppContext();
   const openEventDetails = useCallback(() => {
     if (!props.event) {
       return;
     }
-    navigation.navigate("EventDetails", {
-      id: props.id,
-    });
+    navigateTo({ page: "EventDetails", id: props.id });
   }, [props]);
 
   return (

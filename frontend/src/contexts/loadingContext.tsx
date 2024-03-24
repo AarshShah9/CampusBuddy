@@ -3,7 +3,6 @@ import { createContext, useCallback, useState } from "react";
 import LoadingDisplay from "~/components/LoadingDisplay";
 
 type loadingContext = {
-  isLoading: boolean;
   startLoading: () => void;
   stopLoading: () => void;
 };
@@ -21,7 +20,7 @@ export const LoadingContextProvider = ({
   }, []);
 
   return (
-    <LoadingContext.Provider value={{ isLoading, startLoading, stopLoading }}>
+    <LoadingContext.Provider value={{ startLoading, stopLoading }}>
       {children}
       <LoadingDisplay isLoading={isLoading} />
     </LoadingContext.Provider>
