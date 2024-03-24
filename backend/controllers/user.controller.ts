@@ -19,7 +19,7 @@ import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
 import { users } from "../prisma/data";
-import { thankYouMessage } from "../utils/emails";
+import { alreadyVerifiedMessage, thankYouMessage } from "../utils/emails";
 import UploadToS3, {
   deleteFromS3,
   generateUniqueFileName,
@@ -34,7 +34,7 @@ export const signupAsStudent = async (
   next: NextFunction,
 ) => {
   try {
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -95,7 +95,6 @@ export const signupAsStudent = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -191,7 +190,6 @@ export const verifyStudentSignup = async (
     // Create new student
     const newStudent = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -246,7 +244,6 @@ export const loginUser = async (
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
         institutionId: existingUser.institution.id,
-        username: existingUser.username,
         firstName: existingUser.firstName,
         lastName: existingUser.lastName,
         email: existingUser.email,
@@ -415,7 +412,7 @@ export const signupWithExistingOrg = async (
     const organizationId = IdParamSchema.parse(req.params).id;
 
     // Validate request body
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body);
 
     // Check if the user already exists
@@ -475,7 +472,6 @@ export const signupWithExistingOrg = async (
     }
 
     const payload: UserCreateType = {
-      username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -520,7 +516,7 @@ export const signupAsNewOrg = async (
     // NOTE!: request data nested in req.body.user and req.body.organization
 
     // Validate the new user data
-    const { institutionId, username, firstName, lastName, email, password } =
+    const { institutionId, firstName, lastName, email, password } =
       UserCreateSchema.parse(req.body.user);
 
     // Validate the new organization data
@@ -574,7 +570,6 @@ export const signupAsNewOrg = async (
       organization: OrganizationCreateType;
     } = {
       user: {
-        username,
         firstName,
         lastName,
         email,
@@ -708,7 +703,6 @@ export const verifyExistingOrgSignup = async (
       // Create a new Org user
       newUser = await tx.user.create({
         data: {
-          username: validatedUserData.username,
           firstName: validatedUserData.firstName,
           lastName: validatedUserData.lastName,
           email: validatedUserData.email,
@@ -766,12 +760,10 @@ export const verifyNewOrgSignup = async (
     });
 
     if (userExists) {
-      throw new AppError(
-        AppErrorName.RECORD_EXISTS_ERROR,
-        "User already exists",
-        400,
-        true,
-      );
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(alreadyVerifiedMessage);
+      res.end();
+      return;
     }
     if (!validatedUserData.institutionId) {
       throw new AppError(
@@ -803,7 +795,6 @@ export const verifyNewOrgSignup = async (
     // Create the new Org user
     const newUser = await prisma.user.create({
       data: {
-        username: validatedUserData.username,
         firstName: validatedUserData.firstName,
         lastName: validatedUserData.lastName,
         email: validatedUserData.email,
@@ -818,10 +809,10 @@ export const verifyNewOrgSignup = async (
       validatedorganizationData,
       newUser.id,
     );
-    res.status(200).json({
-      message: `JWT verified and a new org user was created as the pending owner of the organization: ${newOrganization?.organizationName}`,
-      data: { user: newUser, organization: newOrganization },
-    });
+
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.write(thankYouMessage);
+    res.end();
   } catch (error) {
     next(error);
   }
@@ -927,7 +918,6 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
     const loginTokenPayload: loginJwtPayloadType = {
       id: existingUser.id,
       institutionId: null,
-      username: existingUser.username,
       firstName: existingUser.firstName,
       lastName: existingUser.lastName,
       email: existingUser.email,
