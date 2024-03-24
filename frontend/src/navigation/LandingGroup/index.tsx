@@ -10,7 +10,7 @@ import Attendees from "~/screens/Attendees";
 
 const Stack = createNativeStackNavigator();
 
-export default function TopTabsGroup() {
+export default function LandingGroup() {
   const { theme } = useThemeContext();
 
   return (

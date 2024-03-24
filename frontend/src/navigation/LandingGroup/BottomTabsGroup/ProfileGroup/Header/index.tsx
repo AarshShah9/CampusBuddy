@@ -6,7 +6,7 @@ import MenuIcon from "./MenuIcon";
 import useAuthContext from "~/hooks/useAuthContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useProfileContext from "~/hooks/useProfileContext";
 
 export default function Header() {
@@ -14,7 +14,7 @@ export default function Header() {
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
   const { openPictureModal, profileData } = useProfileContext();
-  const [imageSource, setImageSource] = React.useState<any>(null);
+  const [imageSource, setImageSource] = useState<any>(null);
 
   useEffect(() => {
     const imageSource = user?.image

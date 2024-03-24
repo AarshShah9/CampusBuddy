@@ -1,24 +1,19 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-  Image,
-  FlatList,
-  TextInput,
+  FlatList
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useQuery } from "@tanstack/react-query";
-import { AttendeeResponse } from "~/types/Events";
-import useAppContext from "~/hooks/useAppContext";
-import { ThemedTextInput } from "~/components/ThemedComponents";
 import { RenderAttendee } from "~/components/AttendeeCard";
 import { SearchArea } from "~/components/SearchArea";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function Attendees() {
   const {
@@ -26,7 +21,6 @@ export default function Attendees() {
   } = useRoute<any>();
   const { getAttendees } = useEventsContext();
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: attendeeData } = useQuery({
@@ -45,10 +39,12 @@ export default function Attendees() {
     [setSearchQuery],
   );
 
+  const { navigateBack } = useNavigationContext();
+
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigateBack()}>
           <AntDesign name="caretleft" size={24} color="white" />
         </TouchableOpacity>
         <SearchArea setSearchQuery={setSearchQueryCallback} />

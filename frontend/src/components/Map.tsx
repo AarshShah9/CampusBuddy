@@ -1,10 +1,10 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useCallback } from "react";
-import { View, Button, StyleSheet, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import { EventMapItem } from "~/types/Events";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -25,18 +25,15 @@ const Map = ({
   events,
   items,
 }: MapProps) => {
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
   const { theme } = useThemeContext();
 
   const openEventDetails = useCallback(
     (index: number) => {
       if (showInfo) return;
-      navigation.navigate("EventDetails", {
-        id: events?.[index].id,
-        map: false,
-      });
+      navigateTo({ page: "EventDetails", id: events ? events[index].id : '', map: false });
     },
-    [events, navigation],
+    [events],
   );
 
   return (

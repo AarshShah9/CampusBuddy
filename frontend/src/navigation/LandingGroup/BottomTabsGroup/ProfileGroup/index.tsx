@@ -3,7 +3,6 @@ import Header from "./Header";
 import ProfileTabs from "./ProfileTabs";
 import { ProfileContextProvider } from "~/contexts/profileContext";
 import ProfileSettings from "~/screens/ProfileSettings";
-import React from "react";
 import ProfilePictureSettings from "~/screens/ProfilePictureSettings";
 
 const Stack = createNativeStackNavigator();
