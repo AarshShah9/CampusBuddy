@@ -1,9 +1,10 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useCallback } from "react";
-import { View, Button, StyleSheet } from "react-native";
+import { View, Button, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { EventMapItem } from "~/types/Events";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import useThemeContext from "~/hooks/useThemeContext";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -11,6 +12,7 @@ type MapProps = {
   showInfo?: boolean;
   currentLocation: LatLng;
   events?: EventMapItem[];
+  items?: EventMapItem[];
 };
 
 // This is a simple map component that displays a map with a marker at the given latitude and longitude.
@@ -21,8 +23,10 @@ const Map = ({
   showInfo = false,
   currentLocation,
   events,
+  items,
 }: MapProps) => {
   const navigation = useNavigation<any>();
+  const { theme } = useThemeContext();
 
   const openEventDetails = useCallback(
     (index: number) => {
@@ -60,6 +64,28 @@ const Map = ({
               >
                 <View style={circleStyles.circleStyle}>
                   <MaterialIcons name="event-available" size={24} color="red" />
+                </View>
+              </Marker>
+            );
+          })}
+        {items &&
+          items.map((item: EventMapItem, index) => {
+            return (
+              <Marker
+                key={index}
+                title={showInfo ? item.title : ""}
+                description={showInfo ? item.description : ""}
+                coordinate={adjustPosition(item, index, items)}
+                onPress={() => {
+                  Alert.alert("Stay Tuned!", "This feature is coming soon!");
+                }}
+              >
+                <View style={circleStyles.circleStyle}>
+                  <MaterialCommunityIcons
+                    name="shopping-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
                 </View>
               </Marker>
             );

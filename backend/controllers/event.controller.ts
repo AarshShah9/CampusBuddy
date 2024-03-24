@@ -2,6 +2,7 @@ import {
   AppPermissionName,
   EventStatus,
   ParticipationStatus,
+  State,
 } from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
@@ -441,19 +442,51 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
       return distance <= defaultDistance;
     });
 
+    const marketPlaceItems = await prisma.item.findMany({
+      where: {
+        state: State.Available,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    marketPlaceItems.filter((item) => {
+      const distance = getDistanceFromLatLonInKm(
+        userInstitution.location.latitude,
+        userInstitution.location.longitude,
+        item.location.latitude,
+        item.location.longitude,
+      );
+      return distance <= defaultDistance;
+    });
+
     res.status(200).json({
       message: "All events",
-      data: [
-        ...events.map((event) => {
-          return {
-            id: event.id,
-            latitude: event.location.latitude,
-            longitude: event.location.longitude,
-            title: event.title,
-            description: event.description,
-          };
-        }),
-      ],
+      data: {
+        events: [
+          ...events.map((event) => {
+            return {
+              id: event.id,
+              latitude: event.location.latitude,
+              longitude: event.location.longitude,
+              title: event.title,
+              description: event.description,
+            };
+          }),
+        ],
+        items: [
+          ...marketPlaceItems.map((item) => {
+            return {
+              id: item.id,
+              latitude: item.location.latitude,
+              longitude: item.location.longitude,
+              title: item.title,
+              description: item.description,
+            };
+          }),
+        ],
+      },
     });
   } catch (error) {
     console.error("Error fetching events:", error);

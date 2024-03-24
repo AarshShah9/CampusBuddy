@@ -359,6 +359,8 @@ model Item {
   location        Location @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
 
+  state State
+
   @@index([userId])
   @@index([institutionId])
   @@index([locationPlaceId])
@@ -381,3 +383,9 @@ model Image {
 //   Used_Good
 //   Used_Fair
 // }
+
+enum State {
+  Available
+  Sold
+  Removed
+}
