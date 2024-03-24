@@ -104,7 +104,7 @@ export default function Login() {
             )}
           </LogoContainer>
           <OverlayContainer $color={theme.colors.tertiary}>
-            <Header $color={"white"}>{"Login"}</Header>
+            <Header $color={theme.colors.text}>{"Login"}</Header>
             <FormContainer>
               <Controller
                 control={control}
@@ -175,6 +175,7 @@ export default function Login() {
                     marginRight: 5,
                     fontSize: 16,
                     fontFamily: "Roboto-Reg",
+                    color: theme.colors.text,
                   }}
                 >
                   Don't have an account?

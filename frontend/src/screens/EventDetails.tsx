@@ -125,7 +125,7 @@ export default function EventDetails() {
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         <Animated.Image
@@ -136,7 +136,6 @@ export default function EventDetails() {
           style={{
             height: 100,
             width: "100%",
-            backgroundColor: "white",
             flexDirection: "row",
             justifyContent: "space-between",
           }}
@@ -147,6 +146,7 @@ export default function EventDetails() {
                 fontFamily: "Roboto-Medium",
                 fontSize: 16,
                 marginBottom: 5,
+                color: theme.colors.text,
               }}
             >
               {eventData?.title}
@@ -156,6 +156,7 @@ export default function EventDetails() {
                 fontFamily: "Roboto-Medium",
                 fontSize: 16,
                 marginBottom: 5,
+                color: theme.colors.text,
               }}
             >
               {convertUTCToTimeAndDate(eventData?.startTime)}
@@ -187,14 +188,13 @@ export default function EventDetails() {
               borderTopWidth: 1,
               flexDirection: "row",
               height: 50,
-              backgroundColor: "white",
               alignItems: "center",
             }}
           >
             <Ionicons
               name="people-outline"
               size={30}
-              color="black"
+              color={theme.colors.text}
               style={{ marginLeft: 10 }}
             />
 
@@ -203,6 +203,7 @@ export default function EventDetails() {
                 fontFamily: "Roboto-Medium",
                 fontSize: 16,
                 marginLeft: 5,
+                color: theme.colors.text,
               }}
             >
               Attendance: {eventData?.eventResponses.length}{" "}
@@ -211,7 +212,6 @@ export default function EventDetails() {
         </TouchableOpacity>
         <View
           style={{
-            backgroundColor: "white",
             borderTopWidth: 1,
             width: "100%",
             borderTopColor: "#B0CFFF",
@@ -221,13 +221,23 @@ export default function EventDetails() {
           }}
         >
           <Text
-            style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
+            style={{
+              marginTop: 10,
+              fontFamily: "Roboto-Reg",
+              fontSize: 16,
+              color: theme.colors.text,
+            }}
           >
             {eventData?.description}
           </Text>
         </View>
         <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
+          }}
         >
           {eventData?.location && (map === undefined ? true : map) && (
             <TouchableOpacity onPress={onMapPress}>

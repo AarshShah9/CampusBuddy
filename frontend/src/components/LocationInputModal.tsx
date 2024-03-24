@@ -45,13 +45,15 @@ export default function LocationInputModal(props: {
             style={{ marginLeft: 8 }}
             name="location-pin"
             size={24}
-            color="black"
+            color={theme.colors.iconColor}
           />
-          <Text style={styles.textStyle}>{location?.description ?? ""}</Text>
+          <Text style={[styles.textStyle, { color: theme.colors.text }]}>
+            {location?.description ?? ""}
+          </Text>
         </View>
       </TouchableWithoutFeedback>
       <Modal visible={modalVisible}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.tertiary }}>
           <View
             style={[
               styles.modalHeaderContainer,
@@ -66,7 +68,12 @@ export default function LocationInputModal(props: {
               onPress={showModal}
             />
           </View>
-          <View style={styles.modalContainer}>
+          <View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: theme.colors.googleAutoComplete },
+            ]}
+          >
             <Entypo
               style={{ marginLeft: 10, marginTop: 10 }}
               name="location-pin"

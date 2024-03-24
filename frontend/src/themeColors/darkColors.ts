@@ -6,7 +6,7 @@ const darkColors = {
     primaryContainer: "rgb(0, 60, 235)",
     onPrimaryContainer: "rgb(0, 13, 32)",
     secondary: "rgb(13, 48, 82)",
-    onSecondary: "rgb(50, 50, 50)",
+    onSecondary: "rgb(255, 255, 255)",
     secondaryContainer: "transparent",
     onSecondaryContainer: "rgb(0, 13, 28)",
     tertiary: "rgb(50, 50, 50)",
@@ -41,6 +41,13 @@ const darkColors = {
     surfaceDisabled: "rgba(227, 226, 230, 0.12)",
     onSurfaceDisabled: "rgba(227, 226, 230, 0.38)",
     backdrop: "rgba(46, 48, 56, 0.4)",
+    text:"rgb(255,255,255)",
+    mainText:"rgb(255,255,255)",
+    iconColor:"rgb(255,255,255)",
+    profileTabs:"rgb(50,50,50)",
+    googleAutoComplete:"rgb(250,250,250)",
+    checkboxColor:"rgb(250,250,250)",
+    profilePicContainer:"rgb(225, 217, 209)"
   },
 };
 

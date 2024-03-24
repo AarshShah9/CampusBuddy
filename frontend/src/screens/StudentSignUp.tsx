@@ -111,7 +111,7 @@ export default function StudentSignUp() {
         showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
-          <MainContainer>
+          <MainContainer $color={theme.colors.primary}>
             <HeaderContainer>
               <TouchableOpacity
                 onPress={() => navigation.navigate("Login")}
@@ -120,7 +120,7 @@ export default function StudentSignUp() {
               >
                 <AntDesign name="caretleft" size={24} color="white" />
               </TouchableOpacity>
-              <HeaderText $textColor={theme.colors.tertiary}>
+              <HeaderText $textColor={theme.colors.mainText}>
                 Student Sign Up
               </HeaderText>
             </HeaderContainer>
@@ -313,6 +313,7 @@ export default function StudentSignUp() {
                       fontSize: 16,
                       fontFamily: "Roboto-Reg",
                       marginRight: 5,
+                      color: theme.colors.text,
                     }}
                   >
                     Sign up as an Organization
@@ -340,9 +341,9 @@ export default function StudentSignUp() {
 
 // Component
 // prettier-ignore
-const MainContainer = styled(View)`
+const MainContainer = styled(View)<{ $color: string }>`
     height: 100%;
-    background-color: #3a86ff;
+    background-color: ${(props)=>props.$color};
 `;
 // prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`

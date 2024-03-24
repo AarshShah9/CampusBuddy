@@ -125,7 +125,7 @@ export default function OrganizationSignUp() {
         showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <MainContainer>
+          <MainContainer $color={theme.colors.primary}>
             <HeaderContainer>
               <TouchableOpacity
                 onPress={onBack}
@@ -134,11 +134,16 @@ export default function OrganizationSignUp() {
               >
                 <AntDesign name="caretleft" size={24} color="white" />
               </TouchableOpacity>
-              <HeaderText $textColor={theme.colors.tertiary}>
+              <HeaderText $textColor={theme.colors.mainText}>
                 Organization Sign Up
               </HeaderText>
             </HeaderContainer>
-            <View style={styles.overlayContainer}>
+            <View
+              style={[
+                styles.overlayContainer,
+                { backgroundColor: theme.colors.tertiary },
+              ]}
+            >
               <FormContainer>
                 {step === 1 && (
                   <>
@@ -377,7 +382,9 @@ export default function OrganizationSignUp() {
                   </Text>
                 </StyledButton>
                 <ClickLink $color={theme.colors.primary}>
-                  <Text>Join an organization </Text>
+                  <Text style={{ color: theme.colors.text }}>
+                    Join an organization{" "}
+                  </Text>
                   <Text
                     onPress={() => {
                       Alert.alert("Coming soon!", "Stay tuned for updates.");
@@ -401,9 +408,9 @@ export default function OrganizationSignUp() {
 }
 
 // Component
-const MainContainer = styled(View)`
+const MainContainer = styled(View)<{ $color: string }>`
   height: 100%;
-  background-color: #3a86ff;
+  background-color: ${(props) => props.$color};
 `;
 const OverlayContainer = styled(View)<{ $color: string }>`
   alignitems: center;
@@ -473,7 +480,6 @@ const styles = StyleSheet.create({
     height: "85%",
     width: "100%",
     borderTopLeftRadius: 76,
-    backgroundColor: "white",
   },
   icon: {
     marginRight: 5,

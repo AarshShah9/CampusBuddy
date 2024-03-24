@@ -41,6 +41,13 @@ const lightColors = {
     surfaceDisabled: "rgba(27, 27, 31, 0.12)",
     onSurfaceDisabled: "rgba(27, 27, 31, 0.38)",
     backdrop: "rgba(211, 211, 211, 0.5)", 
+    text:"rgb(0,0,0)",
+    mainText:"rgb(255,255,255)",
+    iconColor:"rgb(0,0,0)",
+    profileTabs:"rgb(255,255,255)",
+    googleAutoComplete:"rgb(250,250,250)",
+    checkboxColor:"rgb(0,0,0)",
+    profilePicContainer:"rgb(211, 211, 211)"
   },
 };
 
