@@ -16,12 +16,12 @@ export default function ProfileTabs() {
   return (
     <TopTabs.Navigator
       screenOptions={{
-        tabBarStyle: { 
+        tabBarStyle: {
           backgroundColor: theme.colors.onSecondary,
-          shadowColor: 'grey',
+          shadowColor: "grey",
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.4,
-          shadowRadius: 3
+          shadowRadius: 3,
         },
         tabBarShowLabel: false,
       }}
@@ -47,6 +47,21 @@ export default function ProfileTabs() {
         options={{
           tabBarIcon: ({ color, focused }) => {
             return <FontAwesome name={"binoculars"} size={22} color={color} />;
+          },
+        }}
+      />
+      <TopTabs.Screen
+        name="Market"
+        component={ProfilePosts}
+        options={{
+          tabBarIcon: ({ color, focused }) => {
+            return (
+              <MaterialCommunityIcons
+                name={focused ? "shopping" : "shopping-outline"}
+                size={24}
+                color={color}
+              />
+            );
           },
         }}
       />

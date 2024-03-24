@@ -13,7 +13,13 @@ import {
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
-import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
+import {
+  ParticipationStatus,
+  User,
+  UserOrgStatus,
+  UserRole,
+  UserType,
+} from "@prisma/client";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
@@ -1036,6 +1042,63 @@ export const removeProfilePic = async (
       data: {
         image: null,
       },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const profilePageData = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    const eventResponses = await prisma.userEventResponse.findMany({
+      where: {
+        userId: loggedInUserId,
+      },
+      include: {
+        event: true,
+      },
+    });
+
+    // filter only those that have attended in the past base on the endTime
+    const attended: number = eventResponses.filter((eventRes) => {
+      return (
+        eventRes.event.endTime < new Date() &&
+        eventRes.participationStatus === ParticipationStatus.Going
+      );
+    }).length;
+
+    const savedEvents = eventResponses
+      .filter((eventRes) => {
+        return eventRes.participationStatus === ParticipationStatus.Interested;
+      })
+      .map((eventRes) => {
+        return eventRes.event;
+      });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+    }
+
+    res.status(200).json({
+      message: "User profile page data",
+      data: { user, attended, savedEvents },
     });
   } catch (error: any) {
     next(error);

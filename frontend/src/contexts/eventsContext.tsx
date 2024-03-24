@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createContext, PropsWithChildren } from "react";
 import { ImagePickerAsset } from "expo-image-picker";
 import {
+  attendEvent,
   createEvent,
   createMarketPlaceItem,
   createPost,
@@ -38,6 +39,7 @@ type eventsContext = {
   profilePageEvents: EventType[];
   getEventDetails: (id: string) => Promise<EventDetailsProps>;
   likeEvent: (id: string) => Promise<any>;
+  attendEvent: (id: string) => Promise<any>;
   getAllPosts: () => Promise<any>;
   getAttendees: (id: string) => Promise<AttendeeResponse[]>;
   createMarketPlaceItem: (
@@ -79,6 +81,7 @@ export const EventsContextProvider = ({
         profilePageEvents,
         getEventDetails,
         likeEvent,
+        attendEvent,
         createPost,
         getAllPosts,
         getAttendees,

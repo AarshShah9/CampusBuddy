@@ -37,6 +37,7 @@
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.7.0",
     "lottie-react-native": "^5.1.6",
+    "moti": "^0.28.1",
     "pinar": "^0.12.2",
     "react": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
@@ -54,7 +55,8 @@
     "react-native-screens": "~3.22.0",
     "react-native-tab-view": "^3.5.2",
     "styled-components": "^6.1.6",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "expo-linear-gradient": "~12.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -4,6 +4,7 @@ import {
   OrganizationStatus,
   ParticipationStatus,
   PostType,
+  State,
   User,
   UserOrgStatus,
   UserRole,
@@ -387,6 +388,7 @@ export const items = [
     createdAt: "2024-10-10T09:00:00Z",
     condition: "Used_Like_New",
     locationPlaceId: locations[1].placeId,
+    state: State.Available,
   },
   {
     id: ids.itemIds[2],
@@ -398,6 +400,7 @@ export const items = [
     createdAt: "2024-10-10T10:00:00Z",
     condition: "Used_Fair",
     locationPlaceId: locations[1].placeId,
+    state: State.Available,
   },
 ];
 

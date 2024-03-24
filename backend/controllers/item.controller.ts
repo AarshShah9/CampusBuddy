@@ -8,6 +8,7 @@ import {
   getCoordinatesFromPlaceId,
   getPlaceNameFromPlaceId,
 } from "../utils/googleMapsApi";
+import { State } from "@prisma/client";
 
 // test Item
 export const itemTest = async (req: Request, res: Response) => {
@@ -91,6 +92,7 @@ export const createItem = async (
           price: validatedItemData.price,
           condition: validatedItemData.condition,
           locationPlaceId: validatedItemData.locationPlaceId,
+          state: State.Available,
         },
       });
 
