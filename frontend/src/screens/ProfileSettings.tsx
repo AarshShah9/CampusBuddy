@@ -43,7 +43,10 @@ export default function ProfileSettings() {
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
       handleIndicatorStyle={{ backgroundColor: "grey" }} // todo change this to use theme
-      backgroundStyle={{ borderRadius: 20 }} // play around with the number to find a suitable one
+      backgroundStyle={{
+        borderRadius: 20,
+        backgroundColor: theme.colors.tertiary,
+      }} // play around with the number to find a suitable one
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
@@ -56,7 +59,9 @@ export default function ProfileSettings() {
                 },
               ]}
             >
-              <Text style={styles.settingText}>{setting}</Text>
+              <Text style={[styles.settingText, { color: theme.colors.text }]}>
+                {setting}
+              </Text>
               <Ionicons name="chevron-forward" size={16} color={"#3a86ff"} />
             </View>
           </TouchableOpacity>

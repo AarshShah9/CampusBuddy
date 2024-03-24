@@ -176,7 +176,7 @@ export default function EventDetails() {
               }}
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
-            <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
+            <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18, color:theme.colors.text }}>
               {eventData?.organization?.organizationName}
             </Text>
           </EClubDetails>
