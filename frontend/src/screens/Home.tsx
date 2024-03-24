@@ -104,12 +104,11 @@ export default function Home() {
                             }}
                         >
                             {startingEvents.map(item => (
-                                <LoadingSkeleton show={queryIsLoading} width={screenWidth} height={214} radius='square'>
-                                    <TouchableOpacity
-                                        key={item.image}
-                                        onPress={() => openEventDetails(item.id)}
-                                    >
-                                        
+                                <LoadingSkeleton 
+                                    key={item.image} 
+                                    show={queryIsLoading} 
+                                    width={screenWidth} height={214} radius='square'>
+                                    <TouchableOpacity onPress={() => openEventDetails(item.id)}>
                                         <Image
                                             key={item.image}
                                             source={{ uri: generateImageURL(item.image) }}
