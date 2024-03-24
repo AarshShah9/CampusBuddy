@@ -99,7 +99,6 @@ export const retrievePushReceipts = async (tickets: ExpoPushTicket[]) => {
       // notification and information about an error, if one occurred.
       for (let [receiptId, receipt] of Object.entries(receipts)) {
         if (receipt.status === "ok") {
-          continue;
         } else if (receipt.status === "error") {
           console.error(
             `There was an error sending a notification: ${receipt.message}. RecieptId: ${receiptId}`,
@@ -131,7 +130,7 @@ export async function getEventsWithinTimeRange(
     include: {
       eventResponses: {
         where: {
-          participationStatus: "Interested",
+          participationStatus: "Going",
         },
         include: {
           user: {

@@ -68,7 +68,10 @@ app.get("/Test", (req: Request, res: Response) => {
 app.use(errorHandler);
 
 // Start task to send out event reminders
-upcomingEventReminderTask.start();
+if (process.env.ENV !== "GA") {
+  console.log("Starting CRON Job");
+  upcomingEventReminderTask.start();
+}
 
 // server start
 const server = app.listen(port, () => {

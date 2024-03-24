@@ -6,6 +6,7 @@ export default function Home() {
   const { expoPushToken, sendLocalNotification } = usePushNotifications();
 
   useEffect(() => {
+    if (!expoPushToken) return;
     sendLocalNotification({
       title: "🎉Welcome to Campus Buddy🎉",
       body: `Your journey to a better campus experience just began!`,
