@@ -16,6 +16,11 @@ type EventDetailsRoute = {
     map?: boolean
 }
 
+type LookingForDetailsRoute = {
+    page: 'LookingForDetails'
+    id: string,
+}
+
 type MessagesRoute = {
     page: 'Messages'
 }
@@ -54,7 +59,7 @@ type OrgSignUpRoute = {
 export type NavigationFunctionArgs = (
     UserProfileRoute | ChatScreenRoute | EventDetailsRoute | MessagesRoute | 
     HomeRoute | LoginRoute | MapDetailsRoute | AttendeesRoute | StudentSignUpRoute |
-    OrgSignUpRoute
+    OrgSignUpRoute | LookingForDetailsRoute
 )
 
 export type NavigableStacks = 'AuthenticationGroup' | 'LandingGroup' | 'ConfirmEmail' | 'OrgCreationConfirmation'

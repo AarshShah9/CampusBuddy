@@ -3,13 +3,15 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import LookingForItem from "~/components/SearchLookingForBar";
 import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
 import { services } from "~/mockData/ServicesData";
 import useEventsContext from "~/hooks/useEventsContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type post = {
   id: string;
@@ -23,6 +25,11 @@ export default function Services() {
   const [posts, setPosts] = useState<post[]>([]);
   const { dismissKeyboard } = useAppContext();
   const { getAllPosts } = useEventsContext();
+  const {navigateTo} = useNavigationContext();
+
+  const openLookingForDetails = useCallback((id:string) =>{
+    navigateTo({ page: "LookingForDetails", id});
+  }, []);
 
   useEffect(() => {
     getAllPosts().then((res: any) => {
@@ -45,12 +52,14 @@ export default function Services() {
           </ThemedText>
           <View style={{ paddingHorizontal: 20 }}>
             {posts.map((service) => (
+              <TouchableOpacity onPress={() => openLookingForDetails(service.id)}>
               <LookingForItem
                 key={service.id}
                 title={service.title}
                 description={service.description}
                 requiredMembers={service.spotsLeft}
               />
+              </TouchableOpacity>
             ))}
           </View>
         </Pressable>

@@ -1,5 +1,5 @@
 import { Text } from "react-native-paper";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet } from "react-native";
 import PersonChip from "./PersonChip";
 import CommentsChip from "./CommentsChip";
 
@@ -12,14 +12,10 @@ type Props = {
 export default function LookingForItem({ title, description, requiredMembers }: Props) {
     return (
         <View style={styles.container}>
-            <TouchableOpacity>
                 <Text style={styles.title}>{title}</Text>
-            </TouchableOpacity>
             <Text style={styles.description}>{description}</Text>
-            <View style={styles.bottomContainer}>
-                <TouchableOpacity>
+            <View style={styles.bottomContainer}>  
                     <CommentsChip />
-                </TouchableOpacity>
                 {requiredMembers && <PersonChip numberOfUsers={requiredMembers} />}
             </View>
         </View>

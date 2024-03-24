@@ -7,6 +7,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
 import Attendees from "~/screens/Attendees";
+import LookingForDetails from "~/screens/LookingForDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,19 @@ export default function LandingGroup() {
               headerStyle: { backgroundColor: theme.colors.primary },
             }}
           />
+
+          <Stack.Screen
+            name="LookingForDetails"
+            component={LookingForDetails}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              presentation: "modal",
+              headerStyle: { backgroundColor: theme.colors.primary },
+            }}
+          />
+          
           <Stack.Screen
             name="MapDetails"
             component={MapDetails}
