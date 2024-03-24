@@ -117,6 +117,7 @@ const allowedEndpoints = [
   "/api/user/deleteProfilePicture",
   "/api/user/student",
   "/api/user/organization/new",
+  "/api/user/profile",
 
   // Organization-related endpoints
   "/api/orgs/test",

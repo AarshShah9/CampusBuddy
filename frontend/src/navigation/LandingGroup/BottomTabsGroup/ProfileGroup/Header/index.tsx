@@ -13,7 +13,7 @@ export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
-  const { openPictureModal } = useProfileContext();
+  const { openPictureModal, profileData } = useProfileContext();
   const [imageSource, setImageSource] = React.useState<any>(null);
 
   useEffect(() => {
@@ -51,7 +51,9 @@ export default function Header() {
             </View>
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>18</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.attended ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
