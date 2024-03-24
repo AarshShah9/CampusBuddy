@@ -66,8 +66,9 @@ export default function EventDetails() {
   });
 
   const onMapPress = useCallback(() => {
-    if(eventData) {
-      navigateTo({ page: "MapDetails",
+    if (eventData) {
+      navigateTo({
+        page: "MapDetails",
         eventData: [
           {
             title: eventData.title,
@@ -132,7 +133,7 @@ export default function EventDetails() {
     >
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={navigateBack}>
-          <AntDesign name="caretleft" size={24} color="white" />
+          <Entypo name="chevron-left" size={28} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={userLiked}>
           <Entypo
