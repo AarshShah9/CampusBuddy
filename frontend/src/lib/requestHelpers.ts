@@ -163,6 +163,12 @@ interface RequestArgs {
   params?: Record<string, string | number>;
 }
 
+export type IdRequiredEndPoints = "/api/user/removeUser/:id" | "/api/user/removeUser/:id" | "/api/user/updateUser/:id" | "/api/events/organization/:id" | "/api/events/:id" | "/api/events/like/:id" | "/api/events/attendees/:id";
+
+export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & { params: { id: string } }
+
+export type NonIdRequiredEndPoints = Exclude<AllowedEndpoints, IdRequiredEndPoints>
+
 /**
  * Generates a complete URL by appending the endpoint to the BACKEND_URL and
  * interpolating any parameters into the endpoint string.
