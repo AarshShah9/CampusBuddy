@@ -74,6 +74,18 @@ export const likeEvent = async (id: string) => {
   }
 };
 
+export const attendEvent = async (id: string) => {
+  try {
+    return await CBRequest("POST", "/api/events/attend/:id", {
+      params: {
+        id,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const getAllPosts = async () => {
   try {
     return await CBRequest("GET", "/api/post/");

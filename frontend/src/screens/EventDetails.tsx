@@ -27,7 +27,7 @@ export default function EventDetails() {
   const {
     params: { id, map },
   } = useRoute<any>();
-  const { getEventDetails, likeEvent } = useEventsContext();
+  const { getEventDetails, likeEvent, attendEvent } = useEventsContext();
   const { theme, inDarkMode } = useThemeContext();
   const navigation = useNavigation<any>();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -47,6 +47,19 @@ export default function EventDetails() {
       previousState: boolean;
     }) => {
       await likeEvent(id);
+      refetch();
+    },
+  });
+
+  const attendMutation = useMutation({
+    mutationFn: async ({
+      id,
+      previousState,
+    }: {
+      id: string;
+      previousState: boolean;
+    }) => {
+      await attendEvent(id);
       refetch();
     },
   });
@@ -72,8 +85,18 @@ export default function EventDetails() {
     : eventData?.isLiked;
 
   const userLiked = useCallback(() => {
-    likeMutation.mutate({ id, previousState: eventData?.isLiked! });
+    likeMutation.mutate({
+      id,
+      previousState: eventData?.isLiked!,
+    });
   }, [id, likeEvent, eventData?.isLiked]);
+
+  const userAttendEvent = useCallback(() => {
+    attendMutation.mutate({
+      id,
+      previousState: eventData?.isAttending!,
+    });
+  }, [id, attendEvent, eventData?.isAttending]);
 
   const returnPrevPage = useCallback(() => {
     navigation.goBack();
@@ -219,7 +242,7 @@ export default function EventDetails() {
                   marginLeft: 5,
                 }}
               >
-                Attendance: {eventData?.eventResponses.length}{" "}
+                Attendance: {eventData?.attendees}{" "}
               </Text>
             </LoadingSkeleton>
           </View>
@@ -267,7 +290,11 @@ export default function EventDetails() {
             alignItems: "center",
           }}
         >
-          <Button style={styles.attendButton} mode="contained">
+          <Button
+            style={styles.attendButton}
+            mode="contained"
+            onPress={userAttendEvent}
+          >
             <Text
               style={{
                 lineHeight: 30,
@@ -277,7 +304,7 @@ export default function EventDetails() {
                 fontFamily: "Nunito-Bold",
               }}
             >
-              Attend
+              {eventData?.isAttending ? "Not Going" : "Attend"}
             </Text>
           </Button>
         </View>

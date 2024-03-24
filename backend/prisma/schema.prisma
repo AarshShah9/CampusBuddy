@@ -46,6 +46,7 @@ enum UserOrgStatus {
 
 enum ParticipationStatus {
   Interested
+  Going
 }
 
 // many of these permissions may not apply to our application
@@ -158,7 +159,7 @@ model UserEventResponse {
   user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@id([userId, eventId])
+  @@id([userId, eventId, participationStatus])
   @@index([userId])
   @@index([eventId])
   @@map("user_event_response")

@@ -505,7 +505,15 @@ export const getEventById = async (
     });
 
     const isLiked = event?.eventResponses.some(
-      (response) => response.userId === req.userId,
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Interested",
+    );
+
+    const isAttending = event?.eventResponses.some(
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Going",
     );
 
     if (!event) {
@@ -524,7 +532,11 @@ export const getEventById = async (
       message: "Event found",
       data: {
         ...event,
+        attendees: event.eventResponses.filter(
+          (response) => response.participationStatus === "Going",
+        ).length,
         isLiked: isLiked,
+        isAttending: isAttending,
       },
     });
   } catch (error) {
@@ -977,7 +989,9 @@ export const LikeEvent = async (
     }
 
     const userLikedEvent = event.eventResponses.some(
-      (response) => response.userId === userId,
+      (response) =>
+        response.userId === userId &&
+        response.participationStatus === "Interested",
     );
 
     if (userLikedEvent) {
@@ -985,6 +999,7 @@ export const LikeEvent = async (
         where: {
           eventId,
           userId,
+          participationStatus: ParticipationStatus.Interested,
         },
       });
     } else {
@@ -1017,6 +1032,9 @@ export const getAttendees = async (
       },
       include: {
         eventResponses: {
+          where: {
+            participationStatus: "Going",
+          },
           include: {
             user: true,
           },
@@ -1045,6 +1063,61 @@ export const getAttendees = async (
       message: "Event attendees",
       data: attendees,
     });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const attendEvent = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const eventId = IdParamSchema.parse(req.params).id;
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: true,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const userLikedEvent = event.eventResponses.some(
+      (response) =>
+        response.userId === userId && response.participationStatus === "Going",
+    );
+
+    if (userLikedEvent) {
+      await prisma.userEventResponse.deleteMany({
+        where: {
+          eventId,
+          userId,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    } else {
+      await prisma.userEventResponse.create({
+        data: {
+          eventId,
+          userId: userId!,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    }
+
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }
