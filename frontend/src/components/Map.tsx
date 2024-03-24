@@ -27,7 +27,7 @@ const Map = ({
   const openEventDetails = useCallback(
     (index: number) => {
       if (showInfo) return;
-      navigateTo({ page: "EventDetails", id: events ? events[index].id : '' });
+      navigateTo({ page: "EventDetails", id: events ? events[index].id : '', map: false });
     },
     [events],
   );

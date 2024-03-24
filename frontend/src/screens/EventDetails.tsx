@@ -26,7 +26,7 @@ const IMG_HEIGHT = 300;
 
 export default function EventDetails() {
   const {
-    params: { id, map },
+    params: { id, map = true },
   } = useRoute<any>();
   const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
@@ -227,7 +227,7 @@ export default function EventDetails() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {eventData?.location && (map === undefined ? true : map) && (
+          {eventData?.location && map && (
             <TouchableOpacity onPress={onMapPress}>
               <MapComponentSmall
                 latitude={eventData?.location.latitude}
