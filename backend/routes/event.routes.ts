@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  attendEvent,
   createEvent,
   createVerifiedEvent,
   deleteEvent,
@@ -32,6 +33,8 @@ router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
 router.get("/user/:id", getEventByUserId);
 router.post("/like/:id", LikeEvent);
+router.post("/attend/:id", attendEvent);
+
 router.get("/attendees/:id", getAttendees);
 
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
