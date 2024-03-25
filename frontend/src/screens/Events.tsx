@@ -9,6 +9,7 @@ import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function Events() {
   const { dismissKeyboard } = useAppContext();

@@ -11,7 +11,9 @@ import user from "./routes/user.routes";
 import org from "./routes/org.routes";
 import post from "./routes/post.routes";
 import item from "./routes/item.routes";
+import notification from "./routes/notification.routes";
 import { validateEnv } from "./utils/validateEnv";
+import { upcomingEventReminderTask } from "./utils/cronTasks";
 
 const app = express();
 const result = dotenv.config();
@@ -55,6 +57,7 @@ app.use("/api/events", event);
 app.use("/api/orgs", org);
 app.use("/api/post", post);
 app.use("/api/item", item);
+app.use("/api/notification", notification);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
@@ -63,6 +66,12 @@ app.get("/Test", (req: Request, res: Response) => {
 
 // Global error handling middleware - Must be the last middleware
 app.use(errorHandler);
+
+// Start task to send out event reminders
+if (process.env.ENV !== "GA") {
+  console.log("Starting CRON Job");
+  upcomingEventReminderTask.start();
+}
 
 // server start
 const server = app.listen(port, () => {

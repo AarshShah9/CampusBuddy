@@ -45,6 +45,7 @@ jobs:
           echo MAILER_EMAIL=NA >> .env
           echo MAILER_PASS=NA >> .env
           echo GOOGLE_MAPS_API_KEY=NA >> .env
+          echo EXPO_ACCESS_TOKEN=NA >> .env
 
       - name: Install Root Dependencies
         run: npm ci

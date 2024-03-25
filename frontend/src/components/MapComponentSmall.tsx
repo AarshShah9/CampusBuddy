@@ -2,6 +2,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { darkModeStyle } from "~/components/Map";
+import useThemeContext from "~/hooks/useThemeContext";
 
 type MapComponentProps = {
   latitude: number;
@@ -20,6 +22,8 @@ const Map = ({
   longitudeDelta = 0.045,
   longitude,
 }: MapComponentProps) => {
+  const { inDarkMode } = useThemeContext();
+
   return (
     <View>
       <View style={styles.mapBox}>
@@ -38,6 +42,7 @@ const Map = ({
           rotateEnabled={false}
           zoomTapEnabled={false}
           zoomControlEnabled={false}
+          customMapStyle={inDarkMode ? darkModeStyle : []}
         >
           <Marker
             coordinate={{

@@ -15,6 +15,7 @@ import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 
@@ -147,7 +148,7 @@ export default function EventDetails() {
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         <LoadingSkeleton
@@ -158,36 +159,36 @@ export default function EventDetails() {
         >
           <Animated.Image
             style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
-            source={{ uri: eventData?.image }}
+            source={{ uri: generateImageURL(eventData?.image) }}
           />
         </LoadingSkeleton>
         <View
           style={{
             height: 100,
             width: "100%",
-            backgroundColor: "white",
             flexDirection: "row",
             justifyContent: "space-between",
           }}
         >
           <View style={styles.eDetails}>
             <LoadingSkeleton show={!eventData} width={180} height={16}>
-              <Text
-                style={{
-                  fontFamily: "Roboto-Medium",
-                  fontSize: 16,
-                  marginBottom: 5,
-                }}
-              >
-                {eventData?.title}
-              </Text>
-            </LoadingSkeleton>
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+                marginBottom: 5,
+                color: theme.colors.text,
+              }}
+            >
+              {eventData?.title}
+            </Text></LoadingSkeleton>
             <LoadingSkeleton show={!eventData} width={150} height={16}>
-              <Text
-                style={{
-                  fontFamily: "Roboto-Medium",
-                  fontSize: 16,
-                  marginBottom: 5,
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+                marginBottom: 5,
+                color: theme.colors.text,
                 }}
               >
                 {convertUTCToTimeAndDate(eventData?.startTime)}
@@ -211,7 +212,7 @@ export default function EventDetails() {
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
             <LoadingSkeleton show={!eventData} width={60} height={16}>
-              <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
+              <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18, color:theme.colors.text }}>
                 {eventData?.organization?.organizationName}
               </Text>
             </LoadingSkeleton>
@@ -224,32 +225,31 @@ export default function EventDetails() {
               borderTopWidth: 1,
               flexDirection: "row",
               height: 50,
-              backgroundColor: "white",
               alignItems: "center",
             }}
           >
             <Ionicons
               name="people-outline"
               size={30}
-              color="black"
+              color={theme.colors.text}
               style={{ marginLeft: 10 }}
             />
             <LoadingSkeleton show={!eventData} width={120} height={16}>
-              <Text
-                style={{
-                  fontFamily: "Roboto-Medium",
-                  fontSize: 16,
-                  marginLeft: 5,
-                }}
-              >
-                Attendance: {eventData?.attendees}{" "}
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+                marginLeft: 5,
+                color: theme.colors.text,
+              }}
+            >
+              Attendance: {eventData?.attendees}{" "}
               </Text>
             </LoadingSkeleton>
           </View>
         </TouchableOpacity>
         <View
           style={{
-            backgroundColor: "white",
             borderTopWidth: 1,
             width: "100%",
             borderTopColor: "#B0CFFF",
@@ -261,14 +261,24 @@ export default function EventDetails() {
         >
           <LoadingSkeleton show={!eventData} width={"100%"} height={30}>
             <Text
-              style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
+              style={{
+              marginTop: 10,
+              fontFamily: "Roboto-Reg",
+              fontSize: 16,
+              color: theme.colors.text,
+            }}
             >
               {eventData?.description}
             </Text>
           </LoadingSkeleton>
         </View>
         <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
+          }}
         >
           {eventData?.location && map && (
             <TouchableOpacity onPress={onMapPress}>

@@ -10,8 +10,6 @@ import {
   getAllPosts,
   getAttendees,
   getEventDetails,
-  getHomePageEvents,
-  getMainEvents,
   getProfilePageEvents,
   getSearchPageEvents,
   likeEvent,
@@ -27,14 +25,12 @@ import {
 import { createEventType } from "~/screens/CreateEvent";
 
 type eventsContext = {
-  getMainEvents: () => Promise<any>;
   createEvent: (
     event: createEventType,
     image: ImagePickerAsset,
   ) => Promise<any>;
   createPost: (post: lookingForDetail) => Promise<any>; // fix any on post type
   getAllMapEvents: () => Promise<any>;
-  homePageEvents: EventType[];
   searchPageEvents: SearchPageEventType[];
   profilePageEvents: EventType[];
   getEventDetails: (id: string) => Promise<EventDetailsProps>;
@@ -52,12 +48,6 @@ const EventsContext = createContext<eventsContext | null>(null);
 export const EventsContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const { data: homePageEvents } = useQuery({
-    queryKey: ["home-page-events"],
-    queryFn: getHomePageEvents,
-    initialData: [],
-  });
-
   const { data: searchPageEvents } = useQuery({
     queryKey: ["search-page-events"],
     queryFn: getSearchPageEvents,
@@ -73,11 +63,9 @@ export const EventsContextProvider = ({
   return (
     <EventsContext.Provider
       value={{
-        getMainEvents,
         createEvent,
         getAllMapEvents,
         searchPageEvents,
-        homePageEvents,
         profilePageEvents,
         getEventDetails,
         likeEvent,

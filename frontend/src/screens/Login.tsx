@@ -104,7 +104,7 @@ export default function Login() {
             )}
           </LogoContainer>
           <OverlayContainer $color={theme.colors.tertiary}>
-            <Header>{"Login"}</Header>
+            <Header $color={theme.colors.text}>{"Login"}</Header>
             <FormContainer>
               <Controller
                 control={control}
@@ -175,6 +175,7 @@ export default function Login() {
                     marginRight: 5,
                     fontSize: 16,
                     fontFamily: "Roboto-Reg",
+                    color: theme.colors.text,
                   }}
                 >
                   Don't have an account?
@@ -228,7 +229,8 @@ const FormContainer = styled(View)`
     margin-right: auto;
 `;
 // prettier-ignore
-const Header = styled(Text)`
+const Header = styled(Text)<{ $color: string }>`
+    color: ${(props) => props.$color};
     font-size: 40px;
     font-weight: bold;
     margin-top: 64px;

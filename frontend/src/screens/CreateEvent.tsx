@@ -140,7 +140,7 @@ export default function CreateEvent() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         {/* View houses the image component, and icon for uploading images */}
@@ -173,7 +173,7 @@ export default function CreateEvent() {
           />
         </View>
         {/* View houses the controllers for each field */}
-        <View style={{ backgroundColor: "white" }}>
+        <View style={{ backgroundColor: theme.colors.tertiary }}>
           <Controller
             control={control}
             rules={{
@@ -186,12 +186,13 @@ export default function CreateEvent() {
                     marginBottom: 3,
                     fontFamily: "Nunito-Medium",
                     fontSize: 16,
+                    color: theme.colors.text,
                   }}
                 >
                   Event Name*
                 </Text>
                 <TextInput
-                  style={style.eventTextInput}
+                  style={[style.eventTextInput, { color: theme.colors.text }]}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -221,6 +222,7 @@ export default function CreateEvent() {
                     style={{
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Start Time*
@@ -257,6 +259,7 @@ export default function CreateEvent() {
                     style={{
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     End Time*
@@ -285,6 +288,7 @@ export default function CreateEvent() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Location*
@@ -304,12 +308,13 @@ export default function CreateEvent() {
                 required: true,
               }}
               render={({ field: { onChange } }) => (
-                <View style={style.tagInput}>
+                <View style={[style.tagInput]}>
                   <Text
                     style={{
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Tags*
@@ -332,12 +337,16 @@ export default function CreateEvent() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Event Description:*
                   </Text>
                   <TextInput
-                    style={style.eventDescriptionInput}
+                    style={[
+                      style.eventDescriptionInput,
+                      { color: theme.colors.text },
+                    ]}
                     multiline={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
