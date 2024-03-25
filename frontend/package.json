@@ -56,6 +56,7 @@
     "react-native-tab-view": "^3.5.2",
     "styled-components": "^6.1.6",
     "zod": "^3.22.4",
+    "expo-constants": "~14.4.2",
     "expo-linear-gradient": "~12.3.0"
   },
   "devDependencies": {

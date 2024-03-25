@@ -145,7 +145,6 @@ export type UserCreateType = z.infer<typeof UserCreateSchema>;
  * Cannot change account type
  * Partial makes all fields optional
  */
-// export const UserUpdateSchema = UserSchema.partial();
 export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
@@ -585,6 +584,12 @@ export const OrgSignupPayloadSchema = z.object({
   user: UserCreateSchema,
   organization: OrganizationCreateSchema,
 });
+
+export const PushTokenSchema = z.object({
+  pushToken: z.string().min(1, { message: "Push token required" }),
+});
+
+export type PushTokenType = z.infer<typeof PushTokenSchema>;
 
 export const updateParticipantStatusSchema = z.object({
   status: ParticipationStatusSchema,
