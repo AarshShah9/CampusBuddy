@@ -1,3 +1,5 @@
+import { string } from "zod";
+
 export type EventType = {
   id: string;
   title: string;
@@ -21,6 +23,7 @@ export type EventDetailsProps = {
   title: string;
   userId: string;
   isLiked: boolean;
+  isAttending: boolean;
   eventResponses: any[];
   location: {
     latitude: number;
@@ -38,6 +41,7 @@ export type EventDetailsProps = {
     status: string;
     updatedAt: string;
   };
+  attendees: number;
 };
 
 export type SearchPageEventType = {

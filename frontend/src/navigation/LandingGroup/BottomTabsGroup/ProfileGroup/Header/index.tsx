@@ -6,15 +6,15 @@ import MenuIcon from "./MenuIcon";
 import useAuthContext from "~/hooks/useAuthContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useProfileContext from "~/hooks/useProfileContext";
 
 export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
-  const { openPictureModal } = useProfileContext();
-  const [imageSource, setImageSource] = React.useState<any>(null);
+  const { openPictureModal, profileData } = useProfileContext();
+  const [imageSource, setImageSource] = useState<any>(null);
 
   useEffect(() => {
     const imageSource = user?.image
@@ -56,7 +56,9 @@ export default function Header() {
             </View>
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>18</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.attended ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>

@@ -117,6 +117,7 @@ const allowedEndpoints = [
   "/api/user/deleteProfilePicture",
   "/api/user/student",
   "/api/user/organization/new",
+  "/api/user/profile",
 
   // Organization-related endpoints
   "/api/orgs/test",
@@ -140,6 +141,7 @@ const allowedEndpoints = [
   "/api/events/mapEvents",
   "/api/events/like/:id",
   "/api/events/attendees/:id",
+  "/api/events/attend/:id",
 
   // Post-related endpoints
   "/api/post/test",
@@ -151,6 +153,7 @@ const allowedEndpoints = [
   "/api/upload",
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
+  "/api/notification/storePushToken",
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints

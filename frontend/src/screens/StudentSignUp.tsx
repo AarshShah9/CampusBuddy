@@ -10,7 +10,6 @@ import {
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
@@ -25,6 +24,7 @@ import { userRegistrationData } from "~/contexts/authContext";
 import ErrorText from "~/components/ErrorText";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { validDomains } from "~/lib/constants";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const schema = zod
   .object({
@@ -57,10 +57,10 @@ const schema = zod
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const { getInstitutions, registerUser } = useAuthContext();
   const { dismissKeyboard } = useAppContext();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {
@@ -83,14 +83,14 @@ export default function StudentSignUp() {
         password: data.password,
       }).then(() => {
         stopLoading();
-        navigation.dispatch(StackActions.replace("ConfirmEmail"));
+        replaceStackWith("ConfirmEmail");
       });
     },
-    [navigation],
+    [],
   );
 
   const handlePress = useCallback(() => {
-    navigation.dispatch(StackActions.push("OrgSignUp"));
+    navigateTo({ page: "OrgSignUp" });
   }, []);
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function StudentSignUp() {
           <MainContainer $color={theme.colors.primary}>
             <HeaderContainer>
               <TouchableOpacity
-                onPress={() => navigation.navigate("Login")}
+                onPress={() => navigateTo({ page: "Login" })}
                 style={{ marginTop: "10%", marginLeft: "3%" }}
                 activeOpacity={0.7}
               >

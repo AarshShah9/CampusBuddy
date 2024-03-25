@@ -1,8 +1,7 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 
 type MapComponentProps = {
   latitude: number;

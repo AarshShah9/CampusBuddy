@@ -46,6 +46,7 @@ enum UserOrgStatus {
 
 enum ParticipationStatus {
   Interested
+  Going
 }
 
 // many of these permissions may not apply to our application
@@ -97,6 +98,7 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
+  pushTokens           PushToken[]
 
   @@index([email])
   @@index([institutionId])
@@ -158,7 +160,7 @@ model UserEventResponse {
   user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@id([userId, eventId])
+  @@id([userId, eventId, participationStatus])
   @@index([userId])
   @@index([eventId])
   @@map("user_event_response")
@@ -358,6 +360,8 @@ model Item {
   location        Location @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
 
+  state State
+
   @@index([userId])
   @@index([institutionId])
   @@index([locationPlaceId])
@@ -380,3 +384,20 @@ model Image {
 //   Used_Good
 //   Used_Fair
 // }
+
+model PushToken {
+  userId    String @map("user_id")
+  pushToken String @map("push_token")
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, pushToken])
+  @@unique([userId, pushToken]) 
+  @@index([userId])
+  @@map("push_token")
+}
+
+enum State {
+  Available
+  Sold
+  Removed
+}

@@ -51,6 +51,21 @@ export default function ProfileTabs() {
         }}
       />
       <TopTabs.Screen
+        name="Market"
+        component={ProfilePosts}
+        options={{
+          tabBarIcon: ({ color, focused }) => {
+            return (
+              <MaterialCommunityIcons
+                name={focused ? "shopping" : "shopping-outline"}
+                size={24}
+                color={color}
+              />
+            );
+          },
+        }}
+      />
+      <TopTabs.Screen
         name="Saved"
         component={ProfileSavedItems}
         options={{

@@ -6,9 +6,9 @@ type contextObject = {
   setFilterWord: (arg: string) => void;
   clearSearchArea: () => void;
 };
-const ChatsSearchContext = createContext<contextObject | null>(null);
+const SearchBarContext = createContext<contextObject | null>(null);
 
-export const ChatsSearchContextProvider = ({ children }: PropsWithChildren) => {
+export const SearchBarContextProvider = ({ children }: PropsWithChildren) => {
   const [filterWord, updateFilterWord] = useState("");
   const setFilterWord = useCallback((arg: string) => {
     updateFilterWord(arg);
@@ -18,12 +18,10 @@ export const ChatsSearchContextProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   return (
-    <ChatsSearchContext.Provider
-      value={{ filterWord, setFilterWord, clearSearchArea }}
-    >
+    <SearchBarContext.Provider value={{ filterWord, setFilterWord, clearSearchArea }}>
       {children}
-    </ChatsSearchContext.Provider>
+    </SearchBarContext.Provider>
   );
 };
 
-export default ChatsSearchContext;
+export default SearchBarContext;
