@@ -4,6 +4,7 @@ import { ThemedText } from "./ThemedComponents";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
 import { useCallback } from "react";
+import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "./LoadingSkeleton";
 
@@ -25,7 +26,7 @@ export default function EventHomeCard({ event, isLoading }: Props) {
                     <LoadingSkeleton show={isLoading} width="100%" height="100%">
                         <Image
                             style={{ width: "100%", height: "100%" }}
-                            source={{ uri: event.image }}
+                            source={{ uri: generateImageURL(event.image) }}
                         />
                     </LoadingSkeleton>
                 </View>
@@ -34,7 +35,7 @@ export default function EventHomeCard({ event, isLoading }: Props) {
                         <ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
                     </LoadingSkeleton>
                     <View style={styles.eventDetailsContainer}>
-                        {isLoading ? 
+                        {isLoading ?
                             <LoadingSkeleton show width={100} height={16} />
                             :<>
                                 {!!event.time && (

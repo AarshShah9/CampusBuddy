@@ -161,7 +161,7 @@ export default function CreateMarketplace() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
@@ -239,12 +239,13 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Item
                   </Text>
                   <TextInput
-                    style={style.eventInput}
+                    style={[style.eventInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -265,12 +266,13 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Price
                   </Text>
                   <TextInput
-                    style={style.priceInput}
+                    style={[style.priceInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={(text) =>
                       onChange(text.replace(/[^0-9]/g, ""))
@@ -294,6 +296,7 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Condition
@@ -306,7 +309,7 @@ export default function CreateMarketplace() {
                     }}
                   >
                     <Checkbox.Android
-                      uncheckedColor="black"
+                      uncheckedColor={theme.colors.checkboxColor}
                       status={
                         checkedItem === "Brand New" ? "checked" : "unchecked"
                       }
@@ -315,7 +318,9 @@ export default function CreateMarketplace() {
                         onChange("Brand New");
                       }}
                     />
-                    <Text>Like Brand New</Text>
+                    <Text style={{ color: theme.colors.text }}>
+                      Like Brand New
+                    </Text>
                   </View>
                   <View
                     style={{
@@ -326,12 +331,13 @@ export default function CreateMarketplace() {
                   >
                     <Checkbox.Android
                       status={checkedItem === "Used" ? "checked" : "unchecked"}
+                      uncheckedColor={theme.colors.checkboxColor}
                       onPress={() => {
                         handleCheckboxToggle("Used");
                         onChange("Used");
                       }}
                     />
-                    <Text>Used</Text>
+                    <Text style={{ color: theme.colors.text }}>Used</Text>
                   </View>
                   <View
                     style={{
@@ -342,7 +348,7 @@ export default function CreateMarketplace() {
                     }}
                   >
                     <Checkbox.Android
-                      uncheckedColor="black"
+                      uncheckedColor={theme.colors.checkboxColor}
                       status={
                         checkedItem === "Heavily Used" ? "checked" : "unchecked"
                       }
@@ -351,7 +357,9 @@ export default function CreateMarketplace() {
                         onChange("Heavily Used");
                       }}
                     />
-                    <Text>Heavily Used</Text>
+                    <Text style={{ color: theme.colors.text }}>
+                      Heavily Used
+                    </Text>
                   </View>
                 </View>
               )}
@@ -369,12 +377,13 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Event Description:*
                   </Text>
                   <TextInput
-                    style={style.eventtextInput}
+                    style={[style.eventtextInput, { color: theme.colors.text }]}
                     multiline={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -412,12 +421,13 @@ export default function CreateMarketplace() {
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={{ marginBottom: 15 }}>
+                <View style={{ marginBottom: 10, marginTop: 15 }}>
                   <Text
                     style={{
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Location*

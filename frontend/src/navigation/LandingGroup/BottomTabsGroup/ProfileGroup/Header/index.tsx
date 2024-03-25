@@ -29,7 +29,7 @@ export default function Header() {
         styles.headerContainer,
         {
           paddingTop: insets.top + 35,
-          backgroundColor: theme.colors.onSecondary,
+          backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
       ]}
@@ -37,7 +37,12 @@ export default function Header() {
       <View style={styles.headerCard}>
         <View style={styles.upperSection}>
           <TouchableOpacity onPress={openPictureModal}>
-            <View style={styles.profilePicContainer}>
+            <View
+              style={[
+                styles.profilePicContainer,
+                { backgroundColor: theme.colors.profilePicContainer },
+              ]}
+            >
               {imageSource ? (
                 <Image
                   style={{ width: "100%", height: "100%" }}

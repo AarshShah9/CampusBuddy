@@ -5,6 +5,7 @@ import { limitTextToMax } from "~/lib/helperFunctions";
 import { useCallback } from "react";
 import { EventType } from "~/types/Events";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function EventMainCard(props: EventType) {
   const { navigateTo } = useNavigationContext();
@@ -17,7 +18,7 @@ export default function EventMainCard(props: EventType) {
       <Card style={styles.card}>
         <Card.Cover
           style={styles.cardCover}
-          source={{ uri: props.image }}
+          source={{ uri: generateImageURL(props.image) }}
           resizeMode="cover"
         />
         <Card.Content style={styles.cardContent}>
