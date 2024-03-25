@@ -76,7 +76,7 @@ export default function CreateLookingFor() {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={{ backgroundColor: "white", flexGrow: 1 }}>
+      <View style={{ backgroundColor: theme.colors.tertiary, flexGrow: 1 }}>
         <Controller
           control={control}
           rules={{
@@ -90,12 +90,13 @@ export default function CreateLookingFor() {
                   marginBottom: 3,
                   fontFamily: "Nunito-Medium",
                   fontSize: 16,
+                  color: theme.colors.text,
                 }}
               >
                 Title*
               </Text>
               <TextInput
-                style={style.inputBox}
+                style={[style.inputBox, { color: theme.colors.text }]}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -116,6 +117,7 @@ export default function CreateLookingFor() {
                   marginBottom: 3,
                   fontFamily: "Nunito-Medium",
                   fontSize: 16,
+                  color: theme.colors.text,
                 }}
               >
                 Tags*
@@ -138,12 +140,13 @@ export default function CreateLookingFor() {
                   marginBottom: 3,
                   fontFamily: "Nunito-Medium",
                   fontSize: 16,
+                  color: theme.colors.text,
                 }}
               >
                 Description*
               </Text>
               <TextInput
-                style={style.inputBox}
+                style={[style.inputBox, { color: theme.colors.text }]}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -165,12 +168,16 @@ export default function CreateLookingFor() {
                   marginBottom: 3,
                   fontFamily: "Nunito-Medium",
                   fontSize: 16,
+                  color: theme.colors.text,
                 }}
               >
                 # of Spots Needed*
               </Text>
               <TextInput
-                style={style.numberOfSpotContainer}
+                style={[
+                  style.numberOfSpotContainer,
+                  { color: theme.colors.text },
+                ]}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 keyboardType="numeric"
@@ -203,6 +210,7 @@ export default function CreateLookingFor() {
                   marginLeft: 20,
                   fontFamily: "Nunito-Medium",
                   fontSize: 16,
+                  color: theme.colors.text,
                 }}
               >
                 Expiry Date*

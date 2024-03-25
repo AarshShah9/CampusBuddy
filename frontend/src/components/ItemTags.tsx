@@ -1,15 +1,18 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
-
+import useThemeContext from "~/hooks/useThemeContext";
 export default function ItemTag(props: { controllerOnChange: any }) {
+  const { theme } = useThemeContext();
   const [tags, setTags] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const updateArray = useCallback((index:number) => {
-    deleteTag(index);
-    props.controllerOnChange([...tags, currentInput]);
-  }, [tags]);
-  
+  const updateArray = useCallback(
+    (index: number) => {
+      deleteTag(index);
+      props.controllerOnChange([...tags, currentInput]);
+    },
+    [tags],
+  );
 
   // Functions
   // Handle adding tag
@@ -54,7 +57,7 @@ export default function ItemTag(props: { controllerOnChange: any }) {
         >
           <Text style={{ marginRight: 5 }}>{tag}</Text>
           <Feather
-            onPress={()=>updateArray(index)}
+            onPress={() => updateArray(index)}
             name="x-circle"
             size={18}
             color="black"
@@ -62,7 +65,7 @@ export default function ItemTag(props: { controllerOnChange: any }) {
         </View>
       ))}
       <TextInput
-        style={{ flexGrow: 1 }}
+        style={{ flexGrow: 1, color: theme.colors.text }}
         value={currentInput}
         onSubmitEditing={addTag}
         onChangeText={(text) => {
