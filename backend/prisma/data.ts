@@ -400,7 +400,6 @@ export const items = [
     locationPlaceId: locations[1].placeId,
     state: State.Available,
   },
-  // finish the rest copilot
   {
     id: ids.itemIds[3],
     userId: ids.userIds[3],

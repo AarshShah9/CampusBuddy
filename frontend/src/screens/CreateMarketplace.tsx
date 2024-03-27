@@ -67,6 +67,10 @@ export default function CreateMarketplace() {
   // Handle submission of data to backend
   const onSubmit = (data: MarketPlaceItem) => {
     startLoading();
+    if (!selectedImages) {
+      alert("Please add an image");
+      return;
+    }
     createMarketPlaceItem(data, selectedImages)
       .then((r) => {
         if (r.status !== 201) {
