@@ -10,6 +10,7 @@ import {
   getAllPosts,
   getAttendees,
   getEventDetails,
+  getMarketPlaceItems,
   getProfilePageEvents,
   getSearchPageEvents,
   likeEvent,
@@ -42,6 +43,7 @@ type eventsContext = {
     item: MarketPlaceItem,
     images?: ImagePickerAsset[],
   ) => Promise<any>;
+  getMarketPlaceItems: () => Promise<any>;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -74,6 +76,7 @@ export const EventsContextProvider = ({
         getAllPosts,
         getAttendees,
         createMarketPlaceItem,
+        getMarketPlaceItems,
       }}
     >
       {children}

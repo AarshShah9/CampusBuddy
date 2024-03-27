@@ -140,3 +140,11 @@ export const createMarketPlaceItem = async (
     }
   }
 };
+
+export const getMarketPlaceItems = async () => {
+  try {
+    return (await CBRequest("GET", "/api/item/")).data;
+  } catch (err) {
+    console.log(err);
+  }
+};
