@@ -4,14 +4,10 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
 } from "react-native";
 import MarketplaceItem from "~/components/MarketplaceItem";
 import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
-// import { marketplaceItems } from "~/mockData/MarketplaceData";
-import useEventsContext from "~/hooks/useEventsContext";
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MarketPlaceCardProps } from "~/types/Events";
 import { getMarketPlaceItems } from "~/lib/apiFunctions/Events";
@@ -19,7 +15,6 @@ import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function Marketplace() {
   const { dismissKeyboard } = useAppContext();
-  // const { getMarketPlaceItems } = useEventsContext();
 
   const { data: marketplaceItems } = useQuery<MarketPlaceCardProps[]>({
     queryKey: ["marketplace-items"],

@@ -41,7 +41,7 @@ export const createEvent = async (
 
 export const getAllMapEvents = async () => {
   try {
-    return await CBRequest("GET", "/api/events/mapEvents");
+    return (await CBRequest("GET", "/api/events/mapEvents")).data;
   } catch (err) {
     console.log(err);
   }

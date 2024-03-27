@@ -4,27 +4,50 @@ import useAppContext from "~/hooks/useAppContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { EventMapItem } from "~/types/Events";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Threads() {
   const { location } = useAppContext();
   const { startLoading, stopLoading } = useLoadingContext();
   const { getAllMapEvents } = useEventsContext();
-  const [events, setEvents] = useState<EventMapItem[]>();
-  const [items, setItems] = useState<EventMapItem[]>();
+
+  const {
+    data: { events, items },
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["search-page-events"],
+    queryFn: getAllMapEvents,
+    initialData: [],
+  });
 
   useEffect(() => {
-    startLoading();
-    getAllMapEvents().then((res) => {
-      setEvents(res.data.events);
-      setItems(res.data.items);
-    });
-    if (location) {
+    if (isLoading || !location) {
+      startLoading();
+    }
+
+    if (isSuccess && !isLoading && location) {
       stopLoading();
     }
-  }, [location]);
+
+    if (isError) {
+      console.error("An error occurred:", error);
+      stopLoading();
+    }
+  }, [
+    isLoading,
+    isError,
+    error,
+    startLoading,
+    stopLoading,
+    isSuccess,
+    location,
+  ]);
 
   if (!location) {
-    return null;
+    return <></>;
   }
 
   return (

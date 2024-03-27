@@ -9,7 +9,7 @@ export default function MarketplaceItem(props: MarketPlaceCardProps) {
     <Card style={styles.card}>
       <Card.Cover
         style={styles.cardCover}
-        source={{ uri: props.picture }}
+        source={{ uri: props.image }}
         resizeMode="cover"
       />
       <Card.Content style={styles.cardContent}>
