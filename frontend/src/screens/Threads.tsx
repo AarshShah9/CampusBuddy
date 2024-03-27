@@ -47,7 +47,7 @@ export default function Threads() {
   ]);
 
   if (!location) {
-    return <></>;
+    return null;
   }
 
   return (

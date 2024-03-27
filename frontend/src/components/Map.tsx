@@ -57,7 +57,7 @@ const Map = ({
         customMapStyle={inDarkMode ? darkModeStyle : []}
       >
         {events &&
-          events.map((event: EventMapItem, index) => {
+          events?.map((event: EventMapItem, index) => {
             const combinedIndex = combinedEventsItems.findIndex(
               (e) => e.id === event.id,
             );
@@ -80,7 +80,7 @@ const Map = ({
             );
           })}
         {items &&
-          items.map((item: EventMapItem, index) => {
+          items?.map((item: EventMapItem, index) => {
             const combinedIndex = combinedEventsItems.findIndex(
               (e) => e.id === item.id,
             );
