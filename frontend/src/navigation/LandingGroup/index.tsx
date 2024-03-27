@@ -7,6 +7,8 @@ import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
 import Attendees from "~/screens/Attendees";
+import ProfileTabs from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/ProfileTabs";
+import Header from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/Header";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,30 +22,35 @@ export default function LandingGroup() {
           <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
           <Stack.Screen name="Messages" component={MessagesGroup} />
           <Stack.Screen
+            name="UserProfile"
+            component={ProfileTabs}
+            options={{
+              title: "Profile",
+            }}
+          />
+          <Stack.Screen
             name="EventDetails"
             component={EventDetails}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,
               },
-              presentation: "modal",
-              headerStyle: { backgroundColor: theme.colors.primary },
-            }}
-          />
-          <Stack.Screen
-            name="MapDetails"
-            component={MapDetails}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              presentation: "modal",
               headerStyle: { backgroundColor: theme.colors.primary },
             }}
           />
           <Stack.Screen
             name="Attendees"
             component={Attendees}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
+            }}
+          />
+          <Stack.Screen
+            name="MapDetails"
+            component={MapDetails}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,

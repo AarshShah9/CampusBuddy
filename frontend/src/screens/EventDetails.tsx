@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
+import { useIsFocused, useRoute } from "@react-navigation/native";
+import { useCallback, useEffect } from "react";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
@@ -10,7 +10,6 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
@@ -23,6 +22,7 @@ import {
   getEventDetails,
   likeEvent,
 } from "~/lib/apiFunctions/Events";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const IMG_HEIGHT = 300;
 
@@ -38,6 +38,7 @@ export default function EventDetails() {
   const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const insets = useSafeAreaInsets();
 
   const { data: eventData, refetch } = useQuery({
     queryKey: ["event-details", id],
@@ -134,7 +135,10 @@ export default function EventDetails() {
 
   return (
     <View
-      style={[styles.mainContainer, { backgroundColor: theme.colors.primary }]}
+      style={[
+        styles.mainContainer,
+        { backgroundColor: theme.colors.primary, paddingTop: insets.top },
+      ]}
     >
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={navigateBack}>
@@ -340,11 +344,11 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: "100%",
-    height: 60, // TODO this should be consistent across the app
+    height: 40, // TODO this should be consistent across the app
     justifyContent: "space-between",
     paddingHorizontal: 20,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   eDetails: {
     marginLeft: 10,
