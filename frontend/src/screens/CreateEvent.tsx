@@ -28,6 +28,7 @@ import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { createEvent } from "~/lib/apiFunctions/Events";
 
 const IMG_HEIGHT = 300;
 
@@ -51,7 +52,6 @@ export default function CreateEvent() {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [image, setImage] = useState<ImagePickerAsset>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
-  const { createEvent } = useEventsContext();
   const { navigateTo } = useNavigationContext();
   const { startLoading, stopLoading } = useLoadingContext();
 

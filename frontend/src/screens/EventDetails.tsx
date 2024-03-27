@@ -18,6 +18,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
+import {
+  attendEvent,
+  getEventDetails,
+  likeEvent,
+} from "~/lib/apiFunctions/Events";
 
 const IMG_HEIGHT = 300;
 
@@ -29,7 +34,6 @@ export default function EventDetails() {
   const {
     params: { id, map = true },
   } = useRoute<any>();
-  const { getEventDetails, likeEvent, attendEvent } = useEventsContext();
   const { theme, inDarkMode } = useThemeContext();
   const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -67,8 +71,9 @@ export default function EventDetails() {
   });
 
   const onMapPress = useCallback(() => {
-    if(eventData) {
-      navigateTo({ page: "MapDetails",
+    if (eventData) {
+      navigateTo({
+        page: "MapDetails",
         eventData: [
           {
             title: eventData.title,
@@ -171,23 +176,24 @@ export default function EventDetails() {
         >
           <View style={styles.eDetails}>
             <LoadingSkeleton show={!eventData} width={180} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-                color: theme.colors.text,
-              }}
-            >
-              {eventData?.title}
-            </Text></LoadingSkeleton>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                {eventData?.title}
+              </Text>
+            </LoadingSkeleton>
             <LoadingSkeleton show={!eventData} width={150} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-                color: theme.colors.text,
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
                 }}
               >
                 {convertUTCToTimeAndDate(eventData?.startTime)}
@@ -211,7 +217,13 @@ export default function EventDetails() {
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
             <LoadingSkeleton show={!eventData} width={60} height={16}>
-              <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18, color:theme.colors.text }}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 18,
+                  color: theme.colors.text,
+                }}
+              >
                 {eventData?.organization?.organizationName}
               </Text>
             </LoadingSkeleton>
@@ -234,15 +246,15 @@ export default function EventDetails() {
               style={{ marginLeft: 10 }}
             />
             <LoadingSkeleton show={!eventData} width={120} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginLeft: 5,
-                color: theme.colors.text,
-              }}
-            >
-              Attendance: {eventData?.attendees}{" "}
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginLeft: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                Attendance: {eventData?.attendees}{" "}
               </Text>
             </LoadingSkeleton>
           </View>
@@ -261,11 +273,11 @@ export default function EventDetails() {
           <LoadingSkeleton show={!eventData} width={"100%"} height={30}>
             <Text
               style={{
-              marginTop: 10,
-              fontFamily: "Roboto-Reg",
-              fontSize: 16,
-              color: theme.colors.text,
-            }}
+                marginTop: 10,
+                fontFamily: "Roboto-Reg",
+                fontSize: 16,
+                color: theme.colors.text,
+              }}
             >
               {eventData?.description}
             </Text>

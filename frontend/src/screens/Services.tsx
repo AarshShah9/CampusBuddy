@@ -10,6 +10,8 @@ import useAppContext from "~/hooks/useAppContext";
 import { services } from "~/mockData/ServicesData";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useEffect, useState } from "react";
+import { getAllPosts } from "~/lib/apiFunctions/Events";
+import { useQuery } from "@tanstack/react-query";
 
 type post = {
   id: string;
@@ -20,17 +22,16 @@ type post = {
 };
 
 export default function Services() {
-  const [posts, setPosts] = useState<post[]>([]);
   const { dismissKeyboard } = useAppContext();
-  const { getAllPosts } = useEventsContext();
 
-  useEffect(() => {
-    getAllPosts().then((res: any) => {
-      setPosts(res.data);
-    });
-  }, []);
+  const { data: posts } = useQuery({
+    queryKey: ["search-page-posts"],
+    queryFn: getAllPosts,
+    initialData: [],
+  });
 
-  if (posts.length === 0) {
+  if (!Array.isArray(posts)) {
+    console.log("WHY IS THIS TURNING NULL - Services");
     return null;
   }
 
@@ -44,14 +45,15 @@ export default function Services() {
             Looking For
           </ThemedText>
           <View style={{ paddingHorizontal: 20 }}>
-            {posts.map((service) => (
-              <LookingForItem
-                key={service.id}
-                title={service.title}
-                description={service.description}
-                requiredMembers={service.spotsLeft}
-              />
-            ))}
+            {posts &&
+              posts.map((service) => (
+                <LookingForItem
+                  key={service.id}
+                  title={service.title}
+                  description={service.description}
+                  requiredMembers={service.spotsLeft}
+                />
+              ))}
           </View>
         </Pressable>
       </ScrollView>

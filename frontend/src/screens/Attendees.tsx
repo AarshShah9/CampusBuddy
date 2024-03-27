@@ -1,10 +1,5 @@
 import { useCallback, useState } from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  FlatList
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View, FlatList } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
@@ -14,12 +9,12 @@ import { useQuery } from "@tanstack/react-query";
 import AttendeeCard from "~/components/AttendeeCard";
 import { SearchArea } from "~/components/SearchArea";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { getAttendees } from "~/lib/apiFunctions/Events";
 
 export default function Attendees() {
   const {
     params: { id },
   } = useRoute<any>();
-  const { getAttendees } = useEventsContext();
   const { theme } = useThemeContext();
   const [searchQuery, setSearchQuery] = useState("");
 

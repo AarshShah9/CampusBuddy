@@ -22,6 +22,11 @@ export default function Marketplace() {
     initialData: [],
   });
 
+  if (!Array.isArray(marketplaceItems)) {
+    console.log("WHY IS THIS TURNING NULL - Marketplace");
+    return null;
+  }
+
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <ScrollView style={{ flex: 1 }}>
@@ -32,17 +37,18 @@ export default function Marketplace() {
             Marketplace
           </ThemedText>
           <View style={styles.itemsContainer}>
-            {marketplaceItems?.map((item) => (
-              <MarketplaceItem
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                date={""}
-                location={item.location}
-                price={`$${item.price}`}
-                image={generateImageURL(item.image)!}
-              />
-            ))}
+            {marketplaceItems &&
+              marketplaceItems.map((item) => (
+                <MarketplaceItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  date={""}
+                  location={item.location}
+                  price={`$${item.price}`}
+                  image={generateImageURL(item.image)!}
+                />
+              ))}
           </View>
         </Pressable>
       </ScrollView>

@@ -5,14 +5,18 @@ import {
 } from "../CBRequest";
 import { ImagePickerAsset } from "expo-image-picker";
 import { createEventType } from "~/screens/CreateEvent";
-import { MarketPlaceItem } from "~/types/Events";
+import { AttendeeResponse, MarketPlaceItem } from "~/types/Events";
+import { date } from "zod";
 
 export async function getHomePageEvents() {
   return [];
 }
 export async function getSearchPageEvents() {
-  let response = await CBRequest("GET", "/api/events/");
-  return response.data;
+  try {
+    return (await CBRequest("GET", "/api/events/")).data;
+  } catch (e) {
+    console.log(e);
+  }
 }
 export async function getProfilePageEvents() {
   return [];
@@ -29,7 +33,7 @@ export const getMainEvents = async () => {
 export const createEvent = async (
   event: createEventType,
   image: ImagePickerAsset,
-) => {
+): Promise<any> => {
   try {
     return await uploadImageRequest("post", "/api/events/", image, {
       body: event,
@@ -88,7 +92,7 @@ export const attendEvent = async (id: string) => {
 
 export const getAllPosts = async () => {
   try {
-    return await CBRequest("GET", "/api/post/");
+    return (await CBRequest("GET", "/api/post/")).data;
   } catch (err) {
     console.log(err);
   }
@@ -112,7 +116,7 @@ export const getAttendees = async (id: string) => {
           id,
         },
       })
-    ).data;
+    ).data as AttendeeResponse[];
   } catch (err) {
     console.log(err);
   }

@@ -5,11 +5,11 @@ import useEventsContext from "~/hooks/useEventsContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { EventMapItem } from "~/types/Events";
 import { useQuery } from "@tanstack/react-query";
+import { getAllMapEvents } from "~/lib/apiFunctions/Events";
 
 export default function Threads() {
   const { location } = useAppContext();
   const { startLoading, stopLoading } = useLoadingContext();
-  const { getAllMapEvents } = useEventsContext();
 
   const {
     data: { events, items },

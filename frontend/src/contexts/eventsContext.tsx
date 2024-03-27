@@ -25,63 +25,13 @@ import {
 } from "~/types/Events";
 import { createEventType } from "~/screens/CreateEvent";
 
-type eventsContext = {
-  createEvent: (
-    event: createEventType,
-    image: ImagePickerAsset,
-  ) => Promise<any>;
-  createPost: (post: lookingForDetail) => Promise<any>; // fix any on post type
-  getAllMapEvents: () => Promise<any>;
-  searchPageEvents: SearchPageEventType[];
-  profilePageEvents: EventType[];
-  getEventDetails: (id: string) => Promise<EventDetailsProps>;
-  likeEvent: (id: string) => Promise<any>;
-  attendEvent: (id: string) => Promise<any>;
-  getAllPosts: () => Promise<any>;
-  getAttendees: (id: string) => Promise<AttendeeResponse[]>;
-  createMarketPlaceItem: (
-    item: MarketPlaceItem,
-    images?: ImagePickerAsset[],
-  ) => Promise<any>;
-  getMarketPlaceItems: () => Promise<any>;
-};
+type eventsContext = {};
 const EventsContext = createContext<eventsContext | null>(null);
 
 export const EventsContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const { data: searchPageEvents } = useQuery({
-    queryKey: ["search-page-events"],
-    queryFn: getSearchPageEvents,
-    initialData: [],
-  });
-
-  const { data: profilePageEvents } = useQuery({
-    queryKey: ["profile-page-events"],
-    queryFn: getProfilePageEvents,
-    initialData: [],
-  });
-
-  return (
-    <EventsContext.Provider
-      value={{
-        createEvent,
-        getAllMapEvents,
-        searchPageEvents,
-        profilePageEvents,
-        getEventDetails,
-        likeEvent,
-        attendEvent,
-        createPost,
-        getAllPosts,
-        getAttendees,
-        createMarketPlaceItem,
-        getMarketPlaceItems,
-      }}
-    >
-      {children}
-    </EventsContext.Provider>
-  );
+  return <EventsContext.Provider value={{}}>{children}</EventsContext.Provider>;
 };
 
 export default EventsContext;
