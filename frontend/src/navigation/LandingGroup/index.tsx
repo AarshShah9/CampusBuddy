@@ -7,8 +7,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
 import Attendees from "~/screens/Attendees";
-import ProfileTabs from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/ProfileTabs";
-import Header from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/Header";
+import ProfilePage from "~/screens/ProfilePage";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +22,7 @@ export default function LandingGroup() {
           <Stack.Screen name="Messages" component={MessagesGroup} />
           <Stack.Screen
             name="UserProfile"
-            component={ProfileTabs}
+            component={ProfilePage}
             options={{
               title: "Profile",
             }}

@@ -13,7 +13,9 @@ export async function getHomePageEvents() {
 }
 export async function getSearchPageEvents() {
   try {
-    return (await CBRequest("GET", "/api/events/")).data;
+    const res = (await CBRequest("GET", "/api/events/")).data;
+    console.log("INSIDE OF EVENTS CB", res);
+    return res;
   } catch (e) {
     console.log(e);
   }

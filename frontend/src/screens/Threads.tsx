@@ -18,7 +18,7 @@ export default function Threads() {
     error,
     isSuccess,
   } = useQuery({
-    queryKey: ["search-page-events"],
+    queryKey: ["map-page-events"],
     queryFn: getAllMapEvents,
     initialData: [],
   });

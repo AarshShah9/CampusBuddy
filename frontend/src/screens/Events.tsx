@@ -7,12 +7,10 @@ import {
 import EventMainCard from "~/components/EventMainCard";
 import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { generateImageURL } from "~/lib/CDNFunctions";
 import { useQuery } from "@tanstack/react-query";
 import { getSearchPageEvents } from "~/lib/apiFunctions/Events";
-import { EventType, SearchPageEventType } from "~/types/Events";
+import { SearchPageEventType } from "~/types/Events";
 
 export default function Events() {
   const { dismissKeyboard } = useAppContext();
@@ -22,15 +20,6 @@ export default function Events() {
     queryFn: getSearchPageEvents,
     initialData: [],
   });
-
-  if (!Array.isArray(searchPageEvents)) {
-    console.log("WHY IS THIS TURNING NULL");
-    console.log(searchPageEvents);
-    return null;
-  } else {
-    console.log("searchPageEvents is an array");
-    console.log(searchPageEvents);
-  }
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>

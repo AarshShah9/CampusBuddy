@@ -17,15 +17,10 @@ export default function Marketplace() {
   const { dismissKeyboard } = useAppContext();
 
   const { data: marketplaceItems } = useQuery<MarketPlaceCardProps[]>({
-    queryKey: ["marketplace-items"],
+    queryKey: ["search-marketplace-items"],
     queryFn: getMarketPlaceItems,
     initialData: [],
   });
-
-  if (!Array.isArray(marketplaceItems)) {
-    console.log("WHY IS THIS TURNING NULL - Marketplace");
-    return null;
-  }
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>

@@ -19,6 +19,7 @@ export default function Attendees() {
   const { theme } = useThemeContext();
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
+  const { navigateBack } = useNavigationContext();
 
   const { data: attendeeData } = useQuery({
     queryKey: ["attendees", id],
@@ -36,7 +37,6 @@ export default function Attendees() {
     [setSearchQuery],
   );
 
-  const { navigateBack } = useNavigationContext();
   return (
     <View
       style={{
