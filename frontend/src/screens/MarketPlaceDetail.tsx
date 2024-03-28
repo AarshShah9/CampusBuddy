@@ -18,6 +18,7 @@ const Header = () => {
 const ImageGallery = () => {
   const { theme } = useThemeContext();
   const example = [1, 2, 3];
+  // Users image will be loaded into the carousel 
   return (
     <View style={{ height: 300 }}>
       <Carousel>
