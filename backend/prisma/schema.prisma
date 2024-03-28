@@ -175,7 +175,8 @@ model Post {
   createdAt   DateTime  @unique @default(now()) @map("created_at")
   title       String
   description String?
-  public      Boolean   @default(true)
+  public      Boolean   @default(false)
+  flagged     Boolean   @default(false)
   expiresAt   DateTime? @map("expires_at")
 
   numberOfSpots     Int? @map("number_of_spots")
