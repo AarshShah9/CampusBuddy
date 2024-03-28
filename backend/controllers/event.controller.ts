@@ -879,7 +879,7 @@ export const getMainPageEvents = async (
             eventResponses: {
               some: {
                 userId,
-                participationStatus: "Interested",
+                participationStatus: "Going",
               },
             },
           },
