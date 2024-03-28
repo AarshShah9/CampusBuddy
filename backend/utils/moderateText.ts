@@ -1,8 +1,9 @@
 import OpenAI from "openai";
+import { env } from "./validateEnv";
 
 const openai = new OpenAI({
-  organization: "org-EgABnNmZjU6Utwv9RDHxiAPc",
-  apiKey: "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",
+  organization: env.GPT_ORG,
+  apiKey: env.GPT_KEY,
 });
 
 export const moderateText = async (
