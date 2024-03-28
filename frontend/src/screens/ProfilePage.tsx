@@ -1,20 +1,35 @@
-import ProfileTabs from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/ProfileTabs";
-import Header from "~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/Header";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ProfileContextProvider } from "~/contexts/profileContext";
-
-const Stack = createNativeStackNavigator();
+import UserProfileHeader from "~/components/UserProfileHeader";
+import { View } from "react-native";
+import { useRoute } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { getUserProfile } from "~/lib/apiFunctions/Profile";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function ProfilePage() {
+  const {
+    params: { id },
+  } = useRoute<any>();
+
+  console.log("ID", id);
+
+  const { data: profileData } = useQuery({
+    queryKey: ["profile", id],
+    queryFn: () => getUserProfile(id),
+    initialData: undefined,
+  });
+
+  console.log(profileData);
+
   return (
-    <>
-      {/*<Stack.Navigator screenOptions={{ header: Header }}>*/}
-      {/*  <Stack.Screen*/}
-      {/*    name="ProfileTabs"*/}
-      {/*    component={ProfileTabs}*/}
-      {/*    options={{ title: "Profile" }}*/}
-      {/*  />*/}
-      {/*</Stack.Navigator>*/}
-    </>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <UserProfileHeader
+        name={profileData?.user.name}
+        attended={0}
+        following={0}
+        imageSource={{ uri: generateImageURL(profileData?.user.image)! }}
+        programs={profileData?.user.programs}
+      />
+    </View>
   );
 }

@@ -288,62 +288,62 @@ export const userEventResponses = [
   {
     userId: ids.userIds[1],
     eventId: ids.eventIds[1],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[1],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[1],
     eventId: ids.eventIds[3],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[2],
     eventId: ids.eventIds[1],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[2],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[2],
     eventId: ids.eventIds[3],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[3],
     eventId: ids.eventIds[1],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[3],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[3],
     eventId: ids.eventIds[3],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[1],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[2],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[3],
-    participationStatus: ParticipationStatus.Interested,
+    participationStatus: ParticipationStatus.Going,
   },
 ];
 

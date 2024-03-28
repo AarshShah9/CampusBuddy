@@ -3,6 +3,7 @@ import { NextFunction, Response } from "express";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import { ParticipationStatus } from "@prisma/client";
+import { IdParamSchema } from "../../shared/zodSchemas";
 
 export const profileSavedData = async (
   req: RequestExtended,
@@ -74,6 +75,57 @@ export const profileSavedData = async (
           items: [],
         },
       ],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserProfileData = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = IdParamSchema.parse(req.params).id;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        enrollments: {
+          include: {
+            program: {
+              select: {
+                programName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user || !user.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    res.status(200).json({
+      message: "User Profile Data",
+      data: {
+        user: {
+          name: user.firstName + " " + user.lastName,
+          image: user.profilePic,
+          programs: user.enrollments.map(
+            (enrollment) => enrollment.program.programName,
+          ),
+        },
+      },
     });
   } catch (error) {
     next(error);

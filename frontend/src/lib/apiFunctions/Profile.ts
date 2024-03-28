@@ -8,3 +8,15 @@ export const getProfileSaved = async () => {
     console.log(err);
   }
 };
+
+export const getUserProfile = async (userId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/user/:id`, {
+        params: { id: userId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

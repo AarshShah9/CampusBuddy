@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Button } from "react-native-paper";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { useCallback, useEffect } from "react";
@@ -176,6 +183,7 @@ export default function EventDetails() {
             width: "100%",
             flexDirection: "row",
             justifyContent: "space-between",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <View style={styles.eDetails}>
@@ -241,6 +249,7 @@ export default function EventDetails() {
               flexDirection: "row",
               height: 50,
               alignItems: "center",
+              backgroundColor: theme.colors.tertiary,
             }}
           >
             <Ionicons
@@ -272,6 +281,7 @@ export default function EventDetails() {
             paddingLeft: 10,
             paddingRight: 10,
             paddingTop: 10,
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <LoadingSkeleton show={!eventData} width={"100%"} height={30}>
@@ -309,10 +319,11 @@ export default function EventDetails() {
             paddingBottom: 60,
             marginLeft: "auto",
             marginRight: "auto",
-            width: "90%",
+            width: "100%",
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <Button
@@ -361,7 +372,7 @@ const styles = StyleSheet.create({
   },
   attendButton: {
     borderRadius: 8,
-    width: "100%",
+    width: "90%",
     height: 48,
     fontSize: 25,
     fontWeight: "bold",
