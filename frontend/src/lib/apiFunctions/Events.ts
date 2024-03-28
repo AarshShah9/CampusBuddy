@@ -6,16 +6,13 @@ import {
 import { ImagePickerAsset } from "expo-image-picker";
 import { createEventType } from "~/screens/CreateEvent";
 import { AttendeeResponse, MarketPlaceItem } from "~/types/Events";
-import { date } from "zod";
 
 export async function getHomePageEvents() {
   return [];
 }
 export async function getSearchPageEvents() {
   try {
-    const res = (await CBRequest("GET", "/api/events/")).data;
-    console.log("INSIDE OF EVENTS CB", res);
-    return res;
+    return (await CBRequest("GET", "/api/events/")).data;
   } catch (e) {
     console.log(e);
   }

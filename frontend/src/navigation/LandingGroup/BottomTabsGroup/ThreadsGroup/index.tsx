@@ -19,7 +19,7 @@ export default function ThreadsGroup() {
       <Stack.Screen
         name="ThreadsScreen"
         component={Threads}
-        options={{ title: "Event Map" }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
