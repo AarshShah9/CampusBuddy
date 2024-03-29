@@ -21,9 +21,9 @@ import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
 import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
-import { z } from "zod";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { createMarketPlaceItem } from "~/lib/apiFunctions/Events";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -41,7 +41,6 @@ export default function CreateMarketplace() {
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
-  const { createMarketPlaceItem } = useEventsContext();
   const { startLoading, stopLoading } = useLoadingContext();
   const { navigateTo } = useNavigationContext();
 
@@ -68,6 +67,10 @@ export default function CreateMarketplace() {
   // Handle submission of data to backend
   const onSubmit = (data: MarketPlaceItem) => {
     startLoading();
+    if (!selectedImages) {
+      alert("Please add an image");
+      return;
+    }
     createMarketPlaceItem(data, selectedImages)
       .then((r) => {
         if (r.status !== 201) {

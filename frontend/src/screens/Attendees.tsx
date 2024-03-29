@@ -1,10 +1,5 @@
 import { useCallback, useState } from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  FlatList
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View, FlatList } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
@@ -14,14 +9,17 @@ import { useQuery } from "@tanstack/react-query";
 import AttendeeCard from "~/components/AttendeeCard";
 import { SearchArea } from "~/components/SearchArea";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { getAttendees } from "~/lib/apiFunctions/Events";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Attendees() {
   const {
     params: { id },
   } = useRoute<any>();
-  const { getAttendees } = useEventsContext();
   const { theme } = useThemeContext();
   const [searchQuery, setSearchQuery] = useState("");
+  const insets = useSafeAreaInsets();
+  const { navigateBack } = useNavigationContext();
 
   const { data: attendeeData } = useQuery({
     queryKey: ["attendees", id],
@@ -39,16 +37,21 @@ export default function Attendees() {
     [setSearchQuery],
   );
 
-  const { navigateBack } = useNavigationContext();
-
   return (
-    <MainContainer color={theme.colors.primary}>
-      <HeaderContainer>
+    <View
+      style={{
+        ...styles.mainContainer,
+        paddingTop: insets.top,
+        backgroundColor: theme.colors.primary,
+      }}
+    >
+      <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => navigateBack()}>
+          {/*TODO MAKE the back button aligned*/}
           <AntDesign name="caretleft" size={24} color="white" />
         </TouchableOpacity>
         <SearchArea setSearchQuery={setSearchQueryCallback} />
-      </HeaderContainer>
+      </View>
 
       <FlatList
         data={filteredAttendees}
@@ -57,7 +60,7 @@ export default function Attendees() {
         style={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-    </MainContainer>
+    </View>
   );
 }
 
@@ -88,11 +91,6 @@ const styles = StyleSheet.create({
   list: {
     backgroundColor: "white",
   },
-  headerContainer: {
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 0,
-  },
   searchArea: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -114,19 +112,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 0.98,
   },
+  mainContainer: {
+    height: "100%",
+  },
+  headerContainer: {
+    width: "100%",
+    height: 40,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
 });
-
-// prettier-ignore
-const MainContainer = styled(View) <{ color: string }>`
-    height: 100%;
-    background-color: ${(props) => props.color};
-`;
-// prettier-ignore
-const HeaderContainer = styled(View)`
-    width: 100%;
-    height: 60px; /* TODO this should be consistent across the app */
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-direction: row;
-    align-items: center
-`;

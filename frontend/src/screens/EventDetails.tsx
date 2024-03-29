@@ -1,7 +1,14 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Button } from "react-native-paper";
-import { useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
+import { useIsFocused, useRoute } from "@react-navigation/native";
+import { useCallback, useEffect } from "react";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
@@ -10,7 +17,6 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
@@ -18,6 +24,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
+import {
+  attendEvent,
+  getEventDetails,
+  likeEvent,
+} from "~/lib/apiFunctions/Events";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const IMG_HEIGHT = 300;
 
@@ -29,11 +41,11 @@ export default function EventDetails() {
   const {
     params: { id, map = true },
   } = useRoute<any>();
-  const { getEventDetails, likeEvent, attendEvent } = useEventsContext();
   const { theme, inDarkMode } = useThemeContext();
   const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const insets = useSafeAreaInsets();
 
   const { data: eventData, refetch } = useQuery({
     queryKey: ["event-details", id],
@@ -67,8 +79,9 @@ export default function EventDetails() {
   });
 
   const onMapPress = useCallback(() => {
-    if(eventData) {
-      navigateTo({ page: "MapDetails",
+    if (eventData) {
+      navigateTo({
+        page: "MapDetails",
         eventData: [
           {
             title: eventData.title,
@@ -129,7 +142,10 @@ export default function EventDetails() {
 
   return (
     <View
-      style={[styles.mainContainer, { backgroundColor: theme.colors.primary }]}
+      style={[
+        styles.mainContainer,
+        { backgroundColor: theme.colors.primary, paddingTop: insets.top },
+      ]}
     >
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={navigateBack}>
@@ -167,27 +183,29 @@ export default function EventDetails() {
             width: "100%",
             flexDirection: "row",
             justifyContent: "space-between",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <View style={styles.eDetails}>
             <LoadingSkeleton show={!eventData} width={180} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-                color: theme.colors.text,
-              }}
-            >
-              {eventData?.title}
-            </Text></LoadingSkeleton>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                {eventData?.title}
+              </Text>
+            </LoadingSkeleton>
             <LoadingSkeleton show={!eventData} width={150} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-                color: theme.colors.text,
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
                 }}
               >
                 {convertUTCToTimeAndDate(eventData?.startTime)}
@@ -211,7 +229,13 @@ export default function EventDetails() {
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
             <LoadingSkeleton show={!eventData} width={60} height={16}>
-              <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18, color:theme.colors.text }}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 18,
+                  color: theme.colors.text,
+                }}
+              >
                 {eventData?.organization?.organizationName}
               </Text>
             </LoadingSkeleton>
@@ -225,6 +249,7 @@ export default function EventDetails() {
               flexDirection: "row",
               height: 50,
               alignItems: "center",
+              backgroundColor: theme.colors.tertiary,
             }}
           >
             <Ionicons
@@ -234,15 +259,15 @@ export default function EventDetails() {
               style={{ marginLeft: 10 }}
             />
             <LoadingSkeleton show={!eventData} width={120} height={16}>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginLeft: 5,
-                color: theme.colors.text,
-              }}
-            >
-              Attendance: {eventData?.attendees}{" "}
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginLeft: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                Attendance: {eventData?.attendees}{" "}
               </Text>
             </LoadingSkeleton>
           </View>
@@ -256,16 +281,17 @@ export default function EventDetails() {
             paddingLeft: 10,
             paddingRight: 10,
             paddingTop: 10,
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <LoadingSkeleton show={!eventData} width={"100%"} height={30}>
             <Text
               style={{
-              marginTop: 10,
-              fontFamily: "Roboto-Reg",
-              fontSize: 16,
-              color: theme.colors.text,
-            }}
+                marginTop: 10,
+                fontFamily: "Roboto-Reg",
+                fontSize: 16,
+                color: theme.colors.text,
+              }}
             >
               {eventData?.description}
             </Text>
@@ -293,10 +319,11 @@ export default function EventDetails() {
             paddingBottom: 60,
             marginLeft: "auto",
             marginRight: "auto",
-            width: "90%",
+            width: "100%",
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
           <Button
@@ -328,11 +355,11 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: "100%",
-    height: 60, // TODO this should be consistent across the app
+    height: 40, // TODO this should be consistent across the app
     justifyContent: "space-between",
     paddingHorizontal: 20,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   eDetails: {
     marginLeft: 10,
@@ -345,7 +372,7 @@ const styles = StyleSheet.create({
   },
   attendButton: {
     borderRadius: 8,
-    width: "100%",
+    width: "90%",
     height: 48,
     fontSize: 25,
     fontWeight: "bold",

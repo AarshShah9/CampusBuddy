@@ -16,6 +16,7 @@ export default function ProfileTabs() {
   return (
     <TopTabs.Navigator
       screenOptions={{
+        lazy: true,
         tabBarStyle: {
           backgroundColor: theme.colors.profileTabs,
           shadowColor: "grey",

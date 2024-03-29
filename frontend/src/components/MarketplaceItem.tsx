@@ -2,21 +2,14 @@ import { Dimensions, StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
+import { MarketPlaceCardProps } from "~/types/Events";
 
-type EventMainCardProps = {
-  title: string;
-  date: string;
-  location: string;
-  clubName: string;
-  picture: string;
-};
-
-export default function MarketplaceItem(props: EventMainCardProps) {
+export default function MarketplaceItem(props: MarketPlaceCardProps) {
   return (
     <Card style={styles.card}>
       <Card.Cover
         style={styles.cardCover}
-        source={{ uri: props.picture }}
+        source={{ uri: props.image }}
         resizeMode="cover"
       />
       <Card.Content style={styles.cardContent}>
@@ -24,7 +17,7 @@ export default function MarketplaceItem(props: EventMainCardProps) {
           <Text style={styles.cardTitle}>
             {limitTextToMax(props.title, 14)}
           </Text>
-          <Text style={styles.price}>{props.clubName}</Text>
+          <Text style={styles.price}>{props.price}</Text>
         </Card.Content>
         <Card.Content style={styles.bottomCardContent}>
           <LocationChip size={"small"} location={props.location}></LocationChip>

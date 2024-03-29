@@ -15,6 +15,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import ItemTag from "~/components/ItemTags";
 import useEventsContext from "~/hooks/useEventsContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { createPost } from "~/lib/apiFunctions/Events";
 
 // React Hook Section
 const schema = zod.object({
@@ -35,7 +36,6 @@ type lookingForDetail = {
 
 export default function CreateLookingFor() {
   const { theme } = useThemeContext();
-  const { createPost } = useEventsContext();
   const { navigateTo } = useNavigationContext();
 
   const {

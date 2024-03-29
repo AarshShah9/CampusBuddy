@@ -147,3 +147,12 @@ export type MarketPlaceItem = {
   locationPlaceId: string;
   // tags?: string[];
 };
+
+export type MarketPlaceCardProps = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  price: string;
+  image: string;
+};
