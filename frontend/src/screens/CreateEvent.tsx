@@ -73,8 +73,6 @@ export default function CreateEvent() {
     resolver: zodResolver(schema),
   });
 
-  //Functions
-
   // Handle submission of user data
   const onSubmit = useCallback(
     (data: createEventType) => {

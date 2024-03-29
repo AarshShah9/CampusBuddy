@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import useThemeContext from "~/hooks/useThemeContext";
-import Threads from "~/screens/Threads";
+import MapsPage from "~/screens/MapsPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,8 +17,8 @@ export default function ThreadsGroup() {
       }}
     >
       <Stack.Screen
-        name="ThreadsScreen"
-        component={Threads}
+        name="MapsScreen"
+        component={MapsPage}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

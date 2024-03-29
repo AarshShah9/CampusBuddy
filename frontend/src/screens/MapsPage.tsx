@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
-import { EventMapItem } from "~/types/Events";
 import { useQuery } from "@tanstack/react-query";
 import { getAllMapEvents } from "~/lib/apiFunctions/Events";
 
-export default function Threads() {
+export default function MapsPage() {
   const { location } = useAppContext();
   const { startLoading, stopLoading } = useLoadingContext();
 
