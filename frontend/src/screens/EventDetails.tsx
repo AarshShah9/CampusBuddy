@@ -1,15 +1,8 @@
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useIsFocused, useRoute } from "@react-navigation/native";
-import { useCallback, useEffect, useLayoutEffect } from "react";
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
+import { useCallback, useLayoutEffect } from "react";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -29,7 +22,6 @@ import {
   getEventDetails,
   likeEvent,
 } from "~/lib/apiFunctions/Events";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 const IMG_HEIGHT = 300;
@@ -96,6 +88,7 @@ export default function EventDetails({
       });
     }
   }, [eventData]); // TODO fix optimistic updates
+
   const isOptimistic =
     likeMutation.variables &&
     (likeMutation.isPending ? !likeMutation.variables.previousState : false);

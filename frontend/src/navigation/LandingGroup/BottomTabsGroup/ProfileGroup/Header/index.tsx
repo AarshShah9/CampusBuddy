@@ -34,7 +34,12 @@ export default function Header() {
         },
       ]}
     >
-      <View style={styles.headerCard}>
+      <View
+        style={{
+          width: "100%",
+          height: profileData?.user.programs?.[0] ? 150 : 120,
+        }}
+      >
         <View style={styles.upperSection}>
           <TouchableOpacity onPress={openPictureModal}>
             <View
@@ -57,12 +62,14 @@ export default function Header() {
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
             <Text style={styles.profileInfoItem}>
-              {profileData?.attended ?? "0"}
+              {profileData?.user.attended ?? "0"}
             </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>5</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.user.following ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
           <MenuIcon />
@@ -71,7 +78,7 @@ export default function Header() {
           <Text style={{ fontWeight: "bold" }}>
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text>{`Mechanical Engineering`}</Text>
+          <Text>{profileData?.user.programs?.[0]}</Text>
         </View>
       </View>
     </View>
@@ -84,10 +91,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 0,
     borderBottomWidth: 2,
-  },
-  headerCard: {
-    width: "100%",
-    height: 150,
   },
   upperSection: {
     flexDirection: "row",
