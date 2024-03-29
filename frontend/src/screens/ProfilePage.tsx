@@ -10,8 +10,6 @@ export default function ProfilePage() {
     params: { id },
   } = useRoute<any>();
 
-  console.log("ID", id);
-
   const { data: profileData } = useQuery({
     queryKey: ["profile", id],
     queryFn: () => getUserProfile(id),
