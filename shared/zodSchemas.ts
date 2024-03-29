@@ -114,15 +114,29 @@ export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 ///////////////////////////////
 // USER SCHEMAS
 ///////////////////////////////
+export const PasswordSchema = z
+  .string({ required_error: "Password is required." })
+  .min(8, { message: "Password must be at least 8 characters long" })
+  .regex(/[A-Z]/, {
+    message: "Password must contain at least one uppercase letter",
+  })
+  .regex(/[0-9]/, { message: "Password must contain at least one number" });
+
+export const EmailSchema = z
+  .string({ required_error: "Email is required." })
+  .email({ message: "Invalid email format" })
+  .max(254); // RFC 5321 max 256 with angle brackets
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  firstName: z.string().min(2).max(20),
-  lastName: z.string().min(2).max(20),
-  email: z.string().email({ message: "Invalid email address" }).min(5),
-  password: z
-    .string()
-    .min(8, { message: "Password must be greater than 8 characters long" }),
+  firstName: z
+    .string({ required_error: "First name is required." })
+    .max(50, { message: "Max 50 characters" }),
+  lastName: z
+    .string({ required_error: "Last name is required." })
+    .max(50, { message: "Max 50 characters" }),
+  email: EmailSchema,
+  password: PasswordSchema,
   profilePic: z.string().nullable(),
   accountType: UserType,
   institutionId: z.string().uuid().nullable(),
@@ -559,19 +573,13 @@ export const otpVerifySchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: EmailSchema,
+  password: PasswordSchema,
 });
 
-export const emailSchema = z.object({
-  email: z.string(),
-});
+export type loginType = z.infer<typeof loginSchema>;
 
-export const deleteSchema = z.object({
-  userId: z.string().uuid(),
-});
-
-export const tokenSchema = z.object({
+export const AuthTokenSchema = z.object({
   token: z.string(),
 });
 
