@@ -126,7 +126,7 @@ const ItemDescription = () => {
       <View
         style={{
           flexDirection: "column",
-          borderBottomColor: theme.colors.text,
+          borderBottomColor: "#B0CFFF",
           borderBottomWidth: 1,
           marginTop:4
         }}
@@ -147,7 +147,7 @@ const ItemDescription = () => {
           minHeight: 100,
           marginTop: 4,
           flexDirection: "column",
-          borderBottomColor: theme.colors.text,
+          borderBottomColor: "#B0CFFF",
           borderBottomWidth: 1,
         }}
       >
@@ -177,7 +177,7 @@ const ItemDescription = () => {
           height: 100,
           marginTop: 4,
           flexDirection: "column",
-          borderBottomColor: theme.colors.text,
+          borderBottomColor: "#B0CFFF",
           borderBottomWidth: 1,
         }}
       >
