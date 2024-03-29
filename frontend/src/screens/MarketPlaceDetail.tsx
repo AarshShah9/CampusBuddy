@@ -1,6 +1,7 @@
 import { View, StyleSheet, Text, Image, ScrollView } from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
+import { Button } from "react-native-paper";
 
 const Header = () => {
   const { theme } = useThemeContext();
@@ -67,17 +68,17 @@ const Profile = (item: { name: string }) => {
           {item.name}
         </Text>
       </View>
-      <View
+      <Button
         style={{
           width: 90,
           height: 40,
-          backgroundColor: "grey",
+          backgroundColor: "#afafaf",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <Text style={{ color: theme.colors.text }}>Message</Text>
-      </View>
+      </Button>
     </View>
   );
 };
