@@ -350,7 +350,8 @@ model Item {
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   institutionId String       @map("institution_id")
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-
+  public        Boolean @default(true)
+  flagged       Boolean      @default(false)
   title       String
   description String?
   price       Int

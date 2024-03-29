@@ -9,6 +9,8 @@ import {
   getPlaceNameFromPlaceId,
 } from "../utils/googleMapsApi";
 import { State } from "@prisma/client";
+import { moderateText } from "../utils/moderateText";
+import { title } from "process";
 
 // test Item
 export const itemTest = async (req: Request, res: Response) => {
@@ -82,6 +84,11 @@ export const createItem = async (
         });
       }
 
+      const isFlagged = await moderateText(
+        validatedItemData.title,
+        validatedItemData.description,
+      );
+
       // create item
       const newItem = await prisma.item.create({
         data: {
@@ -89,6 +96,8 @@ export const createItem = async (
           institutionId: user.institutionId,
           title: validatedItemData.title,
           description: validatedItemData.description,
+          public: !isFlagged,
+          flagged: isFlagged,
           price: validatedItemData.price,
           condition: validatedItemData.condition,
           locationPlaceId: validatedItemData.locationPlaceId,
