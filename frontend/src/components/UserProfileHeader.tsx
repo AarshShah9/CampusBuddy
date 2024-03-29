@@ -1,13 +1,15 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { UserProfileHeaderType } from "~/types/Profile";
 import { getUserProfile } from "~/lib/apiFunctions/Profile";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import { useCallback } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function UserProfileHeader({ id }: { id: string }) {
   const insets = useSafeAreaInsets();
@@ -18,6 +20,11 @@ export default function UserProfileHeader({ id }: { id: string }) {
     queryFn: () => getUserProfile(id),
     initialData: undefined,
   });
+  const { navigateTo } = useNavigationContext();
+
+  const goToMessages = useCallback(() => {
+    navigateTo({ page: "Messages" });
+  }, []);
 
   return (
     <View
@@ -50,7 +57,11 @@ export default function UserProfileHeader({ id }: { id: string }) {
               />
             ) : (
               <View style={styles.iconContainer}>
-                <MaterialIcons name="person" size={50} color="grey" />
+                <MaterialIcons
+                  name="person"
+                  size={50}
+                  color={theme.colors.tertiary}
+                />
               </View>
             )}
           </View>
@@ -66,6 +77,13 @@ export default function UserProfileHeader({ id }: { id: string }) {
             </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
+          <TouchableOpacity onPress={goToMessages}>
+            <MaterialCommunityIcons
+              name="chat-outline"
+              size={28}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.lowerSection}>
           <Text style={{ fontWeight: "bold" }}>{profileData?.user.name}</Text>
