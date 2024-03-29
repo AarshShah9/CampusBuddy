@@ -9,11 +9,16 @@ import {
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import {
+  addMemberToOrganization,
   approveOrganizationRequest,
   approveUserRequest,
+  checkOrganizationExists,
   createOrganizationWithDefaults,
+  getRoleIdFromName,
+  getUserRolesInOrganization,
   rejectOrganizationRequest,
   rejectUserRequest,
+  removeUserFromOrganization,
 } from "../services/org.service";
 import {
   emailMembershipRequestApproved,
@@ -668,6 +673,101 @@ export const manageNewOrganizationRequest = async (
     res.status(200).json({
       message: `Organization creation request successfully ${decision.toLowerCase()}`,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const joinOrganization = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request organization id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userId;
+
+    // check if organization exists
+    const existingOrganization = await checkOrganizationExists(organizationId);
+
+    // check if the user is already a member
+    const existingUserOrgRoles = await getUserRolesInOrganization(
+      loggedInUserId!,
+      organizationId,
+    );
+    if (existingUserOrgRoles.length) {
+      return res
+        .status(400)
+        .json({ message: "User is already a member of this organization" });
+    }
+
+    // Add user to the organization as a member (no approval required for now)
+    const newMemberRole = await addMemberToOrganization(
+      loggedInUserId!,
+      organizationId,
+    );
+
+    if (!newMemberRole) {
+      throw new AppError(
+        AppErrorName.INTERNAL_SERVER_ERROR,
+        `Failed to add user as a member`,
+        500,
+        true,
+      );
+    }
+
+    res.status(200).json({
+      message: `User added as member to ${existingOrganization.organizationName}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const leaveOrganization = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request organization id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userId;
+
+    // check if organization exists
+    const existingOrganization = await checkOrganizationExists(organizationId);
+
+    // Get all of the roles a user has within an organization
+    const userRoles = await getUserRolesInOrganization(
+      loggedInUserId!,
+      organizationId,
+    );
+
+    if (!userRoles.length) {
+      return res
+        .status(400)
+        .json({ message: "User is not a member of this organization." });
+    }
+
+    // Fetch owner role
+    const ownerRole = await getRoleIdFromName(UserRole.Owner);
+    // check if the user is the owner of the organization
+    const isOwner = userRoles.some(
+      (userRole) => userRole.roleId === ownerRole.id,
+    );
+    if (isOwner) {
+      return res
+        .status(400)
+        .json({ error: "Owner cannot leave their own organization." });
+    }
+
+    // Remove the user from the organization
+    await removeUserFromOrganization(loggedInUserId!, organizationId);
+
+    res
+      .status(200)
+      .json({ message: "User left the organization successfully." });
   } catch (error) {
     next(error);
   }
