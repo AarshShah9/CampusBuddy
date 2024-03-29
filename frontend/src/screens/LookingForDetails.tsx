@@ -57,16 +57,18 @@ export default function LookingForDetails() {
           </Text>
           <Text
             style={{
+              fontFamily: "Roboto-Medium",
               marginBottom: 8,
             }}
           >
             Date
           </Text>
-          <LocationChip location="Do we need this?" />
+          <LocationChip location="Location if Relevant :D " />
         </View>
 
-        {/* looking for description  */}
+        {/* looking for description  Section */}
         <View style={styles.contentContainer}>
+          <View style={styles.textContainer}>
           <Text
             style={{
               marginBottom: 8,
@@ -74,6 +76,7 @@ export default function LookingForDetails() {
           >
             This is for the Description
           </Text>
+          </View>
 
           {/* Attending and comments Chip */}
           <View style={styles.chipContainer}>
@@ -103,11 +106,22 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
-    borderBottomColor: "black", // This needs to be set to the proper color for the page
+    borderBottomColor: "black", 
   },
   contentContainer: {
-    marginLeft: 32,
-    marginRight: 32,
+    marginLeft: 16,
+    marginRight: 16,
   },
-  chipContainer: {},
+  textContainer :{
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  chipContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: "black", 
+  },
 });
