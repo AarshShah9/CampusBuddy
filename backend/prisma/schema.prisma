@@ -138,7 +138,8 @@ model Event {
   location        Location            @relation(fields: [locationPlaceId], references: [placeId])
   startTime       DateTime            @map("start_time")
   endTime         DateTime            @map("end_time")
-  isPublic        Boolean             @map("is_public")
+  isPublic        Boolean             @default(true) @map("is_public")
+  flagged         Boolean             @default(false)
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -175,7 +176,8 @@ model Post {
   createdAt   DateTime  @unique @default(now()) @map("created_at")
   title       String
   description String?
-  public      Boolean   @default(true)
+  isPublic    Boolean   @default(true)
+  flagged     Boolean   @default(false)
   expiresAt   DateTime? @map("expires_at")
 
   numberOfSpots     Int? @map("number_of_spots")
@@ -349,13 +351,14 @@ model Item {
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   institutionId String       @map("institution_id")
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-
-  title       String
-  description String?
-  price       Int
-  createdAt   DateTime @unique @default(now()) @map("created_at")
-  condition   String?  @map("condition")
-  Image       Image[]
+  isPublic      Boolean      @default(true)
+  flagged       Boolean      @default(false)
+  title         String
+  description   String?
+  price         Int
+  createdAt     DateTime     @unique @default(now()) @map("created_at")
+  condition     String?      @map("condition")
+  Image         Image[]
 
   location        Location @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String

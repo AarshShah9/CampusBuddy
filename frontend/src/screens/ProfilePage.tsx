@@ -34,6 +34,7 @@ export default function ProfilePage() {
         <TopTabs.Screen
           name="Events"
           component={ProfileEvents}
+          initialParams={{ id }}
           options={{
             tabBarIcon: ({ color, focused }) => {
               return (

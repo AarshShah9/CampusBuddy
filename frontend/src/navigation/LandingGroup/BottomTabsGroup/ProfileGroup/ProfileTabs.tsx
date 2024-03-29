@@ -8,11 +8,13 @@ import useThemeContext from "~/hooks/useThemeContext";
 import ProfileEvents from "~/screens/ProfileEvents";
 import ProfilePosts from "~/screens/ProfilePosts";
 import ProfileSavedItems from "~/screens/ProfileSavedItems";
+import useAuthContext from "~/hooks/useAuthContext";
 
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function ProfileTabs() {
   const { theme } = useThemeContext();
+  const { user } = useAuthContext();
   return (
     <TopTabs.Navigator
       screenOptions={{
@@ -30,6 +32,7 @@ export default function ProfileTabs() {
       <TopTabs.Screen
         name="Events"
         component={ProfileEvents}
+        initialParams={{ id: user?.id ?? "0" }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return (

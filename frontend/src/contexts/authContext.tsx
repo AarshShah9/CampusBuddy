@@ -102,7 +102,6 @@ export const AuthContextProvider = ({
       const res = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
       setAxiosTokenHeader(res.authToken as string);
       await setTokenInSecureStore(TOKEN_KEY, res.authToken as string);
-      console.log(res.data);
       setUser(res.data);
     } catch (error) {
       console.log("An error occured while trying to sign in:\n", error);

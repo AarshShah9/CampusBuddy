@@ -151,6 +151,7 @@ const allowedEndpoints = [
   // profile related endpoints
   "/api/profile/saved",
   "/api/profile/user/:id",
+  "/api/profile/events/:id",
 
   // Miscellaneous endpoints
   "/Test",
@@ -177,7 +178,8 @@ export type IdRequiredEndPoints =
   | "/api/events/:id"
   | "/api/events/like/:id"
   | "/api/events/attendees/:id"
-  | "/api/profile/user/:id";
+  | "/api/profile/user/:id"
+  | "/api/profile/events/:id";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
   params: { id: string };
