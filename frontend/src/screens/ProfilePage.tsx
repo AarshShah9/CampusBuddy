@@ -18,8 +18,6 @@ export default function ProfilePage() {
     initialData: undefined,
   });
 
-  console.log(profileData);
-
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <UserProfileHeader
