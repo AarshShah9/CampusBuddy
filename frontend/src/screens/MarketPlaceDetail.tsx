@@ -1,19 +1,32 @@
-import { View, StyleSheet, Text, Image, ScrollView } from "react-native";
+import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
 import LocationChip from "~/components/LocationChip";
+import MapComponentSmall from "~/components/MapComponentSmall";
+import React from "react";
+import { AntDesign } from "@expo/vector-icons";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const Header = () => {
   const { theme } = useThemeContext();
+  const { navigateTo, navigateBack } = useNavigationContext();
   return (
     <View
       style={{
         height: 60,
         width: "100%",
         backgroundColor: theme.colors.primary,
+        justifyContent: "space-between",
+        paddingHorizontal: 20,
+        flexDirection: "row",
+        alignItems: "center",
       }}
-    ></View>
+    >
+       <TouchableOpacity onPress={navigateBack}>
+          <AntDesign name="caretleft" size={24} color="white" />
+        </TouchableOpacity>
+    </View>
   );
 };
 // Image Component of marketplace detail
@@ -87,13 +100,19 @@ const Profile = (item: { name: string }) => {
 const ItemDescription = () => {
   const { theme } = useThemeContext();
   const exampleItemDetail = {
-    title: "PS4",
+    title: "M1 Macbook Air",
     price: 300,
     createdAt: new Date(),
     description:
       "PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH",
     sellerFullName: "Kevin Nguyen",
     condition: "Used-good",
+    location: {
+      latitude: 51,
+      longitude: 114,
+      name: "Calgary",
+      placeId: "Calgary",
+    },
   };
   return (
     <View
@@ -115,10 +134,10 @@ const ItemDescription = () => {
         <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
           {exampleItemDetail.title}
         </Text>
-        <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
+        <Text style={[{ color: theme.colors.text }, styles.PriceText]}>
           ${exampleItemDetail.price}
         </Text>
-        <LocationChip location={"Calgary"} size={"normal"}/>
+        <LocationChip location={exampleItemDetail.location.name} size={"normal"}/>
         <Text style={[{ color: theme.colors.text }, styles.DateText]}>
           Listed {exampleItemDetail.createdAt.toDateString()}
         </Text>
@@ -137,7 +156,7 @@ const ItemDescription = () => {
         </Text>
         <View style={{ flexDirection: "row" }}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 14, marginTop: 2 }}
+            style={{ color: theme.colors.text, fontSize: 14, marginTop: 2, marginLeft:10 }}
           >
             Condition:
           </Text>
@@ -167,10 +186,31 @@ const ItemDescription = () => {
         </Text>
         <Profile name={exampleItemDetail.sellerFullName} />
       </View>
+      <View
+          style={{
+            marginTop:10,
+            marginBottom:15,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
+          }}
+        >
+            <TouchableOpacity onPress={()=>{console.log("pressed")}}>
+              <MapComponentSmall
+                latitude={exampleItemDetail?.location.latitude}
+                longitude={exampleItemDetail?.location.longitude}
+              />
+            </TouchableOpacity>
+        </View>
     </View>
+    
   );
 };
 
+/**
+ * This component is responsible for loading market details based on passed ID.
+ * */
 export default function MarketPlaceDetail() {
   const { theme } = useThemeContext();
   return (
@@ -201,16 +241,24 @@ const styles = StyleSheet.create({
   MainTitleText: {
     fontSize: 23,
     marginBottom: 5,
-    fontFamily: "Roboto-Bold",
+    fontFamily: "Roboto-Medium",
   },
   DescriptorText: {
     fontSize: 16,
     marginBottom: 5,
     fontFamily: "Roboto-Reg",
+    marginLeft:10,
+    marginTop:5
+  },
+  PriceText: {
+    fontSize: 20,
+    fontFamily: "Roboto-Bold",
+    marginBottom:5
   },
   DateText:{
     fontSize:14,
     marginTop:5,
     fontFamily: "Roboto-Reg",
+    marginBottom:5
   }
 });
