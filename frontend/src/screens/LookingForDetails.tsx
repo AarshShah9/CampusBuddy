@@ -20,6 +20,15 @@ import LoadingSkeleton from "~/components/LoadingSkeleton";
 import PersonChip from "~/components/PersonChip";
 import CommentsChip from "~/components/CommentsChip";
 
+const mockData = {
+  title: "I am Looking for Something!",
+  date: "March 29, 2024",
+  location: "University of Calgary",  
+  description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. A porro officiis iure sunt incidunt quidem libero eos doloremque consequatur eaque fuga iste in facere, inventore molestiae architecto vero explicabo corrupti!",
+  numberOfPeopleRequired: 5,
+};
+
+
 /**
  * This component is responsible for loading Looking For Details details based on passed ID.
  * */
@@ -49,7 +58,7 @@ export default function LookingForDetails() {
             style={{
               fontFamily: "Roboto-Medium",
               fontSize: 16,
-              marginBottom: 8,
+              marginBottom: 4,
               // Need to add Text Color Change
             }}
           >
@@ -57,7 +66,8 @@ export default function LookingForDetails() {
           </Text>
           <Text
             style={{
-              fontFamily: "Roboto-Medium",
+              fontFamily: "Nunito",
+              fontSize: 12,
               marginBottom: 8,
             }}
           >
@@ -72,6 +82,8 @@ export default function LookingForDetails() {
           <Text
             style={{
               marginBottom: 8,
+              fontFamily:"Roboto",
+              fontSize:16,
             }}
           >
             This is for the Description
