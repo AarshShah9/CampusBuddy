@@ -4,7 +4,6 @@ import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import { ParticipationStatus } from "@prisma/client";
 import { IdParamSchema } from "../../shared/zodSchemas";
-import { userEventResponses } from "../prisma/data";
 
 export const profileSavedData = async (
   req: RequestExtended,
@@ -64,16 +63,6 @@ export const profileSavedData = async (
           id: "1",
           title: "Saved Events",
           items: events,
-        },
-        {
-          id: "2",
-          title: "Saved Posts",
-          items: [],
-        },
-        {
-          id: "3",
-          title: "Saved Items",
-          items: [],
         },
       ],
     });
@@ -226,6 +215,96 @@ export const getProfileEvents = async (
           items: pastEvents,
         },
       ],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProfilePosts = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = IdParamSchema.parse(req.params).id;
+    const self = req.userId === userId;
+
+    const posts = await prisma.post.findMany({
+      where: {
+        userId: userId,
+        isPublic: self ? true : undefined,
+      },
+    });
+
+    const mappedPosts = posts.map((post) => {
+      return {
+        id: post.id,
+        title: post.title,
+        description: post.description,
+        spotsLeft: post.numberOfSpotsLeft,
+        expiresAt: post.expiresAt,
+      };
+    });
+
+    return res.status(200).json({
+      message: "Profile Posts",
+      data: mappedPosts,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProfileItems = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = IdParamSchema.parse(req.params).id;
+    const self = req.userId === userId;
+
+    const items = await prisma.item.findMany({
+      where: {
+        userId: userId,
+        isPublic: self ? true : undefined,
+      },
+      include: {
+        location: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const images = await prisma.image.findMany({
+      where: {
+        itemId: {
+          in: items.map((item) => item.id),
+        },
+      },
+      select: {
+        url: true,
+        itemId: true,
+      },
+    });
+
+    const profileItems = items.map((item) => {
+      const itemImages = images.filter((image) => image.itemId === item.id);
+      return {
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        location: item.location.name,
+        image: itemImages[0]?.url,
+      };
+    });
+
+    return res.status(200).json({
+      message: "Your items",
+      data: profileItems,
     });
   } catch (error) {
     next(error);

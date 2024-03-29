@@ -6,6 +6,7 @@ import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import ProfilePosts from "~/screens/ProfilePosts";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import useThemeContext from "~/hooks/useThemeContext";
+import ProfileMarket from "~/screens/ProfileMarket";
 
 const TopTabs = createMaterialTopTabNavigator();
 
@@ -50,6 +51,7 @@ export default function ProfilePage() {
         <TopTabs.Screen
           name="Posts"
           component={ProfilePosts}
+          initialParams={{ id }}
           options={{
             tabBarIcon: ({ color, focused }) => {
               return (
@@ -60,7 +62,8 @@ export default function ProfilePage() {
         />
         <TopTabs.Screen
           name="Market"
-          component={ProfilePosts}
+          component={ProfileMarket}
+          initialParams={{ id }}
           options={{
             tabBarIcon: ({ color, focused }) => {
               return (

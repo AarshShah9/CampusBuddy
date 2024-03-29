@@ -35,3 +35,29 @@ export const getUserProfileEvents = async (
     return [];
   }
 };
+
+export const getUserProfilePosts = async (userId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/posts/:id`, {
+        params: { id: userId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+export const getUserProfileItems = async (userId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/items/:id`, {
+        params: { id: userId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};

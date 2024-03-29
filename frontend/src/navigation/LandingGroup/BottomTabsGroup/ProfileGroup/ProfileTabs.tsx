@@ -9,6 +9,7 @@ import ProfileEvents from "~/screens/ProfileEvents";
 import ProfilePosts from "~/screens/ProfilePosts";
 import ProfileSavedItems from "~/screens/ProfileSavedItems";
 import useAuthContext from "~/hooks/useAuthContext";
+import ProfileMarket from "~/screens/ProfileMarket";
 
 const TopTabs = createMaterialTopTabNavigator();
 
@@ -48,6 +49,7 @@ export default function ProfileTabs() {
       <TopTabs.Screen
         name="Posts"
         component={ProfilePosts}
+        initialParams={{ id: user?.id ?? "0" }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return <FontAwesome name={"binoculars"} size={22} color={color} />;
@@ -56,7 +58,8 @@ export default function ProfileTabs() {
       />
       <TopTabs.Screen
         name="Market"
-        component={ProfilePosts}
+        component={ProfileMarket}
+        initialParams={{ id: user?.id ?? "0" }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return (
