@@ -4,6 +4,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { UserDataType } from "~/types/User";
 import { CBRequest } from "~/lib/CBRequest";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const setAxiosTokenHeader = (token: string) =>
   (axios.defaults.headers.common["Authorization"] = `Bearer ${token}`);

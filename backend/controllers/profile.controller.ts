@@ -106,6 +106,29 @@ export const getUserProfileData = async (
       },
     });
 
+    // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+    const attendedEvents = await prisma.userEventResponse.count({
+      where: {
+        userId: userId,
+        participationStatus: ParticipationStatus.Going,
+        event: {
+          endTime: {
+            lte: new Date(),
+          },
+        },
+      },
+    });
+
+    // find the number of organizations the user is a member of
+    const orgs = await prisma.userOrganizationRole.count({
+      where: {
+        userId: userId,
+        role: {
+          roleName: "Member",
+        },
+      },
+    });
+
     if (!user || !user.institutionId) {
       throw new AppError(
         AppErrorName.NOT_FOUND_ERROR,
@@ -124,6 +147,8 @@ export const getUserProfileData = async (
           programs: user.enrollments.map(
             (enrollment) => enrollment.program.programName,
           ),
+          attended: attendedEvents,
+          following: orgs,
         },
       },
     });

@@ -4,18 +4,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { UserProfileHeaderType } from "~/types/Profile";
+import { getUserProfile } from "~/lib/apiFunctions/Profile";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
-type UserProfileHeaderProps = {
-  name: string;
-  attended: number;
-  following: number;
-  imageSource?: { uri: string };
-  programs: string[];
-};
-
-export default function UserProfileHeader(props: UserProfileHeaderProps) {
+export default function UserProfileHeader({ id }: { id: string }) {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
+
+  const { data: profileData } = useQuery<UserProfileHeaderType>({
+    queryKey: ["profile", id],
+    queryFn: () => getUserProfile(id),
+    initialData: undefined,
+  });
 
   return (
     <View
@@ -36,10 +38,10 @@ export default function UserProfileHeader(props: UserProfileHeaderProps) {
               { backgroundColor: theme.colors.profilePicContainer },
             ]}
           >
-            {props.imageSource?.uri ? (
+            {profileData?.user.image ? (
               <Image
                 style={{ width: "100%", height: "100%" }}
-                source={{ uri: props.imageSource.uri }}
+                source={{ uri: generateImageURL(profileData?.user.image) }}
               />
             ) : (
               <View style={styles.iconContainer}>
@@ -48,19 +50,21 @@ export default function UserProfileHeader(props: UserProfileHeaderProps) {
             )}
           </View>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>{props?.attended ?? "0"}</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.user.attended ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
             <Text style={styles.profileInfoItem}>
-              {props?.following ?? "0"}
+              {profileData?.user.following ?? "0"}
             </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
         </View>
         <View style={styles.lowerSection}>
-          <Text style={{ fontWeight: "bold" }}>{props.name}</Text>
-          <Text>{props.programs?.[0]}</Text>
+          <Text style={{ fontWeight: "bold" }}>{profileData?.user.name}</Text>
+          <Text>{profileData?.user.programs?.[0]}</Text>
         </View>
       </View>
     </View>

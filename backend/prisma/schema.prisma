@@ -378,20 +378,13 @@ model Image {
   @@map("image")
 }
 
-// enum Condition {
-//   New
-//   Used_Like_New
-//   Used_Good
-//   Used_Fair
-// }
-
 model PushToken {
   userId    String @map("user_id")
   pushToken String @map("push_token")
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, pushToken])
-  @@unique([userId, pushToken]) 
+  @@unique([userId, pushToken])
   @@index([userId])
   @@map("push_token")
 }

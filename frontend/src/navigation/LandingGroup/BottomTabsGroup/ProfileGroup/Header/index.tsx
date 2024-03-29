@@ -28,7 +28,7 @@ export default function Header() {
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 35,
+          paddingTop: insets.top + 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
