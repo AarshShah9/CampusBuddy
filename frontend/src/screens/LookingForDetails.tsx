@@ -3,12 +3,6 @@ import { Button } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
@@ -19,15 +13,7 @@ import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 import PersonChip from "~/components/PersonChip";
 import CommentsChip from "~/components/CommentsChip";
-
-const mockData = {
-  title: "I am Looking for Something!",
-  date: "March 29, 2024",
-  location: "University of Calgary",  
-  description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. A porro officiis iure sunt incidunt quidem libero eos doloremque consequatur eaque fuga iste in facere, inventore molestiae architecto vero explicabo corrupti!",
-  numberOfPeopleRequired: 5,
-};
-
+import { services } from "~/mockData/ServicesData";
 
 /**
  * This component is responsible for loading Looking For Details details based on passed ID.
@@ -35,6 +21,7 @@ const mockData = {
 
 export default function LookingForDetails() {
   const { theme, inDarkMode } = useThemeContext();
+
   return (
     <View
       style={[
@@ -50,6 +37,11 @@ export default function LookingForDetails() {
         ]}
       >
         <Entypo name="chevron-left" size={28} color="white" />
+        <Entypo
+            name="heart"
+            size={28}
+            color="white" // TODO use theme context
+          />
       </View>
       <View style={[{ backgroundColor: theme.colors.onPrimary }]}>
         {/* Here will go the View for the title  */}
@@ -62,7 +54,7 @@ export default function LookingForDetails() {
               // Need to add Text Color Change
             }}
           >
-            This is the Sample Title
+            Title Text
           </Text>
           <Text
             style={{
