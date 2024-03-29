@@ -201,6 +201,34 @@ export const getProfileEvents = async (
       (event) => new Date(event.endTime) <= new Date(),
     );
 
+    // get the events that the user has created
+    const createdEvents = await prisma.event.findMany({
+      where: {
+        userId: userId,
+        isPublic: self ? true : undefined,
+      },
+      include: {
+        location: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const mappedCreatedEvents = createdEvents.map((event) => {
+      return {
+        id: event.id,
+        title: event.title,
+        time: event.startTime,
+        endTime: event.endTime,
+        location: event.location.name,
+        host: event.organizationId,
+        image: event.image,
+        event: true,
+      };
+    });
+
     return res.status(200).json({
       message: "Profile Events",
       data: [
@@ -213,6 +241,11 @@ export const getProfileEvents = async (
           id: "2",
           title: "Past Events",
           items: pastEvents,
+        },
+        {
+          id: "3",
+          title: "Created Events",
+          items: mappedCreatedEvents,
         },
       ],
     });
