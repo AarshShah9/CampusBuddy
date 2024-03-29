@@ -55,9 +55,8 @@ export default function Marketplace() {
   }, [queryIsLoading]);
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard} style={{ flex: 1 }}>
       <FlashList
-        style={{ flex: 1 }}
         data={marketplaceItems}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={20}

@@ -63,9 +63,8 @@ export default function Services() {
   }, [queryIsLoading]);
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard} style={{ flex: 1 }}>
       <FlashList
-        style={{ flex: 1 }}
         data={posts}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={20}

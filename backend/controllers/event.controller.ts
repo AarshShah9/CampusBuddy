@@ -884,6 +884,7 @@ export const getMainPageEvents = async (
             },
           },
           {
+            status: EventStatus.Verified,
             endTime: {
               gt: new Date(),
             },

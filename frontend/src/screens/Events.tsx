@@ -53,9 +53,8 @@ export default function Events() {
   }, [queryIsLoading]);
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard} style={{ flex: 1 }}>
       <FlashList
-        style={{ flex: 1 }}
         data={searchPageEvents}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={20}

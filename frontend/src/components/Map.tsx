@@ -34,7 +34,6 @@ const Map = ({
       navigateTo({
         page: "EventDetails",
         id: id,
-        map: false,
       });
     },
     [events],

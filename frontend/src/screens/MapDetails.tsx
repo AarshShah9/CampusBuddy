@@ -1,10 +1,11 @@
-import { TouchableOpacity, View } from "react-native";
+import { Linking, Platform, TouchableOpacity, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import styled from "styled-components";
 import useThemeContext from "~/hooks/useThemeContext";
 import Map from "~/components/Map";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { useCallback } from "react";
 
 export default function MapDetails() {
   let {
@@ -14,11 +15,30 @@ export default function MapDetails() {
 
   const { navigateBack } = useNavigationContext();
 
+  const openDirections = useCallback(() => {
+    const latitude = eventData[0].latitude;
+    const longitude = eventData[0].longitude;
+    const scheme = Platform.select({
+      ios: "maps:0,0?q=",
+      android: "geo:0,0?q=",
+    });
+    const label = "Location";
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latitude},${longitude}`,
+      android: `${scheme}${latitude},${longitude}(${label})`,
+    });
+
+    Linking.openURL(url!);
+  }, [eventData]);
+
   return (
     <MainContainer color={theme.colors.primary}>
       <HeaderContainer>
         <TouchableOpacity onPress={navigateBack}>
           <AntDesign name="caretleft" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={openDirections}>
+          <AntDesign name="enviromento" size={24} color="white" />
         </TouchableOpacity>
       </HeaderContainer>
       <Map
