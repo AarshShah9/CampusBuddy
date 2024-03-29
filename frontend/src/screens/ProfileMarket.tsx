@@ -16,15 +16,20 @@ import { getMarketPlaceItems } from "~/lib/apiFunctions/Events";
 import { FlashList } from "@shopify/flash-list";
 import MarketplaceItem from "~/components/MarketplaceItem";
 import { generateImageURL } from "~/lib/CDNFunctions";
-import { useRoute } from "@react-navigation/native";
+import { useNavigationState, useRoute } from "@react-navigation/native";
 import { getUserProfileItems } from "~/lib/apiFunctions/Profile";
 
 export default function ProfileMarket() {
   const { dismissKeyboard } = useAppContext();
-
   const {
     params: { id },
   } = useRoute<any>();
+
+  // TODO figure out a better way to determine if it's your items
+  const isYour = useNavigationState((state) => {
+    const route = state.routes[state.index];
+    return route.name;
+  }).includes("Your");
 
   const {
     data: marketplaceItems,
@@ -89,22 +94,29 @@ export default function ProfileMarket() {
           <ThemedText
             style={{ paddingLeft: 20, fontFamily: "Nunito-Bold", fontSize: 24 }}
           >
-            Your Listings
+            {isYour ? "Your Listings" : "Listings"}
           </ThemedText>
         )}
-        ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ThemedText style={{ textAlign: "center", marginTop: 150 }}>
-              Create a listing to sell items!
-            </ThemedText>
-          </View>
-        )}
+        ListEmptyComponent={() => {
+          return (
+            <>
+              {!isLoading && !isFetching && (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ThemedText style={{ textAlign: "center", marginTop: 150 }}>
+                    {isYour && "Create a listing to sell items!"}
+                    {!isYour && "This user has no listings."}
+                  </ThemedText>
+                </View>
+              )}
+            </>
+          );
+        }}
       />
     </TouchableWithoutFeedback>
   );

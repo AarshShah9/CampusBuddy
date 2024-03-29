@@ -24,13 +24,18 @@ export default function UserProfileHeader({ id }: { id: string }) {
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 35,
+          paddingTop: insets.top + 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
       ]}
     >
-      <View style={styles.headerCard}>
+      <View
+        style={{
+          width: "100%",
+          height: profileData?.user.programs?.[0] ? 140 : 120,
+        }}
+      >
         <View style={styles.upperSection}>
           <View
             style={[
@@ -77,10 +82,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 0,
     borderBottomWidth: 2,
-  },
-  headerCard: {
-    width: "100%",
-    height: 150,
   },
   upperSection: {
     flexDirection: "row",

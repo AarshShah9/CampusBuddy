@@ -1,6 +1,6 @@
 import { Pressable, RefreshControl, StyleSheet, View } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
-import { useRoute } from "@react-navigation/native";
+import { useNavigationState, useRoute } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { EventData, MarketPlaceCardProps } from "~/types/Events";
 import {
@@ -21,6 +21,12 @@ export default function ProfilePosts() {
   const {
     params: { id },
   } = useRoute<any>();
+
+  // TODO figure out a better way to determine if it's your posts
+  const isYour = useNavigationState((state) => {
+    const route = state.routes[state.index];
+    return route.name;
+  }).includes("Your");
 
   const {
     data: userProfilePosts,
@@ -54,8 +60,6 @@ export default function ProfilePosts() {
     if (!queryIsLoading) stopRefresh();
   }, [queryIsLoading]);
 
-  console.log(userProfilePosts);
-
   return (
     <View style={{ flex: 1 }}>
       <FlashList
@@ -88,22 +92,30 @@ export default function ProfilePosts() {
               fontSize: 24,
             }}
           >
-            Your Posts
+            {isYour ? "Your Posts" : "Posts"}
           </ThemedText>
         )}
-        ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ThemedText style={{ textAlign: "center", marginTop: 150 }}>
-              Create a post to see it here!
-            </ThemedText>
-          </View>
-        )}
+        ListEmptyComponent={() => {
+          return (
+            <>
+              {!isLoading && !isFetching && (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ThemedText style={{ textAlign: "center", marginTop: 150 }}>
+                    {isYour
+                      ? "You haven't made any posts yet!"
+                      : "No posts found."}
+                  </ThemedText>
+                </View>
+              )}
+            </>
+          );
+        }}
       />
     </View>
   );

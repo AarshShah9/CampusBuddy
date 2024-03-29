@@ -37,7 +37,7 @@ export default function Header() {
       <View
         style={{
           width: "100%",
-          height: profileData?.user.programs?.[0] ? 150 : 120,
+          height: profileData?.user.programs?.[0] ? 140 : 120,
         }}
       >
         <View style={styles.upperSection}>

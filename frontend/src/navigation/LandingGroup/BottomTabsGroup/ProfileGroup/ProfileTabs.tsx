@@ -31,7 +31,7 @@ export default function ProfileTabs() {
       }}
     >
       <TopTabs.Screen
-        name="Events"
+        name="YourEvents"
         component={ProfileEvents}
         initialParams={{ id: user?.id ?? "0" }}
         options={{
@@ -47,7 +47,7 @@ export default function ProfileTabs() {
         }}
       />
       <TopTabs.Screen
-        name="Posts"
+        name="YourPosts"
         component={ProfilePosts}
         initialParams={{ id: user?.id ?? "0" }}
         options={{
@@ -57,7 +57,7 @@ export default function ProfileTabs() {
         }}
       />
       <TopTabs.Screen
-        name="Market"
+        name="YourMarket"
         component={ProfileMarket}
         initialParams={{ id: user?.id ?? "0" }}
         options={{
