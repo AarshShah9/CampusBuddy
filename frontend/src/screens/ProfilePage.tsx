@@ -1,30 +1,82 @@
 import UserProfileHeader from "~/components/UserProfileHeader";
 import { View } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
-import { getUserProfile } from "~/lib/apiFunctions/Profile";
-import { generateImageURL } from "~/lib/CDNFunctions";
+import ProfileEvents from "~/screens/ProfileEvents";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import ProfilePosts from "~/screens/ProfilePosts";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import useThemeContext from "~/hooks/useThemeContext";
+import ProfileMarket from "~/screens/ProfileMarket";
+
+const TopTabs = createMaterialTopTabNavigator();
 
 export default function ProfilePage() {
   const {
     params: { id },
   } = useRoute<any>();
-
-  const { data: profileData } = useQuery({
-    queryKey: ["profile", id],
-    queryFn: () => getUserProfile(id),
-    initialData: undefined,
-  });
+  const { theme } = useThemeContext();
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <UserProfileHeader
-        name={profileData?.user.name}
-        attended={0}
-        following={0}
-        imageSource={{ uri: generateImageURL(profileData?.user.image)! }}
-        programs={profileData?.user.programs}
-      />
+      <UserProfileHeader id={id} />
+      <TopTabs.Navigator
+        screenOptions={{
+          lazy: true,
+          tabBarStyle: {
+            backgroundColor: theme.colors.profileTabs,
+            shadowColor: "grey",
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.4,
+            shadowRadius: 3,
+          },
+          tabBarShowLabel: false,
+        }}
+      >
+        <TopTabs.Screen
+          name="UserEvents"
+          component={ProfileEvents}
+          initialParams={{ id }}
+          options={{
+            tabBarIcon: ({ color, focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name={focused ? "calendar-blank" : "calendar-blank-outline"}
+                  size={22}
+                  color={color}
+                />
+              );
+            },
+          }}
+        />
+        <TopTabs.Screen
+          name="UserPosts"
+          component={ProfilePosts}
+          initialParams={{ id }}
+          options={{
+            tabBarIcon: ({ color, focused }) => {
+              return (
+                <FontAwesome name={"binoculars"} size={22} color={color} />
+              );
+            },
+          }}
+        />
+        <TopTabs.Screen
+          name="UserMarket"
+          component={ProfileMarket}
+          initialParams={{ id }}
+          options={{
+            tabBarIcon: ({ color, focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name={focused ? "shopping" : "shopping-outline"}
+                  size={24}
+                  color={color}
+                />
+              );
+            },
+          }}
+        />
+      </TopTabs.Navigator>
     </View>
   );
 }

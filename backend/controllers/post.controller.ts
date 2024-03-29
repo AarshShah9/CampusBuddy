@@ -48,7 +48,7 @@ export const getAllPosts = async (
         institutionId: user.institutionId!,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
     });
 

@@ -18,14 +18,7 @@ import EventMainCard from "~/components/EventMainCard";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useRefreshControl from "~/hooks/useRefreshControl";
-
-type post = {
-  id: string;
-  title: string;
-  description: string;
-  spotsLeft?: number;
-  expiresAt: string;
-};
+import { PostType } from "~/types/LookingFor";
 
 export default function Services() {
   const { dismissKeyboard } = useAppContext();
@@ -36,7 +29,7 @@ export default function Services() {
     refetch,
     isFetchedAfterMount,
     isFetching,
-  } = useQuery<post[]>({
+  } = useQuery<PostType[]>({
     queryKey: ["search-page-posts"],
     queryFn: getAllPosts,
     initialData: [],

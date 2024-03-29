@@ -865,6 +865,17 @@ export const generateJWT = async (req: Request, res: Response) => {
     where: {
       id: users[0].id,
     },
+    include: {
+      enrollments: {
+        include: {
+          program: {
+            select: {
+              programName: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -873,6 +884,29 @@ export const generateJWT = async (req: Request, res: Response) => {
       message: "User doesn't exist",
     });
   }
+
+  // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+  const attendedEvents = await prisma.userEventResponse.count({
+    where: {
+      userId: user.id,
+      participationStatus: ParticipationStatus.Going,
+      event: {
+        endTime: {
+          lte: new Date(),
+        },
+      },
+    },
+  });
+
+  // find the number of organizations the user is a member of
+  const orgs = await prisma.userOrganizationRole.count({
+    where: {
+      userId: user.id,
+      role: {
+        roleName: "Member",
+      },
+    },
+  });
 
   const authToken = jwt.sign(user as JwtPayload, jwtSecret);
 
@@ -883,6 +917,11 @@ export const generateJWT = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       image: user.profilePic,
+      programs: user.enrollments.map(
+        (enrollment) => enrollment.program.programName,
+      ),
+      attended: attendedEvents,
+      following: orgs,
     },
   });
 };
