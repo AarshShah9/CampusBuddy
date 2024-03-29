@@ -2,6 +2,7 @@ import { View, StyleSheet, Text, Image, ScrollView } from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
+import LocationChip from "~/components/LocationChip";
 
 const Header = () => {
   const { theme } = useThemeContext();
@@ -88,6 +89,7 @@ const ItemDescription = () => {
   const exampleItemDetail = {
     title: "PS4",
     price: 300,
+    createdAt: new Date(),
     description:
       "PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH",
     sellerFullName: "Kevin Nguyen",
@@ -104,7 +106,6 @@ const ItemDescription = () => {
     >
       <View
         style={{
-          height: 70,
           flexDirection: "column",
           borderBottomColor: theme.colors.text,
           borderBottomWidth: 1,
@@ -117,6 +118,10 @@ const ItemDescription = () => {
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
           ${exampleItemDetail.price}
         </Text>
+        <LocationChip location={"Calgary"} size={"normal"}/>
+        <Text style={[{ color: theme.colors.text }, styles.DateText]}>
+          Listed {exampleItemDetail.createdAt.toDateString()}
+        </Text>
       </View>
       <View
         style={{
@@ -127,38 +132,8 @@ const ItemDescription = () => {
           borderBottomWidth: 1,
         }}
       >
-        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
-          Description
-        </Text>
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
           {exampleItemDetail.description}
-        </Text>
-      </View>
-      <View
-        style={{
-          height: 100,
-          marginTop: 4,
-          flexDirection: "column",
-          borderBottomColor: theme.colors.text,
-          borderBottomWidth: 1,
-        }}
-      >
-        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
-          Seller Information
-        </Text>
-        <Profile name={exampleItemDetail.sellerFullName} />
-      </View>
-      <View
-        style={{
-          height: 75,
-          marginTop: 4,
-          flexDirection: "column",
-          borderBottomColor: theme.colors.text,
-          borderBottomWidth: 1,
-        }}
-      >
-        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
-          Details
         </Text>
         <View style={{ flexDirection: "row" }}>
           <Text
@@ -177,6 +152,20 @@ const ItemDescription = () => {
             {exampleItemDetail.condition}
           </Text>
         </View>
+      </View>
+      <View
+        style={{
+          height: 100,
+          marginTop: 4,
+          flexDirection: "column",
+          borderBottomColor: theme.colors.text,
+          borderBottomWidth: 1,
+        }}
+      >
+        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
+          Seller Information
+        </Text>
+        <Profile name={exampleItemDetail.sellerFullName} />
       </View>
     </View>
   );
@@ -210,7 +199,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   MainTitleText: {
-    fontSize: 20,
+    fontSize: 23,
     marginBottom: 5,
     fontFamily: "Roboto-Bold",
   },
@@ -219,4 +208,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontFamily: "Roboto-Reg",
   },
+  DateText:{
+    fontSize:14,
+    marginTop:5,
+    fontFamily: "Roboto-Reg",
+  }
 });
