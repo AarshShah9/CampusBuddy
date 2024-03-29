@@ -23,8 +23,5 @@ export const moderateText = async (
     descriptionFlagged = responseDescription.results[0].flagged;
   }
 
-  if (titleFlagged || descriptionFlagged) {
-    return true;
-  }
-  return false;
+  return titleFlagged || descriptionFlagged;
 };

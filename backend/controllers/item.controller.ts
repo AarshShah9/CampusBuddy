@@ -123,7 +123,7 @@ export const createItem = async (
           institutionId: user.institutionId,
           title: validatedItemData.title,
           description: validatedItemData.description,
-          public: !isFlagged,
+          isPublic: !isFlagged,
           flagged: isFlagged,
           price: validatedItemData.price,
           condition: validatedItemData.condition,
