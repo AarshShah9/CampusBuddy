@@ -892,11 +892,12 @@ export const getMainPageEvents = async (
             eventResponses: {
               some: {
                 userId,
-                participationStatus: "Interested",
+                participationStatus: "Going",
               },
             },
           },
           {
+            status: EventStatus.Verified,
             endTime: {
               gt: new Date(),
             },

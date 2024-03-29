@@ -11,7 +11,6 @@ import useProfileContext from "~/hooks/useProfileContext";
 export type profileData = {
   attended: number;
   user: any; // TODO type this
-  savedEvents: any; // TODO type this
 };
 
 type profileContext = {

@@ -8,6 +8,7 @@ import {
   TextStyle,
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
+import { locationChipMaxChars } from "~/lib/constants";
 
 type Props = {
   location: string;
@@ -16,6 +17,16 @@ type Props = {
 
 export default function LocationChip({ location, size = "normal" }: Props) {
   const { theme } = useThemeContext();
+
+  // Function to shorten the location text if conditions are met
+  const getShortenedLocation = (location: string, size: string): string => {
+    if (size === "small" && location.length > locationChipMaxChars) {
+      return `${location.substring(0, locationChipMaxChars - 3)}...`;
+    }
+    return location;
+  };
+
+  const displayLocation = getShortenedLocation(location, size);
 
   const containerStyles: StyleProp<ViewStyle> =
     size === "small"
@@ -47,7 +58,7 @@ export default function LocationChip({ location, size = "normal" }: Props) {
     >
       <View style={styles.innerContainer}>
         <EvilIcons name="location" size={iconSize} color={theme.colors.text} />
-        <Text style={[styles.text, textStyles]}>{location}</Text>
+        <Text style={[styles.text, textStyles]}>{displayLocation}</Text>
       </View>
     </View>
   );

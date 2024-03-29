@@ -20,10 +20,37 @@ export const itemTest = async (req: Request, res: Response) => {
 // Get all Items
 export const getAllItems = async (req: RequestExtended, res: Response) => {
   try {
-    const allItems = await prisma.item.findMany();
+    const allItems = await prisma.item.findMany({
+      include: {
+        location: true,
+      },
+    });
+    const images = await prisma.image.findMany({
+      where: {
+        itemId: {
+          in: allItems.map((item) => item.id),
+        },
+      },
+      select: {
+        url: true,
+        itemId: true,
+      },
+    });
+
+    const items = allItems.map((item) => {
+      const itemImages = images.filter((image) => image.itemId === item.id);
+      return {
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        location: item.location.name,
+        image: itemImages[0]?.url,
+      };
+    });
+
     res.status(200).json({
       message: "All items",
-      data: allItems,
+      data: items,
     });
   } catch (error) {
     console.error("Error fetching items:", error);
