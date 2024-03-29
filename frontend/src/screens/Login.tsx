@@ -52,14 +52,10 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = useCallback(
-    (data: loginForm) => {
-      console.log(data);
-      signIn(data.email, data.password);
-      replaceStackWith('LandingGroup')
-    },
-    [],
-  );
+  const onSubmit = useCallback((data: loginForm) => {
+    signIn(data.email, data.password);
+    replaceStackWith("LandingGroup");
+  }, []);
 
   useEffect(() => {
     let keyboardShowListener: EmitterSubscription;

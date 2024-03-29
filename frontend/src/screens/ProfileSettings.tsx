@@ -65,7 +65,7 @@ export default function ProfileSettings() {
       backgroundStyle={{
         borderRadius: 20,
         backgroundColor: theme.colors.tertiary,
-      }} // play around with the number to find a suitable one
+      }}
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (

@@ -239,7 +239,7 @@ export const events = [
     startTime: "2024-12-01T09:00:00Z",
     endTime: "2024-12-01T18:00:00Z",
     isPublic: true,
-    status: EventStatus.NonVerified,
+    status: EventStatus.Verified,
     image: "https://d2epenzoyf672m.cloudfront.net/pfp/lawBook.png",
     // Other event details
   },
@@ -253,7 +253,7 @@ export const events = [
     startTime: "2024-12-15T10:00:00Z",
     endTime: "2024-12-15T16:00:00Z",
     isPublic: true,
-    status: EventStatus.NonVerified,
+    status: EventStatus.Verified,
     image: "https://d2epenzoyf672m.cloudfront.net/pfp/spikeball.jpg",
   },
   {
