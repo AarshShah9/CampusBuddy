@@ -28,7 +28,7 @@ export type userRegistrationData = {
   firstName: string;
   lastName: string;
   password: string;
-  rePassword?: string;
+  confirmPassword?: string;
 };
 export type institution = {
   id: string;
@@ -42,7 +42,7 @@ export type organizationInformation = {
   institutionId: string;
   description: string;
   password: string;
-  rePassword?: string;
+  confirmPassword?: string;
 };
 
 type authContext = {

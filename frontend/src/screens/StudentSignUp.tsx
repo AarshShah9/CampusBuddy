@@ -24,36 +24,7 @@ import { institution } from "~/contexts/authContext";
 import { userRegistrationData } from "~/contexts/authContext";
 import ErrorText from "~/components/ErrorText";
 import useLoadingContext from "~/hooks/useLoadingContext";
-import { validDomains } from "~/lib/constants";
-
-const schema = zod
-  .object({
-    email: zod
-      .string()
-      .email({ message: "Invalid email format" })
-      .refine(
-        (email) => {
-          const domain = email.substring(email.lastIndexOf("@"));
-          return validDomains.includes(domain);
-        },
-        { message: "Email domain is not from a valid domain" },
-      ),
-    institutionId: zod.string(),
-    firstName: zod.string(),
-    lastName: zod.string(),
-    password: zod
-      .string()
-      .min(8, { message: "Password must be at least 8 characters long" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-    rePassword: zod.string(),
-  })
-  .refine((data) => data.password === data.rePassword, {
-    message: "Passwords do not match",
-    path: ["rePassword"],
-  });
+import { StudentRegistrationSchema } from "~/types/schemas";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
@@ -68,7 +39,7 @@ export default function StudentSignUp() {
     handleSubmit,
     formState: { errors },
   } = useForm<userRegistrationData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(StudentRegistrationSchema),
   });
 
   const onSubmit = useCallback(
@@ -134,8 +105,8 @@ export default function StudentSignUp() {
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
                       label={
-                        errors.email ? (
-                          <ErrorText error={"University Email is required."} />
+                        errors.email && errors.email.message ? (
+                          <ErrorText error={errors.email.message} />
                         ) : (
                           "University Email"
                         )
@@ -151,8 +122,8 @@ export default function StudentSignUp() {
                   )}
                   name="email"
                 />
-                {errors.institutionId && (
-                  <ErrorText error={"School is required."} />
+                {errors.institutionId && errors.institutionId.message && (
+                  <ErrorText error={errors.institutionId.message} />
                 )}
                 <Controller
                   control={control}
@@ -194,8 +165,8 @@ export default function StudentSignUp() {
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
                       label={
-                        errors.firstName ? (
-                          <ErrorText error={"First name is required."} />
+                        errors.firstName && errors.firstName.message ? (
+                          <ErrorText error={errors.firstName.message} />
                         ) : (
                           "First Name"
                         )
@@ -218,8 +189,8 @@ export default function StudentSignUp() {
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
                       label={
-                        errors.lastName ? (
-                          <ErrorText error={"Last name is required."} />
+                        errors.lastName && errors.lastName.message ? (
+                          <ErrorText error={errors.lastName.message} />
                         ) : (
                           "Last Name"
                         )
@@ -268,10 +239,11 @@ export default function StudentSignUp() {
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
                       label={
-                        errors.rePassword ? (
-                          <ErrorText error={"Password Doesn't Match."} />
+                        errors.confirmPassword &&
+                        errors.confirmPassword.message ? (
+                          <ErrorText error={errors.confirmPassword.message} />
                         ) : (
-                          "Re-enter Password"
+                          "Confirm Password"
                         )
                       }
                       onBlur={onBlur}
@@ -284,7 +256,7 @@ export default function StudentSignUp() {
                       style={{ backgroundColor: theme.colors.tertiary }}
                     />
                   )}
-                  name="rePassword"
+                  name="confirmPassword"
                 />
 
                 <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
