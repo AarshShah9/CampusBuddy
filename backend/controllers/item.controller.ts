@@ -124,7 +124,7 @@ export const createItem = async (
           title: validatedItemData.title,
           description: validatedItemData.description,
           isPublic: !isFlagged,
-          flagged: isFlagged,
+          isFlagged: isFlagged,
           price: validatedItemData.price,
           condition: validatedItemData.condition,
           locationPlaceId: validatedItemData.locationPlaceId,

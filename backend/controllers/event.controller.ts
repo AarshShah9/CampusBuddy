@@ -117,7 +117,7 @@ export const createVerifiedEvent = async (
           userId: loggedInUserId!,
           status: EventStatus.Verified,
           isPublic: !isFlagged,
-          flagged: isFlagged,
+          isFlagged: isFlagged,
         },
       });
 
@@ -213,7 +213,7 @@ export const createEvent = async (
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
           isPublic: !isFlagged,
-          flagged: isFlagged,
+          isFlagged: isFlagged,
         },
       });
 

@@ -116,7 +116,7 @@ export const createLookingForPost = async (
           title: validatedPostData.title,
           description: validatedPostData.description,
           isPublic: !isFlagged,
-          flagged: isFlagged,
+          isFlagged: isFlagged,
           expiresAt: validatedPostData.expiresAt,
           type: PostType.LookingFor,
           numberOfSpots: validatedPostData.numberOfSpots,
