@@ -1,4 +1,3 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserProfileHeader from "~/components/UserProfileHeader";
 import { View } from "react-native";
 import { useRoute } from "@react-navigation/native";
