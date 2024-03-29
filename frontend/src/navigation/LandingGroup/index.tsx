@@ -35,6 +35,10 @@ export default function LandingGroup() {
                 color: theme.colors.onSecondary,
               },
               headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
             }}
           />
           <Stack.Screen

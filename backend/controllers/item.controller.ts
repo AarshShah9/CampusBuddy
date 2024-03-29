@@ -20,9 +20,35 @@ export const itemTest = async (req: Request, res: Response) => {
 // Get all Items
 export const getAllItems = async (req: RequestExtended, res: Response) => {
   try {
+    const userId = req.userId;
+
+    const institution = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        institutionId: true,
+      },
+    });
+
+    if (!institution || !institution.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${userId} not found or does not have an institution associated with it.`,
+        404,
+        true,
+      );
+    }
+
     const allItems = await prisma.item.findMany({
       include: {
         location: true,
+      },
+      where: {
+        institutionId: institution?.institutionId,
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     });
     const images = await prisma.image.findMany({

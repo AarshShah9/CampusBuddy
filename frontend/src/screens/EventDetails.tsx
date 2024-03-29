@@ -1,15 +1,8 @@
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useIsFocused, useRoute } from "@react-navigation/native";
-import { useCallback, useEffect } from "react";
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
+import { useCallback, useLayoutEffect } from "react";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -29,7 +22,7 @@ import {
   getEventDetails,
   likeEvent,
 } from "~/lib/apiFunctions/Events";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 const IMG_HEIGHT = 300;
 
@@ -37,21 +30,23 @@ const IMG_HEIGHT = 300;
  * This component is responsible for loading event details based on passed ID.
  * */
 
-export default function EventDetails() {
+export default function EventDetails({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
   const {
     params: { id, map = true },
   } = useRoute<any>();
-  const { theme, inDarkMode } = useThemeContext();
-  const { navigateTo, navigateBack } = useNavigationContext();
+  const { theme } = useThemeContext();
+  const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  const insets = useSafeAreaInsets();
 
   const { data: eventData, refetch } = useQuery({
     queryKey: ["event-details", id],
     queryFn: () => getEventDetails(id),
   });
-
   const likeMutation = useMutation({
     mutationFn: async ({
       id,
@@ -93,6 +88,7 @@ export default function EventDetails() {
       });
     }
   }, [eventData]); // TODO fix optimistic updates
+
   const isOptimistic =
     likeMutation.variables &&
     (likeMutation.isPending ? !likeMutation.variables.previousState : false);
@@ -140,17 +136,9 @@ export default function EventDetails() {
     navigateTo({ page: "Attendees", id });
   }, [id]);
 
-  return (
-    <View
-      style={[
-        styles.mainContainer,
-        { backgroundColor: theme.colors.primary, paddingTop: insets.top },
-      ]}
-    >
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={navigateBack}>
-          <AntDesign name="caretleft" size={24} color="white" />
-        </TouchableOpacity>
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
         <TouchableOpacity onPress={userLiked}>
           <Entypo
             name="heart"
@@ -159,7 +147,12 @@ export default function EventDetails() {
             style={{ opacity: isOptimistic ? 0.5 : 1 }}
           />
         </TouchableOpacity>
-      </View>
+      ),
+    });
+  }, [navigation, isLiked, isOptimistic, userLiked]);
+
+  return (
+    <View style={[styles.mainContainer]}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         ref={scrollRef}

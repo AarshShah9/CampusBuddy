@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,9 +14,11 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import ItemTag from "~/components/ItemTags";
-import useEventsContext from "~/hooks/useEventsContext";
+import { ProgressBar } from "react-native-paper";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import { createPost } from "~/lib/apiFunctions/Events";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 // React Hook Section
 const schema = zod.object({
@@ -37,6 +40,7 @@ type lookingForDetail = {
 export default function CreateLookingFor() {
   const { theme } = useThemeContext();
   const { navigateTo } = useNavigationContext();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
@@ -56,27 +60,38 @@ export default function CreateLookingFor() {
 
   // Handles submission of user data
   const onSubmit = (data: lookingForDetail) => {
-    console.log(data);
-    createPost({
+    setIsSubmitting(true);
+    createMutation.mutate({
       title: data.title,
       description: data.description,
       numberOfSpots: parseInt(data.numberOfSpots),
       expiresAt: data.expiryDate,
-    })
-      .then((r) => {
-        alert("Event Created");
-        reset();
-        navigateTo({ page: "Home" });
-      })
-      .catch((e) => {
-        console.log(e);
-        alert("Error creating event");
-      });
+    });
   };
+
+  const createMutation = useMutation({
+    mutationFn: createPost,
+    onSuccess: () => {
+      reset();
+      setIsSubmitting(false);
+      Alert.alert("Success", "Post created successfully");
+    },
+    onError: (error) => {
+      console.log(error);
+      setIsSubmitting(false);
+      alert("Error creating event");
+    },
+  });
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ backgroundColor: theme.colors.tertiary, flexGrow: 1 }}>
+        {createMutation.isPending && (
+          <ProgressBar
+            indeterminate={true}
+            visible={createMutation.isPending}
+          />
+        )}
         <Controller
           control={control}
           rules={{
@@ -100,6 +115,7 @@ export default function CreateLookingFor() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                editable={!isSubmitting}
               />
             </View>
           )}
@@ -150,6 +166,7 @@ export default function CreateLookingFor() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                editable={!isSubmitting}
               />
             </View>
           )}
@@ -184,6 +201,7 @@ export default function CreateLookingFor() {
                 // TODO restrict to whole numbers
                 placeholder="0"
                 value={value}
+                editable={!isSubmitting}
               />
             </View>
           )}
@@ -236,6 +254,7 @@ export default function CreateLookingFor() {
               backgroundColor: theme.colors.primary,
             }}
             onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
           >
             <Text
               style={{
