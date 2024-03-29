@@ -38,10 +38,10 @@ export default function LookingForDetails() {
       >
         <Entypo name="chevron-left" size={28} color="white" />
         <Entypo
-            name="heart"
-            size={28}
-            color="white" // TODO use theme context
-          />
+          name="heart"
+          size={28}
+          color="white" // TODO use theme context
+        />
       </View>
       <View style={[{ backgroundColor: theme.colors.onPrimary }]}>
         {/* Here will go the View for the title  */}
@@ -71,22 +71,28 @@ export default function LookingForDetails() {
         {/* looking for description  Section */}
         <View style={styles.contentContainer}>
           <View style={styles.textContainer}>
-          <Text
-            style={{
-              marginBottom: 8,
-              fontFamily:"Roboto",
-              fontSize:16,
-            }}
-          >
-            This is for the Description
-          </Text>
+            <Text
+              style={{
+                marginBottom: 8,
+                fontFamily: "Roboto",
+                fontSize: 16,
+              }}
+            >
+              This is for the Description
+            </Text>
           </View>
 
           {/* Attending and comments Chip */}
           <View style={styles.chipContainer}>
             <PersonChip numberOfUsers={5} />
-            <CommentsChip />
+            <TouchableOpacity>
+              <CommentsChip />
+            </TouchableOpacity>
           </View>
+          {/* Join Button */}
+          <Button style={styles.joinButton} mode="contained">
+            Join
+          </Button>
         </View>
       </View>
     </View>
@@ -110,15 +116,14 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
-    borderBottomColor: "black", 
+    borderBottomColor: "black",
   },
   contentContainer: {
     marginLeft: 16,
     marginRight: 16,
   },
-  textContainer :{
-    paddingLeft: 16,
-    paddingRight: 16,
+  textContainer: {
+    paddingHorizontal: 16,
   },
   chipContainer: {
     flexDirection: "row",
@@ -126,6 +131,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopStyle: "solid",
-    borderTopColor: "black", 
+    borderTopColor: "black",
+  },
+  joinButton: {
+    marginVertical: 16,
   },
 });
