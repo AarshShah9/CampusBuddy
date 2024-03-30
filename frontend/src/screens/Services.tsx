@@ -3,6 +3,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   ScrollView,
+  RefreshControl,
   TouchableOpacity,
 } from "react-native";
 import LookingForItem from "~/components/SearchLookingForBar";
@@ -12,19 +13,39 @@ import { services } from "~/mockData/ServicesData";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useCallback, useEffect, useState } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
-
-type post = {
-  id: string;
-  title: string;
-  description: string;
-  spotsLeft: number;
-  expiresAt: Date;
-};
+import { getAllPosts } from "~/lib/apiFunctions/Events";
+import { useQuery } from "@tanstack/react-query";
+import { FlashList } from "@shopify/flash-list";
+import EventMainCard from "~/components/EventMainCard";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
+import useLoadingContext from "~/hooks/useLoadingContext";
+import useRefreshControl from "~/hooks/useRefreshControl";
+import { PostType } from "~/types/LookingFor";
 
 export default function Services() {
-  const [posts, setPosts] = useState<post[]>([]);
   const { dismissKeyboard } = useAppContext();
-  const { getAllPosts } = useEventsContext();
+
+  const {
+    data: posts,
+    isLoading,
+    refetch,
+    isFetchedAfterMount,
+    isFetching,
+  } = useQuery<PostType[]>({
+    queryKey: ["search-page-posts"],
+    queryFn: getAllPosts,
+    initialData: [],
+  });
+
+  const { startLoading, stopLoading } = useLoadingContext();
+
+  const { refreshing, triggerRefresh, stopRefresh } = useRefreshControl();
+
+  const onPullRefresh = useCallback(() => {
+    triggerRefresh(() => {
+      refetch();
+    });
+  }, []);
   const {navigateTo} = useNavigationContext();
 
   const openLookingForDetails = useCallback((id:string) =>{
@@ -32,38 +53,46 @@ export default function Services() {
   }, []);
 
   useEffect(() => {
-    getAllPosts().then((res: any) => {
-      setPosts(res.data);
-    });
-  }, []);
+    if (isLoading) startLoading();
+    else stopLoading();
+  }, [isLoading]);
 
-  if (posts.length === 0) {
-    return null;
-  }
+  const queryIsLoading = isFetching && isFetchedAfterMount;
+  useEffect(() => {
+    if (!queryIsLoading) stopRefresh();
+  }, [queryIsLoading]);
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <ScrollView style={{ flex: 1 }}>
-        <Pressable style={{ paddingVertical: 20 }}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard} style={{ flex: 1 }}>
+      <FlashList
+        data={posts}
+        showsVerticalScrollIndicator={false}
+        estimatedItemSize={20}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onPullRefresh} />
+        }
+        extraData={queryIsLoading}
+        renderItem={({ item }) => (
+          <Pressable>
+            <View style={{ paddingHorizontal: 20 }}>
+                <LookingForItem
+                key={item.id}
+                title={item.title}
+                description={item.description}
+                requiredMembers={item.spotsLeft}
+              />
+            </View>
+          </Pressable>
+        )}
+        contentContainerStyle={{ paddingVertical: 20 }}
+        ListHeaderComponent={() => (
           <ThemedText
             style={{ paddingLeft: 20, fontFamily: "Nunito-Bold", fontSize: 24 }}
           >
             Looking For
           </ThemedText>
-          <View style={{ paddingHorizontal: 20 }}>
-            {posts.map((service) => (
-              <TouchableOpacity onPress={() => openLookingForDetails(service.id)}>
-              <LookingForItem
-                key={service.id}
-                title={service.title}
-                description={service.description}
-                requiredMembers={service.spotsLeft}
-              />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </ScrollView>
+        )}
+      />
     </TouchableWithoutFeedback>
   );
 }

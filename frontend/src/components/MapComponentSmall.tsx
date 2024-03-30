@@ -1,7 +1,6 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { useCallback } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet, View } from "react-native";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { darkModeStyle } from "~/components/Map";
 import useThemeContext from "~/hooks/useThemeContext";
 
@@ -10,6 +9,7 @@ type MapComponentProps = {
   longitude: number;
   latitudeDelta?: number;
   longitudeDelta?: number;
+  type?: "event" | "item";
 };
 
 /*
@@ -21,8 +21,9 @@ const Map = ({
   latitudeDelta = 0.045,
   longitudeDelta = 0.045,
   longitude,
+  type = "event",
 }: MapComponentProps) => {
-  const { inDarkMode } = useThemeContext();
+  const { inDarkMode, theme } = useThemeContext();
 
   return (
     <View>
@@ -51,7 +52,16 @@ const Map = ({
             }}
           >
             <View style={circleStyles.circleStyle}>
-              <MaterialIcons name="event-available" size={24} color="red" />
+              {type == "event" && (
+                <MaterialIcons name="event-available" size={24} color="red" />
+              )}
+              {type == "item" && (
+                <MaterialCommunityIcons
+                  name="shopping-outline"
+                  size={24}
+                  color={theme.colors.primary}
+                />
+              )}
             </View>
           </Marker>
         </MapView>

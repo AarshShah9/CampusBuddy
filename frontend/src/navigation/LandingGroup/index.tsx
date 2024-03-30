@@ -7,6 +7,8 @@ import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
 import Attendees from "~/screens/Attendees";
+import ProfilePage from "~/screens/ProfilePage";
+import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
 import LookingForDetails from "~/screens/LookingForDetails";
 
 const Stack = createNativeStackNavigator();
@@ -21,14 +23,24 @@ export default function LandingGroup() {
           <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
           <Stack.Screen name="Messages" component={MessagesGroup} />
           <Stack.Screen
+            name="UserProfile"
+            component={ProfilePage}
+            options={{
+              title: "Profile",
+            }}
+          />
+          <Stack.Screen
             name="EventDetails"
             component={EventDetails}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,
               },
-              presentation: "modal",
               headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
             }}
           />
 
@@ -43,21 +55,34 @@ export default function LandingGroup() {
               headerStyle: { backgroundColor: theme.colors.primary },
             }}
           />
-          
+
           <Stack.Screen
-            name="MapDetails"
-            component={MapDetails}
+            name="MarketPlaceDetail"
+            component={MarketPlaceDetail}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,
               },
-              presentation: "modal",
               headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
             }}
           />
           <Stack.Screen
             name="Attendees"
             component={Attendees}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
+            }}
+          />
+          <Stack.Screen
+            name="MapDetails"
+            component={MapDetails}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,
