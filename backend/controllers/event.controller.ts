@@ -27,6 +27,7 @@ import {
 } from "../utils/googleMapsApi";
 import { defaultDistance } from "../constants";
 import { sampleEventData } from "../prisma/dummyData";
+import { moderateText } from "../utils/moderateText";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -98,8 +99,13 @@ export const createVerifiedEvent = async (
         });
       }
 
-      // TODO add tags to event
+      // moderation stuff for events
+      const isFlagged = await moderateText(
+        validatedEventData.title,
+        validatedEventData.description,
+      );
 
+      // TODO add tags to event
       const event = await prisma.event.create({
         data: {
           startTime: validatedEventData.startTime,
@@ -110,7 +116,8 @@ export const createVerifiedEvent = async (
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
-          isPublic: true,
+          isPublic: !isFlagged,
+          isFlagged: isFlagged,
         },
       });
 
@@ -189,8 +196,13 @@ export const createEvent = async (
         });
       }
 
-      // TODO add tags to event
+      // moderation stuff for events
+      const isFlagged = await moderateText(
+        validatedEventData.title,
+        validatedEventData.description,
+      );
 
+      // TODO add tags to event
       const event = await prisma.event.create({
         data: {
           startTime: validatedEventData.startTime,
@@ -200,7 +212,8 @@ export const createEvent = async (
           locationPlaceId: validatedEventData.locationPlaceId,
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
-          isPublic: true,
+          isPublic: !isFlagged,
+          isFlagged: isFlagged,
         },
       });
 
