@@ -13,7 +13,13 @@ import {
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
 import transporter from "../utils/mailer";
-import { User, UserOrgStatus, UserRole, UserType } from "@prisma/client";
+import {
+  ParticipationStatus,
+  User,
+  UserOrgStatus,
+  UserRole,
+  UserType,
+} from "@prisma/client";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
@@ -859,6 +865,17 @@ export const generateJWT = async (req: Request, res: Response) => {
     where: {
       id: users[0].id,
     },
+    include: {
+      enrollments: {
+        include: {
+          program: {
+            select: {
+              programName: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -867,6 +884,29 @@ export const generateJWT = async (req: Request, res: Response) => {
       message: "User doesn't exist",
     });
   }
+
+  // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+  const attendedEvents = await prisma.userEventResponse.count({
+    where: {
+      userId: user.id,
+      participationStatus: ParticipationStatus.Going,
+      event: {
+        endTime: {
+          lte: new Date(),
+        },
+      },
+    },
+  });
+
+  // find the number of organizations the user is a member of
+  const orgs = await prisma.userOrganizationRole.count({
+    where: {
+      userId: user.id,
+      role: {
+        roleName: "Member",
+      },
+    },
+  });
 
   const authToken = jwt.sign(user as JwtPayload, jwtSecret);
 
@@ -877,6 +917,11 @@ export const generateJWT = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       image: user.profilePic,
+      programs: user.enrollments.map(
+        (enrollment) => enrollment.program.programName,
+      ),
+      attended: attendedEvents,
+      following: orgs,
     },
   });
 };
@@ -1036,6 +1081,63 @@ export const removeProfilePic = async (
       data: {
         image: null,
       },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const profilePageData = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: loggedInUserId!,
+      },
+    });
+
+    const eventResponses = await prisma.userEventResponse.findMany({
+      where: {
+        userId: loggedInUserId,
+      },
+      include: {
+        event: true,
+      },
+    });
+
+    // filter only those that have attended in the past base on the endTime
+    const attended: number = eventResponses.filter((eventRes) => {
+      return (
+        eventRes.event.endTime < new Date() &&
+        eventRes.participationStatus === ParticipationStatus.Going
+      );
+    }).length;
+
+    const savedEvents = eventResponses
+      .filter((eventRes) => {
+        return eventRes.participationStatus === ParticipationStatus.Interested;
+      })
+      .map((eventRes) => {
+        return eventRes.event;
+      });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${loggedInUserId} not found`,
+        404,
+        true,
+      );
+    }
+
+    res.status(200).json({
+      message: "User profile page data",
+      data: { user, attended, savedEvents },
     });
   } catch (error: any) {
     next(error);

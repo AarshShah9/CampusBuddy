@@ -1,9 +1,8 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
-import styled from "styled-components";
+import { useRoute } from "@react-navigation/native";
+import { useCallback, useLayoutEffect } from "react";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -11,11 +10,19 @@ import Animated, {
   useScrollViewOffset,
 } from "react-native-reanimated";
 import useThemeContext from "~/hooks/useThemeContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import useNavigationContext from "~/hooks/useNavigationContext";
+import LoadingSkeleton from "~/components/LoadingSkeleton";
+import {
+  attendEvent,
+  getEventDetails,
+  likeEvent,
+} from "~/lib/apiFunctions/Events";
+import { NavigationProp, ParamListBase } from "@react-navigation/native";
 
 const IMG_HEIGHT = 300;
 
@@ -23,13 +30,16 @@ const IMG_HEIGHT = 300;
  * This component is responsible for loading event details based on passed ID.
  * */
 
-export default function EventDetails() {
+export default function EventDetails({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
   const {
-    params: { id, map },
+    params: { id, map = true },
   } = useRoute<any>();
-  const { getEventDetails, likeEvent } = useEventsContext();
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
 
@@ -37,7 +47,6 @@ export default function EventDetails() {
     queryKey: ["event-details", id],
     queryFn: () => getEventDetails(id),
   });
-
   const likeMutation = useMutation({
     mutationFn: async ({
       id,
@@ -51,20 +60,35 @@ export default function EventDetails() {
     },
   });
 
-  const onMapPress = useCallback(() => {
-    navigation.navigate("MapDetails", {
-      eventData: [
-        {
-          title: eventData?.title,
-          description: eventData?.description,
-          latitude: eventData?.location.latitude,
-          longitude: eventData?.location.longitude,
-        },
-      ],
-    });
-  }, [eventData, navigation]);
+  const attendMutation = useMutation({
+    mutationFn: async ({
+      id,
+      previousState,
+    }: {
+      id: string;
+      previousState: boolean;
+    }) => {
+      await attendEvent(id);
+      refetch();
+    },
+  });
 
-  // TODO fix optimistic updates
+  const onMapPress = useCallback(() => {
+    if (eventData) {
+      navigateTo({
+        page: "MapDetails",
+        eventData: [
+          {
+            title: eventData.title,
+            description: eventData.description,
+            latitude: eventData.location.latitude,
+            longitude: eventData.location.longitude,
+          },
+        ],
+      });
+    }
+  }, [eventData]); // TODO fix optimistic updates
+
   const isOptimistic =
     likeMutation.variables &&
     (likeMutation.isPending ? !likeMutation.variables.previousState : false);
@@ -74,12 +98,18 @@ export default function EventDetails() {
     : eventData?.isLiked;
 
   const userLiked = useCallback(() => {
-    likeMutation.mutate({ id, previousState: eventData?.isLiked! });
+    likeMutation.mutate({
+      id,
+      previousState: eventData?.isLiked!,
+    });
   }, [id, likeEvent, eventData?.isLiked]);
 
-  const returnPrevPage = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+  const userAttendEvent = useCallback(() => {
+    attendMutation.mutate({
+      id,
+      previousState: eventData?.isAttending!,
+    });
+  }, [id, attendEvent, eventData?.isAttending]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -103,15 +133,12 @@ export default function EventDetails() {
   });
 
   const seeAttendees = useCallback(() => {
-    navigation.navigate("Attendees", { id });
-  }, [navigation, id]);
+    navigateTo({ page: "Attendees", id });
+  }, [id]);
 
-  return (
-    <MainContainer color={theme.colors.primary}>
-      <HeaderContainer>
-        <TouchableOpacity onPress={returnPrevPage}>
-          <AntDesign name="caretleft" size={24} color="white" />
-        </TouchableOpacity>
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
         <TouchableOpacity onPress={userLiked}>
           <Entypo
             name="heart"
@@ -120,50 +147,70 @@ export default function EventDetails() {
             style={{ opacity: isOptimistic ? 0.5 : 1 }}
           />
         </TouchableOpacity>
-      </HeaderContainer>
+      ),
+    });
+  }, [navigation, isLiked, isOptimistic, userLiked]);
+
+  return (
+    <View style={[styles.mainContainer]}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
-        <Animated.Image
-          style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
-          source={{ uri: eventData?.image }}
-        />
+        <LoadingSkeleton
+          show={!eventData}
+          radius="square"
+          width={"100%"}
+          height={250}
+        >
+          <Animated.Image
+            style={[{ height: 250, width: "100%" }, imageAnimatedStyle]}
+            source={{ uri: generateImageURL(eventData?.image) }}
+          />
+        </LoadingSkeleton>
         <View
           style={{
             height: 100,
             width: "100%",
-            backgroundColor: "white",
             flexDirection: "row",
             justifyContent: "space-between",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
-          <EDetails>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-              }}
-            >
-              {eventData?.title}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginBottom: 5,
-              }}
-            >
-              {convertUTCToTimeAndDate(eventData?.startTime)}
-            </Text>
-            {eventData?.location.name && (
-              <LocationChip location={eventData?.location.name} />
-            )}
-          </EDetails>
-          <EClubDetails>
+          <View style={styles.eDetails}>
+            <LoadingSkeleton show={!eventData} width={180} height={16}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                {eventData?.title}
+              </Text>
+            </LoadingSkeleton>
+            <LoadingSkeleton show={!eventData} width={150} height={16}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginBottom: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                {convertUTCToTimeAndDate(eventData?.startTime)}
+              </Text>
+            </LoadingSkeleton>
+            <LoadingSkeleton show={!eventData} width={120} height={16}>
+              {eventData?.location.name && (
+                <LocationChip location={eventData?.location.name} />
+              )}
+            </LoadingSkeleton>
+          </View>
+          <View style={styles.eClubDetails}>
             <Image
               style={{
                 height: 30,
@@ -174,10 +221,18 @@ export default function EventDetails() {
               }}
               source={require("~/assets/Campus_Buddy_Logo.png")}
             />
-            <Text style={{ fontFamily: "Roboto-Medium", fontSize: 18 }}>
-              {eventData?.organization?.organizationName}
-            </Text>
-          </EClubDetails>
+            <LoadingSkeleton show={!eventData} width={60} height={16}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 18,
+                  color: theme.colors.text,
+                }}
+              >
+                {eventData?.organization?.organizationName}
+              </Text>
+            </LoadingSkeleton>
+          </View>
         </View>
         <TouchableOpacity onPress={seeAttendees}>
           <View
@@ -186,49 +241,64 @@ export default function EventDetails() {
               borderTopWidth: 1,
               flexDirection: "row",
               height: 50,
-              backgroundColor: "white",
               alignItems: "center",
+              backgroundColor: theme.colors.tertiary,
             }}
           >
             <Ionicons
               name="people-outline"
               size={30}
-              color="black"
+              color={theme.colors.text}
               style={{ marginLeft: 10 }}
             />
-
-            <Text
-              style={{
-                fontFamily: "Roboto-Medium",
-                fontSize: 16,
-                marginLeft: 5,
-              }}
-            >
-              Attendance: {eventData?.eventResponses.length}{" "}
-            </Text>
+            <LoadingSkeleton show={!eventData} width={120} height={16}>
+              <Text
+                style={{
+                  fontFamily: "Roboto-Medium",
+                  fontSize: 16,
+                  marginLeft: 5,
+                  color: theme.colors.text,
+                }}
+              >
+                Attendance: {eventData?.attendees}{" "}
+              </Text>
+            </LoadingSkeleton>
           </View>
         </TouchableOpacity>
         <View
           style={{
-            backgroundColor: "white",
             borderTopWidth: 1,
             width: "100%",
             borderTopColor: "#B0CFFF",
             paddingBottom: 20,
             paddingLeft: 10,
             paddingRight: 10,
+            paddingTop: 10,
+            backgroundColor: theme.colors.tertiary,
           }}
         >
-          <Text
-            style={{ marginTop: 10, fontFamily: "Roboto-Reg", fontSize: 16 }}
-          >
-            {eventData?.description}
-          </Text>
+          <LoadingSkeleton show={!eventData} width={"100%"} height={30}>
+            <Text
+              style={{
+                marginTop: 10,
+                fontFamily: "Roboto-Reg",
+                fontSize: 16,
+                color: theme.colors.text,
+              }}
+            >
+              {eventData?.description}
+            </Text>
+          </LoadingSkeleton>
         </View>
         <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
+          }}
         >
-          {eventData?.location && (map === undefined ? true : map) && (
+          {eventData?.location && map && (
             <TouchableOpacity onPress={onMapPress}>
               <MapComponentSmall
                 latitude={eventData?.location.latitude}
@@ -242,13 +312,18 @@ export default function EventDetails() {
             paddingBottom: 60,
             marginLeft: "auto",
             marginRight: "auto",
-            width: "90%",
+            width: "100%",
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
+            backgroundColor: theme.colors.tertiary,
           }}
         >
-          <Button mode="contained" style={styles.AttendButton}>
+          <Button
+            style={styles.attendButton}
+            mode="contained"
+            onPress={userAttendEvent}
+          >
             <Text
               style={{
                 lineHeight: 30,
@@ -258,19 +333,39 @@ export default function EventDetails() {
                 fontFamily: "Nunito-Bold",
               }}
             >
-              Attend
+              {eventData?.isAttending ? "Not Going" : "Attend"}
             </Text>
           </Button>
         </View>
       </Animated.ScrollView>
-    </MainContainer>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  AttendButton: {
-    borderRadius: 8,
+  mainContainer: {
+    height: "100%",
+  },
+  headerContainer: {
     width: "100%",
+    height: 40, // TODO this should be consistent across the app
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  eDetails: {
+    marginLeft: 10,
+    marginTop: 20,
+  },
+  eClubDetails: {
+    marginRight: 10,
+    marginTop: 25,
+    alignItems: "center",
+  },
+  attendButton: {
+    borderRadius: 8,
+    width: "90%",
     height: 48,
     fontSize: 25,
     fontWeight: "bold",
@@ -280,38 +375,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
-// prettier-ignore
-const MainContainer = styled(View) <{ color: string }>`
-    height: 100%;
-    background-color: ${(props) => props.color};
-`;
-// prettier-ignore
-const HeaderContainer = styled(View)`
-    width: 100%;
-    height: 60px; /* TODO this should be consistent across the app */
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-direction: row;
-    align-items: center
-`;
-// prettier-ignore
-const EDetails = styled(View)`
-    margin-left: 10px;
-    margin-top: 20px;
-`;
-// prettier-ignore
-const EClubDetails = styled(View)`
-    margin-right: 10px;
-    margin-top: 25px;
-    align-items: center;
-`;
-// prettier-ignore
-const TagContainer = styled(View)`
-    background-color: #b0cfff;
-    width: 90%;
-    border-radius: 8px;
-    flex-direction: row;
-    padding: 5px;
-    margin-bottom: 5px;
-`;

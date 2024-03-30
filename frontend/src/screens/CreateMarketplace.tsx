@@ -11,21 +11,17 @@ import {
 } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import Animated, { useAnimatedRef } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
-import { Button, Checkbox } from "react-native-paper";
-import ItemTag from "~/components/ItemTags";
+import { Button, Checkbox, ProgressBar } from "react-native-paper";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
-import useEventsContext from "~/hooks/useEventsContext";
 import { MarketPlaceItem } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
-import { z } from "zod";
-import useLoadingContext from "~/hooks/useLoadingContext";
+import { createMarketPlaceItem } from "~/lib/apiFunctions/Events";
+import { useMutation } from "@tanstack/react-query";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -43,9 +39,7 @@ export default function CreateMarketplace() {
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
-  const { createMarketPlaceItem } = useEventsContext();
-  const { startLoading, stopLoading } = useLoadingContext();
-  const navigation = useNavigation<any>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
@@ -69,24 +63,31 @@ export default function CreateMarketplace() {
 
   // Handle submission of data to backend
   const onSubmit = (data: MarketPlaceItem) => {
-    startLoading();
-    createMarketPlaceItem(data, selectedImages)
-      .then((r) => {
-        if (r.status !== 201) {
-          throw new Error("Error creating item");
-        }
-        reset();
-        setSelectedImages(undefined);
-        setCheckedItem(null);
-        setResetLocationValue(!resetLocationValue);
-        stopLoading();
-        alert("item Created");
-        navigation.navigate("Home");
-      })
-      .catch((e) => {
-        alert("Error creating event");
-      });
+    if (!selectedImages) {
+      Alert.alert("Image Required", "Please upload at least one image");
+      return;
+    }
+    setIsSubmitting(true);
+    createMutation.mutate(data);
   };
+
+  const createMutation = useMutation({
+    mutationFn: (data: MarketPlaceItem) =>
+      createMarketPlaceItem(data, selectedImages!),
+    onSuccess: () => {
+      reset();
+      setSelectedImages(undefined);
+      setCheckedItem(null);
+      setResetLocationValue(!resetLocationValue);
+      setIsSubmitting(false);
+      Alert.alert("Success", "Your item has been posted");
+    },
+    onError: (error) => {
+      console.log(error);
+      setIsSubmitting(false);
+      alert("Error creating event");
+    },
+  });
 
   const addPhoto = useCallback(async () => {
     // Calculate the remaining number of images that can be selected
@@ -159,11 +160,14 @@ export default function CreateMarketplace() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
+      {createMutation.isPending && (
+        <ProgressBar indeterminate={true} visible={createMutation.isPending} />
+      )}
       <Animated.ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         <View style={{ marginLeft: 20, marginTop: 15 }}>
@@ -241,12 +245,14 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Item
                   </Text>
                   <TextInput
-                    style={style.eventInput}
+                    editable={!isSubmitting}
+                    style={[style.eventInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -267,12 +273,14 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Price
                   </Text>
                   <TextInput
-                    style={style.priceInput}
+                    editable={!isSubmitting}
+                    style={[style.priceInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={(text) =>
                       onChange(text.replace(/[^0-9]/g, ""))
@@ -296,6 +304,7 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Condition
@@ -308,7 +317,7 @@ export default function CreateMarketplace() {
                     }}
                   >
                     <Checkbox.Android
-                      uncheckedColor="black"
+                      uncheckedColor={theme.colors.checkboxColor}
                       status={
                         checkedItem === "Brand New" ? "checked" : "unchecked"
                       }
@@ -317,7 +326,9 @@ export default function CreateMarketplace() {
                         onChange("Brand New");
                       }}
                     />
-                    <Text>Like Brand New</Text>
+                    <Text style={{ color: theme.colors.text }}>
+                      Like Brand New
+                    </Text>
                   </View>
                   <View
                     style={{
@@ -328,12 +339,13 @@ export default function CreateMarketplace() {
                   >
                     <Checkbox.Android
                       status={checkedItem === "Used" ? "checked" : "unchecked"}
+                      uncheckedColor={theme.colors.checkboxColor}
                       onPress={() => {
                         handleCheckboxToggle("Used");
                         onChange("Used");
                       }}
                     />
-                    <Text>Used</Text>
+                    <Text style={{ color: theme.colors.text }}>Used</Text>
                   </View>
                   <View
                     style={{
@@ -344,7 +356,7 @@ export default function CreateMarketplace() {
                     }}
                   >
                     <Checkbox.Android
-                      uncheckedColor="black"
+                      uncheckedColor={theme.colors.checkboxColor}
                       status={
                         checkedItem === "Heavily Used" ? "checked" : "unchecked"
                       }
@@ -353,7 +365,9 @@ export default function CreateMarketplace() {
                         onChange("Heavily Used");
                       }}
                     />
-                    <Text>Heavily Used</Text>
+                    <Text style={{ color: theme.colors.text }}>
+                      Heavily Used
+                    </Text>
                   </View>
                 </View>
               )}
@@ -371,12 +385,14 @@ export default function CreateMarketplace() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Event Description:*
                   </Text>
                   <TextInput
-                    style={style.eventtextInput}
+                    editable={!isSubmitting}
+                    style={[style.eventtextInput, { color: theme.colors.text }]}
                     multiline={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -414,12 +430,13 @@ export default function CreateMarketplace() {
                 required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={{ marginBottom: 15 }}>
+                <View style={{ marginBottom: 10, marginTop: 15 }}>
                   <Text
                     style={{
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Location*
@@ -437,6 +454,7 @@ export default function CreateMarketplace() {
         <View style={{ marginTop: 50, marginBottom: 50 }}>
           <Button
             onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
             style={{
               width: 300,
               backgroundColor: theme.colors.primary,

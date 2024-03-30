@@ -14,26 +14,45 @@ import {
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
+import useAuthContext from "~/hooks/useAuthContext";
 
 const snapPoints = ["45%"];
 
-const settings = [
-  "Settings and Privacy",
-  "Archive",
-  "My activity",
-  "Saved",
-  "Personal Information",
-];
-
 export default function ProfileSettings() {
   const { theme } = useThemeContext();
-  const { bottomSheetModalRef } = useProfileContext();
+  const { logOut } = useAuthContext();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
+
+  const { bottomSheetModalRef, closeModal } = useProfileContext();
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />
     ),
     [],
   );
+
+  const settings = [
+    {
+      title: "Settings and Privacy",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Settings" });
+      },
+    },
+    { title: "Help", onClick: () => console.log("Help") },
+    {
+      title: "Report a Problem",
+      onClick: () => console.log("Report a Problem"),
+    },
+    {
+      title: "Log Out",
+      onClick: () => {
+        logOut();
+        replaceStackWith("AuthenticationGroup");
+      },
+    },
+  ];
 
   return (
     <BottomSheetModal
@@ -43,11 +62,14 @@ export default function ProfileSettings() {
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
       handleIndicatorStyle={{ backgroundColor: "grey" }} // todo change this to use theme
-      backgroundStyle={{ borderRadius: 20 }} // play around with the number to find a suitable one
+      backgroundStyle={{
+        borderRadius: 20,
+        backgroundColor: theme.colors.tertiary,
+      }}
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
-          <TouchableOpacity key={i}>
+          <TouchableOpacity key={i} onPress={setting.onClick}>
             <View
               style={[
                 styles.settingContainer,
@@ -56,7 +78,9 @@ export default function ProfileSettings() {
                 },
               ]}
             >
-              <Text style={styles.settingText}>{setting}</Text>
+              <Text style={[styles.settingText, { color: theme.colors.text }]}>
+                {setting.title}
+              </Text>
               <Ionicons name="chevron-forward" size={16} color={"#3a86ff"} />
             </View>
           </TouchableOpacity>

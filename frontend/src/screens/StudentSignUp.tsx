@@ -10,7 +10,6 @@ import {
 import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Controller, useForm } from "react-hook-form";
@@ -24,14 +23,15 @@ import { institution } from "~/contexts/authContext";
 import { userRegistrationData } from "~/contexts/authContext";
 import ErrorText from "~/components/ErrorText";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 import { StudentRegistrationSchema } from "~/types/schemas";
 
 export default function StudentSignUp() {
   const { theme } = useThemeContext();
-  const navigation = useNavigation<any>();
   const [institutions, setInstitutions] = useState<institution[]>([]);
   const { getInstitutions, registerUser } = useAuthContext();
   const { dismissKeyboard } = useAppContext();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {
@@ -42,26 +42,23 @@ export default function StudentSignUp() {
     resolver: zodResolver(StudentRegistrationSchema),
   });
 
-  const onSubmit = useCallback(
-    (data: userRegistrationData) => {
-      console.log(data);
-      startLoading();
-      registerUser({
-        email: data.email,
-        institutionId: data.institutionId,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        password: data.password,
-      }).then(() => {
-        stopLoading();
-        navigation.dispatch(StackActions.replace("ConfirmEmail"));
-      });
-    },
-    [navigation],
-  );
+  const onSubmit = useCallback((data: userRegistrationData) => {
+    console.log(data);
+    startLoading();
+    registerUser({
+      email: data.email,
+      institutionId: data.institutionId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      password: data.password,
+    }).then(() => {
+      stopLoading();
+      replaceStackWith("ConfirmEmail");
+    });
+  }, []);
 
   const handlePress = useCallback(() => {
-    navigation.dispatch(StackActions.push("OrgSignUp"));
+    navigateTo({ page: "OrgSignUp" });
   }, []);
 
   useEffect(() => {
@@ -82,16 +79,16 @@ export default function StudentSignUp() {
         showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
-          <MainContainer>
+          <MainContainer $color={theme.colors.primary}>
             <HeaderContainer>
               <TouchableOpacity
-                onPress={() => navigation.navigate("Login")}
+                onPress={() => navigateTo({ page: "Login" })}
                 style={{ marginTop: "10%", marginLeft: "3%" }}
                 activeOpacity={0.7}
               >
                 <AntDesign name="caretleft" size={24} color="white" />
               </TouchableOpacity>
-              <HeaderText $textColor={theme.colors.tertiary}>
+              <HeaderText $textColor={theme.colors.mainText}>
                 Student Sign Up
               </HeaderText>
             </HeaderContainer>
@@ -285,6 +282,7 @@ export default function StudentSignUp() {
                       fontSize: 16,
                       fontFamily: "Roboto-Reg",
                       marginRight: 5,
+                      color: theme.colors.text,
                     }}
                   >
                     Sign up as an Organization
@@ -312,9 +310,9 @@ export default function StudentSignUp() {
 
 // Component
 // prettier-ignore
-const MainContainer = styled(View)`
+const MainContainer = styled(View)<{ $color: string }>`
     height: 100%;
-    background-color: #3a86ff;
+    background-color: ${(props)=>props.$color};
 `;
 // prettier-ignore
 const OverlayContainer = styled(View)<{ $color: string }>`

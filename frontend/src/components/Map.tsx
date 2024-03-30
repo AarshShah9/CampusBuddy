@@ -1,9 +1,10 @@
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useCallback } from "react";
-import { View, Button, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import { EventMapItem } from "~/types/Events";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import useThemeContext from "~/hooks/useThemeContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type MapProps = {
   latitudeDelta?: number;
@@ -11,6 +12,7 @@ type MapProps = {
   showInfo?: boolean;
   currentLocation: LatLng;
   events?: EventMapItem[];
+  items?: EventMapItem[];
 };
 
 // This is a simple map component that displays a map with a marker at the given latitude and longitude.
@@ -21,19 +23,23 @@ const Map = ({
   showInfo = false,
   currentLocation,
   events,
+  items,
 }: MapProps) => {
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
+  const { theme, inDarkMode } = useThemeContext();
 
   const openEventDetails = useCallback(
-    (index: number) => {
+    (id: string) => {
       if (showInfo) return;
-      navigation.navigate("EventDetails", {
-        id: events?.[index].id,
-        map: false,
+      navigateTo({
+        page: "EventDetails",
+        id: id,
       });
     },
-    [events, navigation],
+    [events],
   );
+
+  const combinedEventsItems = [...(events || []), ...(items || [])];
 
   return (
     <View style={styles.container}>
@@ -47,19 +53,57 @@ const Map = ({
           longitudeDelta,
         }}
         showsUserLocation={true}
+        customMapStyle={inDarkMode ? darkModeStyle : []}
       >
         {events &&
-          events.map((event: EventMapItem, index) => {
+          events?.map((event: EventMapItem, index) => {
+            const combinedIndex = combinedEventsItems.findIndex(
+              (e) => e.id === event.id,
+            );
             return (
               <Marker
                 key={index}
                 title={showInfo ? event.title : ""}
                 description={showInfo ? event.description : ""}
-                coordinate={adjustPosition(event, index, events)}
-                onPress={() => openEventDetails(index)}
+                coordinate={adjustPosition(
+                  event,
+                  combinedIndex,
+                  combinedEventsItems,
+                )}
+                onPress={() => openEventDetails(event.id)}
               >
                 <View style={circleStyles.circleStyle}>
                   <MaterialIcons name="event-available" size={24} color="red" />
+                </View>
+              </Marker>
+            );
+          })}
+        {items &&
+          items?.map((item: EventMapItem, index) => {
+            const combinedIndex = combinedEventsItems.findIndex(
+              (e) => e.id === item.id,
+            );
+
+            return (
+              <Marker
+                key={index}
+                title={showInfo ? item.title : ""}
+                description={showInfo ? item.description : ""}
+                coordinate={adjustPosition(
+                  item,
+                  combinedIndex,
+                  combinedEventsItems,
+                )}
+                onPress={() => {
+                  Alert.alert("Stay Tuned!", "This feature is coming soon!");
+                }}
+              >
+                <View style={circleStyles.circleStyle}>
+                  <MaterialCommunityIcons
+                    name="shopping-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
                 </View>
               </Marker>
             );
@@ -70,27 +114,162 @@ const Map = ({
 };
 
 const adjustPosition = (
-  event: EventMapItem,
+  current: EventMapItem,
   index: number,
-  events: EventMapItem[],
+  combinedEventsItems: EventMapItem[],
 ) => {
-  const adjustment = 0.0003; // Small adjustment value
-  let duplicates = events.filter(
-    (e) => e.latitude === event.latitude && e.longitude === event.longitude,
+  let baseAdjustment = 0.0001; // Base adjustment value
+  let duplicates = combinedEventsItems.filter(
+    (e) =>
+      Math.abs(e.latitude - current.latitude) < baseAdjustment &&
+      Math.abs(e.longitude - current.longitude) < baseAdjustment,
   );
+
   if (duplicates.length > 1) {
-    let angle = (360 / duplicates.length) * index; // distribute evenly in a circle
+    // Dynamically adjust the adjustment value based on the number of duplicates
+    const dynamicAdjustment =
+      baseAdjustment + duplicates.length * baseAdjustment * 0.5;
+    let angle = (360 / duplicates.length) * index * 1.05;
     return {
-      latitude: event.latitude + adjustment * Math.cos(angle * (Math.PI / 180)),
+      latitude:
+        current.latitude +
+        dynamicAdjustment * Math.cos(angle * (Math.PI / 180)),
       longitude:
-        event.longitude + adjustment * Math.sin(angle * (Math.PI / 180)),
+        current.longitude +
+        dynamicAdjustment * Math.sin(angle * (Math.PI / 180)),
     };
   }
+
   return {
-    latitude: event.latitude,
-    longitude: event.longitude,
+    latitude: current.latitude,
+    longitude: current.longitude,
   };
 };
+
+export const darkModeStyle = [
+  { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
+  {
+    featureType: "administrative.country",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#4b6878" }],
+  },
+  {
+    featureType: "administrative.land_parcel",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "administrative.land_parcel",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#64779e" }],
+  },
+  {
+    featureType: "administrative.province",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#4b6878" }],
+  },
+  {
+    featureType: "landscape.man_made",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#334e87" }],
+  },
+  {
+    featureType: "landscape.natural",
+    elementType: "geometry",
+    stylers: [{ color: "#023e58" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#283d6a" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#6f9ba5" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#1d2c4d" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#023e58" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#3C7680" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#304a7d" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#98a5be" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#1d2c4d" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#2c6675" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#255763" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#b0d5ce" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#023e58" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#98a5be" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#1d2c4d" }],
+  },
+  {
+    featureType: "transit.line",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#283d6a" }],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "geometry",
+    stylers: [{ color: "#3a4762" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0e1626" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#4e6d70" }],
+  },
+];
 
 // prettier-ignore
 const styles = {

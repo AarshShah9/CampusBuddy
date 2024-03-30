@@ -1,24 +1,24 @@
 import { AttendeeResponse } from "~/types/Events";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import React, { useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
-export function RenderAttendee({ item }: { item: AttendeeResponse }) {
-  const navigation = useNavigation<any>();
-  const onUserPress = useCallback(
-    (id: string) => {
-      navigation.navigate("UserProfile", { id });
-    },
-    [navigation],
-  );
-  const imageSource = item.image ? { uri: generateImageURL(item.image) } : null;
+export default function AttendeeCard({ item }: { item: AttendeeResponse }) {
+  const { navigateTo } = useNavigationContext();
+
+  const onUserPress = useCallback(() => {
+    navigateTo({ page: "UserProfile", id: item.id });
+  }, [item.id]);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onUserPress(item.id)}>
-      {imageSource ? (
-        <Image source={imageSource} style={styles.profilePic} />
+    <TouchableOpacity style={styles.card} onPress={onUserPress}>
+      {item.image ? (
+        <Image
+          source={{ uri: generateImageURL(item.image) }}
+          style={styles.profilePic}
+        />
       ) : (
         <MaterialIcons name="person" size={50} color="#333" />
       )}

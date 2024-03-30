@@ -8,27 +8,32 @@ import useThemeContext from "~/hooks/useThemeContext";
 import ProfileEvents from "~/screens/ProfileEvents";
 import ProfilePosts from "~/screens/ProfilePosts";
 import ProfileSavedItems from "~/screens/ProfileSavedItems";
+import useAuthContext from "~/hooks/useAuthContext";
+import ProfileMarket from "~/screens/ProfileMarket";
 
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function ProfileTabs() {
   const { theme } = useThemeContext();
+  const { user } = useAuthContext();
   return (
     <TopTabs.Navigator
       screenOptions={{
-        tabBarStyle: { 
-          backgroundColor: theme.colors.onSecondary,
-          shadowColor: 'grey',
+        lazy: true,
+        tabBarStyle: {
+          backgroundColor: theme.colors.profileTabs,
+          shadowColor: "grey",
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.4,
-          shadowRadius: 3
+          shadowRadius: 3,
         },
         tabBarShowLabel: false,
       }}
     >
       <TopTabs.Screen
-        name="Events"
+        name="YourEvents"
         component={ProfileEvents}
+        initialParams={{ id: user?.id ?? "0" }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return (
@@ -42,11 +47,28 @@ export default function ProfileTabs() {
         }}
       />
       <TopTabs.Screen
-        name="Posts"
+        name="YourPosts"
         component={ProfilePosts}
+        initialParams={{ id: user?.id ?? "0" }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return <FontAwesome name={"binoculars"} size={22} color={color} />;
+          },
+        }}
+      />
+      <TopTabs.Screen
+        name="YourMarket"
+        component={ProfileMarket}
+        initialParams={{ id: user?.id ?? "0" }}
+        options={{
+          tabBarIcon: ({ color, focused }) => {
+            return (
+              <MaterialCommunityIcons
+                name={focused ? "shopping" : "shopping-outline"}
+                size={24}
+                color={color}
+              />
+            );
           },
         }}
       />

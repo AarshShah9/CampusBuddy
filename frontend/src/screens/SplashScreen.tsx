@@ -1,13 +1,12 @@
 import { View, StyleSheet, Dimensions } from "react-native";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function SplashScreen() {
     const { width, height } = Dimensions.get("window");
     const [loading, setLoading] = useState<boolean>(true);
-    const navigation = useNavigation<any>();
     const [fontsLoaded] = useFonts({
         "Nunito-Medium": require("~/assets/fonts/Nunito-Medium.ttf"),
     "Nunito-Bold": require("~/assets/fonts/Nunito-Bold.ttf"),
@@ -31,11 +30,13 @@ export default function SplashScreen() {
         loadData();
     }, []);
 
+    const { replaceStackWith } = useNavigationContext();
+
     useEffect(() => {
         if (!loading && fontsLoaded) {
             // On state change to loading, indicate ready to switch pages
             console.log("Finished Loading move to new page");
-            navigation.dispatch(StackActions.replace("AuthenticationGroup"));
+            replaceStackWith("AuthenticationGroup");
         }
     }, [loading, fontsLoaded]);
 

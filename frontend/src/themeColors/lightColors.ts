@@ -1,6 +1,7 @@
 const lightColors = {
   colors: {
-    primary: "rgb(0, 90, 194)",
+    primary: "rgb(58, 134, 255)",
+    PrimaryHeader: "rgb(255, 255, 255)",
     onPrimary: "rgb(255, 255, 255)",
     primaryContainer: "rgb(216, 226, 255)",
     onPrimaryContainer: "rgb(0, 26, 65)",
@@ -21,7 +22,7 @@ const lightColors = {
     surface: "rgb(254, 251, 255)",
     onSurface: "rgb(27, 27, 31)",
     surfaceVariant: "rgb(235, 236, 246)",
-    onSurfaceVariant: "rgb(68, 71, 79)",
+    onSurfaceVariant: "rgb(68, 71, 79)", 
     outline: "rgb(117, 119, 127)",
     outlineVariant: "rgb(196, 198, 208)",
     shadow: "rgb(0, 0, 0)",
@@ -39,7 +40,14 @@ const lightColors = {
     },
     surfaceDisabled: "rgba(27, 27, 31, 0.12)",
     onSurfaceDisabled: "rgba(27, 27, 31, 0.38)",
-    backdrop: "rgba(211, 211, 211, 0.5)",
+    backdrop: "rgba(211, 211, 211, 0.5)", 
+    text:"rgb(0,0,0)",
+    mainText:"rgb(255,255,255)",
+    iconColor:"rgb(0,0,0)",
+    profileTabs:"rgb(255,255,255)",
+    googleAutoComplete:"rgb(250,250,250)",
+    checkboxColor:"rgb(0,0,0)",
+    profilePicContainer:"rgb(211, 211, 211)"
   },
 };
 

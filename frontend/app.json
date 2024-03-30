@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "config": {
@@ -28,6 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.example.campusbuddy",
+      "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyATVa14cULE6unb0p7DUj9MW4v6tzRWzdE"

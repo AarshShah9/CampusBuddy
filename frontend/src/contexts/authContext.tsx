@@ -4,6 +4,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { UserDataType } from "~/types/User";
 import { CBRequest } from "~/lib/CBRequest";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const setAxiosTokenHeader = (token: string) =>
   (axios.defaults.headers.common["Authorization"] = `Bearer ${token}`);
@@ -63,7 +64,7 @@ export const AuthContextProvider = ({
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
-      let res = await CBRequest("POST", "/api/user/student", { body: data });
+      await CBRequest("POST", "/api/user/student", { body: data });
     } catch (error) {
       console.log(error);
     }

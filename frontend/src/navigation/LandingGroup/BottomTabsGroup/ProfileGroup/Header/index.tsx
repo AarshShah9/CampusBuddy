@@ -6,15 +6,15 @@ import MenuIcon from "./MenuIcon";
 import useAuthContext from "~/hooks/useAuthContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useProfileContext from "~/hooks/useProfileContext";
 
 export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
-  const { openPictureModal } = useProfileContext();
-  const [imageSource, setImageSource] = React.useState<any>(null);
+  const { openPictureModal, profileData } = useProfileContext();
+  const [imageSource, setImageSource] = useState<any>(null);
 
   useEffect(() => {
     const imageSource = user?.image
@@ -28,16 +28,26 @@ export default function Header() {
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 35,
-          backgroundColor: theme.colors.onSecondary,
+          paddingTop: insets.top + 15,
+          backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
       ]}
     >
-      <View style={styles.headerCard}>
+      <View
+        style={{
+          width: "100%",
+          height: profileData?.user.programs?.[0] ? 140 : 120,
+        }}
+      >
         <View style={styles.upperSection}>
           <TouchableOpacity onPress={openPictureModal}>
-            <View style={styles.profilePicContainer}>
+            <View
+              style={[
+                styles.profilePicContainer,
+                { backgroundColor: theme.colors.profilePicContainer },
+              ]}
+            >
               {imageSource ? (
                 <Image
                   style={{ width: "100%", height: "100%" }}
@@ -51,11 +61,15 @@ export default function Header() {
             </View>
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>18</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.user.attended ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>5</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.user.following ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
           <MenuIcon />
@@ -64,7 +78,7 @@ export default function Header() {
           <Text style={{ fontWeight: "bold" }}>
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text>{`Mechanical Engineering`}</Text>
+          <Text>{profileData?.user.programs?.[0]}</Text>
         </View>
       </View>
     </View>
@@ -77,10 +91,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 0,
     borderBottomWidth: 2,
-  },
-  headerCard: {
-    width: "100%",
-    height: 150,
   },
   upperSection: {
     flexDirection: "row",

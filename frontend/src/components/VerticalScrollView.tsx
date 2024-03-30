@@ -3,18 +3,16 @@ import {
   View,
   Image,
   Dimensions,
-  Text,
   TouchableOpacity,
 } from "react-native";
-import { carouselImages } from "~/mockData/EventData";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
 import { useCallback, useEffect, useState } from "react";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { CarousalItem, EventData } from "~/types/Events";
-import { useNavigation } from "@react-navigation/native";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function VerticalScrollComponent() {
   const screenWidth = Dimensions.get("window").width;
@@ -32,56 +30,54 @@ export default function VerticalScrollComponent() {
     });
   }, []);
 
-  const navigation = useNavigation<any>();
+  const { navigateTo } = useNavigationContext();
+
   const openEventDetails = useCallback(
     (id: string) => {
-      navigation.navigate("EventDetails", {
-        id,
-      });
+      navigateTo({ page: "EventDetails", id });
     },
-    [events, navigation],
+    [events],
   );
 
   return (
-    <>
-      <FlatList
-        data={events}
-        renderItem={HorizontalScrollElement}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={
-          <View
+    <FlatList
+      data={events}
+      renderItem={HorizontalScrollElement}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={
+        <View
+          style={{
+            justifyContent: "center",
+            marginBottom: 32,
+            alignItems: "center",
+          }}
+        >
+          <Carousel
+            loop={true}
+            autoplay={true}
+            autoplayInterval={5000}
+            showsControls={false}
             style={{
-              justifyContent: "center",
-              marginBottom: 32,
-              alignItems: "center",
+              width: screenWidth,
+              height: 214,
             }}
           >
-            <Carousel
-              loop={true}
-              autoplay={true}
-              autoplayInterval={5000}
-              showsControls={false}
-              style={{
-                width: screenWidth,
-                height: 214,
-              }}
-            >
-              {startingEvents.map((item) => (
-                <TouchableOpacity
+            {startingEvents.map((item) => (
+              <TouchableOpacity
+                key={item.image}
+                onPress={() => openEventDetails(item.id)}
+              >
+                <Image
                   key={item.image}
-                  onPress={() => openEventDetails(item.id)}
-                >
-                  <Image
-                    key={item.image}
-                    source={{ uri: generateImageURL(item.image) }}
-                    style={{ width: screenWidth, height: 214 }}
-                  />
-                </TouchableOpacity>
-              ))}
-            </Carousel>
-          </View>
-        }
-      />
-    </>
+                  source={{ uri: generateImageURL(item.image) }}
+                  style={{ width: screenWidth, height: 214 }}
+                />
+              </TouchableOpacity>
+            ))}
+          </Carousel>
+        </View>
+      }
+    />
   );
 }
+

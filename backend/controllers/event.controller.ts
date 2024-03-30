@@ -2,6 +2,7 @@ import {
   AppPermissionName,
   EventStatus,
   ParticipationStatus,
+  State,
 } from "@prisma/client";
 import {
   CursorPaginationDatetimeParams,
@@ -26,6 +27,7 @@ import {
 } from "../utils/googleMapsApi";
 import { defaultDistance } from "../constants";
 import { sampleEventData } from "../prisma/dummyData";
+import { moderateText } from "../utils/moderateText";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -97,8 +99,13 @@ export const createVerifiedEvent = async (
         });
       }
 
-      // TODO add tags to event
+      // moderation stuff for events
+      const isFlagged = await moderateText(
+        validatedEventData.title,
+        validatedEventData.description,
+      );
 
+      // TODO add tags to event
       const event = await prisma.event.create({
         data: {
           startTime: validatedEventData.startTime,
@@ -109,7 +116,8 @@ export const createVerifiedEvent = async (
           organizationId,
           userId: loggedInUserId!,
           status: EventStatus.Verified,
-          isPublic: true,
+          isPublic: !isFlagged,
+          isFlagged: isFlagged,
         },
       });
 
@@ -188,8 +196,13 @@ export const createEvent = async (
         });
       }
 
-      // TODO add tags to event
+      // moderation stuff for events
+      const isFlagged = await moderateText(
+        validatedEventData.title,
+        validatedEventData.description,
+      );
 
+      // TODO add tags to event
       const event = await prisma.event.create({
         data: {
           startTime: validatedEventData.startTime,
@@ -199,7 +212,8 @@ export const createEvent = async (
           locationPlaceId: validatedEventData.locationPlaceId,
           userId: loggedInUserId!,
           status: EventStatus.NonVerified,
-          isPublic: true,
+          isPublic: !isFlagged,
+          isFlagged: isFlagged,
         },
       });
 
@@ -441,19 +455,51 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
       return distance <= defaultDistance;
     });
 
+    const marketPlaceItems = await prisma.item.findMany({
+      where: {
+        state: State.Available,
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    marketPlaceItems.filter((item) => {
+      const distance = getDistanceFromLatLonInKm(
+        userInstitution.location.latitude,
+        userInstitution.location.longitude,
+        item.location.latitude,
+        item.location.longitude,
+      );
+      return distance <= defaultDistance;
+    });
+
     res.status(200).json({
       message: "All events",
-      data: [
-        ...events.map((event) => {
-          return {
-            id: event.id,
-            latitude: event.location.latitude,
-            longitude: event.location.longitude,
-            title: event.title,
-            description: event.description,
-          };
-        }),
-      ],
+      data: {
+        events: [
+          ...events.map((event) => {
+            return {
+              id: event.id,
+              latitude: event.location.latitude,
+              longitude: event.location.longitude,
+              title: event.title,
+              description: event.description,
+            };
+          }),
+        ],
+        items: [
+          ...marketPlaceItems.map((item) => {
+            return {
+              id: item.id,
+              latitude: item.location.latitude,
+              longitude: item.location.longitude,
+              title: item.title,
+              description: item.description,
+            };
+          }),
+        ],
+      },
     });
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -505,7 +551,15 @@ export const getEventById = async (
     });
 
     const isLiked = event?.eventResponses.some(
-      (response) => response.userId === req.userId,
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Interested",
+    );
+
+    const isAttending = event?.eventResponses.some(
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Going",
     );
 
     if (!event) {
@@ -524,7 +578,11 @@ export const getEventById = async (
       message: "Event found",
       data: {
         ...event,
+        attendees: event.eventResponses.filter(
+          (response) => response.participationStatus === "Going",
+        ).length,
         isLiked: isLiked,
+        isAttending: isAttending,
       },
     });
   } catch (error) {
@@ -834,11 +892,12 @@ export const getMainPageEvents = async (
             eventResponses: {
               some: {
                 userId,
-                participationStatus: "Interested",
+                participationStatus: "Going",
               },
             },
           },
           {
+            status: EventStatus.Verified,
             endTime: {
               gt: new Date(),
             },
@@ -977,7 +1036,9 @@ export const LikeEvent = async (
     }
 
     const userLikedEvent = event.eventResponses.some(
-      (response) => response.userId === userId,
+      (response) =>
+        response.userId === userId &&
+        response.participationStatus === "Interested",
     );
 
     if (userLikedEvent) {
@@ -985,6 +1046,7 @@ export const LikeEvent = async (
         where: {
           eventId,
           userId,
+          participationStatus: ParticipationStatus.Interested,
         },
       });
     } else {
@@ -1017,6 +1079,9 @@ export const getAttendees = async (
       },
       include: {
         eventResponses: {
+          where: {
+            participationStatus: "Going",
+          },
           include: {
             user: true,
           },
@@ -1045,6 +1110,61 @@ export const getAttendees = async (
       message: "Event attendees",
       data: attendees,
     });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const attendEvent = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const eventId = IdParamSchema.parse(req.params).id;
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: true,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    const userLikedEvent = event.eventResponses.some(
+      (response) =>
+        response.userId === userId && response.participationStatus === "Going",
+    );
+
+    if (userLikedEvent) {
+      await prisma.userEventResponse.deleteMany({
+        where: {
+          eventId,
+          userId,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    } else {
+      await prisma.userEventResponse.create({
+        data: {
+          eventId,
+          userId: userId!,
+          participationStatus: ParticipationStatus.Going,
+        },
+      });
+    }
+
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }

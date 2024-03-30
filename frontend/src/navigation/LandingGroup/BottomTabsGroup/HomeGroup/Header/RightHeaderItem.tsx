@@ -1,14 +1,14 @@
-import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import useThemeContext from "~/hooks/useThemeContext";
 import { TouchableOpacity } from "react-native";
 import { useCallback } from "react";
+import useNavigationContext from '~/hooks/useNavigationContext';
 
 export default function RightHeaderItem() {
     const { theme } = useThemeContext();
-    const navigation = useNavigation<any>();
+    const { navigateTo } = useNavigationContext();
     const goToMessages = useCallback(() => {
-        navigation.navigate('Messages')
+        navigateTo({ page: 'Messages' })
     }, [])
 
     return (

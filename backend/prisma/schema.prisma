@@ -46,6 +46,7 @@ enum UserOrgStatus {
 
 enum ParticipationStatus {
   Interested
+  Going
 }
 
 // many of these permissions may not apply to our application
@@ -97,6 +98,7 @@ model User {
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
+  pushTokens           PushToken[]
 
   @@index([email])
   @@index([institutionId])
@@ -136,7 +138,8 @@ model Event {
   location        Location            @relation(fields: [locationPlaceId], references: [placeId])
   startTime       DateTime            @map("start_time")
   endTime         DateTime            @map("end_time")
-  isPublic        Boolean             @map("is_public")
+  isPublic        Boolean             @default(true) @map("is_public")
+  isFlagged         Boolean             @default(false)
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -158,7 +161,7 @@ model UserEventResponse {
   user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@id([userId, eventId])
+  @@id([userId, eventId, participationStatus])
   @@index([userId])
   @@index([eventId])
   @@map("user_event_response")
@@ -173,7 +176,8 @@ model Post {
   createdAt   DateTime  @unique @default(now()) @map("created_at")
   title       String
   description String?
-  public      Boolean   @default(true)
+  isPublic    Boolean   @default(true)
+  isFlagged     Boolean   @default(false)
   expiresAt   DateTime? @map("expires_at")
 
   numberOfSpots     Int? @map("number_of_spots")
@@ -347,16 +351,19 @@ model Item {
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   institutionId String       @map("institution_id")
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-
-  title       String
-  description String?
-  price       Int
-  createdAt   DateTime @unique @default(now()) @map("created_at")
-  condition   String?  @map("condition")
-  Image       Image[]
+  isPublic      Boolean      @default(true)
+  isFlagged       Boolean      @default(false)
+  title         String
+  description   String?
+  price         Int
+  createdAt     DateTime     @unique @default(now()) @map("created_at")
+  condition     String?      @map("condition")
+  Image         Image[]
 
   location        Location @relation(fields: [locationPlaceId], references: [placeId])
   locationPlaceId String
+
+  state State
 
   @@index([userId])
   @@index([institutionId])
@@ -374,9 +381,19 @@ model Image {
   @@map("image")
 }
 
-// enum Condition {
-//   New
-//   Used_Like_New
-//   Used_Good
-//   Used_Fair
-// }
+model PushToken {
+  userId    String @map("user_id")
+  pushToken String @map("push_token")
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, pushToken])
+  @@unique([userId, pushToken])
+  @@index([userId])
+  @@map("push_token")
+}
+
+enum State {
+  Available
+  Sold
+  Removed
+}

@@ -13,7 +13,6 @@ import { Button, TextInput } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import styled from "styled-components";
 import { MainContainer } from "~/components/ThemedComponents";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
@@ -22,6 +21,7 @@ import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import { Keyboard } from "react-native";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 type loginForm = {
   email: string;
@@ -31,7 +31,7 @@ type loginForm = {
 export default function Login() {
   const { theme } = useThemeContext();
   const { dismissKeyboard } = useAppContext();
-  const navigation = useNavigation<any>();
+  const { navigateTo, replaceStackWith } = useNavigationContext();
   const { signIn } = useAuthContext();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
@@ -52,14 +52,10 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = useCallback(
-    (data: loginForm) => {
-      console.log(data);
-      signIn(data.email, data.password);
-      navigation.dispatch(StackActions.replace("LandingGroup"));
-    },
-    [navigation],
-  );
+  const onSubmit = useCallback((data: loginForm) => {
+    signIn(data.email, data.password);
+    replaceStackWith("LandingGroup");
+  }, []);
 
   useEffect(() => {
     let keyboardShowListener: EmitterSubscription;
@@ -104,7 +100,7 @@ export default function Login() {
             )}
           </LogoContainer>
           <OverlayContainer $color={theme.colors.tertiary}>
-            <Header>{"Login"}</Header>
+            <Header $color={theme.colors.text}>{"Login"}</Header>
             <FormContainer>
               <Controller
                 control={control}
@@ -175,13 +171,14 @@ export default function Login() {
                     marginRight: 5,
                     fontSize: 16,
                     fontFamily: "Roboto-Reg",
+                    color: theme.colors.text,
                   }}
                 >
                   Don't have an account?
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("StudentSignUp");
+                    navigateTo({ page: "StudentSignUp" });
                   }}
                   activeOpacity={0.7}
                 >
@@ -228,7 +225,8 @@ const FormContainer = styled(View)`
     margin-right: auto;
 `;
 // prettier-ignore
-const Header = styled(Text)`
+const Header = styled(Text)<{ $color: string }>`
+    color: ${(props) => props.$color};
     font-size: 40px;
     font-weight: bold;
     margin-top: 64px;

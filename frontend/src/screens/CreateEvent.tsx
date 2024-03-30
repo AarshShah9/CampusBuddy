@@ -1,4 +1,5 @@
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -19,15 +20,16 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import { z } from "zod";
-import { Button } from "react-native-paper";
+import { Button, ProgressBar } from "react-native-paper";
 import ItemTag from "~/components/ItemTags";
 import { useCallback, useState } from "react";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
-import useEventsContext from "~/hooks/useEventsContext";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
 import useLoadingContext from "~/hooks/useLoadingContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
+import { createEvent } from "~/lib/apiFunctions/Events";
+import { useMutation } from "@tanstack/react-query";
 
 const IMG_HEIGHT = 300;
 
@@ -51,9 +53,7 @@ export default function CreateEvent() {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [image, setImage] = useState<ImagePickerAsset>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
-  const { createEvent } = useEventsContext();
-  const navigation = useNavigation<any>();
-  const { startLoading, stopLoading } = useLoadingContext();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
@@ -73,32 +73,35 @@ export default function CreateEvent() {
     resolver: zodResolver(schema),
   });
 
-  //Functions
-
   // Handle submission of user data
   const onSubmit = useCallback(
     (data: createEventType) => {
-      startLoading();
-      createEvent(data, image!)
-        .then((r) => {
-          if (r.status !== 201) {
-            throw new Error("Error creating event");
-          }
-          alert("Event Created");
-          // clear form and navigate to event page
-          setImage(undefined);
-          setSelectedImage(undefined);
-          setResetLocationValue(!resetLocationValue);
-          reset();
-          stopLoading();
-          navigation.navigate("Home");
-        })
-        .catch((e) => {
-          alert("Error creating event");
-        });
+      if (!image) {
+        alert("Please upload an image");
+        return;
+      }
+      setIsSubmitting(true);
+      createMutation.mutate(data);
     },
-    [resetLocationValue, image, createEvent, reset, navigation],
+    [resetLocationValue, image, createEvent, reset],
   );
+
+  const createMutation = useMutation({
+    mutationFn: (data: createEventType) => createEvent(data, image!),
+    onSuccess: () => {
+      reset();
+      setImage(undefined);
+      setSelectedImage(undefined);
+      setResetLocationValue(!resetLocationValue);
+      setIsSubmitting(false);
+      Alert.alert("Event Created", "Your event has been created successfully");
+    },
+    onError: (error) => {
+      console.log(error);
+      setIsSubmitting(false);
+      alert("Error creating event");
+    },
+  });
 
   //  Animation of scroll image
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -123,6 +126,9 @@ export default function CreateEvent() {
   });
 
   const addPhoto = useCallback(async () => {
+    if (isSubmitting) {
+      return;
+    }
     const result = await imageGetter();
     if (result.canceled) {
       return;
@@ -136,11 +142,14 @@ export default function CreateEvent() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
+      {createMutation.isPending && (
+        <ProgressBar indeterminate={true} visible={createMutation.isPending} />
+      )}
       <Animated.ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         ref={scrollRef}
-        style={{ height: "100%", backgroundColor: "white" }}
+        style={{ height: "100%", backgroundColor: theme.colors.tertiary }}
         scrollEventThrottle={16}
       >
         {/* View houses the image component, and icon for uploading images */}
@@ -173,7 +182,7 @@ export default function CreateEvent() {
           />
         </View>
         {/* View houses the controllers for each field */}
-        <View style={{ backgroundColor: "white" }}>
+        <View style={{ backgroundColor: theme.colors.tertiary }}>
           <Controller
             control={control}
             rules={{
@@ -186,15 +195,17 @@ export default function CreateEvent() {
                     marginBottom: 3,
                     fontFamily: "Nunito-Medium",
                     fontSize: 16,
+                    color: theme.colors.text,
                   }}
                 >
                   Event Name*
                 </Text>
                 <TextInput
-                  style={style.eventTextInput}
+                  style={[style.eventTextInput, { color: theme.colors.text }]}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  editable={!isSubmitting}
                 />
               </View>
             )}
@@ -221,6 +232,7 @@ export default function CreateEvent() {
                     style={{
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Start Time*
@@ -232,6 +244,7 @@ export default function CreateEvent() {
                     onChange={(event, time) => {
                       onChange(time);
                     }}
+                    disabled={isSubmitting}
                   />
                 </View>
               )}
@@ -257,6 +270,7 @@ export default function CreateEvent() {
                     style={{
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     End Time*
@@ -268,6 +282,7 @@ export default function CreateEvent() {
                     onChange={(event, time) => {
                       onChange(time);
                     }}
+                    disabled={isSubmitting}
                   />
                 </View>
               )}
@@ -285,6 +300,7 @@ export default function CreateEvent() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Location*
@@ -304,17 +320,21 @@ export default function CreateEvent() {
                 required: true,
               }}
               render={({ field: { onChange } }) => (
-                <View style={style.tagInput}>
+                <View style={[style.tagInput]}>
                   <Text
                     style={{
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Tags*
                   </Text>
-                  <ItemTag controllerOnChange={onChange} />
+                  <ItemTag
+                    controllerOnChange={onChange}
+                    editable={!isSubmitting}
+                  />
                 </View>
               )}
               name="tags"
@@ -332,16 +352,21 @@ export default function CreateEvent() {
                       marginBottom: 3,
                       fontFamily: "Nunito-Medium",
                       fontSize: 16,
+                      color: theme.colors.text,
                     }}
                   >
                     Event Description:*
                   </Text>
                   <TextInput
-                    style={style.eventDescriptionInput}
+                    style={[
+                      style.eventDescriptionInput,
+                      { color: theme.colors.text },
+                    ]}
                     multiline={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
+                    editable={!isSubmitting}
                   />
                 </View>
               )}
@@ -357,6 +382,7 @@ export default function CreateEvent() {
                 backgroundColor: theme.colors.primary,
               }}
               onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             >
               <Text
                 style={{

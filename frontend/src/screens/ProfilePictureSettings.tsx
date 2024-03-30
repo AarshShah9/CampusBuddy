@@ -3,7 +3,7 @@ import {
   BottomSheetBackdropProps,
   BottomSheetModal,
 } from "@gorhom/bottom-sheet";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -34,7 +34,7 @@ export default function ProfilePictureSettings() {
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
       handleIndicatorStyle={{ backgroundColor: "grey" }} // todo change this to use theme
-      backgroundStyle={{ borderRadius: 20 }}
+      backgroundStyle={{ borderRadius: 20, backgroundColor:theme.colors.tertiary }}
     >
       <View style={styles.contentContainer}>
         <TouchableOpacity onPress={onUpload}>
@@ -49,11 +49,11 @@ export default function ProfilePictureSettings() {
             <Ionicons
               name="image-outline"
               size={24}
-              color="black"
+              color={theme.colors.text}
               style={styles.icon}
             />
 
-            <Text style={styles.settingText}>Upload Picture</Text>
+            <Text style={[styles.settingText,{color:theme.colors.text}]}>Upload Picture</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={onDelete}>

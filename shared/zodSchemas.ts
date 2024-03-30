@@ -7,7 +7,7 @@ import { BooleanSchema } from "./utils";
 
 export const EventStatusSchema = z.enum(["Verified", "NonVerified"]);
 
-export const ParticipationStatusSchema = z.enum(["Interested"]);
+export const ParticipationStatusSchema = z.enum(["Interested", "Going"]);
 
 export const OrganizationStatusSchema = z.enum([
   "Pending",
@@ -159,7 +159,6 @@ export type UserCreateType = z.infer<typeof UserCreateSchema>;
  * Cannot change account type
  * Partial makes all fields optional
  */
-// export const UserUpdateSchema = UserSchema.partial();
 export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
@@ -592,4 +591,14 @@ export const loginJwtPayloadSchema = UserSchema.omit({
 export const OrgSignupPayloadSchema = z.object({
   user: UserCreateSchema,
   organization: OrganizationCreateSchema,
+});
+
+export const PushTokenSchema = z.object({
+  pushToken: z.string().min(1, { message: "Push token required" }),
+});
+
+export type PushTokenType = z.infer<typeof PushTokenSchema>;
+
+export const updateParticipantStatusSchema = z.object({
+  status: ParticipationStatusSchema,
 });

@@ -13,6 +13,7 @@ import UploadToS3, {
   generateUniqueFileName,
 } from "../utils/S3Uploader";
 import { RequestExtended } from "../middleware/verifyAuth";
+import { moderateText } from "../utils/moderateText";
 
 // test Post
 export const postTest = async (req: Request, res: Response) => {
@@ -48,7 +49,7 @@ export const getAllPosts = async (
         institutionId: user.institutionId!,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
     });
 
@@ -101,6 +102,12 @@ export const createLookingForPost = async (
         );
       }
 
+      // run moderation check
+      const isFlagged = await moderateText(
+        validatedPostData.title,
+        validatedPostData.description,
+      );
+
       // create post
       return prisma.post.create({
         data: {
@@ -108,6 +115,8 @@ export const createLookingForPost = async (
           institutionId: user.institutionId,
           title: validatedPostData.title,
           description: validatedPostData.description,
+          isPublic: !isFlagged,
+          isFlagged: isFlagged,
           expiresAt: validatedPostData.expiresAt,
           type: PostType.LookingFor,
           numberOfSpots: validatedPostData.numberOfSpots,
