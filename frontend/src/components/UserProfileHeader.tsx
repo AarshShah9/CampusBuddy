@@ -1,27 +1,30 @@
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
-import MenuIcon from "./MenuIcon";
-import useAuthContext from "~/hooks/useAuthContext";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Image } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { UserProfileHeaderType } from "~/types/Profile";
+import { getUserProfile } from "~/lib/apiFunctions/Profile";
 import { generateImageURL } from "~/lib/CDNFunctions";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
-import useProfileContext from "~/hooks/useProfileContext";
+import { useCallback } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
-export default function Header() {
+export default function UserProfileHeader({ id }: { id: string }) {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
-  const { user } = useAuthContext();
-  const { openPictureModal, profileData } = useProfileContext();
-  const [imageSource, setImageSource] = useState<any>(null);
 
-  useEffect(() => {
-    const imageSource = user?.image
-      ? { uri: generateImageURL(user.image) }
-      : null;
-    setImageSource(imageSource);
-  }, [user]);
+  const { data: profileData } = useQuery<UserProfileHeaderType>({
+    queryKey: ["profile", id],
+    queryFn: () => getUserProfile(id),
+    initialData: undefined,
+  });
+  const { navigateTo } = useNavigationContext();
+
+  const goToMessages = useCallback(() => {
+    navigateTo({ page: "Messages" });
+  }, []);
 
   return (
     <View
@@ -41,25 +44,27 @@ export default function Header() {
         }}
       >
         <View style={styles.upperSection}>
-          <TouchableOpacity onPress={openPictureModal}>
-            <View
-              style={[
-                styles.profilePicContainer,
-                { backgroundColor: theme.colors.profilePicContainer },
-              ]}
-            >
-              {imageSource ? (
-                <Image
-                  style={{ width: "100%", height: "100%" }}
-                  source={{ uri: imageSource.uri }}
+          <View
+            style={[
+              styles.profilePicContainer,
+              { backgroundColor: theme.colors.profilePicContainer },
+            ]}
+          >
+            {profileData?.user.image ? (
+              <Image
+                style={{ width: "100%", height: "100%" }}
+                source={{ uri: generateImageURL(profileData?.user.image) }}
+              />
+            ) : (
+              <View style={styles.iconContainer}>
+                <MaterialIcons
+                  name="person"
+                  size={50}
+                  color={theme.colors.tertiary}
                 />
-              ) : (
-                <View style={styles.iconContainer}>
-                  <MaterialIcons name="person" size={50} color="grey" />
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+              </View>
+            )}
+          </View>
           <View style={styles.miniInfoContainer}>
             <Text style={styles.profileInfoItem}>
               {profileData?.user.attended ?? "0"}
@@ -72,12 +77,16 @@ export default function Header() {
             </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
-          <MenuIcon />
+          <TouchableOpacity onPress={goToMessages}>
+            <MaterialCommunityIcons
+              name="chat-outline"
+              size={28}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.lowerSection}>
-          <Text style={{ fontWeight: "bold" }}>
-            {user?.firstName} {user?.lastName}
-          </Text>
+          <Text style={{ fontWeight: "bold" }}>{profileData?.user.name}</Text>
           <Text>{profileData?.user.programs?.[0]}</Text>
         </View>
       </View>

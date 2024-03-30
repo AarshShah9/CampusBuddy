@@ -11,7 +11,9 @@ import user from "./routes/user.routes";
 import org from "./routes/org.routes";
 import post from "./routes/post.routes";
 import item from "./routes/item.routes";
+import profile from "./routes/profile.routes";
 import notification from "./routes/notification.routes";
+import moderation from "./routes/moderation.routes";
 import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
 
@@ -57,7 +59,9 @@ app.use("/api/events", event);
 app.use("/api/orgs", org);
 app.use("/api/post", post);
 app.use("/api/item", item);
+app.use("/api/profile", profile);
 app.use("/api/notification", notification);
+app.use("/api/moderation", moderation);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
