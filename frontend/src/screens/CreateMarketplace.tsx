@@ -19,8 +19,8 @@ import { Button, Checkbox, ProgressBar } from "react-native-paper";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
-import { MarketPlaceItem } from "~/types/Events";
-import { createMarketPlaceItem } from "~/lib/apiFunctions/Events";
+import { MarketPlaceItem } from "~/types/MarketPlaceItem";
+import { createMarketPlaceItem } from "~/lib/apiFunctions/Items";
 import { useMutation } from "@tanstack/react-query";
 
 // React Hook Form Section

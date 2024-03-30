@@ -16,6 +16,11 @@ type EventDetailsRoute = {
   map?: boolean;
 };
 
+type MarketPlaceDetailsRoute = {
+  page: "MarketPlaceDetail";
+  id: string;
+};
+
 type MessagesRoute = {
   page: "Messages";
 };
@@ -30,7 +35,13 @@ type LoginRoute = {
 
 type MapDetailsRoute = {
   page: "MapDetails";
-  eventData: {
+  eventData?: {
+    title: string;
+    description: string;
+    latitude: number;
+    longitude: number;
+  }[];
+  itemData?: {
     title: string;
     description: string;
     latitude: number;
@@ -66,6 +77,7 @@ export type NavigationFunctionArgs =
   | AttendeesRoute
   | StudentSignUpRoute
   | OrgSignUpRoute
+  | MarketPlaceDetailsRoute
   | SettingsRoute;
 
 export type NavigableStacks =
