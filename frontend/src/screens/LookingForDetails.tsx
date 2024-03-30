@@ -46,6 +46,7 @@ export default function LookingForDetails() {
       <View style={[{ backgroundColor: theme.colors.onPrimary }]}>
         {/* Here will go the View for the title  */}
         <View style={styles.titleContainer}>
+        <View style={styles.profileContainer}>
           <Text
             style={{
               fontFamily: "Roboto-Medium",
@@ -56,6 +57,26 @@ export default function LookingForDetails() {
           >
             Title Text
           </Text>
+          <View style={styles.userContainer}>
+          <Image
+              style={{
+                height: 30,
+                width: 30,
+                backgroundColor: "red",
+                borderRadius: 90,
+                marginBottom: 5,
+              }}
+              source={{ uri: "https://picsum.photos/700" }}
+            />
+            <Text
+              style={{
+                marginLeft: 8,
+              }}
+            >
+              Username
+            </Text>
+            </View>
+          </View>
           <Text
             style={{
               fontFamily: "Nunito",
@@ -119,6 +140,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: "black",
+  },
+  profileContainer:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  userContainer:{
+    flexDirection: "row",
+    alignItems: "center",
   },
   contentContainer: {
     marginLeft: 16,
