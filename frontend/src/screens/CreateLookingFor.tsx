@@ -138,7 +138,7 @@ export default function CreateLookingFor() {
               >
                 Tags*
               </Text>
-              <ItemTag controllerOnChange={onChange} />
+              <ItemTag controllerOnChange={onChange} editable={isSubmitting} />
             </View>
           )}
           name="tags"
