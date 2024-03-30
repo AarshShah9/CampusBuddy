@@ -2,18 +2,11 @@ import { Pressable, RefreshControl, StyleSheet, View } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
 import { useNavigationState, useRoute } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { EventData, MarketPlaceCardProps } from "~/types/Events";
-import {
-  getUserProfileEvents,
-  getUserProfilePosts,
-} from "~/lib/apiFunctions/Profile";
+import { getUserProfilePosts } from "~/lib/apiFunctions/Profile";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useRefreshControl from "~/hooks/useRefreshControl";
 import { useCallback, useEffect } from "react";
 import { FlashList } from "@shopify/flash-list";
-import HorizontalScrollElement from "~/components/HorizontalScrollElement";
-import MarketplaceItem from "~/components/MarketplaceItem";
-import { generateImageURL } from "~/lib/CDNFunctions";
 import LookingForItem from "~/components/SearchLookingForBar";
 import { PostType } from "~/types/LookingFor";
 

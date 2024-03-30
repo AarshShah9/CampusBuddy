@@ -1,51 +1,100 @@
-import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
-import React from "react";
-import { AntDesign } from "@expo/vector-icons";
+import React, { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useRoute } from "@react-navigation/native";
+import { getMarketPlaceItem } from "~/lib/apiFunctions/Items";
+import { MarketPlaceItemResponse } from "~/types/MarketPlaceItem";
+import Modal from "react-native-modal";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 
-const Header = () => {
-  const { theme } = useThemeContext();
-  const { navigateTo, navigateBack } = useNavigationContext();
-  return (
-    <View
-      style={{
-        height: 60,
-        width: "100%",
-        backgroundColor: theme.colors.primary,
-        justifyContent: "space-between",
-        paddingHorizontal: 20,
-        flexDirection: "row",
-        alignItems: "center",
-      }}
-    >
-       <TouchableOpacity onPress={navigateBack}>
-          <AntDesign name="caretleft" size={24} color="white" />
-        </TouchableOpacity>
-    </View>
-  );
-};
 // Image Component of marketplace detail
-const ImageGallery = () => {
-  const { theme } = useThemeContext();
-  const example = [1, 2, 3];
-  // Users image will be loaded into the carousel 
+
+// TODO when the images havent been loaded the carousel just shows a blank screen and doesnt rerender when the images are loaded
+// TODO Add loading skeleton
+const ImageGallery = ({ images }: { images?: string[] }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openImage = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setModalVisible(true);
+  };
+
   return (
-    <View style={{ height: 300 }}>
-      <Carousel>
-        {example.map((item) => {
-          return (
+    <>
+      <Modal
+        isVisible={modalVisible}
+        onSwipeComplete={() => setModalVisible(false)}
+        swipeDirection={["down"]}
+        style={styles.modal}
+        propagateSwipe={true} // This prop allows inner ScrollView components to scroll as expected.
+        animationOut={"slideOutDown"}
+        animationInTiming={200}
+        animationOutTiming={200}
+        animationIn={"slideInUp"}
+        avoidKeyboard={true}
+        backdropColor={"black"}
+        backdropOpacity={1}
+        backdropTransitionInTiming={200}
+        backdropTransitionOutTiming={200}
+        coverScreen={true}
+      >
+        <View style={styles.fullScreenContainer}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+          {selectedImage && (
+            <Image
+              source={{ uri: generateImageURL(selectedImage) }}
+              style={styles.fullScreenImage}
+            />
+          )}
+        </View>
+      </Modal>
+      <View style={{ height: 250 }}>
+        <Carousel>
+          {images && images.length > 0 ? (
+            images.map((item, i) => (
+              <TouchableOpacity
+                style={styles.ExampleContainer}
+                key={i}
+                onPress={() => openImage(item)}
+              >
+                <Image
+                  source={{ uri: generateImageURL(item) }}
+                  style={{
+                    height: 300,
+                    width: "100%",
+                    backgroundColor: "black",
+                  }}
+                />
+              </TouchableOpacity>
+            ))
+          ) : (
             <View style={styles.ExampleContainer}>
-              <Text style={styles.ExampleText}>{item}</Text>
+              <Text style={styles.ExampleText}>No images available</Text>
             </View>
-          );
-        })}
-      </Carousel>
-    </View>
+          )}
+        </Carousel>
+      </View>
+    </>
   );
 };
 
@@ -97,23 +146,42 @@ const Profile = (item: { name: string }) => {
   );
 };
 // Component holding details about the item
-const ItemDescription = () => {
+type ItemDetail = {
+  title: string;
+  price: string;
+  createdAt: string;
+  description: string;
+  sellerFullName: string;
+  condition: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+};
+
+const ItemDescription = (props: ItemDetail) => {
   const { theme } = useThemeContext();
-  const exampleItemDetail = {
-    title: "M1 Macbook Air",
-    price: 300,
-    createdAt: new Date(),
-    description:
-      "PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH,PS4 BRAND NEW, GOOOD STUUUF YUUUH",
-    sellerFullName: "Kevin Nguyen",
-    condition: "Used-good",
-    location: {
-      latitude: 51,
-      longitude: 114,
-      name: "Calgary",
-      placeId: "Calgary",
-    },
-  };
+  const { navigateTo } = useNavigationContext();
+
+  const onMapPress = useCallback(() => {
+    navigateTo({
+      page: "MapDetails",
+      itemData: [
+        {
+          title: props.title,
+          description: props.description,
+          latitude: props.latitude,
+          longitude: props.longitude,
+        },
+      ],
+    });
+  }, [
+    props.latitude,
+    props.longitude,
+    props.title,
+    props.description,
+    navigateTo,
+  ]);
+
   return (
     <View
       style={{
@@ -128,18 +196,18 @@ const ItemDescription = () => {
           flexDirection: "column",
           borderBottomColor: "#B0CFFF",
           borderBottomWidth: 1,
-          marginTop:4
+          marginTop: 4,
         }}
       >
         <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
-          {exampleItemDetail.title}
+          {props.title}
         </Text>
         <Text style={[{ color: theme.colors.text }, styles.PriceText]}>
-          ${exampleItemDetail.price}
+          ${props.price}
         </Text>
-        <LocationChip location={exampleItemDetail.location.name} size={"normal"}/>
+        <LocationChip location={props.location} size={"normal"} />
         <Text style={[{ color: theme.colors.text }, styles.DateText]}>
-          Listed {exampleItemDetail.createdAt.toDateString()}
+          Listed {convertUTCToTimeAndDate(props.createdAt)}
         </Text>
       </View>
       <View
@@ -152,11 +220,16 @@ const ItemDescription = () => {
         }}
       >
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
-          {exampleItemDetail.description}
+          {props.description}
         </Text>
         <View style={{ flexDirection: "row" }}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 14, marginTop: 2, marginLeft:10 }}
+            style={{
+              color: theme.colors.text,
+              fontSize: 14,
+              marginTop: 2,
+              marginLeft: 10,
+            }}
           >
             Condition:
           </Text>
@@ -168,7 +241,7 @@ const ItemDescription = () => {
               marginLeft: 20,
             }}
           >
-            {exampleItemDetail.condition}
+            {props.condition}
           </Text>
         </View>
       </View>
@@ -184,27 +257,30 @@ const ItemDescription = () => {
         <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
           Seller Information
         </Text>
-        <Profile name={exampleItemDetail.sellerFullName} />
+        <Profile name={props.sellerFullName} />
       </View>
       <View
-          style={{
-            marginTop:10,
-            marginBottom:15,
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: theme.colors.tertiary,
-          }}
-        >
-            <TouchableOpacity onPress={()=>{console.log("pressed")}}>
-              <MapComponentSmall
-                latitude={exampleItemDetail?.location.latitude}
-                longitude={exampleItemDetail?.location.longitude}
-              />
-            </TouchableOpacity>
-        </View>
+        style={{
+          marginTop: 10,
+          marginBottom: 15,
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.colors.tertiary,
+          paddingBottom: 60,
+        }}
+      >
+        {props.location && (
+          <TouchableOpacity onPress={onMapPress}>
+            <MapComponentSmall
+              latitude={props?.latitude}
+              longitude={props?.longitude}
+              type={"item"}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
-    
   );
 };
 
@@ -213,12 +289,21 @@ const ItemDescription = () => {
  * */
 export default function MarketPlaceDetail() {
   const { theme } = useThemeContext();
+
+  const {
+    params: { id },
+  } = useRoute<any>();
+
+  const { data: marketplaceData } = useQuery<MarketPlaceItemResponse>({
+    queryKey: ["marketplace-detail", id],
+    queryFn: () => getMarketPlaceItem(id),
+  });
+
   return (
     <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
-      <Header />
       <ScrollView>
-        <ImageGallery />
-        <ItemDescription />
+        <ImageGallery images={marketplaceData?.images} />
+        {marketplaceData && <ItemDescription {...marketplaceData} />}
       </ScrollView>
     </View>
   );
@@ -230,12 +315,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#a3c9a8",
+    backgroundColor: "black",
   },
   ExampleText: {
-    color: "#1f2d3d",
+    color: "white",
     opacity: 0.7,
-    fontSize: 48,
+    fontSize: 28,
     fontWeight: "bold",
   },
   MainTitleText: {
@@ -247,18 +332,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     fontFamily: "Roboto-Reg",
-    marginLeft:10,
-    marginTop:5
+    marginLeft: 10,
+    marginTop: 5,
   },
   PriceText: {
     fontSize: 20,
     fontFamily: "Roboto-Bold",
-    marginBottom:5
+    marginBottom: 5,
   },
-  DateText:{
-    fontSize:14,
-    marginTop:5,
+  DateText: {
+    fontSize: 14,
+    marginTop: 5,
     fontFamily: "Roboto-Reg",
-    marginBottom:5
-  }
+    marginBottom: 5,
+  },
+  fullScreenContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  fullScreenImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    borderRadius: 20,
+    padding: 10,
+    zIndex: 1,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  modal: {
+    margin: 0,
+    justifyContent: "center",
+  },
 });

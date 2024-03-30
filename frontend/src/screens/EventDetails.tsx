@@ -87,8 +87,9 @@ export default function EventDetails({
         ],
       });
     }
-  }, [eventData]); // TODO fix optimistic updates
+  }, [eventData]);
 
+  // TODO fix optimistic updates
   const isOptimistic =
     likeMutation.variables &&
     (likeMutation.isPending ? !likeMutation.variables.previousState : false);
