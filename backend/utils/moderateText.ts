@@ -33,8 +33,6 @@ export const moderateText = async (
 
     const isProfaneTitle = filter.isProfane(title);
 
-    console.log("title", title, isProfaneTitle);
-
     if (description !== null) {
       const responseDescription = await openai.moderations.create({
         input: description,
