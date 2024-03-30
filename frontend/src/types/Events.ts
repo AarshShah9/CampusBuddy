@@ -138,21 +138,3 @@ export type AttendeeResponse = {
   name: string;
   image: string;
 };
-
-// export type MarketPlaceItem = {
-//   title: string;
-//   price: string;
-//   condition: string;
-//   description: string;
-//   locationPlaceId: string;
-//   // tags?: string[];
-// };
-//
-// export type MarketPlaceCardProps = {
-//   id: string;
-//   title: string;
-//   date: string;
-//   location: string;
-//   price: string;
-//   image: string;
-// };
