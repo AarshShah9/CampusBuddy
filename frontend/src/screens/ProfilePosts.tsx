@@ -66,6 +66,7 @@ export default function ProfilePosts() {
                 title={item.title}
                 description={item.description}
                 requiredMembers={item.spotsLeft}
+                id={item.id}
               />
             </View>
           </Pressable>

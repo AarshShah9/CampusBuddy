@@ -46,11 +46,6 @@ export default function Services() {
       refetch();
     });
   }, []);
-  const {navigateTo} = useNavigationContext();
-
-  const openLookingForDetails = useCallback((id:string) =>{
-    navigateTo({ page: "LookingForDetails", id});
-  }, []);
 
   useEffect(() => {
     if (isLoading) startLoading();
@@ -75,11 +70,12 @@ export default function Services() {
         renderItem={({ item }) => (
           <Pressable>
             <View style={{ paddingHorizontal: 20 }}>
-                <LookingForItem
+              <LookingForItem
                 key={item.id}
                 title={item.title}
                 description={item.description}
                 requiredMembers={item.spotsLeft}
+                id={item.id}
               />
             </View>
           </Pressable>
