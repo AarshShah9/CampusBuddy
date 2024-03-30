@@ -90,9 +90,11 @@ export default function LookingForDetails() {
             </TouchableOpacity>
           </View>
           {/* Join Button */}
-          <Button style={styles.joinButton} mode="contained">
-            Join
-          </Button>
+          <TouchableOpacity>
+            <Button style={styles.joinButton} mode="contained">
+              Join
+            </Button>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
