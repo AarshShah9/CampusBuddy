@@ -116,3 +116,21 @@ export const getAttendees = async (id: string) => {
     console.log(err);
   }
 };
+
+export const Search = async ({
+  query,
+  page = 1,
+}: {
+  query: string;
+  page?: number;
+}) => {
+  try {
+    return (
+      await CBRequest("POST", "/api/search/", {
+        body: { query, limit: 10, page },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

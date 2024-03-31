@@ -602,3 +602,9 @@ export type PushTokenType = z.infer<typeof PushTokenSchema>;
 export const updateParticipantStatusSchema = z.object({
   status: ParticipationStatusSchema,
 });
+
+export const searchSchema = z.object({
+  query: z.string(),
+  page: z.number().int().min(1),
+  limit: z.number().int().min(1),
+});
