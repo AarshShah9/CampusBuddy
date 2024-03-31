@@ -10,7 +10,6 @@ import {
 } from "../utils/googleMapsApi";
 import { State } from "@prisma/client";
 import { moderateText } from "../utils/moderateText";
-import { title } from "process";
 
 // test Item
 export const itemTest = async (req: Request, res: Response) => {

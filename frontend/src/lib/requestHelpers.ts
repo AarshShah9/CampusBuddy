@@ -164,6 +164,7 @@ const allowedEndpoints = [
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
   "/api/notification/storePushToken",
+  "/api/search/",
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints
