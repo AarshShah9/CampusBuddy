@@ -1,26 +1,53 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
-import { useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
-import useEventsContext from "~/hooks/useEventsContext";
-import LocationChip from "~/components/LocationChip";
-import MapComponentSmall from "~/components/MapComponentSmall";
-import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import useNavigationContext from "~/hooks/useNavigationContext";
-import LoadingSkeleton from "~/components/LoadingSkeleton";
 import PersonChip from "~/components/PersonChip";
 import CommentsChip from "~/components/CommentsChip";
-import { services } from "~/mockData/ServicesData";
+import { useRoute } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { getLookingForById } from "~/lib/apiFunctions/LookingFor";
+import {
+  convertUTCToLocalDate,
+  convertUTCToTimeAndDate,
+} from "~/lib/timeFunctions";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import { useCallback } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 /**
- * This component is responsible for loading Looking For Details details based on passed ID.
+ * This component is responsible for loading Looking For Details based on passed ID.
  * */
+
+type LookingForDetailsType = {
+  id: string;
+  title: string;
+  description: string;
+  spotsLeft: number;
+  createdAt: string;
+  userId: string;
+  userName: string;
+  userImage: string;
+};
 
 export default function LookingForDetails() {
   const { theme, inDarkMode } = useThemeContext();
+  let {
+    params: { id },
+  } = useRoute<any>();
+  const { navigateTo } = useNavigationContext();
+
+  const handleClickCommentSection = useCallback(() => {
+    navigateTo({ page: "LookingForCommentsScreen", id });
+  }, [navigateTo, id]);
+
+  const { data: lookingForData } = useQuery<LookingForDetailsType>({
+    queryKey: ["lookingFor-details", id],
+    queryFn: async () => getLookingForById(id),
+  });
+
+  const onUserPress = useCallback(() => {
+    navigateTo({ page: "UserProfile", id: lookingForData?.userId ?? "" });
+  }, [lookingForData?.userId]);
 
   return (
     <View
@@ -30,63 +57,53 @@ export default function LookingForDetails() {
       ]}
     >
       {/* This is the header container */}
-      <View
-        style={[
-          styles.headerContainer,
-          { backgroundColor: theme.colors.primary },
-        ]}
-      >
-        <Entypo name="chevron-left" size={28} color="white" />
-        <Entypo
-          name="heart"
-          size={28}
-          color="white" // TODO use theme context
-        />
-      </View>
       <View style={[{ backgroundColor: theme.colors.onPrimary }]}>
         {/* Here will go the View for the title  */}
         <View style={styles.titleContainer}>
-        <View style={styles.profileContainer}>
-          <Text
-            style={{
-              fontFamily: "Roboto-Medium",
-              fontSize: 16,
-              marginBottom: 4,
-              // Need to add Text Color Change
-            }}
-          >
-            Title Text
-          </Text>
-          <View style={styles.userContainer}>
-          <Image
-              style={{
-                height: 30,
-                width: 30,
-                backgroundColor: "red",
-                borderRadius: 90,
-                marginBottom: 5,
-              }}
-              source={{ uri: "https://picsum.photos/700" }}
-            />
+          <View style={styles.profileContainer}>
             <Text
               style={{
-                marginLeft: 8,
+                fontSize: 16,
+                marginBottom: 4,
+                // TODO Need to add Text Color Change
               }}
             >
-              Username
+              {lookingForData?.title}
             </Text>
-            </View>
+            <TouchableOpacity onPress={onUserPress}>
+              <View style={styles.userContainer}>
+                {lookingForData?.userImage && (
+                  <Image
+                    style={{
+                      height: 30,
+                      width: 30,
+                      backgroundColor: "grey",
+                      borderRadius: 90,
+                      marginBottom: 5,
+                    }}
+                    source={{
+                      uri: generateImageURL(lookingForData?.userImage),
+                    }}
+                  />
+                )}
+                <Text
+                  style={{
+                    marginLeft: 8,
+                  }}
+                >
+                  {lookingForData?.userName}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
           <Text
             style={{
-              fontFamily: "Nunito",
               fontSize: 12,
               marginBottom: 8,
             }}
           >
-            Date
+            {convertUTCToTimeAndDate(lookingForData?.createdAt)}
           </Text>
-          <LocationChip location="Location if Relevant :D " />
         </View>
 
         {/* looking for description  Section */}
@@ -95,28 +112,31 @@ export default function LookingForDetails() {
             <Text
               style={{
                 marginBottom: 8,
-                fontFamily: "Roboto",
                 fontSize: 16,
               }}
             >
-              This is for the Description
+              {lookingForData?.description}
             </Text>
           </View>
 
           {/* Attending and comments Chip */}
           <View style={styles.chipContainer}>
-            <PersonChip numberOfUsers={5} />
-            <TouchableOpacity>
+            {lookingForData?.spotsLeft ? (
+              <PersonChip numberOfUsers={lookingForData?.spotsLeft} />
+            ) : (
+              <View />
+            )}
+            <TouchableOpacity onPress={handleClickCommentSection}>
               <CommentsChip />
             </TouchableOpacity>
           </View>
           {/* Join Button */}
-          <TouchableOpacity>
-            <Button style={styles.joinButton} mode="contained">
-              Join
-            </Button>
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity style={styles.buttonContainer}>
+          <Button style={styles.joinButton} mode="contained">
+            Join
+          </Button>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -139,13 +159,13 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
-    borderBottomColor: "black",
+    borderBottomColor: "grey",
   },
-  profileContainer:{
+  profileContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  userContainer:{
+  userContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -153,18 +173,18 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
   },
-  textContainer: {
-    paddingHorizontal: 16,
-  },
+  textContainer: {},
   chipContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "black",
   },
   joinButton: {
+    marginVertical: 16,
+  },
+  buttonContainer: {
+    width: "90%",
+    alignSelf: "center",
     marginVertical: 16,
   },
 });

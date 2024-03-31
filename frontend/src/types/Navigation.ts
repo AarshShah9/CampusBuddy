@@ -22,9 +22,9 @@ type MarketPlaceDetailsRoute = {
 };
 
 type LookingForDetailsRoute = {
-    page: 'LookingForDetails'
-    id: string,
-}
+  page: "LookingForDetails";
+  id: string;
+};
 
 type MessagesRoute = {
   page: "Messages";
@@ -71,6 +71,11 @@ type SettingsRoute = {
   page: "Settings";
 };
 
+type CommentsRoute = {
+  page: "LookingForCommentsScreen";
+  id: string;
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -81,8 +86,10 @@ export type NavigationFunctionArgs =
   | MapDetailsRoute
   | AttendeesRoute
   | StudentSignUpRoute
-  | OrgSignUpRoute | LookingForDetailsRoute
+  | OrgSignUpRoute
+  | LookingForDetailsRoute
   | MarketPlaceDetailsRoute
+  | CommentsRoute
   | SettingsRoute;
 
 export type NavigableStacks =

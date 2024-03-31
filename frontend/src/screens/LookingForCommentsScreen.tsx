@@ -1,11 +1,36 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Entypo } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
 import CommentsBar from "~/components/CommentsBar";
+import { useRoute } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { getLookingForCommentsById } from "~/lib/apiFunctions/LookingFor";
+import { ThemedText } from "~/components/ThemedComponents";
 
-export default function LookingForDetails() {
+export type commentType = {
+  content: string;
+  createdAt: string;
+  id: string;
+  userId: string;
+  userImage: string;
+  userName: string;
+};
+
+export default function LookingForCommentsScreen() {
   const { theme, inDarkMode } = useThemeContext();
+  let {
+    params: { id },
+  } = useRoute<any>();
+
+  const {
+    data: comments,
+    isLoading,
+    isFetching,
+  } = useQuery<commentType[]>({
+    queryKey: ["comments", id],
+    queryFn: async () => getLookingForCommentsById(id),
+    initialData: [],
+  });
 
   return (
     <View
@@ -14,18 +39,11 @@ export default function LookingForDetails() {
         { backgroundColor: theme.colors.onPrimary }, // Color incorrect for dark mode
       ]}
     >
-      <View
-        style={[
-          styles.headerContainer,
-          { backgroundColor: theme.colors.primary },
-        ]}
-      >
-        <Entypo name="chevron-left" size={28} color="white" />
-      </View>
-      <View style={[{ backgroundColor: theme.colors.onPrimary }]}>
-      </View>
-      {/* Main Container */}
-      <CommentsBar />
+      {comments &&
+        comments.map((comment, i) => <CommentsBar {...comment} key={i} />)}
+      {comments?.length === 0 && !isLoading && !isFetching && (
+        <ThemedText style={styles.noCommentsText}>No Comments</ThemedText>
+      )}
     </View>
   );
 }
@@ -41,5 +59,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
+  },
+  noCommentsText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 45,
   },
 });

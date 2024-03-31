@@ -1,8 +1,11 @@
 import { View, StyleSheet, Image } from "react-native";
 import { Text } from "react-native-paper";
 import ReplyChip from "./ReplyChip";
+import { commentType } from "~/screens/LookingForCommentsScreen";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 
-export default function CommentsBar() {
+export default function CommentsBar(props: commentType) {
   return (
     <View style={styles.mainContainer}>
       {/* Header Bar */}
@@ -10,31 +13,31 @@ export default function CommentsBar() {
         <View style={styles.headerContainer}>
           <View style={styles.profileContainer}>
             {/* Profile Pic */}
-            <Image
-              style={{
-                height: 30,
-                width: 30,
-                backgroundColor: "red",
-                borderRadius: 90,
-                marginBottom: 5,
-              }}
-              source={{ uri: "https://picsum.photos/700" }}
-            />
+            {props?.userImage && (
+              <Image
+                style={{
+                  height: 30,
+                  width: 30,
+                  backgroundColor: "grey",
+                  borderRadius: 90,
+                  marginBottom: 5,
+                }}
+                source={{ uri: generateImageURL(props.userImage) }}
+              />
+            )}
             <Text
               style={{
                 marginLeft: 8,
               }}
             >
-              Username
+              {props.userName}
             </Text>
           </View>
-          <Text>Date Posted</Text>
+          <Text>{convertUTCToTimeAndDate(props.createdAt)}</Text>
         </View>
         {/* Comment Section */}
         <View>
-          <Text style={{ fontFamily: "Roboto", fontSize: 16 }}>
-            Comment will go here
-          </Text>
+          <Text style={{ fontSize: 16 }}>{props.content}</Text>
         </View>
       </View>
       {/* Up Vote and DownVote Section */}
@@ -42,35 +45,33 @@ export default function CommentsBar() {
         <ReplyChip />
       </View>
     </View>
-    
   );
 }
 
 const styles = StyleSheet.create({
-    mainContainer: {
-      width: "auto",
-      height: 200,
-      paddingHorizontal: 16,
-      flexDirection: "column",
-      justifyContent: "space-between", 
-    },
-    dataContainer: {
-      flexDirection: "column",
-    },
-    headerContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginVertical: 16,
-    },
-    profileContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    chipStyleContainer: {
-      flexDirection: "row",
-      justifyContent: "flex-end", 
-      marginTop: "auto",
-      paddingBottom: 24
-    },
-  });
-  
+  mainContainer: {
+    width: "auto",
+    height: 200,
+    paddingHorizontal: 16,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  dataContainer: {
+    flexDirection: "column",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 16,
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  chipStyleContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: "auto",
+    paddingBottom: 24,
+  },
+});

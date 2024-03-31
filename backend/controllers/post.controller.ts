@@ -321,3 +321,111 @@ export const deletePost = async (
     next(error);
   }
 };
+
+export const getPostById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post with id ${postId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: post.userId,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${post.userId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const postResponse = {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      spotsLeft: post.numberOfSpotsLeft,
+      createdAt: post.createdAt,
+      userId: post.userId,
+      userName: user.firstName + " " + user.lastName,
+      userImage: user.profilePic,
+    };
+
+    res.status(200).json({
+      message: "Post found",
+      data: postResponse,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getPostCommentsById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        comments: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post with id ${postId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const postComments = post.comments.map((comment) => {
+      return {
+        id: comment.id,
+        content: comment.text,
+        createdAt: comment.createdAt,
+        userId: comment.userId,
+        userName: comment.user.firstName + " " + comment.user.lastName,
+        userImage: comment.user.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      message: "Post comments found",
+      data: postComments,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
