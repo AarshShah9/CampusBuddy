@@ -5,7 +5,7 @@ import {
   OrganizationCreateSchema,
   OrganizationCreateType,
   OrgSignupPayloadSchema,
-  tokenSchema,
+  AuthTokenSchema,
   UserCreateSchema,
   UserCreateType,
   UserUpdateSchema,
@@ -139,7 +139,7 @@ export const verifyStudentSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
@@ -623,7 +623,7 @@ export const verifyExistingOrgSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(token, jwtSecret);
@@ -746,7 +746,7 @@ export const verifyNewOrgSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
