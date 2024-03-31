@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { useCallback, useLayoutEffect } from "react";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import {Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
