@@ -8,6 +8,9 @@ import MessagesGroup from "./MessagesGroup";
 import MapDetails from "~/screens/MapDetails";
 import Attendees from "~/screens/Attendees";
 import ProfilePage from "~/screens/ProfilePage";
+import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
+import LookingForDetails from "~/screens/LookingForDetails";
+import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +33,48 @@ export default function LandingGroup() {
           <Stack.Screen
             name="EventDetails"
             component={EventDetails}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
+            }}
+          />
+          <Stack.Screen
+            name="LookingForDetails"
+            component={LookingForDetails}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
+            }}
+          />
+          <Stack.Screen
+            name="LookingForCommentsScreen"
+            component={LookingForCommentsScreen}
+            options={{
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
+              headerTitle: "",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerTintColor: theme.colors.onSecondary,
+            }}
+          />
+          <Stack.Screen
+            name="MarketPlaceDetail"
+            component={MarketPlaceDetail}
             options={{
               headerTitleStyle: {
                 color: theme.colors.onSecondary,

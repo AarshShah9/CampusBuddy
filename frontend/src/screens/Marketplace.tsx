@@ -2,7 +2,6 @@ import {
   View,
   TouchableWithoutFeedback,
   Pressable,
-  ScrollView,
   StyleSheet,
   RefreshControl,
 } from "react-native";
@@ -10,13 +9,12 @@ import MarketplaceItem from "~/components/MarketplaceItem";
 import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
 import { useQuery } from "@tanstack/react-query";
-import { MarketPlaceCardProps } from "~/types/Events";
-import { getMarketPlaceItems } from "~/lib/apiFunctions/Events";
+import { MarketPlaceCardProps } from "~/types/MarketPlaceItem";
+import { getMarketPlaceItems } from "~/lib/apiFunctions/Items";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useRefreshControl from "~/hooks/useRefreshControl";
 import { useCallback, useEffect } from "react";
-import LookingForItem from "~/components/SearchLookingForBar";
 import { FlashList } from "@shopify/flash-list";
 
 export default function Marketplace() {

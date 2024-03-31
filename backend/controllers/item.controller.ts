@@ -254,3 +254,68 @@ export const deleteItem = async (
     next(error);
   }
 };
+
+export const getItemById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const itemId = IdParamSchema.parse(req.params).id;
+    const item = await prisma.item.findUnique({
+      where: {
+        id: itemId,
+      },
+      include: {
+        location: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    const images = await prisma.image.findMany({
+      where: {
+        itemId: item?.id,
+      },
+      select: {
+        url: true,
+        itemId: true,
+      },
+    });
+
+    if (!item) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Item with id ${itemId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const itemResponse = {
+      id: item.id,
+      title: item.title,
+      price: item.price,
+      location: item.location.name,
+      latitude: item.location.latitude,
+      longitude: item.location.longitude,
+      createdAt: item.createdAt,
+      condition: item.condition,
+      description: item.description,
+      sellerFullName: item.user.firstName + " " + item.user.lastName,
+      sellerId: item.userId,
+      images: images?.map((image) => image.url),
+    };
+
+    res.status(200).json({
+      message: "Item found",
+      data: itemResponse,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};

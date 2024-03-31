@@ -16,6 +16,16 @@ type EventDetailsRoute = {
   map?: boolean;
 };
 
+type MarketPlaceDetailsRoute = {
+  page: "MarketPlaceDetail";
+  id: string;
+};
+
+type LookingForDetailsRoute = {
+  page: "LookingForDetails";
+  id: string;
+};
+
 type MessagesRoute = {
   page: "Messages";
 };
@@ -30,7 +40,13 @@ type LoginRoute = {
 
 type MapDetailsRoute = {
   page: "MapDetails";
-  eventData: {
+  eventData?: {
+    title: string;
+    description: string;
+    latitude: number;
+    longitude: number;
+  }[];
+  itemData?: {
     title: string;
     description: string;
     latitude: number;
@@ -55,6 +71,11 @@ type SettingsRoute = {
   page: "Settings";
 };
 
+type CommentsRoute = {
+  page: "LookingForCommentsScreen";
+  id: string;
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -66,6 +87,9 @@ export type NavigationFunctionArgs =
   | AttendeesRoute
   | StudentSignUpRoute
   | OrgSignUpRoute
+  | LookingForDetailsRoute
+  | MarketPlaceDetailsRoute
+  | CommentsRoute
   | SettingsRoute;
 
 export type NavigableStacks =

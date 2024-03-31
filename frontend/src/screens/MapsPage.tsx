@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import { useQuery } from "@tanstack/react-query";
 import { getAllMapEvents } from "~/lib/apiFunctions/Events";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MapsPage() {
   const { location } = useAppContext();
@@ -15,6 +16,7 @@ export default function MapsPage() {
     isError,
     error,
     isSuccess,
+    refetch,
   } = useQuery({
     queryKey: ["map-page-events"],
     queryFn: getAllMapEvents,
@@ -43,6 +45,13 @@ export default function MapsPage() {
     isSuccess,
     location,
   ]);
+
+  // TODO Prevent this from firing twice on initial load
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   if (!location) {
     return null;

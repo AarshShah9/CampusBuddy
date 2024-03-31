@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { MarketPlaceCardProps } from "~/types/Events";
+import { MarketPlaceCardProps } from "~/types/MarketPlaceItem";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useRefreshControl from "~/hooks/useRefreshControl";
 import { useCallback, useEffect } from "react";
@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
 import useAppContext from "~/hooks/useAppContext";
-import { getMarketPlaceItems } from "~/lib/apiFunctions/Events";
 import { FlashList } from "@shopify/flash-list";
 import MarketplaceItem from "~/components/MarketplaceItem";
 import { generateImageURL } from "~/lib/CDNFunctions";
