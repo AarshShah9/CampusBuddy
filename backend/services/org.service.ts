@@ -365,8 +365,8 @@ export async function getUserRolesInOrganization(
   }
 }
 
-// Check if the organization exists in the database
-export async function checkOrganizationExists(organizationId: string) {
+// Fetch the organization by its id
+export async function getOrgById(organizationId: string) {
   try {
     const existingOrganization = await prisma.organization.findUnique({
       where: { id: organizationId },
