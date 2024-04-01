@@ -1,8 +1,9 @@
 import {
+  Alert,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -19,9 +20,9 @@ import * as zod from "zod";
 import { useCallback, useEffect, useState } from "react";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
-import { Keyboard } from "react-native";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import ErrorText from "~/components/ErrorText";
 
 type loginForm = {
   email: string;
@@ -53,8 +54,19 @@ export default function Login() {
   });
 
   const onSubmit = useCallback((data: loginForm) => {
-    signIn(data.email, data.password);
-    replaceStackWith("LandingGroup");
+    const dev = false;
+    if (!dev) {
+      if (errors.email || errors.password) return;
+      if (!data.email || !data.password) {
+        Alert.alert("Error Logging In", "Please fill out all fields.");
+        return;
+      }
+    }
+
+    signIn(data.email, data.password, dev).then((succeeded) => {
+      if (succeeded) replaceStackWith("LandingGroup");
+      else Alert.alert("Error Logging In", "Something went wrong!");
+    });
   }, []);
 
   useEffect(() => {
@@ -109,7 +121,13 @@ export default function Login() {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputField
-                    placeholder="Email"
+                    label={
+                      errors.email ? (
+                        <ErrorText error={"Email is required."} />
+                      ) : (
+                        "Email"
+                      )
+                    }
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -121,7 +139,7 @@ export default function Login() {
                 )}
                 name="email"
               />
-              {errors.email && <Text>Email is required.</Text>}
+
               <Controller
                 control={control}
                 rules={{
@@ -129,7 +147,13 @@ export default function Login() {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputField
-                    placeholder="Password"
+                    label={
+                      errors.password ? (
+                        <ErrorText error={"Password is required."} />
+                      ) : (
+                        "Password"
+                      )
+                    }
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -141,8 +165,6 @@ export default function Login() {
                 )}
                 name="password"
               />
-              {errors.password && <Text>Password is required.</Text>}
-
               <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
                 <Text
                   style={{

@@ -24,7 +24,7 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { createOrganizationWithDefaults } from "../services/org.service";
 import { loginJwtPayloadType, RequestExtended } from "../middleware/verifyAuth";
 import { comparePassword, hashPassword } from "../utils/hasher";
-import { userOrganizationRoles, users } from "../prisma/data";
+import { users } from "../prisma/data";
 import { alreadyVerifiedMessage, thankYouMessage } from "../utils/emails";
 import UploadToS3, {
   deleteFromS3,
@@ -335,7 +335,6 @@ export const loginUser = async (
           id: existingUser.id,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
-          image: existingUser.profilePic,
           organizationName: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) =>
               UserOrganizationRole.organization.organizationName,
@@ -347,14 +346,16 @@ export const loginUser = async (
           organizationImage: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) => UserOrganizationRole.organization.image,
           ),
-          type: "Organization Admin",
+          type: "Organization_Admin",
         },
       });
       //user not a student, or an approved organization owner
-    } else {
+    } else if (existingUser.accountType === "PendingOrg") {
       res
         .status(401)
         .json({ error: "Organization has not been approved, login failed." });
+    } else {
+      res.status(401).json({ error: "Invalid user account type" });
     }
   } catch (error) {
     next(error);
