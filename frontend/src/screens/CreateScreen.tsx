@@ -7,6 +7,7 @@ import CreateLookingFor from "./CreateLookingFor";
 import CreateMarketplace from "./CreateMarketplace";
 import { MaterialIcons } from "@expo/vector-icons";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import useAuthContext from "~/hooks/useAuthContext";
 
 const pages = [
   { label: "Event", value: "1" },
@@ -18,6 +19,7 @@ const pages = [
 export default function CreateScreen() {
   const { theme } = useThemeContext();
   const [currentSelected, setCurrentSelected] = useState("1");
+  const { userType } = useAuthContext();
   const { navigateBack } = useNavigationContext();
 
   return (
@@ -31,25 +33,26 @@ export default function CreateScreen() {
             style={{ marginTop: 60, marginLeft: 10 }}
           />
         </TouchableOpacity>
-
-        <Dropdown
-          style={{ width: 125, marginTop: 50, paddingRight: 5 }}
-          itemTextStyle={{ fontSize: 12, fontFamily: "Nunito-Medium" }}
-          placeholderStyle={{ color: "white" }}
-          selectedTextStyle={{
-            color: "white",
-            fontSize: 16,
-            fontFamily: "Nunito-Bold",
-          }}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          onChange={(item) => {
-            setCurrentSelected(item.value);
-          }}
-          data={pages}
-          placeholder="Event"
-        />
+        {userType === "Student" && (
+          <Dropdown
+            style={{ width: 125, marginTop: 50, paddingRight: 5 }}
+            itemTextStyle={{ fontSize: 12, fontFamily: "Nunito-Medium" }}
+            placeholderStyle={{ color: "white" }}
+            selectedTextStyle={{
+              color: "white",
+              fontSize: 16,
+              fontFamily: "Nunito-Bold",
+            }}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            onChange={(item) => {
+              setCurrentSelected(item.value);
+            }}
+            data={pages}
+            placeholder="Event"
+          />
+        )}
       </View>
       {currentSelected == "1" && <CreateEvent />}
       {currentSelected == "2" && <CreateLookingFor />}
