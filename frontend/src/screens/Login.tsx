@@ -54,7 +54,7 @@ export default function Login() {
   });
 
   const onSubmit = useCallback((data: loginForm) => {
-    const dev = false;
+    const dev = true;
     if (!dev) {
       if (errors.email || errors.password) return;
       if (!data.email || !data.password) {
@@ -154,6 +154,7 @@ export default function Login() {
                         "Password"
                       )
                     }
+                    secureTextEntry={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
