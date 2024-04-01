@@ -29,16 +29,25 @@ const Map = ({
   const { theme, inDarkMode } = useThemeContext();
 
   const openEventDetails = useCallback(
-    (index: number) => {
+    (id: string) => {
       if (showInfo) return;
       navigateTo({
         page: "EventDetails",
-        id: events ? events[index].id : "",
-        map: false,
+        id: id,
       });
     },
-    [events],
+    [navigateTo, events],
   );
+
+  const openMarketPlaceDetail = useCallback(
+    (id: string) => {
+      if (showInfo) return;
+      navigateTo({ page: "MarketPlaceDetail", id });
+    },
+    [navigateTo, items],
+  );
+
+  const combinedEventsItems = [...(events || []), ...(items || [])];
 
   return (
     <View style={styles.container}>
@@ -55,14 +64,21 @@ const Map = ({
         customMapStyle={inDarkMode ? darkModeStyle : []}
       >
         {events &&
-          events.map((event: EventMapItem, index) => {
+          events?.map((event: EventMapItem, index) => {
+            const combinedIndex = combinedEventsItems.findIndex(
+              (e) => e.id === event.id,
+            );
             return (
               <Marker
                 key={index}
                 title={showInfo ? event.title : ""}
                 description={showInfo ? event.description : ""}
-                coordinate={adjustPosition(event, index, events)}
-                onPress={() => openEventDetails(index)}
+                coordinate={adjustPosition(
+                  event,
+                  combinedIndex,
+                  combinedEventsItems,
+                )}
+                onPress={() => openEventDetails(event.id)}
               >
                 <View style={circleStyles.circleStyle}>
                   <MaterialIcons name="event-available" size={24} color="red" />
@@ -71,16 +87,22 @@ const Map = ({
             );
           })}
         {items &&
-          items.map((item: EventMapItem, index) => {
+          items?.map((item: EventMapItem, index) => {
+            const combinedIndex = combinedEventsItems.findIndex(
+              (e) => e.id === item.id,
+            );
+
             return (
               <Marker
                 key={index}
                 title={showInfo ? item.title : ""}
                 description={showInfo ? item.description : ""}
-                coordinate={adjustPosition(item, index, items)}
-                onPress={() => {
-                  Alert.alert("Stay Tuned!", "This feature is coming soon!");
-                }}
+                coordinate={adjustPosition(
+                  item,
+                  combinedIndex,
+                  combinedEventsItems,
+                )}
+                onPress={() => openMarketPlaceDetail(item.id)}
               >
                 <View style={circleStyles.circleStyle}>
                   <MaterialCommunityIcons
@@ -98,25 +120,35 @@ const Map = ({
 };
 
 const adjustPosition = (
-  event: EventMapItem,
+  current: EventMapItem,
   index: number,
-  events: EventMapItem[],
+  combinedEventsItems: EventMapItem[],
 ) => {
-  const adjustment = 0.0003; // Small adjustment value
-  let duplicates = events.filter(
-    (e) => e.latitude === event.latitude && e.longitude === event.longitude,
+  let baseAdjustment = 0.0001; // Base adjustment value
+  let duplicates = combinedEventsItems.filter(
+    (e) =>
+      Math.abs(e.latitude - current.latitude) < baseAdjustment &&
+      Math.abs(e.longitude - current.longitude) < baseAdjustment,
   );
+
   if (duplicates.length > 1) {
-    let angle = (360 / duplicates.length) * index; // distribute evenly in a circle
+    // Dynamically adjust the adjustment value based on the number of duplicates
+    const dynamicAdjustment =
+      baseAdjustment + duplicates.length * baseAdjustment * 0.5;
+    let angle = (360 / duplicates.length) * index * 1.05;
     return {
-      latitude: event.latitude + adjustment * Math.cos(angle * (Math.PI / 180)),
+      latitude:
+        current.latitude +
+        dynamicAdjustment * Math.cos(angle * (Math.PI / 180)),
       longitude:
-        event.longitude + adjustment * Math.sin(angle * (Math.PI / 180)),
+        current.longitude +
+        dynamicAdjustment * Math.sin(angle * (Math.PI / 180)),
     };
   }
+
   return {
-    latitude: event.latitude,
-    longitude: event.longitude,
+    latitude: current.latitude,
+    longitude: current.longitude,
   };
 };
 

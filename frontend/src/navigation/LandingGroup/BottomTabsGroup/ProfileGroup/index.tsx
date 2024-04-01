@@ -4,18 +4,76 @@ import ProfileTabs from "./ProfileTabs";
 import { ProfileContextProvider } from "~/contexts/profileContext";
 import ProfileSettings from "~/screens/ProfileSettings";
 import ProfilePictureSettings from "~/screens/ProfilePictureSettings";
+import Settings from "~/screens/Settings";
+import useThemeContext from "~/hooks/useThemeContext";
+import useAuthContext from "~/hooks/useAuthContext";
+import OrganizationSettings from "~/screens/OrganizationSettings";
 
 const Stack = createNativeStackNavigator();
 
 export default function ProfileGroup() {
+  const { theme } = useThemeContext();
+  const { userType } = useAuthContext();
+
   return (
     <ProfileContextProvider>
-      <Stack.Navigator screenOptions={{ header: Header }}>
-        <Stack.Screen
-          name="ProfileTabs"
-          component={ProfileTabs}
-          options={{ title: "Profile" }}
-        />
+      <Stack.Navigator>
+        {userType === "Student" && (
+          <Stack.Screen
+            name="ProfileTabs"
+            component={ProfileTabs}
+            options={{
+              title: "Profile",
+              header: Header,
+            }}
+          />
+        )}
+        {userType === "Student" && (
+          <Stack.Screen
+            name="Settings"
+            component={Settings}
+            options={{
+              title: "Settings",
+              headerShown: true,
+              headerBackTitle: "Home",
+              headerTintColor: theme.colors.onSecondary,
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+            }}
+          />
+        )}
+        {/*{userType === "Organization_Admin" && (*/}
+        {/*    <Stack.Screen*/}
+        {/*        name="OrganizationProfileTabs"*/}
+        {/*        component={TODO}*/}
+        {/*        options={{*/}
+        {/*            title: "Organization Profile",*/}
+        {/*            header: TODO,*/}
+        {/*        }}*/}
+        {/*    />*/}
+        {/*)}*/}
+        {userType === "Organization_Admin" && (
+          <Stack.Screen
+            name="OrganizationSettings"
+            component={OrganizationSettings}
+            options={{
+              title: "Organization Settings",
+              headerShown: true,
+              headerBackTitle: "Home",
+              headerTintColor: theme.colors.onSecondary,
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+            }}
+          />
+        )}
       </Stack.Navigator>
       <ProfileSettings />
       <ProfilePictureSettings />

@@ -73,6 +73,7 @@ export default function Home() {
       queryFn: fetchMainEvents,
     });
 
+  // TODO Replace this with skeleton loading
   useEffect(() => {
     if (isLoading) startLoading();
     else stopLoading();
