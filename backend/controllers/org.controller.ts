@@ -9,11 +9,16 @@ import {
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import {
+  addMemberToOrganization,
   approveOrganizationRequest,
   approveUserRequest,
   createOrganizationWithDefaults,
+  getOrgById,
+  getRoleIdFromName,
+  getUserRolesInOrganization,
   rejectOrganizationRequest,
   rejectUserRequest,
+  removeUserFromOrganization,
 } from "../services/org.service";
 import {
   emailMembershipRequestApproved,
@@ -105,25 +110,8 @@ export const getOrganizationById = async (
   try {
     // Validate request id param
     const organizationId = IdParamSchema.parse(req.params).id;
-
-    // Get organization from db
-    const organization = await prisma.organization.findUnique({
-      where: {
-        id: organizationId,
-      },
-    });
-
-    if (!organization) {
-      // Throw error if organization not found
-      const notFoundError = new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        `Organization with id ${organizationId} not found`,
-        404,
-        true,
-      );
-
-      throw notFoundError;
-    }
+    // Fetch the organization by its id
+    const organization = await getOrgById(organizationId);
 
     res.status(200).json({
       message: "Organization retrieved successfully",
@@ -668,6 +656,80 @@ export const manageNewOrganizationRequest = async (
     res.status(200).json({
       message: `Organization creation request successfully ${decision.toLowerCase()}`,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles user requests to join or leave an organization.
+
+ * Based on the user's membership status:
+ *    - If the user is not part of the organization it adds them as a member 
+ *    - If the user is already a member (or some other role) it removes them from the organization.
+ *    - Owners cannot leave their own organization.
+ */
+export const joinOrganization = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request organization id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userId;
+
+    // Get the organization if it exists
+    const existingOrganization = await getOrgById(organizationId);
+
+    // check if the user is already a member
+    // Get all of the roles a user has within an organization
+    const existingUserOrgRoles = await getUserRolesInOrganization(
+      loggedInUserId!,
+      organizationId,
+    );
+
+    // Join the organization
+    if (!existingUserOrgRoles.length) {
+      // Add user to the organization as a member (no approval required for now)
+      const newMemberRole = await addMemberToOrganization(
+        loggedInUserId!,
+        organizationId,
+      );
+
+      if (!newMemberRole) {
+        throw new AppError(
+          AppErrorName.INTERNAL_SERVER_ERROR,
+          `Failed to add user as a member`,
+          500,
+          true,
+        );
+      }
+      res.status(200).json({
+        message: `User added as member to ${existingOrganization.organizationName}`,
+      });
+    } else {
+      // Leave organization if user already has a role in the org
+
+      // Fetch owner role
+      const ownerRole = await getRoleIdFromName(UserRole.Owner);
+      // check if the user is the owner of the organization
+      const isOwner = existingUserOrgRoles.some(
+        (userRole) => userRole.roleId === ownerRole.id,
+      );
+      if (isOwner) {
+        return res
+          .status(400)
+          .json({ error: "Owner cannot leave their own organization." });
+      }
+
+      // Remove the user from the organization
+      await removeUserFromOrganization(loggedInUserId!, organizationId);
+
+      res
+        .status(200)
+        .json({ message: "User left the organization successfully." });
+    }
   } catch (error) {
     next(error);
   }

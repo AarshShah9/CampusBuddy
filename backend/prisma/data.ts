@@ -647,7 +647,7 @@ export const roles = [
 ];
 
 export const organizationRolePermissions = [
-  // add all permissions for owner of org1
+  // add all default permissions for owner of org1
   {
     organizationId: ids.organizationIds[1],
     roleId: ids.roleIds[UserRole.Owner],
@@ -724,11 +724,266 @@ export const organizationRolePermissions = [
     roleId: ids.roleIds[UserRole.Moderator],
     permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
   },
+  // org 1 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[1],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
   // org2
+  // add all default permissions for owner of org2
   {
     organizationId: ids.organizationIds[2],
     roleId: ids.roleIds[UserRole.Owner],
     permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 2 moderator
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 2 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
+  // org3
+  // add all default permissions for owner of org3
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 3 moderator
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 3 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
+  // org4
+  // add all default permissions for owner of org4
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 4 moderator
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 4 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
   },
 ];
 
