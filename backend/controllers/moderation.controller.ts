@@ -40,6 +40,7 @@ export const approveFlaggedItem = async (
       data: {
         isPublic: true,
         isFlagged: false,
+        createdAt: new Date(),
       },
     });
 
@@ -118,6 +119,7 @@ export const approveFlaggedPost = async (
       data: {
         isPublic: true,
         isFlagged: false,
+        createdAt: new Date(),
       },
     });
 
@@ -196,6 +198,7 @@ export const approveFlaggedEvent = async (
       data: {
         isPublic: true,
         isFlagged: false,
+        createdAt: new Date(),
       },
     });
 
@@ -229,10 +232,8 @@ export const rejectFlaggedEvent = async (
       data: event,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error - failed to reject flagged event",
-      });
+    res.status(500).json({
+      error: "Internal Server Error - failed to reject flagged event",
+    });
   }
 };
