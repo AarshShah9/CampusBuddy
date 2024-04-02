@@ -1,37 +1,29 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, View, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useAuthContext from '~/hooks/useAuthContext';
-import useProfileContext from '~/hooks/useProfileContext';
 import useThemeContext from '~/hooks/useThemeContext';
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { generateImageURL } from '~/lib/CDNFunctions';
 import { useRoute } from '@react-navigation/native';
-import ProfileTabs from '~/navigation/LandingGroup/BottomTabsGroup/ProfileGroup/ProfileTabs';
 
-type HeaderProps = {
-    name: string,
-    uri?: string
-}
-const Header = ({ uri, name }: HeaderProps) => {
+
+export default function Header () {
+    const { params: { id, name, image: uri } } = useRoute<any>();
     const { theme } = useThemeContext();
 
     return (
-        <View style={styles.headerCard}>
+        <View 
+            style={[
+                styles.headerCard,
+                {
+                    backgroundColor: theme.colors.profileTabs,
+                    borderBottomColor: theme.colors.background,
+                },
+            ]}>
             <View style={styles.upperSection}>
-                <TouchableOpacity style={{
-                    shadowColor: "grey",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 2,
-                }}>
-                   <View 
-                        style={[
-                            styles.profilePicContainer,
-                            { backgroundColor: theme.colors.profilePicContainer },
-                        ]}
-                    >
+                <TouchableOpacity style={[
+                    styles.profilePicWrapper,
+                    { backgroundColor: theme.colors.profilePicContainer }
+                ]}>
+                   <View style={styles.profilePicContainer}>
                         {uri ?
                             <Image 
                                 style={{ width: "100%", height: "100%" }}
@@ -42,8 +34,12 @@ const Header = ({ uri, name }: HeaderProps) => {
                    </View>
                 </TouchableOpacity>
                 <View style={styles.miniInfoContainer}>
-                    <Text style={styles.profileInfoItem}>5</Text>
-                    <Text style={styles.profileInfoItem}>Following</Text>
+                    <Text style={styles.profileInfoItem1}>5</Text>
+                    <Text style={styles.profileInfoItem2}>Events</Text>
+                </View>
+                <View style={styles.miniInfoContainer}>
+                    <Text style={styles.profileInfoItem1}>167</Text>
+                    <Text style={styles.profileInfoItem2}>Members</Text>
                 </View>
                 <TouchableOpacity style={styles.miniInfoContainer}>
                     <Ionicons name="menu-outline" size={40} color={theme.colors.text} />
@@ -58,19 +54,6 @@ const Header = ({ uri, name }: HeaderProps) => {
     );
 }
 
-
-export default function OrganizationProfile() {
-    const { params: { id, name, image } } = useRoute<any>();
-
-    return (
-        <ScrollView>
-            <Header name={name} uri={image} />
-            <View style={{ minHeight: Dimensions.get("window").height * 0.8, backgroundColor: 'red' }}>
-            </View>
-        </ScrollView>
-    )
-}
-
 const styles = StyleSheet.create({
     headerCard: {
         paddingTop: 20,
@@ -81,6 +64,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+    },
+    profilePicWrapper: {
+        shadowColor: "grey",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 2,
+        borderRadius: 50
     },
     profilePicContainer: {
         width: 84,
@@ -94,9 +84,12 @@ const styles = StyleSheet.create({
     miniInfoContainer: {
         alignItems: "center",
     },
-    profileInfoItem: {
+    profileInfoItem1: {
         fontSize: 16,
         fontWeight: "bold",
+    },
+    profileInfoItem2: {
+        fontSize: 16,
     },
     lowerSection: {
         marginTop: 10,
