@@ -57,7 +57,7 @@ export default function ProfileEvents() {
       <FlatList
         data={events as any}
         showsVerticalScrollIndicator={false}
-        renderItem={HorizontalScrollElement}
+        renderItem={({ item }) => <HorizontalScrollElement key={item.id} item={item} isLoading={false} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingTop: 20 }}
       />
