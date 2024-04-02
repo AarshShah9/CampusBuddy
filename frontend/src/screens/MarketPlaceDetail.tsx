@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -298,6 +299,13 @@ export default function MarketPlaceDetail() {
     queryKey: ["marketplace-detail", id],
     queryFn: () => getMarketPlaceItem(id),
   });
+
+  if (marketplaceData && marketplaceData.isFlagged) {
+    Alert.alert(
+      "Under Review",
+      "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
+    );
+  }
 
   return (
     <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
