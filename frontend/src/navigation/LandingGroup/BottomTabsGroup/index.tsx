@@ -1,7 +1,7 @@
-import { Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-  MaterialBottomTabNavigationOptions,
   createMaterialBottomTabNavigator,
+  MaterialBottomTabNavigationOptions,
 } from "@react-navigation/material-bottom-tabs";
 import useThemeContext from "~/hooks/useThemeContext";
 import SearchGroup from "./SearchGroup";
@@ -12,7 +12,6 @@ import ThreadsGroup from "./ThreadsGroup";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import HomeGroup from "./HomeGroup/";
-import { Entypo } from "@expo/vector-icons";
 
 const BottomTab = createMaterialBottomTabNavigator();
 

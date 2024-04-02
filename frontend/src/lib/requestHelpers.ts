@@ -147,6 +147,16 @@ const allowedEndpoints = [
   "/api/post/test",
   "/api/post/",
   "/api/item/",
+  "/api/item/:id",
+  "/api/post/:id",
+  "/api/post/comments/:id",
+
+  // profile related endpoints
+  "/api/profile/saved",
+  "/api/profile/user/:id",
+  "/api/profile/events/:id",
+  "/api/profile/posts/:id",
+  "/api/profile/items/:id",
 
   // Miscellaneous endpoints
   "/Test",
@@ -154,6 +164,7 @@ const allowedEndpoints = [
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
   "/api/notification/storePushToken",
+  "/api/search/",
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints
@@ -166,11 +177,29 @@ interface RequestArgs {
   params?: Record<string, string | number>;
 }
 
-export type IdRequiredEndPoints = "/api/user/removeUser/:id" | "/api/user/removeUser/:id" | "/api/user/updateUser/:id" | "/api/events/organization/:id" | "/api/events/:id" | "/api/events/like/:id" | "/api/events/attendees/:id";
+export type IdRequiredEndPoints =
+  | "/api/user/removeUser/:id"
+  | "/api/user/updateUser/:id"
+  | "/api/events/organization/:id"
+  | "/api/events/:id"
+  | "/api/events/like/:id"
+  | "/api/events/attendees/:id"
+  | "/api/profile/user/:id"
+  | "/api/profile/events/:id"
+  | "/api/profile/posts/:id"
+  | "/api/item/:id"
+  | "/api/post/:id"
+  | "/api/post/comments/:id"
+  | "/api/profile/items/:id";
 
-export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & { params: { id: string } }
+export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
+  params: { id: string };
+};
 
-export type NonIdRequiredEndPoints = Exclude<AllowedEndpoints, IdRequiredEndPoints>
+export type NonIdRequiredEndPoints = Exclude<
+  AllowedEndpoints,
+  IdRequiredEndPoints
+>;
 
 /**
  * Generates a complete URL by appending the endpoint to the BACKEND_URL and

@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -13,7 +13,7 @@ export default function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const { user } = useAuthContext();
-  const { openPictureModal, profileData } = useProfileContext();
+  const { openPictureModal } = useProfileContext();
   const [imageSource, setImageSource] = useState<any>(null);
 
   useEffect(() => {
@@ -28,13 +28,18 @@ export default function Header() {
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 35,
+          paddingTop: insets.top + 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
       ]}
     >
-      <View style={styles.headerCard}>
+      <View
+        style={{
+          width: "100%",
+          height: user?.programs?.[0] ? 140 : 120,
+        }}
+      >
         <View style={styles.upperSection}>
           <TouchableOpacity onPress={openPictureModal}>
             <View
@@ -56,13 +61,11 @@ export default function Header() {
             </View>
           </TouchableOpacity>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>
-              {profileData?.attended ?? "0"}
-            </Text>
+            <Text style={styles.profileInfoItem}>{user?.attended ?? "0"}</Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>5</Text>
+            <Text style={styles.profileInfoItem}>{user?.following ?? "0"}</Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
           <MenuIcon />
@@ -71,7 +74,7 @@ export default function Header() {
           <Text style={{ fontWeight: "bold" }}>
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text>{`Mechanical Engineering`}</Text>
+          <Text>{user?.programs?.[0]}</Text>
         </View>
       </View>
     </View>
@@ -85,10 +88,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     borderBottomWidth: 2,
   },
-  headerCard: {
-    width: "100%",
-    height: 150,
-  },
   upperSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -98,9 +97,9 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 50,
-    backgroundColor: "#FFF", // Ensure background color for consistency
-    justifyContent: "center", // Center vertically inside the circle
-    alignItems: "center", // Center horizontally inside the circle
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
     overflow: "hidden",
   },
   miniInfoContainer: {

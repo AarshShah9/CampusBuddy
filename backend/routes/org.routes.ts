@@ -11,6 +11,7 @@ import {
   organizationTest,
   updateOrganization,
   manageNewOrganizationRequest,
+  joinOrganization,
 } from "../controllers/org.controller";
 import { upload } from "../utils/S3Uploader";
 import { verifyAuthentication } from "../middleware/verifyAuth";
@@ -25,6 +26,7 @@ router.get("/:id/pendingUsers", getAllPendingOrgUsers);
 router.get("/pending", getAllPendingOrganizations); // for admin interface
 router.post("/:id/orgApproval", manageNewOrganizationRequest); // for admin interface
 router.post("/:id/membership/approval", manageMembershipRequest);
+router.post("/:id/join", joinOrganization);
 router.post("/", upload.single("file"), createNewOrganization);
 router.get("/:id", getOrganizationById);
 router.patch("/:id", upload.single("file"), updateOrganization);

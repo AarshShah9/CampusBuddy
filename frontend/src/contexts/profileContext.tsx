@@ -1,18 +1,9 @@
 import { BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { createContext, useCallback, useRef } from "react";
+import { createContext, PropsWithChildren, useCallback, useRef } from "react";
 import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
 import useAuthContext from "~/hooks/useAuthContext";
 import { imageGetter } from "~/lib/requestHelpers";
-import useLoadingContext from "~/hooks/useLoadingContext";
-import useProfileContext from "~/hooks/useProfileContext";
-
-export type profileData = {
-  attended: number;
-  user: any; // TODO type this
-  savedEvents: any; // TODO type this
-};
 
 type profileContext = {
   closeModal: () => void;
@@ -24,8 +15,6 @@ type profileContext = {
 
   onUpload: () => void;
   onDelete: () => void;
-
-  profileData?: profileData;
 };
 const ProfileContext = createContext<profileContext | null>(null);
 
@@ -34,9 +23,6 @@ export const ProfileContextProvider = ({
 }: PropsWithChildren): JSX.Element => {
   const { dismiss } = useBottomSheetModal();
   const { setUser } = useAuthContext();
-  const { startLoading, stopLoading } = useLoadingContext();
-
-  const [profileData, setProfileData] = useState<profileData>();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const openModal = useCallback(() => {
@@ -97,23 +83,6 @@ export const ProfileContextProvider = ({
     }
   }, []);
 
-  const getProfileData = useCallback(async () => {
-    try {
-      startLoading();
-      const res = await CBRequest("GET", "/api/user/profile");
-      setProfileData(res.data);
-      stopLoading();
-    } catch (error) {
-      console.log(error);
-      stopLoading();
-      alert("An error occurred while trying to get the profile data");
-    }
-  }, [startLoading, stopLoading]);
-
-  useEffect(() => {
-    getProfileData();
-  }, [getProfileData]);
-
   return (
     <ProfileContext.Provider
       value={{
@@ -124,7 +93,6 @@ export const ProfileContextProvider = ({
         openPictureModal,
         onUpload,
         onDelete,
-        profileData,
       }}
     >
       {children}

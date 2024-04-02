@@ -15,6 +15,8 @@ const envSchema = z.object({
   MAILER_PASS: z.string(),
   GOOGLE_MAPS_API_KEY: z.string(),
   EXPO_ACCESS_TOKEN: z.string(),
+  GPT_KEY: z.string(),
+  GPT_ORG: z.string(),
   // Add more environment variables as needed
 });
 
@@ -38,6 +40,8 @@ const env = {
   MAILER_PASS: process.env.MAILER_PASS!,
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY!,
   EXPO_ACCESS_TOKEN: process.env.EXPO_ACCESS_TOKEN!,
+  GPT_KEY: process.env.GPT_KEY!,
+  GPT_ORG: process.env.GPT_ORG!,
 };
 
 export { env, validateEnv };

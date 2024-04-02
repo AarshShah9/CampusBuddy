@@ -9,8 +9,8 @@ export const checkUserPermission = async (
   requiredPermission: AppPermissionName,
 ): Promise<boolean> => {
   try {
-    // Get the user's role in the organization if they are in good standing
-    const userRole = await prisma.userOrganizationRole.findFirst({
+    // Get the user's roles in the organization if they are in good standing
+    const userRoles = await prisma.userOrganizationRole.findMany({
       where: {
         userId,
         organizationId,
@@ -18,22 +18,29 @@ export const checkUserPermission = async (
       },
     });
 
-    if (!userRole) {
+    if (!userRoles.length) {
       // The user is not an approved member of the organization
       return false;
     }
 
-    // Retrieve the role-based permissions
-    const rolePermissions = await prisma.organizationRolePermission.findMany({
-      where: { roleId: userRole.roleId },
-      select: { permission: { select: { permissionName: true } } },
-    });
+    let hasPermission = false;
+    // Check permissions against all roles, stopping if a match is found
+    for (const userRole of userRoles) {
+      const rolePermissions = await prisma.organizationRolePermission.findMany({
+        where: { roleId: userRole.roleId, organizationId },
+        select: { permission: { select: { permissionName: true } } },
+      });
 
-    // Check if the required permission matches any of the role permissions
-    return rolePermissions.some(
-      (rolePermission) =>
-        rolePermission.permission.permissionName === requiredPermission,
-    );
+      hasPermission = rolePermissions.some(
+        (rolePermission) =>
+          rolePermission.permission.permissionName === requiredPermission,
+      );
+
+      if (hasPermission) {
+        break; // Exit loop if permission found
+      }
+    }
+    return hasPermission;
   } catch (error: any) {
     throw new AppError(
       AppErrorName.PRISMA_ERROR,

@@ -73,10 +73,11 @@ export default function Home() {
             queryFn: fetchMainEvents,
         });
 
-    useEffect(() => {
-        if (isLoading) startLoading();
-        else stopLoading();
-    }, [isLoading]);
+  // TODO Replace this with skeleton loading
+  useEffect(() => {
+    if (isLoading) startLoading();
+    else stopLoading();
+  }, [isLoading]);
 
     const queryIsLoading = isFetching && isFetchedAfterMount;
     useEffect(() => {
