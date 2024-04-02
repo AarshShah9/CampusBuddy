@@ -43,6 +43,13 @@ type AttendeesRoute = {
     id: string
 }
 
+type OrganizationProfileRoute = {
+    page: 'OrganizationProfile',
+    id: string,
+    name: string,
+    image: string
+}
+
 type StudentSignUpRoute = {
     page: 'StudentSignUp',
 }
@@ -54,7 +61,7 @@ type OrgSignUpRoute = {
 export type NavigationFunctionArgs = (
     UserProfileRoute | ChatScreenRoute | EventDetailsRoute | MessagesRoute | 
     HomeRoute | LoginRoute | MapDetailsRoute | AttendeesRoute | StudentSignUpRoute |
-    OrgSignUpRoute
+    OrgSignUpRoute | OrganizationProfileRoute
 )
 
 export type NavigableStacks = 'AuthenticationGroup' | 'LandingGroup' | 'ConfirmEmail' | 'OrgCreationConfirmation'

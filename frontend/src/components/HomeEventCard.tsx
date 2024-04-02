@@ -1,6 +1,6 @@
 import LocationChip from "./LocationChip";
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { ThemedText } from "./ThemedComponents";
+import { Text } from "react-native-paper";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
 import { useCallback } from "react";
@@ -15,42 +15,45 @@ type Props = {
 export default function EventHomeCard({ event, isLoading }: Props) {
     const { navigateTo } = useNavigationContext();
     const openEventDetails = useCallback(() => {
+        const { id, title: name, image } = event;
         if(event.event)
-            navigateTo({ page: "EventDetails", id: event.id });
+            navigateTo({ page: "EventDetails", id });
+        else 
+            navigateTo({ page: "OrganizationProfile", id, image, name });
     }, [event]);
 
     return (
         <TouchableOpacity onPress={openEventDetails}>
             <View style={styles.card}>
                 <View style={styles.cardCover}>
-                    <LoadingSkeleton show={isLoading} width="100%" height="100%">
-                        <Image
+                    {
+                        isLoading ? <LoadingSkeleton show width="100%" height="100%" />
+                        :<Image
                             style={{ width: "100%", height: "100%" }}
                             source={{ uri: generateImageURL(event.image) }}
                         />
-                    </LoadingSkeleton>
+                    }
                 </View>
-                <View style={{ paddingHorizontal: 0 }}>
-                    <LoadingSkeleton show={isLoading} width="80%" height={16}>
-                        <ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
-                    </LoadingSkeleton>
-                    <View style={styles.eventDetailsContainer}>
-                        {isLoading ?
-                            <LoadingSkeleton show width={100} height={16} />
-                            :<>
-                                {!!event.time && (
-                                    <ThemedText style={styles.eventTime}>
-                                        {convertUTCToLocalDate(event.time)}
-                                    </ThemedText>
+                {isLoading ?
+                    <LoadingSkeleton show width="75%" height={16} />
+                    :<Text style={styles.eventTitle}>{event.title}</Text>
+                }
+                <View style={styles.eventDetailsContainer}>
+                    {isLoading ?
+                        <LoadingSkeleton show width={100} height={16} />
+                        :<>
+                            {!!event.time && (
+                                <Text style={styles.eventTime}>
+                                    {convertUTCToLocalDate(event.time)}
+                                </Text>
+                            )}
+                            <View>
+                                {event.location && (
+                                    <LocationChip location={event.location} size="small" />
                                 )}
-                                <View>
-                                    {event.location && (
-                                        <LocationChip location={event.location} size="small" />
-                                    )}
-                                </View>
-                            </>
-                        }
-                    </View>
+                            </View>
+                        </>
+                    }
                 </View>
             </View>
         </TouchableOpacity>
