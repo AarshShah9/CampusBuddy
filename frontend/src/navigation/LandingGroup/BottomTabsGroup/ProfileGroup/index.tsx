@@ -74,6 +74,7 @@ export default function ProfileGroup() {
             }}
           />
         )}
+        <Stack.Screen name="HiddenProfile" component={() => null} />
       </Stack.Navigator>
       <ProfileSettings />
       <ProfilePictureSettings />

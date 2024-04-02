@@ -601,6 +601,7 @@ export const getEventById = async (
         isLiked: isLiked,
         isAttending: isAttending,
         isFlagged: event.isFlagged,
+        self: self,
       },
     });
   } catch (error) {

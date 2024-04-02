@@ -46,7 +46,7 @@ export default function EventDetails({
     params: { id, map = true },
   } = useRoute<any>();
   const { theme } = useThemeContext();
-  const { navigateTo } = useNavigationContext();
+  const { navigateTo, navigateBack } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
 
@@ -144,20 +144,55 @@ export default function EventDetails({
     navigateTo({ page: "Attendees", id });
   }, [id]);
 
+  const onDelete = useCallback(() => {
+    Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: async () => {
+          navigateBack();
+        },
+      },
+    ]);
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={userLiked}>
-          <Entypo
-            name="heart"
-            size={28}
-            color={isLiked ? "red" : "white"} // TODO use theme context
-            style={{ opacity: isOptimistic ? 0.5 : 1 }}
-          />
-        </TouchableOpacity>
+        <>
+          {!eventData?.self && (
+            <TouchableOpacity onPress={userLiked}>
+              <Entypo
+                name="heart"
+                size={28}
+                color={isLiked ? "red" : "white"} // TODO use theme context
+                style={{ opacity: isOptimistic ? 0.5 : 1 }}
+              />
+            </TouchableOpacity>
+          )}
+          {eventData?.self && (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: 60,
+              }}
+            >
+              <TouchableOpacity>
+                <Entypo name="edit" size={22} color={"white"} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onDelete}>
+                <Entypo name="trash" size={22} color={"white"} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
       ),
     });
-  }, [navigation, isLiked, isOptimistic, userLiked]);
+  }, [navigation, isLiked, isOptimistic, userLiked, eventData]);
 
   if (eventData && eventData.isFlagged) {
     Alert.alert(
