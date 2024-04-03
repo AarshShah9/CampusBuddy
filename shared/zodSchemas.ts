@@ -572,8 +572,8 @@ export const otpVerifySchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: EmailSchema,
-  password: PasswordSchema,
+  email: z.string(),
+  password: z.string(),
 });
 
 export type loginType = z.infer<typeof loginSchema>;
