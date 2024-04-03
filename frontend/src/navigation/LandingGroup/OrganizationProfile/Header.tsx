@@ -1,13 +1,32 @@
-import { StyleSheet, View, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import useThemeContext from '~/hooks/useThemeContext';
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { useRoute } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 
 
 export default function Header () {
     const { params: { id, name, image: uri } } = useRoute<any>();
     const { theme } = useThemeContext();
+
+    const [joined, setJoined] = useState(false);
+    const joinOrganization = useCallback(() => {
+        Alert.alert(
+            'Join Organization', 
+            'Are you sure you want to join this organization?', 
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => setJoined(true)
+                },
+            ]
+        );
+    }, [])
 
     return (
         <View 
@@ -34,8 +53,16 @@ export default function Header () {
                    </View>
                 </TouchableOpacity>
                 <View style={styles.miniInfoContainer}>
-                    <Text style={styles.profileInfoItem1}>5</Text>
-                    <Text style={styles.profileInfoItem2}>Events</Text>
+                    {joined ?
+                        <>
+                            <Ionicons name="checkmark-circle-outline" size={24} color="green" />
+                            <Text style={styles.profileInfoItem2}>Joined</Text>
+                        </>
+                        :<TouchableOpacity onPress={joinOrganization} style={{ alignItems: "center" }}>
+                            <Ionicons name="add-circle-outline" size={24} color="green" />
+                            <Text style={styles.profileInfoItem2}>Join</Text>
+                        </TouchableOpacity>
+                    }
                 </View>
                 <View style={styles.miniInfoContainer}>
                     <Text style={styles.profileInfoItem1}>167</Text>
@@ -85,8 +112,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     profileInfoItem1: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
+        marginBottom: 4
     },
     profileInfoItem2: {
         fontSize: 16,
