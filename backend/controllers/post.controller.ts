@@ -47,6 +47,7 @@ export const getAllPosts = async (
     const allPosts = await prisma.post.findMany({
       where: {
         institutionId: user.institutionId!,
+        isPublic: true,
       },
       orderBy: {
         createdAt: "asc",
@@ -334,6 +335,9 @@ export const getPostById = async (
       where: {
         id: postId,
       },
+      include: {
+        user: true,
+      },
     });
 
     if (!post) {
@@ -345,17 +349,13 @@ export const getPostById = async (
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: post.userId,
-      },
-    });
+    const self: boolean = req.userId === post.userId;
 
-    if (!user) {
+    if (!post.isPublic && !self) {
       throw new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        `User with id ${post.userId} not found`,
-        404,
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view post`,
+        403,
         true,
       );
     }
@@ -367,8 +367,9 @@ export const getPostById = async (
       spotsLeft: post.numberOfSpotsLeft,
       createdAt: post.createdAt,
       userId: post.userId,
-      userName: user.firstName + " " + user.lastName,
-      userImage: user.profilePic,
+      userName: post.user.firstName + " " + post.user.lastName,
+      userImage: post.user.profilePic,
+      isFlagged: post.isFlagged,
     };
 
     res.status(200).json({

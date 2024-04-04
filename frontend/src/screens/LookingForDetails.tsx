@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import PersonChip from "~/components/PersonChip";
@@ -27,6 +34,7 @@ type LookingForDetailsType = {
   userId: string;
   userName: string;
   userImage: string;
+  isFlagged: boolean;
 };
 
 export default function LookingForDetails() {
@@ -48,6 +56,13 @@ export default function LookingForDetails() {
   const onUserPress = useCallback(() => {
     navigateTo({ page: "UserProfile", id: lookingForData?.userId ?? "" });
   }, [lookingForData?.userId]);
+
+  if (lookingForData && lookingForData.isFlagged) {
+    Alert.alert(
+      "Under Review",
+      "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
+    );
+  }
 
   return (
     <View

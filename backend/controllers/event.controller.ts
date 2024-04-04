@@ -384,6 +384,9 @@ export const getAllEvents = async (req: RequestExtended, res: Response) => {
         location: true,
         organization: true,
       },
+      where: {
+        isPublic: true,
+      },
     });
     res.status(200).json({
       message: "All events",
@@ -438,6 +441,7 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
         startTime: {
           gt: new Date(),
         },
+        isPublic: true,
       },
       include: {
         location: true,
@@ -458,6 +462,7 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
     const marketPlaceItems = await prisma.item.findMany({
       where: {
         state: State.Available,
+        isPublic: true,
       },
       include: {
         location: true,
@@ -517,6 +522,7 @@ export const getAllVerifiedEvents = async (
     const allEvents = await prisma.event.findMany({
       where: {
         status: EventStatus.Verified,
+        isPublic: true,
       },
     });
     res.status(200).json({
@@ -563,6 +569,17 @@ export const getEventById = async (
       throw notFoundError;
     }
 
+    const self: boolean = req.userId === event.userId;
+
+    if (!self && !event.isPublic) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view event with id ${eventId}`,
+        403,
+        true,
+      );
+    }
+
     const isLiked = event.eventResponses.some(
       (response) =>
         response.userId === req.userId &&
@@ -598,6 +615,8 @@ export const getEventById = async (
         ).length,
         isLiked: isLiked,
         isAttending: isAttending,
+        isFlagged: event.isFlagged,
+        self: self,
         userName: event.user.firstName + " " + event.user.lastName,
         userId: event.user.id,
         userImage: event.user.profilePic,
@@ -857,6 +876,7 @@ export const getMainPageEvents = async (
         AND: [
           {
             status: EventStatus.Verified,
+            isPublic: true,
           },
           {
             startTime: {
@@ -917,6 +937,7 @@ export const getMainPageEvents = async (
           },
           {
             status: EventStatus.Verified,
+            isPublic: true,
             endTime: {
               gt: new Date(),
             },

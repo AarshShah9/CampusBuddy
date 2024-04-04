@@ -162,7 +162,7 @@ export const getProfileEvents = async (
         userId: userId,
         participationStatus: ParticipationStatus.Going,
         event: {
-          isPublic: self ? true : undefined,
+          isPublic: self ? undefined : true,
         },
       },
       include: {
@@ -205,7 +205,7 @@ export const getProfileEvents = async (
     const createdEvents = await prisma.event.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
       include: {
         location: {
@@ -266,7 +266,7 @@ export const getProfilePosts = async (
     const posts = await prisma.post.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
     });
 
@@ -301,7 +301,7 @@ export const getProfileItems = async (
     const items = await prisma.item.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
       include: {
         location: {

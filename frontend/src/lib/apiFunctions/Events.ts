@@ -28,13 +28,30 @@ export const getMainEvents = async () => {
 export const createEvent = async (
   event: createEventType,
   image: ImagePickerAsset,
+  verified: boolean = false,
+  id: string,
 ): Promise<any> => {
   try {
-    return await uploadImageRequest("post", "/api/events/", image, {
-      body: event,
-    });
+    if (verified) {
+      return await uploadImageRequest(
+        "post",
+        "/api/events/organization/:id",
+        image,
+        {
+          body: event,
+          params: {
+            id,
+          },
+        },
+      );
+    } else {
+      return await uploadImageRequest("post", "/api/events/", image, {
+        body: event,
+      });
+    }
   } catch (err) {
     console.log(err);
+    throw err;
   }
 };
 
