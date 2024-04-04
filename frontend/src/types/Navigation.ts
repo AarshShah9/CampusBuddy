@@ -59,6 +59,11 @@ type AttendeesRoute = {
   id: string;
 };
 
+type OrganizationProfileRoute = {
+  page: "OrganizationProfile";
+  id: string;
+};
+
 type StudentSignUpRoute = {
   page: "StudentSignUp";
 };
@@ -76,6 +81,10 @@ type CommentsRoute = {
   id: string;
 };
 
+type OrganizationSettingsRoute = {
+  page: "OrganizationSettings";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -87,9 +96,11 @@ export type NavigationFunctionArgs =
   | AttendeesRoute
   | StudentSignUpRoute
   | OrgSignUpRoute
+  | OrganizationProfileRoute
   | LookingForDetailsRoute
   | MarketPlaceDetailsRoute
   | CommentsRoute
+  | OrganizationSettingsRoute
   | SettingsRoute;
 
 export type NavigableStacks =

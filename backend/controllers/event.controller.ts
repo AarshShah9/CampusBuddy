@@ -553,6 +553,7 @@ export const getEventById = async (
         location: true,
         eventResponses: true,
         organization: true,
+        user: true,
       },
     });
 
@@ -594,7 +595,21 @@ export const getEventById = async (
     res.status(200).json({
       message: "Event found",
       data: {
-        ...event,
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        location: {
+          latitude: event.location.latitude,
+          longitude: event.location.longitude,
+          name: event.location.name,
+        },
+        organization: {
+          organizationName: event.organization?.organizationName,
+          organizationId: event.organization?.id,
+          organizationImage: event.organization?.image,
+        },
+        startTime: event.startTime,
+        image: event.image,
         attendees: event.eventResponses.filter(
           (response) => response.participationStatus === "Going",
         ).length,
@@ -602,6 +617,10 @@ export const getEventById = async (
         isAttending: isAttending,
         isFlagged: event.isFlagged,
         self: self,
+        userName: event.user.firstName + " " + event.user.lastName,
+        userId: event.user.id,
+        userImage: event.user.profilePic,
+        eventType: event.status,
       },
     });
   } catch (error) {
@@ -956,11 +975,65 @@ export const getMainPageEvents = async (
       }),
     };
 
-    // TODO: Upcoming events from following
+    // to get the reformattedUpcoming events we have to filter the UserOrganizationRole and search for membership status as 'Member'
+    const userOrganizationRoles = await prisma.userOrganizationRole.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        role: {
+          select: {
+            roleName: true,
+          },
+        },
+        organization: true,
+      },
+    });
+
+    const filteredUserOrganizationRoles = userOrganizationRoles.filter(
+      (role) => role.role.roleName === "Member",
+    );
+
+    // find 5 of the most recent events that are happening in the organizations that the user is a member of
+    const organizationEvents = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            organizationId: {
+              in: filteredUserOrganizationRoles.map(
+                (role) => role.organizationId,
+              ),
+            },
+          },
+          {
+            startTime: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      include: {
+        location: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+      take: 5,
+    });
+
     const reformattedUpcomingEvents = {
       title: "Upcoming Events From Following",
       id: "2",
-      items: sampleEventData[1].items,
+      items: organizationEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+          event: true,
+        };
+      }),
     };
 
     const reformattedTrendingEvents = {

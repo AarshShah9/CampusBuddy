@@ -1,16 +1,16 @@
 import {
-  View,
+  Modal,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Modal,
+  View,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
 import { useCallback, useEffect, useState } from "react";
 import useAppContext from "~/hooks/useAppContext";
-import { ThemedText, ThemedTextInput } from "~/components/ThemedComponents";
+import { ThemedTextInput } from "~/components/ThemedComponents";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "~/lib/apiFunctions/Events";
 import AttendeeCard from "~/components/AttendeeCard";
@@ -150,6 +150,7 @@ const SearchArea = () => {
             searchResult.length > 0 &&
             searchResult.map((result) => (
               <AttendeeCard
+                key={result.id}
                 item={{
                   id: result.id,
                   name: result.name,

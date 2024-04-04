@@ -11,6 +11,7 @@ import ProfilePage from "~/screens/ProfilePage";
 import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
 import LookingForDetails from "~/screens/LookingForDetails";
 import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
+import OrganizationProfile from "./BottomTabsGroup/OrganizationProfile";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,7 +28,14 @@ export default function LandingGroup() {
             name="UserProfile"
             component={ProfilePage}
             options={{
-              title: "Profile",
+              title: "",
+              headerShown: true,
+              headerBackTitle: "Home",
+              headerTintColor: theme.colors.onSecondary,
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
+              headerStyle: { backgroundColor: theme.colors.primary },
             }}
           />
           <Stack.Screen
@@ -104,6 +112,20 @@ export default function LandingGroup() {
                 color: theme.colors.onSecondary,
               },
               presentation: "modal",
+              headerStyle: { backgroundColor: theme.colors.primary },
+            }}
+          />
+          <Stack.Screen
+            name="OrganizationProfile"
+            component={OrganizationProfile}
+            options={{
+              title: "",
+              headerShown: true,
+              headerBackTitle: "Home",
+              headerTintColor: theme.colors.onSecondary,
+              headerTitleStyle: {
+                color: theme.colors.onSecondary,
+              },
               headerStyle: { backgroundColor: theme.colors.primary },
             }}
           />
