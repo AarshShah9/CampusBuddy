@@ -954,11 +954,65 @@ export const getMainPageEvents = async (
       }),
     };
 
-    // TODO: Upcoming events from following
+    // to get the reformattedUpcoming events we have to filter the UserOrganizationRole and search for membership status as 'Member'
+    const userOrganizationRoles = await prisma.userOrganizationRole.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        role: {
+          select: {
+            roleName: true,
+          },
+        },
+        organization: true,
+      },
+    });
+
+    const filteredUserOrganizationRoles = userOrganizationRoles.filter(
+      (role) => role.role.roleName === "Member",
+    );
+
+    // find 5 of the most recent events that are happening in the organizations that the user is a member of
+    const organizationEvents = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            organizationId: {
+              in: filteredUserOrganizationRoles.map(
+                (role) => role.organizationId,
+              ),
+            },
+          },
+          {
+            startTime: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      include: {
+        location: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+      take: 5,
+    });
+
     const reformattedUpcomingEvents = {
       title: "Upcoming Events From Following",
       id: "2",
-      items: sampleEventData[1].items,
+      items: organizationEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+          event: true,
+        };
+      }),
     };
 
     const reformattedTrendingEvents = {
