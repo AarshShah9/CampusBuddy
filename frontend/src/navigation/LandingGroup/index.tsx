@@ -11,7 +11,7 @@ import ProfilePage from "~/screens/ProfilePage";
 import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
 import LookingForDetails from "~/screens/LookingForDetails";
 import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
-import OrganizationProfile from "./OrganizationProfile";
+import OrganizationProfile from "./BottomTabsGroup/OrganizationProfile";
 
 const Stack = createNativeStackNavigator();
 

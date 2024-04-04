@@ -55,15 +55,15 @@ type MapDetailsRoute = {
 };
 
 type AttendeesRoute = {
-    page: "Attendees";
-    id: string;
+  page: "Attendees";
+  id: string;
 };
 
 type OrganizationProfileRoute = {
-    page: 'OrganizationProfile';
-    id: string;
-    name: string;
-    image: string;
+  page: "OrganizationProfile";
+  id: string;
+  name: string;
+  image: string;
 };
 
 type StudentSignUpRoute = {
@@ -83,6 +83,10 @@ type CommentsRoute = {
   id: string;
 };
 
+type OrganizationSettingsRoute = {
+  page: "OrganizationSettings";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -93,11 +97,12 @@ export type NavigationFunctionArgs =
   | MapDetailsRoute
   | AttendeesRoute
   | StudentSignUpRoute
-  | OrgSignUpRoute 
+  | OrgSignUpRoute
   | OrganizationProfileRoute
   | LookingForDetailsRoute
   | MarketPlaceDetailsRoute
   | CommentsRoute
+  | OrganizationSettingsRoute
   | SettingsRoute;
 
 export type NavigableStacks =

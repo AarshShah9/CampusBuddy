@@ -18,7 +18,6 @@ export default function ProfilePictureSettings() {
   const { theme } = useThemeContext();
   const { bottomSheetPictureModalRef, onUpload, onDelete } =
     useProfileContext();
-  const {} = useAuthContext();
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />
@@ -34,7 +33,10 @@ export default function ProfilePictureSettings() {
       snapPoints={snapPoints}
       backdropComponent={Backdrop}
       handleIndicatorStyle={{ backgroundColor: "grey" }} // todo change this to use theme
-      backgroundStyle={{ borderRadius: 20, backgroundColor:theme.colors.tertiary }}
+      backgroundStyle={{
+        borderRadius: 20,
+        backgroundColor: theme.colors.tertiary,
+      }}
     >
       <View style={styles.contentContainer}>
         <TouchableOpacity onPress={onUpload}>
@@ -53,7 +55,9 @@ export default function ProfilePictureSettings() {
               style={styles.icon}
             />
 
-            <Text style={[styles.settingText,{color:theme.colors.text}]}>Upload Picture</Text>
+            <Text style={[styles.settingText, { color: theme.colors.text }]}>
+              Upload Picture
+            </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={onDelete}>

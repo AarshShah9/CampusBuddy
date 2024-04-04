@@ -239,11 +239,17 @@ export const loginUser = async (
         },
         UserOrganizationRole: {
           include: {
+            role: true,
             organization: {
               select: {
                 organizationName: true,
                 description: true,
                 image: true,
+                events: {
+                  select: {
+                    id: true,
+                  },
+                },
               },
             },
           },
@@ -346,6 +352,13 @@ export const loginUser = async (
           organizationImage: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) => UserOrganizationRole.organization.image,
           ),
+          members: existingUser?.UserOrganizationRole.filter(
+            (UserOrganizationRole) =>
+              UserOrganizationRole.role.roleName === "Member",
+          ).length,
+          posts: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.events,
+          ).length,
           type: "Organization_Admin",
         },
       });

@@ -16,6 +16,8 @@ export type OrganizationDataType = {
   organizationName: string[];
   organizationImage: string[];
   organizationDescription: string[];
+  members: number;
+  posts: number;
   type: UserType;
 };
 

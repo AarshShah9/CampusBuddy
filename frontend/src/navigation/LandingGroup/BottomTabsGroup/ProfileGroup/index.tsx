@@ -8,8 +8,8 @@ import Settings from "~/screens/Settings";
 import useThemeContext from "~/hooks/useThemeContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import OrganizationSettings from "~/screens/OrganizationSettings";
-import OrganizationTabs from "~/navigation/LandingGroup/OrganizationProfile/OrganizationTabs";
-import OrganizationProfileHeader from "../../OrganizationProfile/Header";
+import OrganizationTabs from "~/navigation/LandingGroup/BottomTabsGroup/OrganizationProfile/OrganizationTabs";
+import OrganizationProfileHeader from "~/navigation/LandingGroup/BottomTabsGroup/OrganizationProfile/Header";
 
 const Stack = createNativeStackNavigator();
 
@@ -75,7 +75,6 @@ export default function ProfileGroup() {
             }}
           />
         )}
-        <Stack.Screen name="HiddenProfile" component={() => null} />
       </Stack.Navigator>
       <ProfileSettings />
       <ProfilePictureSettings />

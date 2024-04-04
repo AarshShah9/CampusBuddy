@@ -10,33 +10,24 @@ import { Text } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useAuthContext from "~/hooks/useAuthContext";
+import useProfileContext from "~/hooks/useProfileContext";
+import { generateImageURL } from "~/lib/CDNFunctions";
 
 export default function Header() {
-  // const { params: { id, name, image: uri } } = useRoute<any>();
   const { theme } = useThemeContext();
   const insets = useSafeAreaInsets();
   const { organization } = useAuthContext();
-
-  const [joined, setJoined] = useState(false);
-  const joinOrganization = useCallback(() => {
-    Alert.alert(
-      "Join Organization",
-      "Are you sure you want to join this organization?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => setJoined(true),
-        },
-      ],
-    );
-  }, []);
+  const { openPictureModal, openModal } = useProfileContext();
+  const [imageSource, setImageSource] = useState<any>(null);
+  useEffect(() => {
+    const imageSource = organization?.organizationImage
+      ? { uri: generateImageURL(organization?.organizationImage[0]) }
+      : null;
+    setImageSource(imageSource);
+  }, [organization]);
 
   return (
     <View
@@ -51,16 +42,17 @@ export default function Header() {
     >
       <View style={styles.upperSection}>
         <TouchableOpacity
+          onPress={openPictureModal}
           style={[
             styles.profilePicWrapper,
             { backgroundColor: theme.colors.profilePicContainer },
           ]}
         >
           <View style={styles.profilePicContainer}>
-            {organization?.organizationImage ? (
+            {imageSource ? (
               <Image
                 style={{ width: "100%", height: "100%" }}
-                source={{ uri: organization?.organizationImage[0] }}
+                source={{ uri: imageSource.uri }}
               />
             ) : (
               <MaterialIcons name="person" size={50} color="grey" />
@@ -68,14 +60,14 @@ export default function Header() {
           </View>
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
-          <Text style={styles.profileInfoItem1}>5</Text>
+          <Text style={styles.profileInfoItem1}>{organization?.posts}</Text>
           <Text style={styles.profileInfoItem2}>Posts</Text>
         </View>
         <View style={styles.miniInfoContainer}>
-          <Text style={styles.profileInfoItem1}>167</Text>
+          <Text style={styles.profileInfoItem1}>{organization?.members}</Text>
           <Text style={styles.profileInfoItem2}>Members</Text>
         </View>
-        <TouchableOpacity style={styles.miniInfoContainer}>
+        <TouchableOpacity style={styles.miniInfoContainer} onPress={openModal}>
           <Ionicons name="menu-outline" size={40} color={theme.colors.text} />
         </TouchableOpacity>
       </View>

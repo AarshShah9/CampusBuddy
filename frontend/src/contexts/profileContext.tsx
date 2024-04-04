@@ -22,7 +22,7 @@ export const ProfileContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
   const { dismiss } = useBottomSheetModal();
-  const { setUser } = useAuthContext();
+  const { setUser, setOrganization, userType } = useAuthContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const openModal = useCallback(() => {
@@ -39,7 +39,7 @@ export const ProfileContextProvider = ({
     dismiss();
   }, [dismiss]);
 
-  const onUpload = useCallback(async () => {
+  const onUploadUser = useCallback(async () => {
     try {
       const result = await imageGetter();
       if (result.canceled) {
@@ -59,15 +59,36 @@ export const ProfileContextProvider = ({
         }
         return { ...prev, image: res.data.data.image };
       });
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred while trying to upload the picture");
+    }
+  }, []);
+
+  const onUploadOrganization = useCallback(async () => {
+    try {
+      const result = await imageGetter();
+      if (result.canceled) {
+        return;
+      }
+      const image = result.assets[0];
       closeModal();
     } catch (error) {
       console.log(error);
-      alert("An error occurred while trying to delete the picture");
+      alert("An error occurred while trying to upload the picture");
     }
     closeModal();
   }, []);
 
-  const onDelete = useCallback(async () => {
+  const onUpload = useCallback(async () => {
+    if (userType === "Student") {
+      await onUploadUser();
+    } else {
+      await onUploadOrganization();
+    }
+  }, [setOrganization, setUser, userType]);
+
+  const onDeleteUser = useCallback(async () => {
     try {
       await CBRequest("POST", "/api/user/deleteProfilePicture");
       setUser((prev) => {
@@ -82,6 +103,23 @@ export const ProfileContextProvider = ({
       alert("An error occurred while trying to delete the picture");
     }
   }, []);
+
+  const onDeleteOrganization = useCallback(async () => {
+    try {
+      closeModal();
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred while trying to delete the picture");
+    }
+  }, []);
+
+  const onDelete = useCallback(async () => {
+    if (userType === "Student") {
+      await onDeleteUser();
+    } else {
+      await onDeleteOrganization();
+    }
+  }, [setOrganization, setUser, userType]);
 
   return (
     <ProfileContext.Provider
