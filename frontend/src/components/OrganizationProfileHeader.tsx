@@ -11,10 +11,15 @@ import useThemeContext from "~/hooks/useThemeContext";
 import { MaterialIcons, Ionicons, Entypo } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { useCallback, useLayoutEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserProfileHeaderType } from "~/types/Profile";
-import { getOrgProfile, getUserProfile } from "~/lib/apiFunctions/Profile";
+import {
+  getOrgProfile,
+  getUserProfile,
+  joinOrg,
+} from "~/lib/apiFunctions/Profile";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import useAuthContext from "~/hooks/useAuthContext";
 
 export type OrganizationProfileHeaderType = {
   organization: {
@@ -30,18 +35,32 @@ export default function Header() {
     params: { id },
   } = useRoute<any>();
   const { theme } = useThemeContext();
+  const { userType } = useAuthContext();
 
-  const { data: organizationData } = useQuery<OrganizationProfileHeaderType>({
-    queryKey: ["org-profile", id],
-    queryFn: () => getOrgProfile(id),
-    initialData: undefined,
+  const { data: organizationData, refetch } =
+    useQuery<OrganizationProfileHeaderType>({
+      queryKey: ["org-profile", id],
+      queryFn: () => getOrgProfile(id),
+      initialData: undefined,
+    });
+
+  const joinMutation = useMutation({
+    mutationFn: () => joinOrg(id),
+    onSuccess: () => {
+      refetch();
+    },
+    onError: (error) => {
+      console.log(error);
+      Alert.alert("Error", "Failed to join organization");
+    },
   });
 
-  const [joined, setJoined] = useState(false);
   const joinOrganization = useCallback(() => {
+    const action = organizationData?.organization.member ? "Leave" : "Join";
+
     Alert.alert(
-      "Join Organization",
-      "Are you sure you want to join this organization?",
+      `${action} Organization`,
+      `Are you sure you want to ${action.toLowerCase()} this organization?`,
       [
         {
           text: "Cancel",
@@ -49,11 +68,13 @@ export default function Header() {
         },
         {
           text: "Yes",
-          onPress: () => setJoined(true),
+          onPress: () => {
+            joinMutation.mutate();
+          },
         },
       ],
     );
-  }, []);
+  }, [organizationData?.organization.member, joinMutation]);
 
   return (
     <View
@@ -86,32 +107,40 @@ export default function Header() {
           </View>
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
+          <Text style={styles.profileInfoItem1}>{0}</Text>
+          <Text style={styles.profileInfoItem2}>Posts</Text>
+        </View>
+        <View style={styles.miniInfoContainer}>
           <Text style={styles.profileInfoItem1}>
             {organizationData?.organization.members}
           </Text>
           <Text style={styles.profileInfoItem2}>Members</Text>
         </View>
-        <View style={styles.miniInfoContainer}>
-          {organizationData?.organization.member ? (
-            <>
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={24}
-                color="green"
-              />
-              <Text style={styles.profileInfoItem2}>Joined</Text>
-            </>
-          ) : (
+        {userType === "Student" && (
+          <View style={styles.miniInfoContainer}>
             <TouchableOpacity
               onPress={joinOrganization}
               style={{ alignItems: "center" }}
             >
-              <Ionicons name="add-circle-outline" size={24} color="green" />
-              <Text style={styles.profileInfoItem2}>Join</Text>
+              {organizationData?.organization.member && (
+                <>
+                  <Ionicons
+                    name="checkmark-circle-outline"
+                    size={24}
+                    color="green"
+                  />
+                  <Text style={styles.profileInfoItem2}>Joined</Text>
+                </>
+              )}
+              {!organizationData?.organization.member && (
+                <>
+                  <Ionicons name="add-circle-outline" size={24} color="green" />
+                  <Text style={styles.profileInfoItem2}>Join</Text>
+                </>
+              )}
             </TouchableOpacity>
-          )}
-        </View>
-        <View style={styles.miniInfoContainer}></View>
+          </View>
+        )}
       </View>
       <View style={styles.lowerSection}>
         <Text style={{ fontWeight: "bold", fontSize: 18 }}>
@@ -149,6 +178,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     overflow: "hidden",
   },
+  // TODO fix this width changing whens its joined or join
   miniInfoContainer: {
     alignItems: "center",
   },

@@ -351,7 +351,6 @@ export const getOrganizationProfileData = async (
 ) => {
   try {
     const organizationId = IdParamSchema.parse(req.params).id;
-
     const organization = await prisma.organization.findUnique({
       where: {
         id: organizationId,

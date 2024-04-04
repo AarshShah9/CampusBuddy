@@ -73,3 +73,13 @@ export const getOrgProfile = async (orgId: string) => {
     console.log(err);
   }
 };
+
+export const joinOrg = async (orgId: string) => {
+  try {
+    return await CBRequest("POST", `/api/orgs/join/:id`, {
+      params: { id: orgId },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};

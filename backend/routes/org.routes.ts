@@ -32,7 +32,7 @@ router.get("/:id/pendingUsers", getAllPendingOrgUsers);
 router.get("/pending", getAllPendingOrganizations); // for admin interface
 router.post("/:id/orgApproval", manageNewOrganizationRequest); // for admin interface
 router.post("/:id/membership/approval", manageMembershipRequest);
-router.post("/:id/join", joinOrganization);
+router.post("/join/:id", joinOrganization);
 router.post("/", upload.single("file"), createNewOrganization);
 router.get("/:id", getOrganizationById);
 router.patch("/:id", upload.single("file"), updateOrganization);

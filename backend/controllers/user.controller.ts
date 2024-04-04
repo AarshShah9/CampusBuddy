@@ -266,32 +266,6 @@ export const loginUser = async (
       );
     }
 
-    const orgId = existingUser.UserOrganizationRole.map(
-      (UserOrganizationRole) => UserOrganizationRole.organizationId,
-    );
-
-    const organization = await prisma.organization.findUnique({
-      where: {
-        id: orgId[0],
-      },
-      include: {
-        userOrganizationRoles: {
-          include: {
-            role: true,
-          },
-        },
-      },
-    });
-
-    if (!organization) {
-      throw new AppError(
-        AppErrorName.NOT_FOUND_ERROR,
-        "Organization not found",
-        404,
-        true,
-      );
-    }
-
     // Confirm password matches
     const isCorrectPassword = await comparePassword(
       password,
@@ -364,6 +338,32 @@ export const loginUser = async (
         password: existingUser.password,
       };
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
+
+      const orgId = existingUser.UserOrganizationRole.map(
+        (UserOrganizationRole) => UserOrganizationRole.organizationId,
+      );
+
+      const organization = await prisma.organization.findUnique({
+        where: {
+          id: orgId[0],
+        },
+        include: {
+          userOrganizationRoles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      if (!organization) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Organization not found",
+          404,
+          true,
+        );
+      }
 
       res.status(200).json({
         authToken,
