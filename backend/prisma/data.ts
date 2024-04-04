@@ -281,6 +281,7 @@ export const events = [
     isPublic: true,
     status: EventStatus.Verified,
     image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
+    isFlagged: true,
   },
 ];
 
@@ -371,6 +372,7 @@ export const posts = [
     expiresAt: "2024-10-10T19:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 8,
+    isFlagged: true,
     // Other post details
   },
 ];
@@ -459,6 +461,7 @@ export const items = [
     condition: "Used_Good",
     locationPlaceId: locations[0].placeId,
     state: State.Available,
+    isFlagged: true,
   },
   {
     id: ids.itemIds[8],
@@ -471,6 +474,7 @@ export const items = [
     condition: "Used_Good",
     locationPlaceId: locations[1].placeId,
     state: State.Available,
+    isFlagged: true,
   },
 ];
 

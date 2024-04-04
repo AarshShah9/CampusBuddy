@@ -3,14 +3,12 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
   XMarkIcon,
+  ShoppingCartIcon,
+  CalendarDaysIcon,
+  HashtagIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
@@ -20,17 +18,49 @@ import { classNames } from "../lib/className";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const navigation = [
-  { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
-  { name: "Team", href: "#", icon: UsersIcon, current: false },
-  { name: "Projects", href: "#", icon: FolderIcon, current: false },
-  { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-  { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
-  { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
+  {
+    name: "Organization Requests",
+    href: "/dashboard/orgTable",
+    icon: UserGroupIcon,
+    current: true,
+  },
+  {
+    name: "Flagged Posts",
+    href: "/dashboard/postTable",
+    icon: HashtagIcon,
+    current: false,
+  },
+  {
+    name: "Flagged Events",
+    href: "/dashboard/eventTable",
+    icon: CalendarDaysIcon,
+    current: false,
+  },
+  {
+    name: "Flagged Items",
+    href: "/dashboard/itemTable",
+    icon: ShoppingCartIcon,
+    current: false,
+  },
 ];
+
+type Request = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  profilePic: string;
+  institutionId: string;
+  accountType: string;
+};
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userNavigation = [
     { name: "Your profile", onClick: () => console.log("Your profile") },
@@ -43,12 +73,35 @@ export default function Layout() {
     },
   ];
 
+  const fetchRequests = async () => {
+    try {
+      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
+      const authToken = localStorage.getItem("token");
+      console.log(authToken);
+      const response = await fetch(`http://localhost:3000/api/user/me/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (response.ok) {
+        const res = await response.json();
+        setRequests(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user information:", error);
+    }
+  };
+
   useEffect(() => {
     if (localStorage.getItem("token") === null) {
       navigate("/login");
     }
-  }, []);
+    fetchRequests().then(() => setIsLoading(false));
+  }, [updateTrigger]);
 
+  console.log(requests);
   return (
     <>
       <div>
@@ -109,8 +162,8 @@ export default function Layout() {
                     <div className="flex h-16 shrink-0 items-center">
                       <img
                         className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                        alt="Your Company"
+                        src="/Campus_Buddy_Logo.png"
+                        alt="Campus Buddy"
                       />
                     </div>
                     <nav className="flex flex-1 flex-col">
@@ -165,8 +218,8 @@ export default function Layout() {
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center">
               <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                className="h-12 w-auto"
+                src="/Campus_Buddy_Logo.png"
                 alt="Your Company"
               />
             </div>
@@ -275,7 +328,7 @@ export default function Layout() {
                         className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                         aria-hidden="true"
                       >
-                        Tom Cook
+                        {/* {request.firstName}, {request.lastName} */}
                       </span>
                       <ChevronDownIcon
                         className="ml-2 h-5 w-5 text-gray-400"
