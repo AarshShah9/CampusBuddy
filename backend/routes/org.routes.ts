@@ -12,9 +12,15 @@ import {
   updateOrganization,
   manageNewOrganizationRequest,
   joinOrganization,
+  deleteOrganizationProfileImage,
+  uploadOrgProfilePic,
 } from "../controllers/org.controller";
 import { upload } from "../utils/S3Uploader";
 import { verifyAuthentication } from "../middleware/verifyAuth";
+import {
+  removeProfilePic,
+  uploadProfilePic,
+} from "../controllers/user.controller";
 
 const router = express.Router();
 
@@ -31,5 +37,8 @@ router.post("/", upload.single("file"), createNewOrganization);
 router.get("/:id", getOrganizationById);
 router.patch("/:id", upload.single("file"), updateOrganization);
 router.delete("/:id", deleteOrganization);
+
+router.post("/profilePicture/:id", upload.single("file"), uploadOrgProfilePic);
+router.post("/deleteProfilePicture/:id", deleteOrganizationProfileImage);
 
 export default router;

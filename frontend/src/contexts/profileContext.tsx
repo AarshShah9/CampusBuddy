@@ -22,7 +22,7 @@ export const ProfileContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
   const { dismiss } = useBottomSheetModal();
-  const { setUser, setOrganization, userType } = useAuthContext();
+  const { setUser, setOrganization, userType, organization } = useAuthContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const openModal = useCallback(() => {
@@ -73,6 +73,21 @@ export const ProfileContextProvider = ({
       }
       const image = result.assets[0];
       closeModal();
+      const res = await uploadImageRequest(
+        "post",
+        "/api/orgs/profilePicture/:id",
+        image,
+        {
+          body: { force: true },
+          params: { id: organization?.organizationId?.[0]! },
+        },
+      );
+      setOrganization((prev) => {
+        if (!prev) {
+          throw new Error("prev organization is undefined");
+        }
+        return { ...prev, organizationImage: [res.data.data.image] };
+      });
     } catch (error) {
       console.log(error);
       alert("An error occurred while trying to upload the picture");
@@ -83,7 +98,7 @@ export const ProfileContextProvider = ({
   const onUpload = useCallback(async () => {
     if (userType === "Student") {
       await onUploadUser();
-    } else {
+    } else if (userType === "Organization_Admin") {
       await onUploadOrganization();
     }
   }, [setOrganization, setUser, userType]);
@@ -106,6 +121,15 @@ export const ProfileContextProvider = ({
 
   const onDeleteOrganization = useCallback(async () => {
     try {
+      await CBRequest("POST", "/api/orgs/deleteProfilePicture/:id", {
+        params: { id: organization?.organizationId?.[0]! },
+      });
+      setOrganization((prev) => {
+        if (!prev) {
+          throw new Error("prev organization is undefined");
+        }
+        return { ...prev, organizationImage: [] };
+      });
       closeModal();
     } catch (error) {
       console.log(error);
@@ -116,7 +140,7 @@ export const ProfileContextProvider = ({
   const onDelete = useCallback(async () => {
     if (userType === "Student") {
       await onDeleteUser();
-    } else {
+    } else if (userType === "Organization_Admin") {
       await onDeleteOrganization();
     }
   }, [setOrganization, setUser, userType]);

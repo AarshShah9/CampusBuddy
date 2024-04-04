@@ -341,6 +341,9 @@ export const loginUser = async (
           id: existingUser.id,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
+          organizationId: existingUser.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organizationId,
+          ),
           organizationName: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) =>
               UserOrganizationRole.organization.organizationName,

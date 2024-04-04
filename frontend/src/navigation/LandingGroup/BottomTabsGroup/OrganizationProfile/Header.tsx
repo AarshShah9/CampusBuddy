@@ -23,9 +23,10 @@ export default function Header() {
   const { openPictureModal, openModal } = useProfileContext();
   const [imageSource, setImageSource] = useState<any>(null);
   useEffect(() => {
-    const imageSource = organization?.organizationImage
-      ? { uri: generateImageURL(organization?.organizationImage[0]) }
-      : null;
+    const imageSource =
+      organization && organization?.organizationImage?.length > 0
+        ? { uri: generateImageURL(organization?.organizationImage?.[0]) }
+        : null;
     setImageSource(imageSource);
   }, [organization]);
 

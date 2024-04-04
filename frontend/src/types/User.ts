@@ -13,6 +13,7 @@ export type OrganizationDataType = {
   id: string;
   firstName: string;
   lastName: string;
+  organizationId: string[];
   organizationName: string[];
   organizationImage: string[];
   organizationDescription: string[];
