@@ -17,7 +17,6 @@ export default function SearchGroup() {
       {userType === "Organization_Admin" && (
         <Stack.Screen name="Events" component={Events} />
       )}
-      <Stack.Screen name="Hidden" component={() => null} />
     </Stack.Navigator>
   );
 }
