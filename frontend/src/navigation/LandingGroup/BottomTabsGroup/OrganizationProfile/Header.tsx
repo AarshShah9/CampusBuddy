@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useAuthContext from "~/hooks/useAuthContext";
 import useProfileContext from "~/hooks/useProfileContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
+import { ThemedText } from "~/components/ThemedComponents";
 
 export default function Header() {
   const { theme } = useThemeContext();
@@ -62,7 +63,7 @@ export default function Header() {
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
           <Text style={styles.profileInfoItem1}>{organization?.posts}</Text>
-          <Text style={styles.profileInfoItem2}>Posts</Text>
+          <Text style={styles.profileInfoItem2}>Events</Text>
         </View>
         <View style={styles.miniInfoContainer}>
           <Text style={styles.profileInfoItem1}>{organization?.members}</Text>
@@ -76,6 +77,16 @@ export default function Header() {
         <Text style={{ fontWeight: "bold", fontSize: 18 }}>
           {organization?.organizationName}
         </Text>
+        <ThemedText
+          style={{
+            fontSize: 16,
+            color: theme.colors.text,
+            textAlign: "left",
+            justifyContent: "flex-start",
+          }}
+        >
+          {organization?.organizationDescription}
+        </ThemedText>
       </View>
     </View>
   );
@@ -85,7 +96,7 @@ const styles = StyleSheet.create({
   headerCard: {
     paddingTop: 20,
     paddingHorizontal: 20,
-    height: Dimensions.get("window").height * 0.25,
+    height: Dimensions.get("window").height * 0.26,
   },
   upperSection: {
     flexDirection: "row",

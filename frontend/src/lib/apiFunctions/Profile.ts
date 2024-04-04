@@ -83,3 +83,15 @@ export const joinOrg = async (orgId: string) => {
     console.log(err);
   }
 };
+
+export const geOrganizationProfileEvents = async (orgId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/orgEvents/:id`, {
+        params: { id: orgId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

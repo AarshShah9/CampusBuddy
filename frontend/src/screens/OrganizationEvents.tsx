@@ -3,15 +3,21 @@ import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import { FlashList } from "@shopify/flash-list";
 import { useRoute } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { getUserProfileEvents } from "~/lib/apiFunctions/Profile";
+import {
+  geOrganizationProfileEvents,
+  getUserProfileEvents,
+} from "~/lib/apiFunctions/Profile";
 import { EventData } from "~/types/Events";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import useRefreshControl from "~/hooks/useRefreshControl";
 import { useCallback, useEffect } from "react";
+import useAuthContext from "~/hooks/useAuthContext";
 
 export default function OrganizationEvents() {
+  const { organization } = useAuthContext();
+
   const {
-    params: { id },
+    params: { self, id },
   } = useRoute<any>();
 
   const {
@@ -21,9 +27,11 @@ export default function OrganizationEvents() {
     isFetchedAfterMount,
     isFetching,
   } = useQuery<EventData[]>({
-    queryKey: ["organization-events"],
+    queryKey: ["organization-events", id],
     queryFn: () => {
-      return [];
+      return geOrganizationProfileEvents(
+        self ? organization?.organizationId?.[0]! : id,
+      );
     },
     initialData: [],
   });

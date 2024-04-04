@@ -15,9 +15,9 @@ import { TouchableOpacity } from "react-native";
 
 const TopTabs = createMaterialTopTabNavigator();
 
+// TODO MAY BE REDUNDANT
 export default function OrganizationTabs() {
   const { theme } = useThemeContext();
-  const { user } = useAuthContext();
 
   return (
     <TopTabs.Navigator
@@ -36,7 +36,7 @@ export default function OrganizationTabs() {
       <TopTabs.Screen
         name="OrganizationEvents"
         component={OrganizationEvents}
-        initialParams={{ id: user?.id ?? "0" }}
+        initialParams={{ self: true }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return (
@@ -52,7 +52,7 @@ export default function OrganizationTabs() {
       <TopTabs.Screen
         name="OrganizationPosts"
         component={OrganizationPosts}
-        initialParams={{ id: user?.id ?? "0" }}
+        initialParams={{ self: true }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return <FontAwesome name={"binoculars"} size={22} color={color} />;
@@ -62,7 +62,7 @@ export default function OrganizationTabs() {
       <TopTabs.Screen
         name="OrganizationMarket"
         component={OrganizationMarket}
-        initialParams={{ id: user?.id ?? "0" }}
+        initialParams={{ self: true }}
         options={{
           tabBarIcon: ({ color, focused }) => {
             return (

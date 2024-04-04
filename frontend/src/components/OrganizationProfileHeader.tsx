@@ -20,6 +20,7 @@ import {
 } from "~/lib/apiFunctions/Profile";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useAuthContext from "~/hooks/useAuthContext";
+import { ThemedText } from "~/components/ThemedComponents";
 
 export type OrganizationProfileHeaderType = {
   organization: {
@@ -27,6 +28,8 @@ export type OrganizationProfileHeaderType = {
     name: string;
     image: string;
     member: boolean;
+    description: string;
+    posts: number;
   };
 };
 
@@ -107,8 +110,10 @@ export default function Header() {
           </View>
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
-          <Text style={styles.profileInfoItem1}>{0}</Text>
-          <Text style={styles.profileInfoItem2}>Posts</Text>
+          <Text style={styles.profileInfoItem1}>
+            {organizationData?.organization.posts}
+          </Text>
+          <Text style={styles.profileInfoItem2}>Events</Text>
         </View>
         <View style={styles.miniInfoContainer}>
           <Text style={styles.profileInfoItem1}>
@@ -116,6 +121,9 @@ export default function Header() {
           </Text>
           <Text style={styles.profileInfoItem2}>Members</Text>
         </View>
+        {userType === "Organization_Admin" && (
+          <View style={styles.miniInfoContainer}></View>
+        )}
         {userType === "Student" && (
           <View style={styles.miniInfoContainer}>
             <TouchableOpacity
@@ -146,6 +154,16 @@ export default function Header() {
         <Text style={{ fontWeight: "bold", fontSize: 18 }}>
           {organizationData?.organization.name}
         </Text>
+        <ThemedText
+          style={{
+            fontSize: 16,
+            color: theme.colors.text,
+            textAlign: "left",
+            justifyContent: "flex-start",
+          }}
+        >
+          {organizationData?.organization.description}
+        </ThemedText>
       </View>
     </View>
   );

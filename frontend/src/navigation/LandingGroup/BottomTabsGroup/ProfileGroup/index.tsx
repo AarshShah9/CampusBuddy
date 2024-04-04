@@ -8,8 +8,8 @@ import Settings from "~/screens/Settings";
 import useThemeContext from "~/hooks/useThemeContext";
 import useAuthContext from "~/hooks/useAuthContext";
 import OrganizationSettings from "~/screens/OrganizationSettings";
-import OrganizationTabs from "~/navigation/LandingGroup/BottomTabsGroup/OrganizationProfile/OrganizationTabs";
 import OrganizationProfileHeader from "~/navigation/LandingGroup/BottomTabsGroup/OrganizationProfile/Header";
+import OrganizationEvents from "~/screens/OrganizationEvents";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,7 +51,8 @@ export default function ProfileGroup() {
         {userType === "Organization_Admin" && (
           <Stack.Screen
             name="OrganizationProfileTabs"
-            component={OrganizationTabs}
+            component={OrganizationEvents}
+            initialParams={{ self: true, id: "0" }}
             options={{
               header: OrganizationProfileHeader,
             }}
