@@ -14,6 +14,7 @@ import UploadToS3, {
 } from "../utils/S3Uploader";
 import { RequestExtended } from "../middleware/verifyAuth";
 import { moderateText } from "../utils/moderateText";
+import { emailPostFlagged } from "../utils/emails";
 
 // test Post
 export const postTest = async (req: Request, res: Response) => {
@@ -109,7 +110,7 @@ export const createLookingForPost = async (
       );
 
       // create post
-      return prisma.post.create({
+      const createdPost = await prisma.post.create({
         data: {
           userId: loggedInUserId!,
           institutionId: user.institutionId,
@@ -123,6 +124,12 @@ export const createLookingForPost = async (
           numberOfSpotsLeft: validatedPostData.numberOfSpots,
         },
       });
+
+      if (isFlagged) {
+        await emailPostFlagged(user, createdPost);
+      }
+
+      return createdPost;
     });
 
     if (newPost) {

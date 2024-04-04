@@ -10,7 +10,7 @@ import {
 } from "../utils/googleMapsApi";
 import { State } from "@prisma/client";
 import { moderateText } from "../utils/moderateText";
-import { title } from "process";
+import { emailItemFlagged } from "../utils/emails";
 
 // test Item
 export const itemTest = async (req: Request, res: Response) => {
@@ -151,6 +151,11 @@ export const createItem = async (
             });
           }),
         );
+      }
+
+      // Send email to user if item is flagged
+      if (isFlagged) {
+        await emailItemFlagged(user, newItem);
       }
 
       return newItem;

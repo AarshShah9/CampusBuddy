@@ -69,6 +69,12 @@ export const ModerationSchemaEvent = z.object({
 
 export type ModerationEvent = z.infer<typeof ModerationSchemaEvent>;
 
+export const ModerationSchemaRejection = z.object({
+  rejectionReason: z.string(),
+});
+
+export type ModerationRejection = z.infer<typeof ModerationSchemaRejection>;
+
 ///////////////////////////////
 // EVENT SCHEMAS
 ///////////////////////////////

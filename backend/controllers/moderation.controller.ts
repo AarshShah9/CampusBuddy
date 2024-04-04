@@ -5,7 +5,16 @@ import {
   ModerationSchemaEvent,
   ModerationSchemaItem,
   ModerationSchemaPost,
+  ModerationSchemaRejection,
 } from "../../shared/zodSchemas";
+import {
+  emailItemApproved,
+  emailItemRejected,
+  emailPostApproved,
+  emailPostRejected,
+  emailEventApproved,
+  emailEventRejected,
+} from "../utils/emails";
 
 export const getFlaggedItems = async (
   req: RequestExtended,
@@ -38,20 +47,45 @@ export const approveFlaggedItem = async (
   try {
     const itemId = ModerationSchemaItem.parse(req.body).itemId;
 
-    const item = await prisma.item.update({
-      where: {
-        id: itemId,
-      },
-      data: {
-        isPublic: true,
-        isFlagged: false,
-        createdAt: new Date(),
-      },
+    const approvedItem = await prisma.$transaction(async (prisma) => {
+      // get item
+      const item = await prisma.item.findUnique({
+        where: {
+          id: itemId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: item?.user.id,
+        },
+      });
+
+      // approve item
+      const approvedItem = await prisma.item.update({
+        where: {
+          id: itemId,
+        },
+        data: {
+          isPublic: true,
+          isFlagged: false,
+          createdAt: new Date(),
+        },
+      });
+
+      // Send email to user if item is approved
+      emailItemApproved(user!, item!);
+
+      return approvedItem;
     });
 
     res.status(200).json({
       message: "Item approved",
-      data: item,
+      data: approvedItem,
     });
   } catch (error) {
     res.status(500).json({
@@ -67,16 +101,44 @@ export const rejectFlaggedItem = async (
 ) => {
   try {
     const itemId = ModerationSchemaItem.parse(req.body).itemId;
+    const rejectionReason = ModerationSchemaRejection.parse(
+      req.body,
+    ).rejectionReason;
 
-    const item = await prisma.item.delete({
-      where: {
-        id: itemId,
-      },
+    const rejectedItem = await prisma.$transaction(async (prisma) => {
+      // get item
+      const item = await prisma.item.findUnique({
+        where: {
+          id: itemId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: item?.user.id,
+        },
+      });
+
+      // delete item
+      const rejectedItem = await prisma.item.delete({
+        where: {
+          id: itemId,
+        },
+      });
+
+      // Send email to user if item is rejected
+      emailItemRejected(user!, item!, rejectionReason);
+
+      return rejectedItem;
     });
 
     res.status(200).json({
       message: "Item rejected",
-      data: item,
+      data: rejectedItem,
     });
   } catch (error) {
     res
@@ -117,20 +179,43 @@ export const approveFlaggedPost = async (
   try {
     const postId = ModerationSchemaPost.parse(req.body).postId;
 
-    const post = await prisma.post.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        isPublic: true,
-        isFlagged: false,
-        createdAt: new Date(),
-      },
+    const approvedPost = await prisma.$transaction(async (prisma) => {
+      // get post
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: post?.user.id,
+        },
+      });
+
+      // approve post
+      const approvedPost = await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data: {
+          isPublic: true,
+          isFlagged: false,
+          createdAt: new Date(),
+        },
+      });
+
+      // Send email to user if post is approved
+      emailPostApproved(user!, post!);
     });
 
     res.status(200).json({
       message: "Post approved",
-      data: post,
+      data: approvedPost,
     });
   } catch (error) {
     res
@@ -146,16 +231,44 @@ export const rejectFlaggedPost = async (
 ) => {
   try {
     const postId = ModerationSchemaPost.parse(req.body).postId;
+    const rejectionReason = ModerationSchemaRejection.parse(
+      req.body,
+    ).rejectionReason;
 
-    const post = await prisma.post.delete({
-      where: {
-        id: postId,
-      },
+    const rejectedPost = await prisma.$transaction(async (prisma) => {
+      // get post
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: post?.user.id,
+        },
+      });
+
+      // delete post
+      const rejectedPost = await prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+
+      // Send email to user if post is rejected
+      emailPostRejected(user!, post!, rejectionReason);
+
+      return rejectedPost;
     });
 
     res.status(200).json({
       message: "Post rejected and deleted",
-      data: post,
+      data: rejectedPost,
     });
   } catch (error) {
     res
@@ -196,20 +309,45 @@ export const approveFlaggedEvent = async (
   try {
     const eventId = ModerationSchemaEvent.parse(req.body).eventId;
 
-    const event = await prisma.event.update({
-      where: {
-        id: eventId,
-      },
-      data: {
-        isPublic: true,
-        isFlagged: false,
-        createdAt: new Date(),
-      },
+    const approvedEvent = await prisma.$transaction(async (prisma) => {
+      // get event
+      const event = await prisma.event.findUnique({
+        where: {
+          id: eventId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: event?.user.id,
+        },
+      });
+
+      // approve event
+      const approvedEvent = await prisma.event.update({
+        where: {
+          id: eventId,
+        },
+        data: {
+          isPublic: true,
+          isFlagged: false,
+          createdAt: new Date(),
+        },
+      });
+
+      // Send email to user if event is approved
+      emailEventApproved(user!, event!);
+
+      return approvedEvent;
     });
 
     res.status(200).json({
       message: "Event approved",
-      data: event,
+      data: approvedEvent,
     });
   } catch (error) {
     res
@@ -225,16 +363,44 @@ export const rejectFlaggedEvent = async (
 ) => {
   try {
     const eventId = ModerationSchemaEvent.parse(req.body).eventId;
+    const rejectionReason = ModerationSchemaRejection.parse(
+      req.body,
+    ).rejectionReason;
 
-    const event = await prisma.event.delete({
-      where: {
-        id: eventId,
-      },
+    const rejectedEvent = await prisma.$transaction(async (prisma) => {
+      // get event
+      const event = await prisma.event.findUnique({
+        where: {
+          id: eventId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // get user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: event?.user.id,
+        },
+      });
+
+      // delete event
+      const rejectedEvent = await prisma.event.delete({
+        where: {
+          id: eventId,
+        },
+      });
+
+      // Send email to user if event is rejected
+      emailEventRejected(user!, event!, rejectionReason);
+
+      return rejectedEvent;
     });
 
     res.status(200).json({
       message: "Event rejected and deleted",
-      data: event,
+      data: rejectedEvent,
     });
   } catch (error) {
     res.status(500).json({
