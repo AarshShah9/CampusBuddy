@@ -8,17 +8,17 @@ import {
 } from "react-native";
 import { Text } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons, Entypo } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { useCallback, useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import useAuthContext from "~/hooks/useAuthContext";
+import { useCallback, useLayoutEffect, useState } from "react";
 
 export default function Header() {
   // const { params: { id, name, image: uri } } = useRoute<any>();
   const { theme } = useThemeContext();
-  const insets = useSafeAreaInsets();
-  const { organization } = useAuthContext();
+
+  const name = "Organization Name (NOT YOURS)";
+  const uri =
+    "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
 
   const [joined, setJoined] = useState(false);
   const joinOrganization = useCallback(() => {
@@ -43,7 +43,6 @@ export default function Header() {
       style={[
         styles.headerCard,
         {
-          paddingTop: insets.top + 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
@@ -57,10 +56,10 @@ export default function Header() {
           ]}
         >
           <View style={styles.profilePicContainer}>
-            {organization?.organizationImage ? (
+            {uri ? (
               <Image
                 style={{ width: "100%", height: "100%" }}
-                source={{ uri: organization?.organizationImage[0] }}
+                source={{ uri }}
               />
             ) : (
               <MaterialIcons name="person" size={50} color="grey" />
@@ -68,21 +67,33 @@ export default function Header() {
           </View>
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
-          <Text style={styles.profileInfoItem1}>5</Text>
-          <Text style={styles.profileInfoItem2}>Posts</Text>
+          {joined ? (
+            <>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={24}
+                color="green"
+              />
+              <Text style={styles.profileInfoItem2}>Joined</Text>
+            </>
+          ) : (
+            <TouchableOpacity
+              onPress={joinOrganization}
+              style={{ alignItems: "center" }}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="green" />
+              <Text style={styles.profileInfoItem2}>Join</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.miniInfoContainer}>
           <Text style={styles.profileInfoItem1}>167</Text>
           <Text style={styles.profileInfoItem2}>Members</Text>
         </View>
-        <TouchableOpacity style={styles.miniInfoContainer}>
-          <Ionicons name="menu-outline" size={40} color={theme.colors.text} />
-        </TouchableOpacity>
+        <View style={styles.miniInfoContainer}></View>
       </View>
       <View style={styles.lowerSection}>
-        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-          {organization?.organizationName}
-        </Text>
+        <Text style={{ fontWeight: "bold", fontSize: 18 }}>{name}</Text>
       </View>
     </View>
   );
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
   headerCard: {
     paddingTop: 20,
     paddingHorizontal: 20,
-    height: Dimensions.get("window").height * 0.25,
+    height: Dimensions.get("window").height * 0.2,
   },
   upperSection: {
     flexDirection: "row",
