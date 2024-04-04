@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client";
 import { RequestExtended } from "../middleware/verifyAuth";
+import {
+  ModerationSchemaEvent,
+  ModerationSchemaItem,
+  ModerationSchemaPost,
+} from "../../shared/zodSchemas";
 
 export const getFlaggedItems = async (
   req: RequestExtended,
@@ -31,7 +36,7 @@ export const approveFlaggedItem = async (
   next: NextFunction,
 ) => {
   try {
-    const { itemId } = req.body.itemId;
+    const itemId = ModerationSchemaItem.parse(req.body).itemId;
 
     const item = await prisma.item.update({
       where: {
@@ -61,7 +66,7 @@ export const rejectFlaggedItem = async (
   next: NextFunction,
 ) => {
   try {
-    const { itemId } = req.body.itemId;
+    const itemId = ModerationSchemaItem.parse(req.body).itemId;
 
     const item = await prisma.item.delete({
       where: {
@@ -110,7 +115,7 @@ export const approveFlaggedPost = async (
   next: NextFunction,
 ) => {
   try {
-    const { postId } = req.body.postId;
+    const postId = ModerationSchemaPost.parse(req.body).postId;
 
     const post = await prisma.post.update({
       where: {
@@ -140,7 +145,7 @@ export const rejectFlaggedPost = async (
   next: NextFunction,
 ) => {
   try {
-    const { postId } = req.body.itemId;
+    const postId = ModerationSchemaPost.parse(req.body).postId;
 
     const post = await prisma.post.delete({
       where: {
@@ -189,7 +194,7 @@ export const approveFlaggedEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const { eventId } = req.body.eventId;
+    const eventId = ModerationSchemaEvent.parse(req.body).eventId;
 
     const event = await prisma.event.update({
       where: {
@@ -219,7 +224,7 @@ export const rejectFlaggedEvent = async (
   next: NextFunction,
 ) => {
   try {
-    const { eventId } = req.body.eventId;
+    const eventId = ModerationSchemaEvent.parse(req.body).eventId;
 
     const event = await prisma.event.delete({
       where: {
