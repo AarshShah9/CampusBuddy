@@ -62,8 +62,6 @@ type AttendeesRoute = {
 type OrganizationProfileRoute = {
   page: "OrganizationProfile";
   id: string;
-  name: string;
-  image: string;
 };
 
 type StudentSignUpRoute = {

@@ -159,6 +159,7 @@ const allowedEndpoints = [
   "/api/profile/events/:id",
   "/api/profile/posts/:id",
   "/api/profile/items/:id",
+  "/api/profile/orgItems/:id",
 
   // Miscellaneous endpoints
   "/Test",
@@ -193,6 +194,8 @@ export type IdRequiredEndPoints =
   | "/api/post/:id"
   | "/api/post/comments/:id"
   | "/api/orgs/deleteProfilePicture/:id"
+  | "/api/orgs/profilePicture/:id"
+  | "/api/profile/orgItems/:id"
   | "/api/profile/items/:id";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {

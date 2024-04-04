@@ -10,56 +10,60 @@ import useRefreshControl from "~/hooks/useRefreshControl";
 import { useCallback, useEffect } from "react";
 
 export default function OrganizationEvents() {
-    const { params: { id } } = useRoute<any>();
+  const {
+    params: { id },
+  } = useRoute<any>();
 
-    const {
-        data: organizationEvents,
-        isLoading,
-        refetch,
-        isFetchedAfterMount,
-        isFetching,
-    } = useQuery<EventData[]>({
-        queryKey: ["organization-events"],
-        queryFn: () => getUserProfileEvents(id),
-        initialData: [],
+  const {
+    data: organizationEvents,
+    isLoading,
+    refetch,
+    isFetchedAfterMount,
+    isFetching,
+  } = useQuery<EventData[]>({
+    queryKey: ["organization-events"],
+    queryFn: () => {
+      return [];
+    },
+    initialData: [],
+  });
+
+  const { startLoading, stopLoading } = useLoadingContext();
+
+  const { refreshing, triggerRefresh, stopRefresh } = useRefreshControl();
+
+  const onPullRefresh = useCallback(() => {
+    triggerRefresh(() => {
+      refetch();
     });
+  }, []);
 
-    const { startLoading, stopLoading } = useLoadingContext();
+  useEffect(() => {
+    if (isLoading) startLoading();
+    else stopLoading();
+  }, [isLoading]);
 
-    const { refreshing, triggerRefresh, stopRefresh } = useRefreshControl();
+  const queryIsLoading = isFetching && isFetchedAfterMount;
+  useEffect(() => {
+    if (!queryIsLoading) stopRefresh();
+  }, [queryIsLoading]);
 
-    const onPullRefresh = useCallback(() => {
-        triggerRefresh(() => {
-            refetch();
-        });
-    }, []);
-
-    useEffect(() => {
-        if (isLoading) startLoading();
-        else stopLoading();
-    }, [isLoading]);
-
-    const queryIsLoading = isFetching && isFetchedAfterMount;
-    useEffect(() => {
-        if (!queryIsLoading) stopRefresh();
-    }, [queryIsLoading]);
-
-    return (
-        <View style={{ flex: 1 }}>
-            <FlashList
-                data={organizationEvents}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                    <HorizontalScrollElement item={item} isLoading={queryIsLoading} />
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingTop: 20 }}
-                estimatedItemSize={20}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onPullRefresh} />
-                }
-                extraData={queryIsLoading}
-            />
-        </View>
-    );
+  return (
+    <View style={{ flex: 1 }}>
+      <FlashList
+        data={organizationEvents}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <HorizontalScrollElement item={item} isLoading={queryIsLoading} />
+        )}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingTop: 20 }}
+        estimatedItemSize={20}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onPullRefresh} />
+        }
+        extraData={queryIsLoading}
+      />
+    </View>
+  );
 }

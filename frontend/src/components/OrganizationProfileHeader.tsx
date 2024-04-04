@@ -11,14 +11,31 @@ import useThemeContext from "~/hooks/useThemeContext";
 import { MaterialIcons, Ionicons, Entypo } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { useCallback, useLayoutEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { UserProfileHeaderType } from "~/types/Profile";
+import { getOrgProfile, getUserProfile } from "~/lib/apiFunctions/Profile";
+import { generateImageURL } from "~/lib/CDNFunctions";
+
+export type OrganizationProfileHeaderType = {
+  organization: {
+    members: number;
+    name: string;
+    image: string;
+    member: boolean;
+  };
+};
 
 export default function Header() {
-  // const { params: { id, name, image: uri } } = useRoute<any>();
+  const {
+    params: { id },
+  } = useRoute<any>();
   const { theme } = useThemeContext();
 
-  const name = "Organization Name (NOT YOURS)";
-  const uri =
-    "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
+  const { data: organizationData } = useQuery<OrganizationProfileHeaderType>({
+    queryKey: ["org-profile", id],
+    queryFn: () => getOrgProfile(id),
+    initialData: undefined,
+  });
 
   const [joined, setJoined] = useState(false);
   const joinOrganization = useCallback(() => {
@@ -56,10 +73,12 @@ export default function Header() {
           ]}
         >
           <View style={styles.profilePicContainer}>
-            {uri ? (
+            {organizationData?.organization.image ? (
               <Image
                 style={{ width: "100%", height: "100%" }}
-                source={{ uri }}
+                source={{
+                  uri: generateImageURL(organizationData?.organization.image),
+                }}
               />
             ) : (
               <MaterialIcons name="person" size={50} color="grey" />
@@ -67,7 +86,13 @@ export default function Header() {
           </View>
         </TouchableOpacity>
         <View style={styles.miniInfoContainer}>
-          {joined ? (
+          <Text style={styles.profileInfoItem1}>
+            {organizationData?.organization.members}
+          </Text>
+          <Text style={styles.profileInfoItem2}>Members</Text>
+        </View>
+        <View style={styles.miniInfoContainer}>
+          {organizationData?.organization.member ? (
             <>
               <Ionicons
                 name="checkmark-circle-outline"
@@ -86,14 +111,12 @@ export default function Header() {
             </TouchableOpacity>
           )}
         </View>
-        <View style={styles.miniInfoContainer}>
-          <Text style={styles.profileInfoItem1}>167</Text>
-          <Text style={styles.profileInfoItem2}>Members</Text>
-        </View>
         <View style={styles.miniInfoContainer}></View>
       </View>
       <View style={styles.lowerSection}>
-        <Text style={{ fontWeight: "bold", fontSize: 18 }}>{name}</Text>
+        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+          {organizationData?.organization.name}
+        </Text>
       </View>
     </View>
   );

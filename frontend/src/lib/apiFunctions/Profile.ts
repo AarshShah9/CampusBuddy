@@ -61,3 +61,15 @@ export const getUserProfileItems = async (userId: string) => {
     return [];
   }
 };
+
+export const getOrgProfile = async (orgId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/orgItems/:id`, {
+        params: { id: orgId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

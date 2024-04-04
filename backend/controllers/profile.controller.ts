@@ -343,3 +343,56 @@ export const getProfileItems = async (
     next(error);
   }
 };
+
+export const getOrganizationProfileData = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: organizationId,
+      },
+      include: {
+        userOrganizationRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    // get the number of members in the organization
+    const members = organization.userOrganizationRoles.filter(
+      (role) => role.role.roleName === "Member",
+    );
+    const isMember =
+      members.filter((role) => role.userId === req.userId).length > 0;
+
+    res.status(200).json({
+      message: "User Profile Data",
+      data: {
+        organization: {
+          members: members.length,
+          name: organization.organizationName,
+          image: organization.image,
+          member: isMember,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

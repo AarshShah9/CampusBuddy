@@ -258,22 +258,52 @@ export const loginUser = async (
     });
 
     if (!existingUser || existingUser.institution === null) {
-      res.status(404).json({
-        success: false,
-        message: "User doesn't exist",
-      });
-      //checks if user is a student
-    } else if (existingUser.accountType === "Student") {
-      // Confirm password matches
-      const isCorrectPassword = await comparePassword(
-        password,
-        existingUser.password,
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
       );
+    }
 
-      if (!isCorrectPassword) {
-        return res.status(401).json({ message: "Invalid password" });
-      }
+    const orgId = existingUser.UserOrganizationRole.map(
+      (UserOrganizationRole) => UserOrganizationRole.organizationId,
+    );
 
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: orgId[0],
+      },
+      include: {
+        userOrganizationRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    // Confirm password matches
+    const isCorrectPassword = await comparePassword(
+      password,
+      existingUser.password,
+    );
+
+    if (!isCorrectPassword) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    //checks if user is a student
+    if (existingUser.accountType === "Student") {
       // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
       const attendedEvents = await prisma.userEventResponse.count({
         where: {
@@ -355,9 +385,9 @@ export const loginUser = async (
           organizationImage: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) => UserOrganizationRole.organization.image,
           ),
-          members: existingUser?.UserOrganizationRole.filter(
-            (UserOrganizationRole) =>
-              UserOrganizationRole.role.roleName === "Member",
+          members: organization?.userOrganizationRoles.filter(
+            (userOrganizationRole) =>
+              userOrganizationRole.role.roleName === "Member",
           ).length,
           posts: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) => UserOrganizationRole.organization.events,
