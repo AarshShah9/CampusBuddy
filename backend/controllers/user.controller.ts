@@ -239,11 +239,17 @@ export const loginUser = async (
         },
         UserOrganizationRole: {
           include: {
+            role: true,
             organization: {
               select: {
                 organizationName: true,
                 description: true,
                 image: true,
+                events: {
+                  select: {
+                    id: true,
+                  },
+                },
               },
             },
           },
@@ -252,22 +258,26 @@ export const loginUser = async (
     });
 
     if (!existingUser || existingUser.institution === null) {
-      res.status(404).json({
-        success: false,
-        message: "User doesn't exist",
-      });
-      //checks if user is a student
-    } else if (existingUser.accountType === "Student") {
-      // Confirm password matches
-      const isCorrectPassword = await comparePassword(
-        password,
-        existingUser.password,
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
       );
+    }
 
-      if (!isCorrectPassword) {
-        return res.status(401).json({ message: "Invalid password" });
-      }
+    // Confirm password matches
+    const isCorrectPassword = await comparePassword(
+      password,
+      existingUser.password,
+    );
 
+    if (!isCorrectPassword) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    //checks if user is a student
+    if (existingUser.accountType === "Student") {
       // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
       const attendedEvents = await prisma.userEventResponse.count({
         where: {
@@ -329,12 +339,41 @@ export const loginUser = async (
       };
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
+      const orgId = existingUser.UserOrganizationRole.map(
+        (UserOrganizationRole) => UserOrganizationRole.organizationId,
+      );
+
+      const organization = await prisma.organization.findUnique({
+        where: {
+          id: orgId[0],
+        },
+        include: {
+          userOrganizationRoles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      if (!organization) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Organization not found",
+          404,
+          true,
+        );
+      }
+
       res.status(200).json({
         authToken,
         data: {
           id: existingUser.id,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
+          organizationId: existingUser.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organizationId,
+          ),
           organizationName: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) =>
               UserOrganizationRole.organization.organizationName,
@@ -346,6 +385,13 @@ export const loginUser = async (
           organizationImage: existingUser?.UserOrganizationRole.map(
             (UserOrganizationRole) => UserOrganizationRole.organization.image,
           ),
+          members: organization?.userOrganizationRoles.filter(
+            (userOrganizationRole) =>
+              userOrganizationRole.role.roleName === "Member",
+          ).length,
+          posts: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.events,
+          ).length,
           type: "Organization_Admin",
         },
       });

@@ -22,6 +22,9 @@ export default function AttendeeCard({
     if (type === "User") {
       onPress?.();
       navigateTo({ page: "UserProfile", id: item.id });
+    } else {
+      onPress?.();
+      navigateTo({ page: "OrganizationProfile", id: item.id });
     }
   }, [item.id]);
 

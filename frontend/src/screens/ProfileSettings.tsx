@@ -23,6 +23,7 @@ export default function ProfileSettings() {
   const { theme } = useThemeContext();
   const { logOut } = useAuthContext();
   const { navigateTo, replaceStackWith } = useNavigationContext();
+  const { userType } = useAuthContext();
 
   const { bottomSheetModalRef, closeModal } = useProfileContext();
   const Backdrop = useCallback(
@@ -37,7 +38,9 @@ export default function ProfileSettings() {
       title: "Settings and Privacy",
       onClick: () => {
         closeModal();
-        navigateTo({ page: "Settings" });
+        navigateTo({
+          page: userType === "Student" ? "Settings" : "OrganizationSettings",
+        });
       },
     },
     { title: "Help", onClick: () => console.log("Help") },
