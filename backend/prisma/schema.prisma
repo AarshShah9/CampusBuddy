@@ -139,7 +139,7 @@ model Event {
   startTime       DateTime            @map("start_time")
   endTime         DateTime            @map("end_time")
   isPublic        Boolean             @default(true) @map("is_public")
-  isFlagged         Boolean             @default(false)
+  isFlagged       Boolean             @default(false)
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -177,7 +177,7 @@ model Post {
   title       String
   description String?
   isPublic    Boolean   @default(true)
-  isFlagged     Boolean   @default(false)
+  isFlagged   Boolean   @default(false)
   expiresAt   DateTime? @map("expires_at")
 
   numberOfSpots     Int? @map("number_of_spots")
@@ -247,7 +247,7 @@ model UserOrganizationRole {
   organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([userId, organizationId, roleId])
+  @@id([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
   @@index([roleId])
@@ -352,7 +352,7 @@ model Item {
   institutionId String       @map("institution_id")
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   isPublic      Boolean      @default(true)
-  isFlagged       Boolean      @default(false)
+  isFlagged     Boolean      @default(false)
   title         String
   description   String?
   price         Int
