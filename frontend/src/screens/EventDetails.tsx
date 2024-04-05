@@ -12,7 +12,7 @@ import {
   ParamListBase,
   useRoute,
 } from "@react-navigation/native";
-import { useCallback, useLayoutEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
@@ -76,12 +76,12 @@ export default function EventDetails({
   const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  const { openModal } = useEventsContext();
+  const { openModal, eventData, fetchEventDetails, refetchEventDetails } =
+    useEventsContext();
 
-  const { data: eventData, refetch } = useQuery<EventDetailsType>({
-    queryKey: ["event-details", id],
-    queryFn: () => getEventDetails(id),
-  });
+  useEffect(() => {
+    fetchEventDetails(id);
+  }, [id, fetchEventDetails]);
 
   const attendMutation = useMutation({
     mutationFn: async ({
@@ -92,7 +92,7 @@ export default function EventDetails({
       previousState: boolean;
     }) => {
       await attendEvent(id);
-      refetch();
+      refetchEventDetails();
     },
   });
 

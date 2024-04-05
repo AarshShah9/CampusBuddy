@@ -28,33 +28,15 @@ export default function EventSettings() {
   const { userType } = useAuthContext();
   const { navigateTo, navigateBack } = useNavigationContext();
 
-  const { bottomSheetModalRef, closeModal } = useEventsContext();
+  const { bottomSheetModalRef, closeModal, likeMutate, eventData } =
+    useEventsContext();
+
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />
     ),
     [],
   );
-
-  const likeMutation = useMutation({
-    mutationFn: async ({
-      id,
-      previousState,
-    }: {
-      id: string;
-      previousState: boolean;
-    }) => {
-      await likeEvent(id);
-      // refetch();
-    },
-  });
-
-  // const userLiked = useCallback(() => {
-  //   likeMutation.mutate({
-  //     id,
-  //     previousState: eventData?.isLiked!,
-  //   });
-  // }, [id, likeEvent, eventData?.isLiked]);
 
   const onDelete = useCallback(() => {
     Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
@@ -73,17 +55,17 @@ export default function EventSettings() {
 
   const settings = [
     {
-      title: "Save",
+      title: "Like",
       icon: (
         <Entypo
           name="heart"
           size={28}
           color={"red"}
-          // color={isLiked ? "red" : "white"}
+          // color={eventData && eventData?.isLiked ? "red" : "white"}
         />
       ),
       onClick: () => {
-        closeModal();
+        likeMutate();
       },
     },
     {
