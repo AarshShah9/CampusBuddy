@@ -1,12 +1,14 @@
 import {
+  Alert,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  StyleSheet,
 } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -19,9 +21,10 @@ import * as zod from "zod";
 import { useCallback, useEffect, useState } from "react";
 import useAppContext from "~/hooks/useAppContext";
 import useAuthContext from "~/hooks/useAuthContext";
-import { Keyboard } from "react-native";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import ErrorText from "~/components/ErrorText";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type loginForm = {
   email: string;
@@ -34,6 +37,7 @@ export default function Login() {
   const { navigateTo, replaceStackWith } = useNavigationContext();
   const { signIn } = useAuthContext();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const schema = zod.object({
     email: zod.string(),
@@ -52,14 +56,21 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = useCallback(
-    (data: loginForm) => {
-      console.log(data);
-      signIn(data.email, data.password);
-      replaceStackWith('LandingGroup')
-    },
-    [],
-  );
+  const onSubmit = useCallback((data: loginForm) => {
+    const dev = false;
+    if (!dev) {
+      if (errors.email || errors.password) return;
+      if (!data.email || !data.password) {
+        Alert.alert("Error Logging In", "Please fill out all fields.");
+        return;
+      }
+    }
+
+    signIn(data.email, data.password, dev).then((succeeded) => {
+      if (succeeded) replaceStackWith("LandingGroup");
+      else Alert.alert("Error Logging In", "Something went wrong!");
+    });
+  }, []);
 
   useEffect(() => {
     let keyboardShowListener: EmitterSubscription;
@@ -113,7 +124,13 @@ export default function Login() {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputField
-                    placeholder="Email"
+                    label={
+                      errors.email ? (
+                        <ErrorText error={"Email is required."} />
+                      ) : (
+                        "Email"
+                      )
+                    }
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -125,28 +142,45 @@ export default function Login() {
                 )}
                 name="email"
               />
-              {errors.email && <Text>Email is required.</Text>}
+
               <Controller
                 control={control}
                 rules={{
                   required: true,
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <InputField
-                    placeholder="Password"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    autoCorrect={false}
-                    autoCapitalize={"none"}
-                    autoComplete={"off"}
-                    style={{ backgroundColor: theme.colors.tertiary }}
-                  />
+                  <View style={styles.inputContainer}>
+                    <InputField
+                      label={
+                        errors.password ? (
+                          <ErrorText error={"Password is required."} />
+                        ) : (
+                          "Password"
+                        )
+                      }
+                      secureTextEntry={!passwordVisible}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      autoCorrect={false}
+                      autoCapitalize={"none"}
+                      autoComplete={"off"}
+                      style={{ backgroundColor: theme.colors.tertiary }}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setPasswordVisible(!passwordVisible)}
+                      style={styles.icon}
+                    >
+                      <MaterialCommunityIcons
+                        name={passwordVisible ? "eye-off" : "eye"}
+                        size={24}
+                        color="grey"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 )}
                 name="password"
               />
-              {errors.password && <Text>Password is required.</Text>}
-
               <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
                 <Text
                   style={{
@@ -203,6 +237,20 @@ export default function Login() {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  inputField: {
+    flex: 1,
+  },
+  icon: {
+    marginLeft: -35,
+    paddingBottom: 10,
+  },
+});
 
 // prettier-ignore
 const LogoContainer = styled(View)`

@@ -1,34 +1,47 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Image } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { UserProfileHeaderType } from "~/types/Profile";
+import { getUserProfile } from "~/lib/apiFunctions/Profile";
+import { generateImageURL } from "~/lib/CDNFunctions";
+import { useCallback } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
-type UserProfileHeaderProps = {
-  name: string;
-  attended: number;
-  following: number;
-  imageSource?: { uri: string };
-  programs: string[];
-};
-
-export default function UserProfileHeader(props: UserProfileHeaderProps) {
-  const insets = useSafeAreaInsets();
+export default function UserProfileHeader({ id }: { id: string }) {
   const { theme } = useThemeContext();
+
+  const { data: profileData } = useQuery<UserProfileHeaderType>({
+    queryKey: ["profile", id],
+    queryFn: () => getUserProfile(id),
+    initialData: undefined,
+  });
+  const { navigateTo } = useNavigationContext();
+
+  const goToMessages = useCallback(() => {
+    navigateTo({ page: "Messages" });
+  }, []);
 
   return (
     <View
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 35,
+          paddingTop: 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },
       ]}
     >
-      <View style={styles.headerCard}>
+      <View
+        style={{
+          width: "100%",
+          height: profileData?.user.programs?.[0] ? 140 : 120,
+        }}
+      >
         <View style={styles.upperSection}>
           <View
             style={[
@@ -36,31 +49,44 @@ export default function UserProfileHeader(props: UserProfileHeaderProps) {
               { backgroundColor: theme.colors.profilePicContainer },
             ]}
           >
-            {props.imageSource?.uri ? (
+            {profileData?.user.image ? (
               <Image
                 style={{ width: "100%", height: "100%" }}
-                source={{ uri: props.imageSource.uri }}
+                source={{ uri: generateImageURL(profileData?.user.image) }}
               />
             ) : (
               <View style={styles.iconContainer}>
-                <MaterialIcons name="person" size={50} color="grey" />
+                <MaterialIcons
+                  name="person"
+                  size={50}
+                  color={theme.colors.tertiary}
+                />
               </View>
             )}
           </View>
           <View style={styles.miniInfoContainer}>
-            <Text style={styles.profileInfoItem}>{props?.attended ?? "0"}</Text>
+            <Text style={styles.profileInfoItem}>
+              {profileData?.user.attended ?? "0"}
+            </Text>
             <Text style={styles.profileInfoItem}>Attended</Text>
           </View>
           <View style={styles.miniInfoContainer}>
             <Text style={styles.profileInfoItem}>
-              {props?.following ?? "0"}
+              {profileData?.user.following ?? "0"}
             </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
+          <TouchableOpacity onPress={goToMessages}>
+            <MaterialCommunityIcons
+              name="chat-outline"
+              size={28}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.lowerSection}>
-          <Text style={{ fontWeight: "bold" }}>{props.name}</Text>
-          <Text>{props.programs?.[0]}</Text>
+          <Text style={{ fontWeight: "bold" }}>{profileData?.user.name}</Text>
+          <Text>{profileData?.user.programs?.[0]}</Text>
         </View>
       </View>
     </View>
@@ -73,10 +99,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 0,
     borderBottomWidth: 2,
-  },
-  headerCard: {
-    width: "100%",
-    height: 150,
   },
   upperSection: {
     flexDirection: "row",

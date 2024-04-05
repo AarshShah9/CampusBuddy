@@ -1,60 +1,110 @@
 type UserProfileRoute = {
-    page: 'UserProfile',
-    id: string
-}
+  page: "UserProfile";
+  id: string;
+};
 
 type ChatScreenRoute = {
-    page: 'ChatScreen'
-    userId: string,
-    userName: string,
-    icon: string
-}
+  page: "ChatScreen";
+  userId: string;
+  userName: string;
+  icon: string;
+};
 
 type EventDetailsRoute = {
-    page: 'EventDetails'
-    id: string,
-    map?: boolean
-}
+  page: "EventDetails";
+  id: string;
+  map?: boolean;
+};
+
+type MarketPlaceDetailsRoute = {
+  page: "MarketPlaceDetail";
+  id: string;
+};
+
+type LookingForDetailsRoute = {
+  page: "LookingForDetails";
+  id: string;
+};
 
 type MessagesRoute = {
-    page: 'Messages'
-}
+  page: "Messages";
+};
 
 type HomeRoute = {
-    page: 'Home'
-}
+  page: "Home";
+};
 
 type LoginRoute = {
-    page: 'Login'
-}
+  page: "Login";
+};
 
 type MapDetailsRoute = {
-    page: 'MapDetails',
-    eventData: {
-        title: string,
-        description: string,
-        latitude: number,
-        longitude: number
-    }[]
-}
+  page: "MapDetails";
+  eventData?: {
+    title: string;
+    description: string;
+    latitude: number;
+    longitude: number;
+  }[];
+  itemData?: {
+    title: string;
+    description: string;
+    latitude: number;
+    longitude: number;
+  }[];
+};
 
 type AttendeesRoute = {
-    page: 'Attendees',
-    id: string
-}
+  page: "Attendees";
+  id: string;
+};
+
+type OrganizationProfileRoute = {
+  page: "OrganizationProfile";
+  id: string;
+};
 
 type StudentSignUpRoute = {
-    page: 'StudentSignUp',
-}
+  page: "StudentSignUp";
+};
 
 type OrgSignUpRoute = {
-    page: 'OrgSignUp',
-}
+  page: "OrgSignUp";
+};
 
-export type NavigationFunctionArgs = (
-    UserProfileRoute | ChatScreenRoute | EventDetailsRoute | MessagesRoute | 
-    HomeRoute | LoginRoute | MapDetailsRoute | AttendeesRoute | StudentSignUpRoute |
-    OrgSignUpRoute
-)
+type SettingsRoute = {
+  page: "Settings";
+};
 
-export type NavigableStacks = 'AuthenticationGroup' | 'LandingGroup' | 'ConfirmEmail' | 'OrgCreationConfirmation'
+type CommentsRoute = {
+  page: "LookingForCommentsScreen";
+  id: string;
+};
+
+type OrganizationSettingsRoute = {
+  page: "OrganizationSettings";
+};
+
+export type NavigationFunctionArgs =
+  | UserProfileRoute
+  | ChatScreenRoute
+  | EventDetailsRoute
+  | MessagesRoute
+  | HomeRoute
+  | LoginRoute
+  | MapDetailsRoute
+  | AttendeesRoute
+  | StudentSignUpRoute
+  | OrgSignUpRoute
+  | OrganizationProfileRoute
+  | LookingForDetailsRoute
+  | MarketPlaceDetailsRoute
+  | CommentsRoute
+  | OrganizationSettingsRoute
+  | SettingsRoute;
+
+export type NavigableStacks =
+  | "AuthenticationGroup"
+  | "LandingGroup"
+  | "ConfirmEmail"
+  | "OrgCreationConfirmation";

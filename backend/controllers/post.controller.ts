@@ -48,9 +48,10 @@ export const getAllPosts = async (
     const allPosts = await prisma.post.findMany({
       where: {
         institutionId: user.institutionId!,
+        isPublic: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
     });
 
@@ -324,6 +325,114 @@ export const deletePost = async (
       );
     }
     res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getPostById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!post) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post with id ${postId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const self: boolean = req.userId === post.userId;
+
+    if (!post.isPublic && !self) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view post`,
+        403,
+        true,
+      );
+    }
+
+    const postResponse = {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      spotsLeft: post.numberOfSpotsLeft,
+      createdAt: post.createdAt,
+      userId: post.userId,
+      userName: post.user.firstName + " " + post.user.lastName,
+      userImage: post.user.profilePic,
+      isFlagged: post.isFlagged,
+    };
+
+    res.status(200).json({
+      message: "Post found",
+      data: postResponse,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getPostCommentsById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        comments: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post with id ${postId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const postComments = post.comments.map((comment) => {
+      return {
+        id: comment.id,
+        content: comment.text,
+        createdAt: comment.createdAt,
+        userId: comment.userId,
+        userName: comment.user.firstName + " " + comment.user.lastName,
+        userImage: comment.user.profilePic,
+      };
+    });
+
+    res.status(200).json({
+      message: "Post comments found",
+      data: postComments,
+    });
   } catch (error: any) {
     next(error);
   }

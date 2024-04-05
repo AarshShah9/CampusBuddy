@@ -9,10 +9,12 @@ import {
   UserType,
 } from "@prisma/client";
 import prisma from "../prisma/client";
-import { OrganizationCreateType } from "../../shared/zodSchemas";
+import { IdParamSchema, OrganizationCreateType } from "../../shared/zodSchemas";
 import { defaultRolePermissions } from "../constants";
 import { AppError, AppErrorName } from "../utils/AppError";
 import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { RequestExtended } from "../middleware/verifyAuth";
 
 // Creates a new organization and add the default role permissions
 // This messy but it works for now
@@ -284,4 +286,134 @@ export async function rejectOrganizationRequest(
       });
     }
   });
+}
+
+// Remove a user from an organization
+export async function removeUserFromOrganization(
+  userId: string,
+  organizationId: string,
+) {
+  await prisma.userOrganizationRole.deleteMany({
+    where: {
+      userId,
+      organizationId,
+    },
+  });
+}
+
+// Add a user to an organization as a "member"
+export async function addMemberToOrganization(
+  userId: string,
+  organizationId: string,
+) {
+  try {
+    // Fetch member role
+    const memberRole = await prisma.role.findUniqueOrThrow({
+      where: {
+        roleName: UserRole.Member,
+      },
+    });
+
+    const newMemberRole = await prisma.userOrganizationRole.create({
+      data: {
+        userId,
+        organizationId,
+        roleId: memberRole.id,
+        status: UserOrgStatus.Approved,
+      },
+    });
+    return newMemberRole;
+  } catch (error: any) {
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code == "P2002" // unique constrained violation error code
+    ) {
+      throw new AppError(
+        AppErrorName.RECORD_EXISTS_ERROR,
+        "User already exists in the organization",
+        400,
+        true,
+      );
+    } else {
+      throw new AppError(
+        AppErrorName.INTERNAL_SERVER_ERROR,
+        "An unexpected error occurred adding user to organization",
+        500,
+        true,
+      );
+    }
+  }
+}
+
+// Get a list of the users roles within an organization
+export async function getUserRolesInOrganization(
+  userId: string,
+  organizationId: string,
+) {
+  try {
+    const userRoles = await prisma.userOrganizationRole.findMany({
+      where: { userId, organizationId },
+      include: { role: true },
+    });
+    return userRoles;
+  } catch (error: any) {
+    throw new AppError(
+      AppErrorName.INTERNAL_SERVER_ERROR,
+      "An unexpected error occurred while fetching user roles",
+      500,
+      true,
+    );
+  }
+}
+
+// Fetch the organization by its id
+export async function getOrgById(organizationId: string) {
+  try {
+    const existingOrganization = await prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    if (!existingOrganization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Organization not found`,
+        404,
+        true,
+      );
+    }
+
+    return existingOrganization;
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error; // Rethrow AppErrors for middleware error handling
+    } else {
+      throw new AppError(
+        AppErrorName.INTERNAL_SERVER_ERROR,
+        "An unexpected error occurred while checking for organization existence",
+        500,
+        true,
+      );
+    }
+  }
+}
+
+// Get the role from the role name
+export async function getRoleIdFromName(roleName: string) {
+  try {
+    const role = await prisma.role.findUniqueOrThrow({
+      where: {
+        roleName: roleName as UserRole,
+      },
+    });
+    return role;
+  } catch (error: any) {
+    console.error("Error fetching role:", error);
+    // throw error;
+    throw new AppError(
+      AppErrorName.NOT_FOUND_ERROR,
+      `Organization role not found`,
+      404,
+      true,
+    );
+  }
 }

@@ -1,17 +1,9 @@
 import { BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { createContext, useCallback, useRef } from "react";
+import { createContext, PropsWithChildren, useCallback, useRef } from "react";
 import { CBRequest, uploadImageRequest } from "~/lib/CBRequest";
 import useAuthContext from "~/hooks/useAuthContext";
 import { imageGetter } from "~/lib/requestHelpers";
-import useLoadingContext from "~/hooks/useLoadingContext";
-import useProfileContext from "~/hooks/useProfileContext";
-
-export type profileData = {
-  attended: number;
-  user: any; // TODO type this
-};
 
 type profileContext = {
   closeModal: () => void;
@@ -23,8 +15,6 @@ type profileContext = {
 
   onUpload: () => void;
   onDelete: () => void;
-
-  profileData?: profileData;
 };
 const ProfileContext = createContext<profileContext | null>(null);
 
@@ -32,10 +22,7 @@ export const ProfileContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
   const { dismiss } = useBottomSheetModal();
-  const { setUser } = useAuthContext();
-  const { startLoading, stopLoading } = useLoadingContext();
-
-  const [profileData, setProfileData] = useState<profileData>();
+  const { setUser, setOrganization, userType, organization } = useAuthContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const openModal = useCallback(() => {
@@ -52,7 +39,7 @@ export const ProfileContextProvider = ({
     dismiss();
   }, [dismiss]);
 
-  const onUpload = useCallback(async () => {
+  const onUploadUser = useCallback(async () => {
     try {
       const result = await imageGetter();
       if (result.canceled) {
@@ -72,15 +59,51 @@ export const ProfileContextProvider = ({
         }
         return { ...prev, image: res.data.data.image };
       });
-      closeModal();
     } catch (error) {
       console.log(error);
-      alert("An error occurred while trying to delete the picture");
+      alert("An error occurred while trying to upload the picture");
+    }
+  }, []);
+
+  const onUploadOrganization = useCallback(async () => {
+    try {
+      const result = await imageGetter();
+      if (result.canceled) {
+        return;
+      }
+      const image = result.assets[0];
+      closeModal();
+      const res = await uploadImageRequest(
+        "post",
+        "/api/orgs/profilePicture/:id",
+        image,
+        {
+          body: { force: true },
+          params: { id: organization?.organizationId?.[0]! },
+        },
+      );
+      setOrganization((prev) => {
+        if (!prev) {
+          throw new Error("prev organization is undefined");
+        }
+        return { ...prev, organizationImage: [res.data.data.image] };
+      });
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred while trying to upload the picture");
     }
     closeModal();
   }, []);
 
-  const onDelete = useCallback(async () => {
+  const onUpload = useCallback(async () => {
+    if (userType === "Student") {
+      await onUploadUser();
+    } else if (userType === "Organization_Admin") {
+      await onUploadOrganization();
+    }
+  }, [setOrganization, setUser, userType]);
+
+  const onDeleteUser = useCallback(async () => {
     try {
       await CBRequest("POST", "/api/user/deleteProfilePicture");
       setUser((prev) => {
@@ -96,22 +119,31 @@ export const ProfileContextProvider = ({
     }
   }, []);
 
-  const getProfileData = useCallback(async () => {
+  const onDeleteOrganization = useCallback(async () => {
     try {
-      startLoading();
-      const res = await CBRequest("GET", "/api/user/profile");
-      setProfileData(res.data);
-      stopLoading();
+      await CBRequest("POST", "/api/orgs/deleteProfilePicture/:id", {
+        params: { id: organization?.organizationId?.[0]! },
+      });
+      setOrganization((prev) => {
+        if (!prev) {
+          throw new Error("prev organization is undefined");
+        }
+        return { ...prev, organizationImage: [] };
+      });
+      closeModal();
     } catch (error) {
       console.log(error);
-      stopLoading();
-      alert("An error occurred while trying to get the profile data");
+      alert("An error occurred while trying to delete the picture");
     }
-  }, [startLoading, stopLoading]);
+  }, []);
 
-  useEffect(() => {
-    getProfileData();
-  }, [getProfileData]);
+  const onDelete = useCallback(async () => {
+    if (userType === "Student") {
+      await onDeleteUser();
+    } else if (userType === "Organization_Admin") {
+      await onDeleteOrganization();
+    }
+  }, [setOrganization, setUser, userType]);
 
   return (
     <ProfileContext.Provider
@@ -123,7 +155,6 @@ export const ProfileContextProvider = ({
         openPictureModal,
         onUpload,
         onDelete,
-        profileData,
       }}
     >
       {children}

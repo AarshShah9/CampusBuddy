@@ -20,11 +20,39 @@ export const itemTest = async (req: Request, res: Response) => {
 // Get all Items
 export const getAllItems = async (req: RequestExtended, res: Response) => {
   try {
+    const userId = req.userId;
+
+    const institution = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        institutionId: true,
+      },
+    });
+
+    if (!institution || !institution.institutionId) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `User with id ${userId} not found or does not have an institution associated with it.`,
+        404,
+        true,
+      );
+    }
+
     const allItems = await prisma.item.findMany({
       include: {
         location: true,
       },
+      where: {
+        institutionId: institution?.institutionId,
+        isPublic: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
+
     const images = await prisma.image.findMany({
       where: {
         itemId: {
@@ -229,6 +257,92 @@ export const deleteItem = async (
         true,
       );
     }
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getItemById = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const itemId = IdParamSchema.parse(req.params).id;
+    const item = await prisma.item.findUnique({
+      where: {
+        id: itemId,
+      },
+      include: {
+        location: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    if (!item) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Item with id ${itemId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const self: boolean = req.userId === item.userId;
+
+    if (!self && item.isPublic === false) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view item with id ${itemId}`,
+        403,
+        true,
+      );
+    }
+
+    const images = await prisma.image.findMany({
+      where: {
+        itemId: item?.id,
+      },
+      select: {
+        url: true,
+        itemId: true,
+      },
+    });
+
+    if (!item) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Item with id ${itemId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const itemResponse = {
+      id: item.id,
+      title: item.title,
+      price: item.price,
+      location: item.location.name,
+      latitude: item.location.latitude,
+      longitude: item.location.longitude,
+      createdAt: item.createdAt,
+      condition: item.condition,
+      description: item.description,
+      sellerFullName: item.user.firstName + " " + item.user.lastName,
+      sellerId: item.userId,
+      images: images?.map((image) => image.url),
+      isFlagged: item.isFlagged,
+    };
+
+    res.status(200).json({
+      message: "Item found",
+      data: itemResponse,
+    });
   } catch (error: any) {
     next(error);
   }

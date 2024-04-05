@@ -9,15 +9,16 @@ import { useCallback } from "react";
 
 export default function MapDetails() {
   let {
-    params: { eventData },
+    params: { eventData, itemData },
   } = useRoute<any>();
   const { theme } = useThemeContext();
-
   const { navigateBack } = useNavigationContext();
 
+  let data = eventData || itemData;
+
   const openDirections = useCallback(() => {
-    const latitude = eventData[0].latitude;
-    const longitude = eventData[0].longitude;
+    const latitude = data[0].latitude;
+    const longitude = data[0].longitude;
     const scheme = Platform.select({
       ios: "maps:0,0?q=",
       android: "geo:0,0?q=",
@@ -29,7 +30,7 @@ export default function MapDetails() {
     });
 
     Linking.openURL(url!);
-  }, [eventData]);
+  }, [data]);
 
   return (
     <MainContainer color={theme.colors.primary}>
@@ -43,10 +44,11 @@ export default function MapDetails() {
       </HeaderContainer>
       <Map
         currentLocation={{
-          latitude: eventData[0].latitude!,
-          longitude: eventData[0].longitude!,
+          latitude: data[0].latitude!,
+          longitude: data[0].longitude!,
         }}
         events={eventData}
+        items={itemData}
         showInfo={true}
       />
     </MainContainer>

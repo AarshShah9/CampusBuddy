@@ -1,29 +1,42 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { Card, Text } from "react-native-paper";
 import LocationChip from "./LocationChip";
 import { limitTextToMax } from "~/lib/helperFunctions";
-import { MarketPlaceCardProps } from "~/types/Events";
+import { MarketPlaceCardProps } from "~/types/MarketPlaceItem";
+import useNavigationContext from "~/hooks/useNavigationContext";
+import { useCallback } from "react";
 
 export default function MarketplaceItem(props: MarketPlaceCardProps) {
+  const { navigateTo } = useNavigationContext();
+
+  const openMarketPlaceDetail = useCallback(() => {
+    navigateTo({ page: "MarketPlaceDetail", id: props.id });
+  }, [props.id, navigateTo]);
+
   return (
-    <Card style={styles.card}>
-      <Card.Cover
-        style={styles.cardCover}
-        source={{ uri: props.image }}
-        resizeMode="cover"
-      />
-      <Card.Content style={styles.cardContent}>
-        <Card.Content style={styles.topCardContent}>
-          <Text style={styles.cardTitle}>
-            {limitTextToMax(props.title, 14)}
-          </Text>
-          <Text style={styles.price}>{props.price}</Text>
+    <TouchableOpacity onPress={openMarketPlaceDetail}>
+      <Card style={styles.card}>
+        <Card.Cover
+          style={styles.cardCover}
+          source={{ uri: props.image }}
+          resizeMode="cover"
+        />
+        <Card.Content style={styles.cardContent}>
+          <Card.Content style={styles.topCardContent}>
+            <Text style={styles.cardTitle}>
+              {limitTextToMax(props.title, 14)}
+            </Text>
+            <Text style={styles.price}>{props.price}</Text>
+          </Card.Content>
+          <Card.Content style={styles.bottomCardContent}>
+            <LocationChip
+              size={"small"}
+              location={props.location}
+            ></LocationChip>
+          </Card.Content>
         </Card.Content>
-        <Card.Content style={styles.bottomCardContent}>
-          <LocationChip size={"small"} location={props.location}></LocationChip>
-        </Card.Content>
-      </Card.Content>
-    </Card>
+      </Card>
+    </TouchableOpacity>
   );
 }
 

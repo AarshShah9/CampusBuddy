@@ -4,16 +4,40 @@ import { useCallback } from "react";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { MaterialIcons } from "@expo/vector-icons";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import useThemeContext from "~/hooks/useThemeContext";
 
-export default function AttendeeCard({ item }: { item: AttendeeResponse }) {
+export default function AttendeeCard({
+  item,
+  type = "User",
+  onPress,
+}: {
+  item: AttendeeResponse;
+  type?: "User" | "Organization";
+  onPress?: () => void;
+}) {
   const { navigateTo } = useNavigationContext();
+  const { theme } = useThemeContext();
 
   const onUserPress = useCallback(() => {
-    navigateTo({ page: "UserProfile", id: item.id });
+    if (type === "User") {
+      onPress?.();
+      navigateTo({ page: "UserProfile", id: item.id });
+    } else {
+      onPress?.();
+      navigateTo({ page: "OrganizationProfile", id: item.id });
+    }
   }, [item.id]);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onUserPress}>
+    <TouchableOpacity
+      style={[
+        styles.card,
+        {
+          backgroundColor: theme.colors.background,
+        },
+      ]}
+      onPress={onUserPress}
+    >
       {item.image ? (
         <Image
           source={{ uri: generateImageURL(item.image) }}
@@ -33,7 +57,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     padding: 10,
-    backgroundColor: "#fff",
   },
   name: {
     fontSize: 16,

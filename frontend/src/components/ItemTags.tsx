@@ -2,7 +2,10 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
 import useThemeContext from "~/hooks/useThemeContext";
-export default function ItemTag(props: { controllerOnChange: any }) {
+export default function ItemTag(props: {
+  controllerOnChange: any;
+  editable: boolean;
+}) {
   const { theme } = useThemeContext();
   const [tags, setTags] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState("");
@@ -71,6 +74,7 @@ export default function ItemTag(props: { controllerOnChange: any }) {
         onChangeText={(text) => {
           setCurrentInput(text);
         }}
+        editable={props.editable}
       />
     </View>
   );

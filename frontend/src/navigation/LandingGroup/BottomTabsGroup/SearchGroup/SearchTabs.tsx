@@ -4,9 +4,6 @@ import useThemeContext from "~/hooks/useThemeContext";
 import Events from "~/screens/Events";
 import Marketplace from "~/screens/Marketplace";
 import Services from "~/screens/Services";
-import { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { ScrollView } from "react-native";
 
 type BarIconProps = {
   focused: boolean;

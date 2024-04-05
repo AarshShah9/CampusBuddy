@@ -45,20 +45,20 @@ export default function Attendees() {
         backgroundColor: theme.colors.primary,
       }}
     >
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer]}>
         <TouchableOpacity onPress={() => navigateBack()}>
           {/*TODO MAKE the back button aligned*/}
           <AntDesign name="caretleft" size={24} color="white" />
         </TouchableOpacity>
         <SearchArea setSearchQuery={setSearchQueryCallback} />
       </View>
-
       <FlatList
         data={filteredAttendees}
         renderItem={({ item }) => <AttendeeCard item={item} />}
         keyExtractor={(item) => item.id}
         style={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        contentContainerStyle={{ backgroundColor: theme.colors.background }}
       />
     </View>
   );

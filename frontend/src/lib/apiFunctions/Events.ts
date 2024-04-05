@@ -1,11 +1,7 @@
-import {
-  CBRequest,
-  uploadImageRequest,
-  uploadImagesRequest,
-} from "../CBRequest";
+import { CBRequest, uploadImageRequest } from "../CBRequest";
 import { ImagePickerAsset } from "expo-image-picker";
 import { createEventType } from "~/screens/CreateEvent";
-import { AttendeeResponse, MarketPlaceItem } from "~/types/Events";
+import { AttendeeResponse } from "~/types/Events";
 
 export async function getHomePageEvents() {
   return [];
@@ -32,13 +28,30 @@ export const getMainEvents = async () => {
 export const createEvent = async (
   event: createEventType,
   image: ImagePickerAsset,
+  verified: boolean = false,
+  id: string,
 ): Promise<any> => {
   try {
-    return await uploadImageRequest("post", "/api/events/", image, {
-      body: event,
-    });
+    if (verified) {
+      return await uploadImageRequest(
+        "post",
+        "/api/events/organization/:id",
+        image,
+        {
+          body: event,
+          params: {
+            id,
+          },
+        },
+      );
+    } else {
+      return await uploadImageRequest("post", "/api/events/", image, {
+        body: event,
+      });
+    }
   } catch (err) {
     console.log(err);
+    throw err;
   }
 };
 
@@ -121,22 +134,19 @@ export const getAttendees = async (id: string) => {
   }
 };
 
-export const createMarketPlaceItem = async (
-  item: MarketPlaceItem,
-  images: ImagePickerAsset[],
-): Promise<any> => {
+export const Search = async ({
+  query,
+  page = 1,
+}: {
+  query: string;
+  page?: number;
+}) => {
   try {
-    return await uploadImagesRequest("post", "/api/item/", images, {
-      body: item,
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-export const getMarketPlaceItems = async () => {
-  try {
-    return (await CBRequest("GET", "/api/item/")).data;
+    return (
+      await CBRequest("POST", "/api/search/", {
+        body: { query, limit: 10, page },
+      })
+    ).data;
   } catch (err) {
     console.log(err);
   }

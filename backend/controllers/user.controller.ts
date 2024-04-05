@@ -5,7 +5,7 @@ import {
   OrganizationCreateSchema,
   OrganizationCreateType,
   OrgSignupPayloadSchema,
-  tokenSchema,
+  AuthTokenSchema,
   UserCreateSchema,
   UserCreateType,
   UserUpdateSchema,
@@ -139,7 +139,7 @@ export const verifyStudentSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
@@ -228,24 +228,78 @@ export const loginUser = async (
       },
       include: {
         institution: true,
+        enrollments: {
+          include: {
+            program: {
+              select: {
+                programName: true,
+              },
+            },
+          },
+        },
+        UserOrganizationRole: {
+          include: {
+            role: true,
+            organization: {
+              select: {
+                organizationName: true,
+                description: true,
+                image: true,
+                events: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
     if (!existingUser || existingUser.institution === null) {
-      res.status(404).json({
-        success: false,
-        message: "User doesn't exist",
-      });
-    } else {
-      // Confirm password matches
-      const isCorrectPassword = await comparePassword(
-        password,
-        existingUser.password,
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
       );
+    }
 
-      if (!isCorrectPassword) {
-        return res.status(401).json({ message: "Invalid password" });
-      }
+    // Confirm password matches
+    const isCorrectPassword = await comparePassword(
+      password,
+      existingUser.password,
+    );
+
+    if (!isCorrectPassword) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    //checks if user is a student
+    if (existingUser.accountType === "Student") {
+      // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+      const attendedEvents = await prisma.userEventResponse.count({
+        where: {
+          userId: existingUser.id,
+          participationStatus: ParticipationStatus.Going,
+          event: {
+            endTime: {
+              lte: new Date(),
+            },
+          },
+        },
+      });
+
+      // find the number of organizations the user is a member of
+      const orgs = await prisma.userOrganizationRole.count({
+        where: {
+          userId: existingUser.id,
+          role: {
+            roleName: "Member",
+          },
+        },
+      });
 
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
@@ -257,7 +311,97 @@ export const loginUser = async (
       };
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
-      res.status(200).json({ authToken });
+      res.status(200).json({
+        authToken,
+        data: {
+          id: existingUser.id,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          image: existingUser.profilePic,
+          programs: existingUser.enrollments.map(
+            (enrollment) => enrollment.program.programName,
+          ),
+          attended: attendedEvents,
+          following: orgs,
+          type: "Student",
+        },
+      });
+      //checks if user is organization owner
+    } else if (existingUser.accountType === "ApprovedOrg") {
+      // Confirm password matches
+      const loginTokenPayload: loginJwtPayloadType = {
+        id: existingUser.id,
+        institutionId: existingUser.institution.id,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        email: existingUser.email,
+        password: existingUser.password,
+      };
+      const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
+
+      const orgId = existingUser.UserOrganizationRole.map(
+        (UserOrganizationRole) => UserOrganizationRole.organizationId,
+      );
+
+      const organization = await prisma.organization.findUnique({
+        where: {
+          id: orgId[0],
+        },
+        include: {
+          userOrganizationRoles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      if (!organization) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Organization not found",
+          404,
+          true,
+        );
+      }
+
+      res.status(200).json({
+        authToken,
+        data: {
+          id: existingUser.id,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          organizationId: existingUser.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organizationId,
+          ),
+          organizationName: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) =>
+              UserOrganizationRole.organization.organizationName,
+          ),
+          organizationDescription: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) =>
+              UserOrganizationRole.organization.description,
+          ),
+          organizationImage: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.image,
+          ),
+          members: organization?.userOrganizationRoles.filter(
+            (userOrganizationRole) =>
+              userOrganizationRole.role.roleName === "Member",
+          ).length,
+          posts: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.events,
+          ).length,
+          type: "Organization_Admin",
+        },
+      });
+      //user not a student, or an approved organization owner
+    } else if (existingUser.accountType === "PendingOrg") {
+      res
+        .status(401)
+        .json({ error: "Organization has not been approved, login failed." });
+    } else {
+      res.status(401).json({ error: "Invalid user account type" });
     }
   } catch (error) {
     next(error);
@@ -623,7 +767,7 @@ export const verifyExistingOrgSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(token, jwtSecret);
@@ -746,7 +890,7 @@ export const verifyNewOrgSignup = async (
   next: NextFunction,
 ) => {
   try {
-    const token = tokenSchema.parse(req.params).token;
+    const token = AuthTokenSchema.parse(req.params).token;
 
     // Verify jwt
     const payload: string | JwtPayload = jwt.verify(
@@ -865,6 +1009,17 @@ export const generateJWT = async (req: Request, res: Response) => {
     where: {
       id: users[0].id,
     },
+    include: {
+      enrollments: {
+        include: {
+          program: {
+            select: {
+              programName: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -873,6 +1028,29 @@ export const generateJWT = async (req: Request, res: Response) => {
       message: "User doesn't exist",
     });
   }
+
+  // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+  const attendedEvents = await prisma.userEventResponse.count({
+    where: {
+      userId: user.id,
+      participationStatus: ParticipationStatus.Going,
+      event: {
+        endTime: {
+          lte: new Date(),
+        },
+      },
+    },
+  });
+
+  // find the number of organizations the user is a member of
+  const orgs = await prisma.userOrganizationRole.count({
+    where: {
+      userId: user.id,
+      role: {
+        roleName: "Member",
+      },
+    },
+  });
 
   const authToken = jwt.sign(user as JwtPayload, jwtSecret);
 
@@ -883,6 +1061,11 @@ export const generateJWT = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       image: user.profilePic,
+      programs: user.enrollments.map(
+        (enrollment) => enrollment.program.programName,
+      ),
+      attended: attendedEvents,
+      following: orgs,
     },
   });
 };

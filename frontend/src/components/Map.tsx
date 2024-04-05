@@ -36,7 +36,15 @@ const Map = ({
         id: id,
       });
     },
-    [events],
+    [navigateTo, events],
+  );
+
+  const openMarketPlaceDetail = useCallback(
+    (id: string) => {
+      if (showInfo) return;
+      navigateTo({ page: "MarketPlaceDetail", id });
+    },
+    [navigateTo, items],
   );
 
   const combinedEventsItems = [...(events || []), ...(items || [])];
@@ -94,9 +102,7 @@ const Map = ({
                   combinedIndex,
                   combinedEventsItems,
                 )}
-                onPress={() => {
-                  Alert.alert("Stay Tuned!", "This feature is coming soon!");
-                }}
+                onPress={() => openMarketPlaceDetail(item.id)}
               >
                 <View style={circleStyles.circleStyle}>
                   <MaterialCommunityIcons

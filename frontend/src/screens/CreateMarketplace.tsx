@@ -15,15 +15,13 @@ import * as zod from "zod";
 import Animated, { useAnimatedRef } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
-import { Button, Checkbox } from "react-native-paper";
+import { Button, Checkbox, ProgressBar } from "react-native-paper";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetterV2 } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
-import useEventsContext from "~/hooks/useEventsContext";
-import { MarketPlaceItem } from "~/types/Events";
-import useLoadingContext from "~/hooks/useLoadingContext";
-import useNavigationContext from "~/hooks/useNavigationContext";
-import { createMarketPlaceItem } from "~/lib/apiFunctions/Events";
+import { MarketPlaceItem } from "~/types/MarketPlaceItem";
+import { createMarketPlaceItem } from "~/lib/apiFunctions/Items";
+import { useMutation } from "@tanstack/react-query";
 
 // React Hook Form Section
 const schema = zod.object({
@@ -41,8 +39,7 @@ export default function CreateMarketplace() {
   const [checkedItem, setCheckedItem] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
-  const { startLoading, stopLoading } = useLoadingContext();
-  const { navigateTo } = useNavigationContext();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCheckboxToggle = (item: string) => {
     setCheckedItem(item === checkedItem ? null : item);
@@ -66,28 +63,31 @@ export default function CreateMarketplace() {
 
   // Handle submission of data to backend
   const onSubmit = (data: MarketPlaceItem) => {
-    startLoading();
     if (!selectedImages) {
-      alert("Please add an image");
+      Alert.alert("Image Required", "Please upload at least one image");
       return;
     }
-    createMarketPlaceItem(data, selectedImages)
-      .then((r) => {
-        if (r.status !== 201) {
-          throw new Error("Error creating item");
-        }
-        reset();
-        setSelectedImages(undefined);
-        setCheckedItem(null);
-        setResetLocationValue(!resetLocationValue);
-        stopLoading();
-        alert("item Created");
-        navigateTo({ page: "Home" });
-      })
-      .catch((e) => {
-        alert("Error creating event");
-      });
+    setIsSubmitting(true);
+    createMutation.mutate(data);
   };
+
+  const createMutation = useMutation({
+    mutationFn: (data: MarketPlaceItem) =>
+      createMarketPlaceItem(data, selectedImages!),
+    onSuccess: () => {
+      reset();
+      setSelectedImages(undefined);
+      setCheckedItem(null);
+      setResetLocationValue(!resetLocationValue);
+      setIsSubmitting(false);
+      Alert.alert("Success", "Your item has been posted");
+    },
+    onError: (error) => {
+      console.log(error);
+      setIsSubmitting(false);
+      alert("Error creating event");
+    },
+  });
 
   const addPhoto = useCallback(async () => {
     // Calculate the remaining number of images that can be selected
@@ -160,6 +160,9 @@ export default function CreateMarketplace() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
+      {createMutation.isPending && (
+        <ProgressBar indeterminate={true} visible={createMutation.isPending} />
+      )}
       <Animated.ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -248,6 +251,7 @@ export default function CreateMarketplace() {
                     Item
                   </Text>
                   <TextInput
+                    editable={!isSubmitting}
                     style={[style.eventInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -275,6 +279,7 @@ export default function CreateMarketplace() {
                     Price
                   </Text>
                   <TextInput
+                    editable={!isSubmitting}
                     style={[style.priceInput, { color: theme.colors.text }]}
                     onBlur={onBlur}
                     onChangeText={(text) =>
@@ -386,6 +391,7 @@ export default function CreateMarketplace() {
                     Event Description:*
                   </Text>
                   <TextInput
+                    editable={!isSubmitting}
                     style={[style.eventtextInput, { color: theme.colors.text }]}
                     multiline={true}
                     onBlur={onBlur}
@@ -448,6 +454,7 @@ export default function CreateMarketplace() {
         <View style={{ marginTop: 50, marginBottom: 50 }}>
           <Button
             onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
             style={{
               width: 300,
               backgroundColor: theme.colors.primary,

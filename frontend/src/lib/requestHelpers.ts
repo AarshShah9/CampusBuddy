@@ -122,6 +122,9 @@ const allowedEndpoints = [
   // Organization-related endpoints
   "/api/orgs/test",
   "/api/orgs/",
+  "/api/orgs/deleteProfilePicture/:id",
+  "/api/orgs/profilePicture/:id",
+  "/api/orgs/join/:id",
 
   // Institution-related endpoints
   "/api/institution/createInstitution",
@@ -147,10 +150,18 @@ const allowedEndpoints = [
   "/api/post/test",
   "/api/post/",
   "/api/item/",
+  "/api/item/:id",
+  "/api/post/:id",
+  "/api/post/comments/:id",
 
   // profile related endpoints
   "/api/profile/saved",
   "/api/profile/user/:id",
+  "/api/profile/events/:id",
+  "/api/profile/posts/:id",
+  "/api/profile/items/:id",
+  "/api/profile/orgItems/:id",
+  "/api/profile/orgEvents/:id",
 
   // Miscellaneous endpoints
   "/Test",
@@ -158,6 +169,7 @@ const allowedEndpoints = [
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
   "/api/notification/storePushToken",
+  "/api/search/",
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints
@@ -177,7 +189,18 @@ export type IdRequiredEndPoints =
   | "/api/events/:id"
   | "/api/events/like/:id"
   | "/api/events/attendees/:id"
-  | "/api/profile/user/:id";
+  | "/api/profile/user/:id"
+  | "/api/profile/events/:id"
+  | "/api/profile/posts/:id"
+  | "/api/item/:id"
+  | "/api/post/:id"
+  | "/api/post/comments/:id"
+  | "/api/orgs/deleteProfilePicture/:id"
+  | "/api/orgs/profilePicture/:id"
+  | "/api/profile/orgItems/:id"
+  | "/api/orgs/join/:id"
+  | "/api/profile/orgEvents/:id"
+  | "/api/profile/items/:id";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
   params: { id: string };
