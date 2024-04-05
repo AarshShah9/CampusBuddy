@@ -15,6 +15,7 @@ import {
   emailEventApproved,
   emailEventRejected,
 } from "../utils/emails";
+import { AppError, AppErrorName } from "../utils/AppError";
 
 export const getFlaggedItems = async (
   req: RequestExtended,
@@ -58,12 +59,14 @@ export const approveFlaggedItem = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: item?.user.id,
-        },
-      });
+      if (!item) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Item not found",
+          404,
+          true,
+        );
+      }
 
       // approve item
       const approvedItem = await prisma.item.update({
@@ -78,7 +81,7 @@ export const approveFlaggedItem = async (
       });
 
       // Send email to user if item is approved
-      emailItemApproved(user!, item!);
+      await emailItemApproved(item.user, item!);
 
       return approvedItem;
     });
@@ -116,12 +119,14 @@ export const rejectFlaggedItem = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: item?.user.id,
-        },
-      });
+      if (!item) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Item not found",
+          404,
+          true,
+        );
+      }
 
       // delete item
       const rejectedItem = await prisma.item.delete({
@@ -131,7 +136,7 @@ export const rejectFlaggedItem = async (
       });
 
       // Send email to user if item is rejected
-      emailItemRejected(user!, item!, rejectionReason);
+      await emailItemRejected(item.user, item!, rejectionReason);
 
       return rejectedItem;
     });
@@ -190,12 +195,14 @@ export const approveFlaggedPost = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: post?.user.id,
-        },
-      });
+      if (!post) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Post not found",
+          404,
+          true,
+        );
+      }
 
       // approve post
       const approvedPost = await prisma.post.update({
@@ -210,7 +217,7 @@ export const approveFlaggedPost = async (
       });
 
       // Send email to user if post is approved
-      emailPostApproved(user!, post!);
+      await emailPostApproved(post.user, post);
     });
 
     res.status(200).json({
@@ -246,12 +253,14 @@ export const rejectFlaggedPost = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: post?.user.id,
-        },
-      });
+      if (!post) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Post not found",
+          404,
+          true,
+        );
+      }
 
       // delete post
       const rejectedPost = await prisma.post.delete({
@@ -261,7 +270,7 @@ export const rejectFlaggedPost = async (
       });
 
       // Send email to user if post is rejected
-      emailPostRejected(user!, post!, rejectionReason);
+      await emailPostRejected(post.user, post!, rejectionReason);
 
       return rejectedPost;
     });
@@ -320,12 +329,14 @@ export const approveFlaggedEvent = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: event?.user.id,
-        },
-      });
+      if (!event) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Event not found",
+          404,
+          true,
+        );
+      }
 
       // approve event
       const approvedEvent = await prisma.event.update({
@@ -340,7 +351,7 @@ export const approveFlaggedEvent = async (
       });
 
       // Send email to user if event is approved
-      emailEventApproved(user!, event!);
+      await emailEventApproved(event.user, event);
 
       return approvedEvent;
     });
@@ -378,12 +389,14 @@ export const rejectFlaggedEvent = async (
         },
       });
 
-      // get user
-      const user = await prisma.user.findUnique({
-        where: {
-          id: event?.user.id,
-        },
-      });
+      if (!event) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Event not found",
+          404,
+          true,
+        );
+      }
 
       // delete event
       const rejectedEvent = await prisma.event.delete({
@@ -393,7 +406,7 @@ export const rejectFlaggedEvent = async (
       });
 
       // Send email to user if event is rejected
-      emailEventRejected(user!, event!, rejectionReason);
+      await emailEventRejected(event.user, event, rejectionReason);
 
       return rejectedEvent;
     });

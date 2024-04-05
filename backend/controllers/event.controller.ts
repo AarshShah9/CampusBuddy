@@ -130,7 +130,16 @@ export const createVerifiedEvent = async (
           },
         });
 
-        await emailEventFlagged(user!, event);
+        if (!user) {
+          throw new AppError(
+            AppErrorName.NOT_FOUND_ERROR,
+            "User not found",
+            404,
+            true,
+          );
+        }
+
+        await emailEventFlagged(user, event);
       }
 
       const uniqueFileName = generateUniqueFileName(
