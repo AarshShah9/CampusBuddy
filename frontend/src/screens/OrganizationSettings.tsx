@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -30,8 +37,8 @@ export default function OrganizationSettings() {
     reset,
   } = useForm<settingsForm>({ resolver: zodResolver(schema) });
 
-   // Handles submission of user data
-   const onSubmit = (data: settingsForm) => {
+  // Handles submission of user data
+  const onSubmit = (data: settingsForm) => {
     // setIsSubmitting(true);
     // createMutation.mutate({
     //   title: data.title,
@@ -39,100 +46,98 @@ export default function OrganizationSettings() {
     //   numberOfSpots: parseInt(data.numberOfSpots),
     //   expiresAt: data.expiryDate,
     //});
-    console.log(data)
+    console.log(data);
   };
 
   return (
-    <View style={{backgroundColor:theme.colors.tertiary}}>
-      {/*    TODO change pfp */}
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Organization Name
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="organizationName"
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Description
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="description"
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Password
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="password"
-      />
-      <View style={{ marginTop: 100 }}>
+    <ScrollView>
+      <View style={{ backgroundColor: theme.colors.tertiary }}>
+        {/*    TODO change pfp */}
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Organization Name
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="organizationName"
+        />
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Description
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="description"
+        />
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Password
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="password"
+        />
+        <View style={{ marginTop: 100 }}>
           <Button
             style={{
               width: 300,
@@ -155,7 +160,8 @@ export default function OrganizationSettings() {
             </Text>
           </Button>
         </View>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -167,13 +173,12 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
-  inputBox:{
-    width:350,
-    height:50,
+  inputBox: {
+    width: 350,
+    height: 50,
     borderWidth: 1,
     borderRadius: 8,
-    borderColor:"grey",
-    marginLeft:20
+    borderColor: "grey",
+    marginLeft: 20,
   },
 });
-

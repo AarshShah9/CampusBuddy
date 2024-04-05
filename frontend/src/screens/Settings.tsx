@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -32,8 +39,8 @@ export default function Settings() {
     reset,
   } = useForm<settingsForm>({ resolver: zodResolver(schema) });
 
-   // Handles submission of user data
-   const onSubmit = (data: settingsForm) => {
+  // Handles submission of user data
+  const onSubmit = (data: settingsForm) => {
     // setIsSubmitting(true);
     // createMutation.mutate({
     //   title: data.title,
@@ -41,131 +48,127 @@ export default function Settings() {
     //   numberOfSpots: parseInt(data.numberOfSpots),
     //   expiresAt: data.expiryDate,
     //});
-    console.log(data)
+    console.log(data);
   };
 
   return (
     <ScrollView>
-    <View style={{backgroundColor:theme.colors.tertiary}}>
-      {/*    TODO change pfp */}
-      {/*    text inputs for password, current program, first name and last name*/}
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              First Name
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="firstName"
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Last Name
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="lastName"
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Current Program
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="currentProgram"
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ marginTop: 20, marginBottom: 15 }}>
-            <Text
-              style={{
-                marginLeft: 20,
-                marginBottom: 3,
-                fontFamily: "Nunito-Medium",
-                fontSize: 16,
-                color: theme.colors.text,
-              }}
-            >
-              Password
-            </Text>
-            <TextInput
-              style={[styles.inputBox, { color: theme.colors.text }]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              
-            />
-          </View>
-        )}
-        name="password"
-      />
-      <View style={{ marginTop: 100 }}>
+      <View style={{ backgroundColor: theme.colors.tertiary }}>
+        {/*    TODO change pfp */}
+        {/*    text inputs for password, current program, first name and last name*/}
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                First Name
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="firstName"
+        />
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Last Name
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="lastName"
+        />
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Current Program
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="currentProgram"
+        />
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ marginTop: 20, marginBottom: 15 }}>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginBottom: 3,
+                  fontFamily: "Nunito-Medium",
+                  fontSize: 16,
+                  color: theme.colors.text,
+                }}
+              >
+                Password
+              </Text>
+              <TextInput
+                style={[styles.inputBox, { color: theme.colors.text }]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="password"
+        />
+        <View style={{ marginTop: 100 }}>
           <Button
             style={{
               width: 300,
@@ -188,7 +191,7 @@ export default function Settings() {
             </Text>
           </Button>
         </View>
-    </View>
+      </View>
     </ScrollView>
   );
 }
@@ -201,12 +204,12 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
-  inputBox:{
-    width:350,
-    height:50,
+  inputBox: {
+    width: 350,
+    height: 50,
     borderWidth: 1,
     borderRadius: 8,
-    borderColor:"grey",
-    marginLeft:20
+    borderColor: "grey",
+    marginLeft: 20,
   },
 });
