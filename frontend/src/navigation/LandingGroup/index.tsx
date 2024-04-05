@@ -12,6 +12,8 @@ import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
 import LookingForDetails from "~/screens/LookingForDetails";
 import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
 import OrganizationProfile from "./BottomTabsGroup/OrganizationProfile";
+import EventSettings from "~/screens/EventSettings";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,117 +22,120 @@ export default function LandingGroup() {
 
   return (
     <ReactQueryProvider>
-      <EventsContextProvider>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
-          <Stack.Screen name="Messages" component={MessagesGroup} />
-          <Stack.Screen
-            name="UserProfile"
-            component={ProfilePage}
-            options={{
-              title: "",
-              headerShown: true,
-              headerBackTitle: "Home",
-              headerTintColor: theme.colors.onSecondary,
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-            }}
-          />
-          <Stack.Screen
-            name="EventDetails"
-            component={EventDetails}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-              headerTitle: "",
-              headerShown: true,
-              headerBackTitle: "Back",
-              headerTintColor: theme.colors.onSecondary,
-            }}
-          />
-          <Stack.Screen
-            name="LookingForDetails"
-            component={LookingForDetails}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-              headerTitle: "",
-              headerShown: true,
-              headerBackTitle: "Back",
-              headerTintColor: theme.colors.onSecondary,
-            }}
-          />
-          <Stack.Screen
-            name="LookingForCommentsScreen"
-            component={LookingForCommentsScreen}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-              headerTitle: "",
-              headerShown: true,
-              headerBackTitle: "Back",
-              headerTintColor: theme.colors.onSecondary,
-            }}
-          />
-          <Stack.Screen
-            name="MarketPlaceDetail"
-            component={MarketPlaceDetail}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-              headerTitle: "",
-              headerShown: true,
-              headerBackTitle: "Back",
-              headerTintColor: theme.colors.onSecondary,
-            }}
-          />
-          <Stack.Screen
-            name="Attendees"
-            component={Attendees}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-            }}
-          />
-          <Stack.Screen
-            name="MapDetails"
-            component={MapDetails}
-            options={{
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              presentation: "modal",
-              headerStyle: { backgroundColor: theme.colors.primary },
-            }}
-          />
-          <Stack.Screen
-            name="OrganizationProfile"
-            component={OrganizationProfile}
-            options={{
-              title: "",
-              headerShown: true,
-              headerBackTitle: "Home",
-              headerTintColor: theme.colors.onSecondary,
-              headerTitleStyle: {
-                color: theme.colors.onSecondary,
-              },
-              headerStyle: { backgroundColor: theme.colors.primary },
-            }}
-          />
-        </Stack.Navigator>
-      </EventsContextProvider>
+      <BottomSheetModalProvider>
+        <EventsContextProvider>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
+            <Stack.Screen name="Messages" component={MessagesGroup} />
+            <Stack.Screen
+              name="UserProfile"
+              component={ProfilePage}
+              options={{
+                title: "",
+                headerShown: true,
+                headerBackTitle: "Home",
+                headerTintColor: theme.colors.onSecondary,
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+              }}
+            />
+            <Stack.Screen
+              name="EventDetails"
+              component={EventDetails}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
+              }}
+            />
+            <Stack.Screen
+              name="LookingForDetails"
+              component={LookingForDetails}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
+              }}
+            />
+            <Stack.Screen
+              name="LookingForCommentsScreen"
+              component={LookingForCommentsScreen}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
+              }}
+            />
+            <Stack.Screen
+              name="MarketPlaceDetail"
+              component={MarketPlaceDetail}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
+              }}
+            />
+            <Stack.Screen
+              name="Attendees"
+              component={Attendees}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+              }}
+            />
+            <Stack.Screen
+              name="MapDetails"
+              component={MapDetails}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                presentation: "modal",
+                headerStyle: { backgroundColor: theme.colors.primary },
+              }}
+            />
+            <Stack.Screen
+              name="OrganizationProfile"
+              component={OrganizationProfile}
+              options={{
+                title: "",
+                headerShown: true,
+                headerBackTitle: "Home",
+                headerTintColor: theme.colors.onSecondary,
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+              }}
+            />
+          </Stack.Navigator>
+          <EventSettings />
+        </EventsContextProvider>
+      </BottomSheetModalProvider>
     </ReactQueryProvider>
   );
 }

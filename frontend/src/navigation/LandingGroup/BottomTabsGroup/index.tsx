@@ -62,24 +62,20 @@ export default function BottomTabGroup() {
   const { theme } = useThemeContext();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <BottomTab.Navigator
-          barStyle={{
-            backgroundColor: theme.colors.background,
-            height: 88,
-          }}
-          labeled={false}
-          initialRouteName="Home"
-          screenOptions={screenOptions}
-        >
-          <BottomTab.Screen name="Home" component={HomeGroup} />
-          <BottomTab.Screen name="Search" component={SearchGroup} />
-          <BottomTab.Screen name="Add Friends" component={AddFriendsGroup} />
-          <BottomTab.Screen name="Threads" component={ThreadsGroup} />
-          <BottomTab.Screen name="Profile" component={ProfileGroup} />
-        </BottomTab.Navigator>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <BottomTab.Navigator
+      barStyle={{
+        backgroundColor: theme.colors.background,
+        height: 88,
+      }}
+      labeled={false}
+      initialRouteName="Home"
+      screenOptions={screenOptions}
+    >
+      <BottomTab.Screen name="Home" component={HomeGroup} />
+      <BottomTab.Screen name="Search" component={SearchGroup} />
+      <BottomTab.Screen name="Add Friends" component={AddFriendsGroup} />
+      <BottomTab.Screen name="Threads" component={ThreadsGroup} />
+      <BottomTab.Screen name="Profile" component={ProfileGroup} />
+    </BottomTab.Navigator>
   );
 }

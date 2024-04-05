@@ -28,11 +28,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
-import {
-  attendEvent,
-  getEventDetails,
-  likeEvent,
-} from "~/lib/apiFunctions/Events";
+import { attendEvent, getEventDetails } from "~/lib/apiFunctions/Events";
+import useEventsContext from "~/hooks/useEventsContext";
 
 const IMG_HEIGHT = 300;
 
@@ -43,7 +40,9 @@ const IMG_HEIGHT = 300;
 export type EventDetailsType = {
   id: string;
   title: string;
+  self: boolean;
   description: string;
+  isFlagged: boolean;
   location: {
     latitude: number;
     longitude: number;
@@ -74,26 +73,14 @@ export default function EventDetails({
     params: { id, map = true },
   } = useRoute<any>();
   const { theme } = useThemeContext();
-  const { navigateTo, navigateBack } = useNavigationContext();
+  const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const { openModal } = useEventsContext();
 
   const { data: eventData, refetch } = useQuery<EventDetailsType>({
     queryKey: ["event-details", id],
     queryFn: () => getEventDetails(id),
-  });
-
-  const likeMutation = useMutation({
-    mutationFn: async ({
-      id,
-      previousState,
-    }: {
-      id: string;
-      previousState: boolean;
-    }) => {
-      await likeEvent(id);
-      refetch();
-    },
   });
 
   const attendMutation = useMutation({
@@ -124,22 +111,6 @@ export default function EventDetails({
       });
     }
   }, [eventData]);
-
-  // TODO fix optimistic updates
-  const isOptimistic =
-    likeMutation.variables &&
-    (likeMutation.isPending ? !likeMutation.variables.previousState : false);
-
-  const isLiked = isOptimistic
-    ? !likeMutation.variables?.previousState
-    : eventData?.isLiked;
-
-  const userLiked = useCallback(() => {
-    likeMutation.mutate({
-      id,
-      previousState: eventData?.isLiked!,
-    });
-  }, [id, likeEvent, eventData?.isLiked]);
 
   const userAttendEvent = useCallback(() => {
     attendMutation.mutate({
@@ -173,55 +144,15 @@ export default function EventDetails({
     navigateTo({ page: "Attendees", id });
   }, [id]);
 
-  const onDelete = useCallback(() => {
-    Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        onPress: async () => {
-          navigateBack();
-        },
-      },
-    ]);
-  }, []);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <>
-          {!eventData?.self && (
-            <TouchableOpacity onPress={userLiked}>
-              <Entypo
-                name="heart"
-                size={28}
-                color={isLiked ? "red" : "white"} // TODO use theme context
-                style={{ opacity: isOptimistic ? 0.5 : 1 }}
-              />
-            </TouchableOpacity>
-          )}
-          {eventData?.self && (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                width: 60,
-              }}
-            >
-              <TouchableOpacity>
-                <Entypo name="edit" size={22} color={"white"} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onDelete}>
-                <Entypo name="trash" size={22} color={"white"} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </>
+        <TouchableOpacity onPress={() => openModal(id)}>
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
+        </TouchableOpacity>
       ),
     });
-  }, [navigation, isLiked, isOptimistic, userLiked, eventData]);
+  }, [navigation]);
 
   if (eventData && eventData.isFlagged) {
     Alert.alert(
