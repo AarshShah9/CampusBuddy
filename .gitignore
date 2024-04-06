@@ -78,5 +78,9 @@ dashboard/.env
 
 backend/serviceAccountKey.json
 
+# secret files
+secrets/*
+secrets/
+secrets
 
 

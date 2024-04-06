@@ -30,6 +30,7 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import { createEvent } from "~/lib/apiFunctions/Events";
 import { useMutation } from "@tanstack/react-query";
+import useAuthContext from "~/hooks/useAuthContext";
 
 const IMG_HEIGHT = 300;
 
@@ -54,6 +55,7 @@ export default function CreateEvent() {
   const [image, setImage] = useState<ImagePickerAsset>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { userType, organization } = useAuthContext();
 
   const {
     control,
@@ -87,7 +89,15 @@ export default function CreateEvent() {
   );
 
   const createMutation = useMutation({
-    mutationFn: (data: createEventType) => createEvent(data, image!),
+    mutationFn: (data: createEventType) => {
+      let verified: boolean = false;
+      if (userType === "Student") {
+        verified = false;
+      } else if (userType === "Organization_Admin") {
+        verified = true;
+      }
+      return createEvent(data, image!, verified, organization?.id ?? "-1");
+    },
     onSuccess: () => {
       reset();
       setImage(undefined);

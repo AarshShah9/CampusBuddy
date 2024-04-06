@@ -59,6 +59,9 @@ type authContext = {
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
   setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
+  setOrganization: React.Dispatch<
+    React.SetStateAction<OrganizationDataType | undefined>
+  >;
   registerOrganization: (arg: organizationInformation) => Promise<void>;
 };
 const AuthContext = createContext<authContext | null>(null);
@@ -193,6 +196,7 @@ export const AuthContextProvider = ({
         setUser,
         userType,
         organization: organzationalUser,
+        setOrganization: setOrganizationalUser,
       }}
     >
       {children}

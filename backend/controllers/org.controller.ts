@@ -734,3 +734,105 @@ export const joinOrganization = async (
     next(error);
   }
 };
+
+export const deleteOrganizationProfileImage = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    const organization = await prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    if (!organization.image) {
+      throw new AppError(
+        AppErrorName.FILE_DELETE_ERROR,
+        "Organization does not have a profile picture",
+        400,
+        true,
+      );
+    }
+
+    await prisma.$transaction(async (prisma) => {
+      await deleteFromS3(organization.image!);
+      return prisma.organization.update({
+        where: { id: organizationId },
+        data: {
+          image: null,
+        },
+      });
+    });
+
+    res.status(200).json({
+      message: "Profile picture removed successfully",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const uploadOrgProfilePic = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const organizationId = IdParamSchema.parse(req.params).id;
+
+    const organization = await prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    const updatedOrganization = await prisma.$transaction(async (prisma) => {
+      if (organization.image) {
+        await deleteFromS3(organization.image);
+      }
+
+      const uniqueFileName = generateUniqueFileName(
+        req.file!.originalname,
+        organization.id,
+      );
+      const path = `images/profilePictures/${uniqueFileName}`;
+
+      await UploadToS3(req.file!, path);
+
+      return prisma.organization.update({
+        where: { id: organizationId },
+        data: {
+          image: path,
+        },
+      });
+    });
+    res.status(200).json({
+      message: "Profile picture uploaded successfully",
+      data: {
+        image: updatedOrganization.image,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};

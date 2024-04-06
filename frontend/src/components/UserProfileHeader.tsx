@@ -12,7 +12,6 @@ import { useCallback } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function UserProfileHeader({ id }: { id: string }) {
-  const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
 
   const { data: profileData } = useQuery<UserProfileHeaderType>({
@@ -31,7 +30,7 @@ export default function UserProfileHeader({ id }: { id: string }) {
       style={[
         styles.headerContainer,
         {
-          paddingTop: insets.top + 15,
+          paddingTop: 15,
           backgroundColor: theme.colors.profileTabs,
           borderBottomColor: theme.colors.background,
         },

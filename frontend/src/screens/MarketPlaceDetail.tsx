@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Carousel from "pinar";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -99,8 +100,14 @@ const ImageGallery = ({ images }: { images?: string[] }) => {
 };
 
 // Profile Component
-const Profile = (item: { name: string }) => {
+const Profile = (item: { name: string; userId: string }) => {
   const { theme } = useThemeContext();
+  const { navigateTo } = useNavigationContext();
+
+  const onUserPress = useCallback(() => {
+    navigateTo({ page: "UserProfile", id: item.userId });
+  }, [item.userId]);
+
   return (
     // Possibly make this pull up there profile page
     <View
@@ -127,9 +134,13 @@ const Profile = (item: { name: string }) => {
           }}
           source={require("~/assets/Campus_Buddy_Logo.png")}
         />
-        <Text style={{ color: theme.colors.text, fontSize: 16, marginLeft: 5 }}>
-          {item.name}
-        </Text>
+        <TouchableOpacity onPress={onUserPress}>
+          <Text
+            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 5 }}
+          >
+            {item.name}
+          </Text>
+        </TouchableOpacity>
       </View>
       <Button
         style={{
@@ -152,6 +163,7 @@ type ItemDetail = {
   createdAt: string;
   description: string;
   sellerFullName: string;
+  sellerId: string;
   condition: string;
   location: string;
   latitude: number;
@@ -212,7 +224,6 @@ const ItemDescription = (props: ItemDetail) => {
       </View>
       <View
         style={{
-          minHeight: 100,
           marginTop: 4,
           flexDirection: "column",
           borderBottomColor: "#B0CFFF",
@@ -222,23 +233,20 @@ const ItemDescription = (props: ItemDetail) => {
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
           {props.description}
         </Text>
+
         <View style={{ flexDirection: "row" }}>
           <Text
             style={{
               color: theme.colors.text,
-              fontSize: 14,
-              marginTop: 2,
-              marginLeft: 10,
+              ...styles.DescriptorText,
             }}
           >
-            Condition:
+            Condition:{" "}
           </Text>
           <Text
             style={{
               color: theme.colors.text,
-              fontSize: 14,
-              marginTop: 2,
-              marginLeft: 20,
+              ...styles.DescriptorText,
             }}
           >
             {props.condition}
@@ -248,7 +256,7 @@ const ItemDescription = (props: ItemDetail) => {
       <View
         style={{
           height: 100,
-          marginTop: 4,
+          marginTop: 10,
           flexDirection: "column",
           borderBottomColor: "#B0CFFF",
           borderBottomWidth: 1,
@@ -257,7 +265,7 @@ const ItemDescription = (props: ItemDetail) => {
         <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
           Seller Information
         </Text>
-        <Profile name={props.sellerFullName} />
+        <Profile name={props.sellerFullName} userId={props.sellerId} />
       </View>
       <View
         style={{
@@ -299,6 +307,13 @@ export default function MarketPlaceDetail() {
     queryFn: () => getMarketPlaceItem(id),
   });
 
+  if (marketplaceData && marketplaceData.isFlagged) {
+    Alert.alert(
+      "Under Review",
+      "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
+    );
+  }
+
   return (
     <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
       <ScrollView>
@@ -332,7 +347,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     fontFamily: "Roboto-Reg",
-    marginLeft: 10,
     marginTop: 5,
   },
   PriceText: {

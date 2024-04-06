@@ -13,6 +13,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "techstartuofc@gmail.com",
+        "ascAppId": "6481706434",
+        "appleTeamId": "F599YAW8NA"
+      }
+    }
   }
 }

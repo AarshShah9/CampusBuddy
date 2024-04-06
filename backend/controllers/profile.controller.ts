@@ -162,7 +162,7 @@ export const getProfileEvents = async (
         userId: userId,
         participationStatus: ParticipationStatus.Going,
         event: {
-          isPublic: self ? true : undefined,
+          isPublic: self ? undefined : true,
         },
       },
       include: {
@@ -205,7 +205,7 @@ export const getProfileEvents = async (
     const createdEvents = await prisma.event.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
       include: {
         location: {
@@ -266,7 +266,7 @@ export const getProfilePosts = async (
     const posts = await prisma.post.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
     });
 
@@ -301,7 +301,7 @@ export const getProfileItems = async (
     const items = await prisma.item.findMany({
       where: {
         userId: userId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
       include: {
         location: {
@@ -338,6 +338,159 @@ export const getProfileItems = async (
     return res.status(200).json({
       message: "Your items",
       data: profileItems,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrganizationProfileData = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const organizationId = IdParamSchema.parse(req.params).id;
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: organizationId,
+      },
+      include: {
+        userOrganizationRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    // get the number of members in the organization
+    const members = organization.userOrganizationRoles.filter(
+      (role) => role.role.roleName === "Member",
+    );
+    const isMember =
+      members.filter((role) => role.userId === req.userId).length > 0;
+
+    const events = await prisma.event.count({
+      where: {
+        organizationId: organizationId,
+      },
+    });
+
+    res.status(200).json({
+      message: "User Profile Data",
+      data: {
+        organization: {
+          members: members.length,
+          name: organization.organizationName,
+          image: organization.image,
+          member: isMember,
+          description: organization.description,
+          posts: events,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrganizationProfileEvents = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const orgId = IdParamSchema.parse(req.params).id;
+
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: orgId,
+      },
+      include: {
+        userOrganizationRoles: {
+          include: {
+            organization: true,
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Organization not found",
+        404,
+        true,
+      );
+    }
+
+    // if the user has a role within the organization then self is true
+    const self = organization.userOrganizationRoles.some(
+      (role) => role.userId === req.userId,
+    );
+
+    // get all events that the organization has created
+    const events = await prisma.event.findMany({
+      where: {
+        organizationId: orgId,
+        isPublic: self ? true : undefined,
+      },
+      include: {
+        location: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    // filter the events into two arrays, one for upcoming events and one for past events
+
+    const mappedEvents = events.map((event) => {
+      return {
+        id: event.id,
+        title: event.title,
+        time: event.startTime,
+        endTime: event.endTime,
+        location: event.location.name,
+        host: event.organizationId,
+        image: event.image,
+        event: true,
+      };
+    });
+
+    const upcomingEvents = mappedEvents.filter(
+      (event) => new Date(event.endTime) > new Date(),
+    );
+
+    const pastEvents = mappedEvents.filter(
+      (event) => new Date(event.endTime) <= new Date(),
+    );
+
+    return res.status(200).json({
+      message: "Profile Events",
+      data: [
+        {
+          id: "1",
+          title: "Upcoming Events",
+          items: upcomingEvents,
+        },
+        {
+          id: "2",
+          title: "Past Events",
+          items: pastEvents,
+        },
+      ],
     });
   } catch (error) {
     next(error);

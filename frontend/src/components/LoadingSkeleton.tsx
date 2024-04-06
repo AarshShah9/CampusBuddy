@@ -9,9 +9,16 @@ export default function LoadingSkeleton({ space = 8, children, show, ...props }:
     const { inDarkMode } = useThemeContext();
     const colorMode = inDarkMode ? 'dark' : 'light';
     const skeletonChildren = show ? null : children
+    const backgroundColor = inDarkMode ? undefined : "#d4d4d4"
     return (
         <>
-            <Skeleton colorMode={colorMode} show={show} children={skeletonChildren} {...props} />
+            <Skeleton 
+                show={show}
+                colorMode={colorMode}  
+                children={skeletonChildren} 
+                backgroundColor={backgroundColor}
+                {...props} 
+            />
             {show && <Spacer height={space} />}
         </>
     )

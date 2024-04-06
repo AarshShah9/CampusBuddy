@@ -9,11 +9,12 @@ import {
   UserType,
 } from "@prisma/client";
 import prisma from "../prisma/client";
-import { OrganizationCreateType } from "../../shared/zodSchemas";
+import { IdParamSchema, OrganizationCreateType } from "../../shared/zodSchemas";
 import { defaultRolePermissions } from "../constants";
 import { AppError, AppErrorName } from "../utils/AppError";
 import UploadToS3, { generateUniqueFileName } from "../utils/S3Uploader";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { RequestExtended } from "../middleware/verifyAuth";
 
 // Creates a new organization and add the default role permissions
 // This messy but it works for now
