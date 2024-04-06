@@ -15,6 +15,7 @@ import OrganizationProfile from "./BottomTabsGroup/OrganizationProfile";
 import EventSettings from "~/screens/EventSettings";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import CreateEvent from "~/screens/CreateEvent";
+import QRCodeScanner from "~/screens/QRCodeEventScanner";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function LandingGroup() {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
             <Stack.Screen name="Messages" component={MessagesGroup} />
+            {/*  TODO ALL OF THESE SCREENS STACKING IS BOGGING DOWN THE APP */}
             <Stack.Screen
               name="UserProfile"
               component={ProfilePage}
@@ -136,6 +138,20 @@ export default function LandingGroup() {
             <Stack.Screen
               name={"EditEvent"}
               component={CreateEvent}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
+              }}
+            />
+            <Stack.Screen
+              name={"QRCodeScanner"}
+              component={QRCodeScanner}
               options={{
                 headerTitleStyle: {
                   color: theme.colors.onSecondary,

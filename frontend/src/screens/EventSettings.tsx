@@ -44,7 +44,7 @@ export default function EventSettings() {
 
   const isLiked = eventData && eventData?.isLiked;
   const isPublic = eventData && eventData?.isPublic;
-  const snapPoints = eventData?.self ? ["45%"] : ["35%"];
+  const snapPoints = eventData?.self ? ["50%"] : ["35%"];
 
   const settings = [
     {
@@ -59,6 +59,15 @@ export default function EventSettings() {
       ),
       onClick: () => {
         likeMutate();
+      },
+    },
+    {
+      title: "Scan QR Code",
+      shown: eventData?.self,
+      icon: <Ionicons name="create-outline" size={24} color={"black"} />,
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "QRCodeScanner" });
       },
     },
     {
@@ -141,9 +150,9 @@ export default function EventSettings() {
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
-          <>
+          <View key={i}>
             {setting.shown && (
-              <TouchableOpacity key={i} onPress={setting.onClick}>
+              <TouchableOpacity onPress={setting.onClick}>
                 <View
                   style={[
                     styles.settingContainer,
@@ -165,7 +174,7 @@ export default function EventSettings() {
                 </View>
               </TouchableOpacity>
             )}
-          </>
+          </View>
         ))}
       </View>
     </BottomSheetModal>
