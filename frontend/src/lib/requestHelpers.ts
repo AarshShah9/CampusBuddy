@@ -145,6 +145,7 @@ const allowedEndpoints = [
   "/api/events/like/:id",
   "/api/events/attendees/:id",
   "/api/events/attend/:id",
+  "/api/events/public/:id",
 
   // Post-related endpoints
   "/api/post/test",
@@ -200,6 +201,7 @@ export type IdRequiredEndPoints =
   | "/api/profile/orgItems/:id"
   | "/api/orgs/join/:id"
   | "/api/profile/orgEvents/:id"
+  | "/api/events/public/:id"
   | "/api/profile/items/:id";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {

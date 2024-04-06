@@ -22,13 +22,29 @@ export default function EventHomeCard({ event, isLoading }: Props) {
 
   return (
     <TouchableOpacity onPress={openEventDetails}>
-      <View style={styles.card}>
-        <View style={styles.cardCover}>
+      <View
+        style={{
+          width: event.event ? 208 : 110,
+          height: 170,
+        }}
+      >
+        <View
+          style={[
+            styles.cardCover,
+            {
+              width: event.event ? 208 : 100,
+              height: 110,
+            },
+          ]}
+        >
           {isLoading ? (
             <LoadingSkeleton show width="100%" height="100%" />
           ) : (
             <Image
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
               source={{ uri: generateImageURL(event.image) }}
             />
           )}
@@ -63,13 +79,7 @@ export default function EventHomeCard({ event, isLoading }: Props) {
 
 // prettier-ignore
 const styles = StyleSheet.create({
-    card: {
-        width: 208,
-        height: 170
-    },
     cardCover: {
-        width: 208,
-        height: 110,
         marginBottom: 5,
         borderRadius: 8,
         overflow: 'hidden'

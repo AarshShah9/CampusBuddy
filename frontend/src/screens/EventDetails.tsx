@@ -24,11 +24,11 @@ import useThemeContext from "~/hooks/useThemeContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
-import { attendEvent, getEventDetails } from "~/lib/apiFunctions/Events";
+import { attendEvent } from "~/lib/apiFunctions/Events";
 import useEventsContext from "~/hooks/useEventsContext";
 
 const IMG_HEIGHT = 300;
@@ -62,6 +62,7 @@ export type EventDetailsType = {
   userId: string;
   userImage: string;
   eventType: "NonVerified" | "Verified";
+  isPublic: boolean;
 };
 
 export default function EventDetails({
@@ -229,11 +230,31 @@ export default function EventDetails({
                 {convertUTCToTimeAndDate(eventData?.startTime)}
               </Text>
             </LoadingSkeleton>
-            <LoadingSkeleton show={!eventData} width={120} height={16}>
-              {eventData?.location.name && (
-                <LocationChip location={eventData?.location.name} />
-              )}
-            </LoadingSkeleton>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <LoadingSkeleton show={!eventData} width={80} height={16}>
+                {eventData?.location.name && (
+                  <LocationChip location={eventData?.location.name} />
+                )}
+              </LoadingSkeleton>
+              <LoadingSkeleton show={!eventData} width={30} height={16}>
+                <>
+                  {eventData?.isLiked && (
+                    <Ionicons
+                      name="heart"
+                      size={20}
+                      color={"red"}
+                      style={{ paddingLeft: 6 }}
+                    />
+                  )}
+                </>
+              </LoadingSkeleton>
+            </View>
           </View>
           <TouchableOpacity onPress={viewCreator}>
             <View style={styles.eClubDetails}>

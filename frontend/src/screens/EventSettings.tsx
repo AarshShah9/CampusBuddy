@@ -21,15 +21,19 @@ import useEventsContext from "~/hooks/useEventsContext";
 import { likeEvent } from "~/lib/apiFunctions/Events";
 import { useMutation } from "@tanstack/react-query";
 
-const snapPoints = ["50%"];
-
 export default function EventSettings() {
   const { theme } = useThemeContext();
   const { userType } = useAuthContext();
   const { navigateTo, navigateBack } = useNavigationContext();
 
-  const { bottomSheetModalRef, closeModal, likeMutate, eventData } =
-    useEventsContext();
+  const {
+    bottomSheetModalRef,
+    closeModal,
+    likeMutate,
+    eventData,
+    deleteMutate,
+    flipPublicMutate,
+  } = useEventsContext();
 
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -38,30 +42,19 @@ export default function EventSettings() {
     [],
   );
 
-  const onDelete = useCallback(() => {
-    Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        onPress: async () => {
-          navigateBack();
-        },
-      },
-    ]);
-  }, []);
+  const isLiked = eventData && eventData?.isLiked;
+  const isPublic = eventData && eventData?.isPublic;
+  const snapPoints = eventData?.self ? ["45%"] : ["35%"];
 
   const settings = [
     {
-      title: "Like",
+      title: isLiked ? "Unlike" : "Like",
+      shown: !eventData?.self,
       icon: (
         <Entypo
-          name="heart"
+          name={isLiked ? "heart-outlined" : "heart"}
           size={28}
           color={"red"}
-          // color={eventData && eventData?.isLiked ? "red" : "white"}
         />
       ),
       onClick: () => {
@@ -70,6 +63,7 @@ export default function EventSettings() {
     },
     {
       title: "Edit",
+      shown: eventData?.self,
       icon: <Ionicons name="create-outline" size={24} color={"black"} />,
       onClick: () => {
         Alert.alert("Coming Soon", "This feature is not yet available.");
@@ -77,20 +71,45 @@ export default function EventSettings() {
     },
     {
       title: "Delete",
+      shown: eventData?.self,
       icon: <Ionicons name="trash-outline" size={24} color={"black"} />,
       onClick: () => {
-        Alert.alert("Coming Soon", "This feature is not yet available.");
+        Alert.alert(
+          "Delete Event",
+          "Are you sure you want to delete this event?",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Delete",
+              onPress: async () => {
+                deleteMutate();
+                navigateBack();
+              },
+            },
+          ],
+        );
       },
     },
     {
-      title: "Make Public",
-      icon: <Ionicons name="earth-outline" size={24} color={"black"} />,
+      title: isPublic ? "Make Private" : "Make Public",
+      shown: eventData?.self,
+      icon: (
+        <Ionicons
+          name={isPublic ? "lock-closed-outline" : "lock-open-outline"}
+          size={24}
+          color={"black"}
+        />
+      ),
       onClick: () => {
-        Alert.alert("Coming Soon", "This feature is not yet available.");
+        flipPublicMutate();
       },
     },
     {
       title: "Share",
+      shown: true,
       icon: <Ionicons name="share-social-outline" size={24} color={"black"} />,
       onClick: () => {
         Alert.alert("Coming Soon", "This feature is not yet available.");
@@ -98,6 +117,7 @@ export default function EventSettings() {
     },
     {
       title: "Report this Event",
+      shown: true,
       icon: <Ionicons name="flag-outline" size={24} color={"black"} />,
       onClick: () => {
         Alert.alert("Coming Soon", "This feature is not yet available.");
@@ -120,27 +140,31 @@ export default function EventSettings() {
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
-          <TouchableOpacity key={i} onPress={setting.onClick}>
-            <View
-              style={[
-                styles.settingContainer,
-                {
-                  borderBottomColor: theme.colors.backdrop,
-                  paddingLeft: 12,
-                },
-              ]}
-            >
-              {setting.icon}
-              <Text
-                style={[
-                  styles.settingText,
-                  { color: theme.colors.text, paddingLeft: 15 },
-                ]}
-              >
-                {setting.title}
-              </Text>
-            </View>
-          </TouchableOpacity>
+          <>
+            {setting.shown && (
+              <TouchableOpacity key={i} onPress={setting.onClick}>
+                <View
+                  style={[
+                    styles.settingContainer,
+                    {
+                      borderBottomColor: theme.colors.backdrop,
+                      paddingLeft: 12,
+                    },
+                  ]}
+                >
+                  {setting.icon}
+                  <Text
+                    style={[
+                      styles.settingText,
+                      { color: theme.colors.text, paddingLeft: 15 },
+                    ]}
+                  >
+                    {setting.title}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </>
         ))}
       </View>
     </BottomSheetModal>
