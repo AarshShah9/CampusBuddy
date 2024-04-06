@@ -376,23 +376,25 @@ export default function EventDetails({
             backgroundColor: theme.colors.tertiary,
           }}
         >
-          <Button
-            style={styles.attendButton}
-            mode="contained"
-            onPress={userAttendEvent}
-          >
-            <Text
-              style={{
-                lineHeight: 30,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: "white",
-                fontFamily: "Nunito-Bold",
-              }}
+          {!eventData?.self && (
+            <Button
+              style={styles.attendButton}
+              mode="contained"
+              onPress={userAttendEvent}
             >
-              {eventData?.isAttending ? "Not Going" : "Attend"}
-            </Text>
-          </Button>
+              <Text
+                style={{
+                  lineHeight: 30,
+                  fontSize: 24,
+                  fontWeight: "bold",
+                  color: "white",
+                  fontFamily: "Nunito-Bold",
+                }}
+              >
+                {eventData?.isAttending ? "Not Going" : "Attend"}
+              </Text>
+            </Button>
+          )}
         </View>
       </Animated.ScrollView>
     </View>

@@ -28,6 +28,7 @@ import {
 import { defaultDistance } from "../constants";
 import { sampleEventData } from "../prisma/dummyData";
 import { moderateText } from "../utils/moderateText";
+import { organizations } from "../prisma/data";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -545,6 +546,7 @@ export const getEventById = async (
 ) => {
   try {
     // Validate request id param
+    const loggedInUserId = req.userId;
     const eventId = IdParamSchema.parse(req.params).id;
 
     // Get event from db
@@ -555,7 +557,15 @@ export const getEventById = async (
       include: {
         location: true,
         eventResponses: true,
-        organization: true,
+        organization: {
+          include: {
+            userOrganizationRoles: {
+              include: {
+                role: true,
+              },
+            },
+          },
+        },
         user: true,
       },
     });
@@ -572,7 +582,19 @@ export const getEventById = async (
       throw notFoundError;
     }
 
-    const self: boolean = req.userId === event.userId;
+    const isCreatedByUser: boolean = event.userId === loggedInUserId;
+    let hasPermission: boolean = false;
+    // Check if there is a group associated with the event data
+    if (event.organizationId) {
+      // check if the user has permission to delete the event
+      hasPermission = await checkUserPermission(
+        loggedInUserId!,
+        event.organizationId,
+        AppPermissionName.MANAGE_EVENTS,
+      );
+    }
+
+    const self = isCreatedByUser || hasPermission;
 
     if (!self && !event.isPublic) {
       throw new AppError(
@@ -1013,6 +1035,9 @@ export const getMainPageEvents = async (
             startTime: {
               gt: new Date(),
             },
+          },
+          {
+            isPublic: true,
           },
         ],
       },
