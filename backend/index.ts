@@ -19,11 +19,6 @@ import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
 import { initializeApp } from "firebase-admin/app";
 import * as admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json";
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-});
 
 const app = express();
 const result = dotenv.config();
@@ -34,6 +29,16 @@ try {
 } catch (error) {
   throw new Error("Failed to validate environment variables" + error);
 }
+
+const serviceAccountKeyString = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+if (!serviceAccountKeyString) {
+  throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY environment variable not found");
+}
+const serviceAccountKey = JSON.parse(serviceAccountKeyString);
+// Initialize firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccountKey as admin.ServiceAccount),
+});
 
 const port = process.env.PORT;
 
