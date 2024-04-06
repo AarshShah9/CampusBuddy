@@ -85,6 +85,10 @@ type OrganizationSettingsRoute = {
   page: "OrganizationSettings";
 };
 
+type EditEventRoute = {
+  page: "EditEvent";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -101,6 +105,7 @@ export type NavigationFunctionArgs =
   | MarketPlaceDetailsRoute
   | CommentsRoute
   | OrganizationSettingsRoute
+  | EditEventRoute
   | SettingsRoute;
 
 export type NavigableStacks =

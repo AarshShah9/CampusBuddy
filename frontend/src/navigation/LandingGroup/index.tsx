@@ -14,6 +14,7 @@ import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
 import OrganizationProfile from "./BottomTabsGroup/OrganizationProfile";
 import EventSettings from "~/screens/EventSettings";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import CreateEvent from "~/screens/CreateEvent";
 
 const Stack = createNativeStackNavigator();
 
@@ -130,6 +131,20 @@ export default function LandingGroup() {
                   color: theme.colors.onSecondary,
                 },
                 headerStyle: { backgroundColor: theme.colors.primary },
+              }}
+            />
+            <Stack.Screen
+              name={"EditEvent"}
+              component={CreateEvent}
+              options={{
+                headerTitleStyle: {
+                  color: theme.colors.onSecondary,
+                },
+                headerStyle: { backgroundColor: theme.colors.primary },
+                headerTitle: "",
+                headerShown: true,
+                headerBackTitle: "Back",
+                headerTintColor: theme.colors.onSecondary,
               }}
             />
           </Stack.Navigator>
