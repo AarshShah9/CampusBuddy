@@ -17,6 +17,13 @@ import moderation from "./routes/moderation.routes";
 import search from "./routes/search.routes";
 import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
+import { initializeApp } from "firebase-admin/app";
+import * as admin from "firebase-admin";
+import serviceAccount from "./serviceAccountKey.json";
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+});
 
 const app = express();
 const result = dotenv.config();

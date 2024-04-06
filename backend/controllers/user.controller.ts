@@ -30,6 +30,7 @@ import UploadToS3, {
   deleteFromS3,
   generateUniqueFileName,
 } from "../utils/S3Uploader";
+import { generateFirebaseCustomToken } from "../utils/firebaseToken";
 
 const jwtSecret = process.env.JWT_SECRET as Secret;
 
@@ -291,6 +292,7 @@ export const loginUser = async (
         },
       });
 
+      // Create a login jwt
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
         institutionId: existingUser.institution.id,
@@ -301,8 +303,12 @@ export const loginUser = async (
       };
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
+      // Create a firebase token
+      const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
+
       res.status(200).json({
         authToken,
+        firebaseToken,
         data: {
           id: existingUser.id,
           firstName: existingUser.firstName,
@@ -327,10 +333,15 @@ export const loginUser = async (
         email: existingUser.email,
         password: existingUser.password,
       };
+      // Create a login jwt
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
+
+      // Create a firebase token
+      const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
 
       res.status(200).json({
         authToken,
+        firebaseToken,
         data: {
           id: existingUser.id,
           firstName: existingUser.firstName,
@@ -1071,7 +1082,10 @@ export const loginAsAdmin = async (req: Request, res: Response) => {
       process.env.JWT_SECRET as Secret,
     );
 
-    res.status(200).json({ authToken });
+    // Create a firebase token
+    const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
+
+    res.status(200).json({ authToken, firebaseToken });
   } catch (error) {
     res.status(500).json({ message: `Internal server error - ${error}` });
   }
@@ -1236,6 +1250,24 @@ export const profilePageData = async (
     res.status(200).json({
       message: "User profile page data",
       data: { user, attended, savedEvents },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// TODO: remove, for testing
+export const testFirebaseToken = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = IdParamSchema.parse(req.params).id;
+    const firebaseToken = await generateFirebaseCustomToken(userId);
+    res.status(200).json({
+      message: `Firebase token generated`,
+      data: firebaseToken,
     });
   } catch (error: any) {
     next(error);
