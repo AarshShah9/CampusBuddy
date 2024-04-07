@@ -74,7 +74,7 @@ const ImageGallery = ({ images }: { images?: string[] }) => {
           {images && images.length > 0 ? (
             images.map((item, i) => (
               <TouchableOpacity
-                style={styles.ExampleContainer}
+                style={styles.ImageContainer}
                 key={i}
                 onPress={() => openImage(item)}
               >
@@ -89,7 +89,7 @@ const ImageGallery = ({ images }: { images?: string[] }) => {
               </TouchableOpacity>
             ))
           ) : (
-            <View style={styles.ExampleContainer}>
+            <View style={styles.ImageContainer}>
               <Text style={styles.ExampleText}>No images available</Text>
             </View>
           )}
@@ -197,7 +197,7 @@ const ItemDescription = (props: ItemDetail) => {
   return (
     <View
       style={{
-        width: "95%",
+        width: "92%",
         marginLeft: "auto",
         marginRight: "auto",
         marginTop: 5,
@@ -262,7 +262,12 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
-        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
+        <Text
+          style={[
+            styles.MainTitleText,
+            { color: theme.colors.text, fontSize: 20 },
+          ]}
+        >
           Seller Information
         </Text>
         <Profile name={props.sellerFullName} userId={props.sellerId} />
@@ -326,7 +331,7 @@ export default function MarketPlaceDetail() {
 
 const styles = StyleSheet.create({
   // Can delete these after we get backend integration hooked up
-  ExampleContainer: {
+  ImageContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -341,24 +346,24 @@ const styles = StyleSheet.create({
   MainTitleText: {
     fontSize: 23,
     marginBottom: 5,
-    fontFamily: "Roboto-Medium",
+    fontFamily: "Nunito-Bold",
   },
   DescriptorText: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 8,
     fontFamily: "Roboto-Reg",
-    marginTop: 5,
+    marginTop: 8,
   },
   PriceText: {
     fontSize: 20,
     fontFamily: "Roboto-Bold",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   DateText: {
     fontSize: 14,
-    marginTop: 5,
+    marginTop: 8,
     fontFamily: "Roboto-Reg",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   fullScreenContainer: {
     flex: 1,
