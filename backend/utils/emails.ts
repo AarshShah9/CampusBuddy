@@ -1,4 +1,4 @@
-import { User, UserRole } from "@prisma/client";
+import { User, UserRole, Item, Post, Event } from "@prisma/client";
 import transporter from "./mailer";
 
 export async function emailMembershipRequestApproved(
@@ -119,6 +119,189 @@ export async function emailOrganizationRequestRejected(
           <p>Hello ${user.firstName},</p>
           <p>${emailContent}</p>
         `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailItemFlagged(user: User, item: Item) {
+  const subject = `Item ${item.title} Flagged for Review`;
+  const emailContent = `An item you submitted has been flagged for review. Please wait for the moderators to review it.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+            <p>Hello ${user.firstName},</p>
+            <p>${emailContent}</p>
+        `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailItemApproved(user: User, item: Item) {
+  const subject = `Item ${item.title} Approved`;
+  const emailContent = `The item you submitted has been approved and is now public.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                <p>Hello ${user.firstName},</p>
+                <p>${emailContent}</p>
+            `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailItemRejected(
+  user: User,
+  item: Item,
+  reason: string,
+) {
+  const subject = `Item: ${item.title} Rejected`;
+  const emailContent = `The item you submitted has been rejected, for the following reason: ${reason}. Please review the guidelines and resubmit.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+            <p>Hello ${user.firstName},</p>
+            <p>${emailContent}</p>
+        `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailPostFlagged(user: User, post: Post) {
+  const subject = `Post ${post.title} Flagged for Review`;
+  const emailContent = `A post you submitted has been flagged for review. Please wait for the moderators to review it.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                <p>Hello ${user.firstName},</p>
+                <p>${emailContent}</p>
+            `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailPostApproved(user: User, post: Post) {
+  const subject = `Post ${post.title} Approved`;
+  const emailContent = `The post you submitted has been approved and is now public.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                    <p>Hello ${user.firstName},</p>
+                    <p>${emailContent}</p>
+                `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailPostRejected(
+  user: User,
+  post: Post,
+  reason: string,
+) {
+  const subject = `Post: ${post.title} Rejected`;
+  const emailContent = `The post you submitted has been rejected, for the following reason: ${reason}. Please review the guidelines and resubmit.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                <p>Hello ${user.firstName},</p>
+                <p>${emailContent}</p>
+            `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailEventFlagged(user: User, event: Event) {
+  const subject = `Event ${event.title} Flagged for Review`;
+  const emailContent = `An event you submitted has been flagged for review. Please wait for the moderators to review it.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                    <p>Hello ${user.firstName},</p>
+                    <p>${emailContent}</p>
+                `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailEventApproved(user: User, event: Event) {
+  const subject = `Event ${event.title} Approved`;
+  const emailContent = `The event you submitted has been approved and is now public.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                        <p>Hello ${user.firstName},</p>
+                        <p>${emailContent}</p>
+                    `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function emailEventRejected(
+  user: User,
+  event: Event,
+  rejectionReason: string,
+) {
+  const subject = `Event: ${event.title} Rejected`;
+  const emailContent = `The event you submitted has been rejected, for the following reason: ${rejectionReason}. Please review the guidelines and resubmit.`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                            <p>Hello ${user.firstName},</p>
+                            <p>${emailContent}</p>
+                        `,
   };
 
   // Send the email

@@ -49,6 +49,33 @@ export const UserType = z.enum([
 ]);
 
 ///////////////////////////////
+// MODERATION SCHEMAS
+///////////////////////////////
+export const ModerationSchemaItem = z.object({
+  itemId: z.string().uuid(),
+});
+
+export type ModerationItem = z.infer<typeof ModerationSchemaItem>;
+
+export const ModerationSchemaPost = z.object({
+  postId: z.string().uuid(),
+});
+
+export type ModerationPost = z.infer<typeof ModerationSchemaPost>;
+
+export const ModerationSchemaEvent = z.object({
+  eventId: z.string().uuid(),
+});
+
+export type ModerationEvent = z.infer<typeof ModerationSchemaEvent>;
+
+export const ModerationSchemaRejection = z.object({
+  rejectionReason: z.string(),
+});
+
+export type ModerationRejection = z.infer<typeof ModerationSchemaRejection>;
+
+///////////////////////////////
 // EVENT SCHEMAS
 ///////////////////////////////
 
@@ -79,6 +106,7 @@ export const EventSchema = z.object({
     invalid_type_error: "Invalid datetime string",
   }),
   isPublic: BooleanSchema,
+  isFlagged: BooleanSchema,
   image: z.string().nullable(),
 });
 
@@ -270,7 +298,8 @@ export const PostSchema = z.object({
   description: z.string().nullable(),
   numberOfSpots: z.number().int().min(1),
   expiresAt: z.coerce.date(),
-  public: z.boolean(),
+  isPublic: z.boolean(),
+  isFlagged: z.boolean(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
@@ -325,6 +354,8 @@ export const ItemSchema = z.object({
   price: z.coerce.number().min(1),
   condition: z.string(),
   locationPlaceId: z.string(),
+  isPublic: z.boolean(),
+  isFlagged: z.boolean(),
 });
 
 export type Item = z.infer<typeof ItemSchema>;

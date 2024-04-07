@@ -28,7 +28,7 @@ import {
 import { defaultDistance } from "../constants";
 import { sampleEventData } from "../prisma/dummyData";
 import { moderateText } from "../utils/moderateText";
-import { organizations } from "../prisma/data";
+import { emailEventFlagged } from "../utils/emails";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -121,6 +121,26 @@ export const createVerifiedEvent = async (
           isFlagged: isFlagged,
         },
       });
+
+      // Send email to event creator if event is flagged
+      if (isFlagged) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: loggedInUserId,
+          },
+        });
+
+        if (!user) {
+          throw new AppError(
+            AppErrorName.NOT_FOUND_ERROR,
+            "User not found",
+            404,
+            true,
+          );
+        }
+
+        await emailEventFlagged(user, event);
+      }
 
       const uniqueFileName = generateUniqueFileName(
         req.file!.originalname,
