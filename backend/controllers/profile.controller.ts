@@ -437,7 +437,11 @@ export const getOrganizationProfileEvents = async (
 
     // if the user has a role within the organization then self is true
     const self = organization.userOrganizationRoles.some(
-      (role) => role.userId === req.userId && role.role.roleName !== "Member",
+      (role) =>
+        role.userId === req.userId &&
+        (role.role.roleName === "Moderator" ||
+          role.role.roleName === "Admin" ||
+          role.role.roleName === "Owner"),
     );
 
     // get all events that the organization has created

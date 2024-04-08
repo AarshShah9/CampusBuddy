@@ -20,7 +20,7 @@ import { Alert } from "react-native";
 type eventsContext = {
   closeModal: () => void;
 
-  openModal: (eventId: string) => void;
+  openModal: () => void;
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   eventData?: EventDetailsType;
   fetchEventDetails: (id: string) => void;

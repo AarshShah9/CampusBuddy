@@ -1,11 +1,9 @@
-import React, { useState } from "react";
 import { View, Text, StyleSheet, Button, Alert } from "react-native";
 import { BarCodeScanningResult, Camera } from "expo-camera";
 import { useCameraPermissions } from "expo-image-picker";
 
 export default function QRCodeScanner() {
   const [permissions, requestPermission] = useCameraPermissions();
-  const [scanned, setScanned] = useState<boolean>(false);
 
   if (!permissions) {
     return (
@@ -30,9 +28,8 @@ export default function QRCodeScanner() {
 
   // Handle the QR code scanning
   const handleBarCodeScanned = ({ type, data }: BarCodeScanningResult) => {
-    setScanned(true);
-    // console.log(`QR code with type ${type} and data ${data} has been scanned!`);
-    alert(`QR code with type ${type} and data ${data} has been scanned!`);
+    console.log(`QR code with type ${type} and data ${data} has been scanned!`);
+    // alert(`QR code with type ${type} and data ${data} has been scanned!`);
   };
 
   return (
@@ -43,10 +40,12 @@ export default function QRCodeScanner() {
         barCodeScannerSettings={{
           barCodeTypes: ["qr"],
         }}
-      ></Camera>
-      {/*{scanned && (*/}
-      {/*  <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />*/}
-      {/*)}*/}
+        zoom={0}
+      >
+        <View style={styles.cameraContent}>
+          <View style={styles.box} />
+        </View>
+      </Camera>
     </View>
   );
 }
@@ -66,5 +65,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    paddingBottom: 100,
+  },
+  box: {
+    width: 200,
+    height: 200,
+    borderColor: "white",
+    borderWidth: 2,
+    backgroundColor: "transparent",
   },
 });

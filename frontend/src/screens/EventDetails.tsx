@@ -148,7 +148,7 @@ export default function EventDetails({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => openModal(id)}>
+        <TouchableOpacity onPress={() => openModal()}>
           <Entypo name="dots-three-horizontal" size={24} color="white" />
         </TouchableOpacity>
       ),

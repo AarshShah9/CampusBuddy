@@ -64,7 +64,7 @@ export default function EventSettings() {
     {
       title: "Scan QR Code",
       shown: eventData?.self,
-      icon: <Ionicons name="create-outline" size={24} color={"black"} />,
+      icon: <Ionicons name="qr-code-outline" size={24} color={"black"} />,
       onClick: () => {
         closeModal();
         navigateTo({ page: "QRCodeScanner" });
