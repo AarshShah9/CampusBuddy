@@ -126,8 +126,8 @@ const Profile = (item: { name: string; userId: string }) => {
       >
         <Image
           style={{
-            height: 30,
-            width: 30,
+            height: 35,
+            width: 35,
             backgroundColor: "red",
             borderRadius: 90,
             marginBottom: 5,
@@ -136,7 +136,7 @@ const Profile = (item: { name: string; userId: string }) => {
         />
         <TouchableOpacity onPress={onUserPress}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 5 }}
+            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 8, fontFamily:"Roboto-Reg" }}
           >
             {item.name}
           </Text>
@@ -146,7 +146,7 @@ const Profile = (item: { name: string; userId: string }) => {
         style={{
           width: 90,
           height: 40,
-          backgroundColor: "#afafaf",
+          backgroundColor: theme.colors.messageButtonColor,
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -230,6 +230,14 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
+         <Text
+          style={[
+            styles.MainTitleText,
+            { color: theme.colors.text, fontSize: 18 },
+          ]}
+        >
+          Description
+        </Text>
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
           {props.description}
         </Text>
@@ -237,7 +245,7 @@ const ItemDescription = (props: ItemDetail) => {
         <View style={{ flexDirection: "row" }}>
           <Text
             style={{
-              color: theme.colors.text,
+              color: "#898F9C" ,
               ...styles.DescriptorText,
             }}
           >
@@ -265,7 +273,7 @@ const ItemDescription = (props: ItemDetail) => {
         <Text
           style={[
             styles.MainTitleText,
-            { color: theme.colors.text, fontSize: 20 },
+            { color: theme.colors.text, fontSize: 18 },
           ]}
         >
           Seller Information
@@ -321,7 +329,7 @@ export default function MarketPlaceDetail() {
 
   return (
     <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <ImageGallery images={marketplaceData?.images} />
         {marketplaceData && <ItemDescription {...marketplaceData} />}
       </ScrollView>
@@ -355,8 +363,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   PriceText: {
-    fontSize: 20,
-    fontFamily: "Roboto-Bold",
+    fontSize: 18,
+    fontFamily: "Roboto-Reg",
     marginBottom: 8,
   },
   DateText: {
