@@ -135,6 +135,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
     profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    degreeName: null,
   },
   {
     id: ids.userIds[2],
@@ -145,6 +146,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[3],
@@ -155,6 +157,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Computer Science",
   },
   {
     id: ids.userIds[4],
@@ -165,6 +168,7 @@ export const users: User[] = [
     institutionId: null,
     accountType: UserType.Admin,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[5],
@@ -175,6 +179,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[6],
@@ -185,6 +190,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Arts",
   },
   {
     id: ids.userIds[7],
@@ -195,6 +201,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[8],
@@ -205,6 +212,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[9],
@@ -215,6 +223,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[10],
@@ -225,6 +234,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
 ];
 

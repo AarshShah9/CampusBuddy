@@ -118,10 +118,12 @@ const allowedEndpoints = [
   "/api/user/student",
   "/api/user/organization/new",
   "/api/user/profile",
+  "/api/user/me",
 
   // Organization-related endpoints
   "/api/orgs/test",
   "/api/orgs/",
+  "/api/orgs/:id",
   "/api/orgs/deleteProfilePicture/:id",
   "/api/orgs/profilePicture/:id",
   "/api/orgs/join/:id",
@@ -204,7 +206,14 @@ export type IdRequiredEndPoints =
   | "/api/events/public/:id"
   | "/api/profile/items/:id";
 
+export type IdAndBodyRequiredEndPoints = "/api/orgs/:id";
+
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
+  params: { id: string };
+};
+
+export type IdAndBodyRequiredEndpointOptions = Omit<RequestArgs, "params"> & {
+  body: any;
   params: { id: string };
 };
 

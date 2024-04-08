@@ -191,7 +191,11 @@ export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
   accountType: true,
-}).partial();
+})
+  .extend({
+    degreeName: z.string().nullable(),
+  })
+  .partial();
 
 export type UserUpdateType = z.infer<typeof UserUpdateSchema>;
 
@@ -226,7 +230,6 @@ export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
 // Can only manually change the description and image
 export const OrganizationUpdateSchema = OrganizationSchema.omit({
   id: true,
-  organizationName: true,
   createdAt: true,
   updatedAt: true,
   institutionId: true,

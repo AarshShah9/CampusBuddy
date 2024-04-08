@@ -10,6 +10,7 @@ import useAuthContext from "~/hooks/useAuthContext";
 import OrganizationSettings from "~/screens/OrganizationSettings";
 import OrganizationProfileHeader from "~/navigation/LandingGroup/BottomTabsGroup/OrganizationProfile/Header";
 import OrganizationEvents from "~/screens/OrganizationEvents";
+import HelpScreen from "~/screens/HelpScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -76,6 +77,22 @@ export default function ProfileGroup() {
             }}
           />
         )}
+        <Stack.Screen
+          name="Help"
+          component={HelpScreen}
+          options={{
+            title: "Help",
+            headerShown: true,
+            headerBackTitle: "Home",
+            headerTintColor: theme.colors.onSecondary,
+            headerTitleStyle: {
+              color: theme.colors.onSecondary,
+            },
+            headerStyle: {
+              backgroundColor: theme.colors.primary,
+            },
+          }}
+        />
       </Stack.Navigator>
       <ProfileSettings />
       <ProfilePictureSettings />

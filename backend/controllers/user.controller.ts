@@ -9,6 +9,7 @@ import {
   UserCreateSchema,
   UserCreateType,
   UserUpdateSchema,
+  UserUpdateType,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -321,6 +322,7 @@ export const loginUser = async (
           programs: existingUser.enrollments.map(
             (enrollment) => enrollment.program.programName,
           ),
+          degreeName: existingUser.degreeName,
           attended: attendedEvents,
           following: orgs,
           type: "Student",
@@ -525,20 +527,33 @@ export const updateUser = async (
   try {
     const loggedInUserId = req.userId;
 
-    //Validated user data
+    // Validate user data
     const validatedUpdateUserData = UserUpdateSchema.parse(req.body);
+
+    // Filter out undefined values
+    const updateData = Object.entries(validatedUpdateUserData).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as any,
+    ) as UserUpdateType;
+
+    // Conditionally hash password if it exists
+    if (updateData.password) {
+      updateData.password = await hashPassword(updateData.password);
+    }
 
     // Update the user
     const updatedUser = await prisma.user.update({
       where: { id: loggedInUserId! },
-      data: {
-        ...validatedUpdateUserData,
-      },
+      data: updateData,
     });
 
-    // send back the updated user
+    // Send back the updated user
     if (updatedUser) {
-      // User updated successfully
       res.status(200).json({
         message: "User updated successfully",
         data: updatedUser,

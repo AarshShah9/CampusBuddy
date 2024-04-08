@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,10 +44,18 @@ export default function ProfileSettings() {
         });
       },
     },
-    { title: "Help", onClick: () => console.log("Help") },
+    {
+      title: "Help",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Help" });
+      },
+    },
     {
       title: "Report a Problem",
-      onClick: () => console.log("Report a Problem"),
+      onClick: () => {
+        Alert.alert("Coming Soon", "This feature is not yet available.");
+      },
     },
     {
       title: "Log Out",

@@ -130,7 +130,7 @@ export const AuthContextProvider = ({
       }
       return true;
     } catch (error) {
-      console.log("An error occured while trying to sign in:\n", error);
+      Alert.alert("Error Logging In", "Something went wrong!");
       return false;
     }
   }, []);
