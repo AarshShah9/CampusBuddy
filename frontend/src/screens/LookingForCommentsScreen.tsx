@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, KeyboardAvoidingView } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import CommentsBar from "~/components/CommentsBar";
 import { useRoute } from "@react-navigation/native";
@@ -16,10 +16,22 @@ export type commentType = {
   userImage: string;
   userName: string;
 };
+function CommentField(){
+  const [text, setText] = React.useState("");
+  return(
+    <View style = {styles.addComment}>
+        <TextInput
+          label="Add a Comment"
+          mode="outlined"
+          value={text}
+          onChangeText={(text) => setText(text)}
+        />
+      </View>
+  );
+}
 
 export default function LookingForCommentsScreen() {
   const { theme, inDarkMode } = useThemeContext();
-  const [text, setText] = React.useState("");
 
   let {
     params: { id },
@@ -49,14 +61,7 @@ export default function LookingForCommentsScreen() {
           <ThemedText style={styles.noCommentsText}>No Comments</ThemedText>
         )}
       </View>
-      <View style = {styles.addComment}>
-        <TextInput
-          label="Add a Comment"
-          mode="outlined"
-          value={text}
-          onChangeText={(text) => setText(text)}
-        />
-      </View>
+      <CommentField />
     </View>
   );
 }
