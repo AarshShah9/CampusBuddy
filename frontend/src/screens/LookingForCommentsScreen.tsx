@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import CommentsBar from "~/components/CommentsBar";
 import { useRoute } from "@react-navigation/native";
@@ -16,17 +16,17 @@ export type commentType = {
   userImage: string;
   userName: string;
 };
-function CommentField(){
+function CommentField() {
   const [text, setText] = React.useState("");
-  return(
-    <View style = {styles.addComment}>
-        <TextInput
-          label="Add a Comment"
-          mode="outlined"
-          value={text}
-          onChangeText={(text) => setText(text)}
-        />
-      </View>
+  return (
+    <View style={styles.addComment}>
+      <TextInput
+        label="Add a Comment"
+        mode="outlined"
+        value={text}
+        onChangeText={(text) => setText(text)}
+      />
+    </View>
   );
 }
 
@@ -48,6 +48,11 @@ export default function LookingForCommentsScreen() {
   });
 
   return (
+    <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
+    keyboardVerticalOffset={72}
+  >
     <View
       style={[
         styles.mainContainer,
@@ -60,9 +65,12 @@ export default function LookingForCommentsScreen() {
         {comments?.length === 0 && !isLoading && !isFetching && (
           <ThemedText style={styles.noCommentsText}>No Comments</ThemedText>
         )}
+        </View>
+        <View>
+        <CommentField />
       </View>
-      <CommentField />
     </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -70,7 +78,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     height: "100%",
-    justifyContent:"space-between",
+    justifyContent: "space-between",
   },
   headerContainer: {
     width: "100%",
@@ -86,10 +94,10 @@ const styles = StyleSheet.create({
     marginTop: 45,
   },
   addComment: {
-    flexDirection:"column",
+    flexDirection: "column",
     paddingHorizontal: 16,
     paddingTop: 8,
-    marginBottom:32,
+    marginBottom: 32,
     borderTopWidth: 1,
   },
 });
