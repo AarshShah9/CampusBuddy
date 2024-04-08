@@ -100,6 +100,8 @@ model User {
   UserOrganizationRole UserOrganizationRole[]
   pushTokens           PushToken[]
 
+  degreeName String? @map("degree_name")
+
   @@index([email])
   @@index([institutionId])
   @@map("user")

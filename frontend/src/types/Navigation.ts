@@ -93,6 +93,10 @@ type QRCodeScannerRoute = {
   page: "QRCodeScanner";
 };
 
+type HelpRoute = {
+  page: "Help";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -111,6 +115,7 @@ export type NavigationFunctionArgs =
   | OrganizationSettingsRoute
   | EditEventRoute
   | QRCodeScannerRoute
+  | HelpRoute
   | SettingsRoute;
 
 export type NavigableStacks =

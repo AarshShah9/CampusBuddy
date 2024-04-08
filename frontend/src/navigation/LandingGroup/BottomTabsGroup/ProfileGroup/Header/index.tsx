@@ -37,7 +37,7 @@ export default function Header() {
       <View
         style={{
           width: "100%",
-          height: user?.programs?.[0] ? 140 : 120,
+          height: user?.degreeName ? 140 : 120,
         }}
       >
         <View style={styles.upperSection}>
@@ -74,7 +74,7 @@ export default function Header() {
           <Text style={{ fontWeight: "bold" }}>
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text>{user?.programs?.[0]}</Text>
+          <Text>{user?.degreeName}</Text>
         </View>
       </View>
     </View>

@@ -3,213 +3,199 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from "react-native";
-import React from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useLayoutEffect, useState } from "react";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import styled from "styled-components";
 import InputField from "~/components/InputField";
-import { Button } from "react-native-paper";
-
-type settingsForm = {
-  password: string;
-  currentProgram: string;
-  firstName: string;
-  lastName: string;
-};
+import { NavigationProp, ParamListBase } from "@react-navigation/native";
+import useAuthContext from "~/hooks/useAuthContext";
+import { useMutation } from "@tanstack/react-query";
+import { settingsForm } from "~/types/Profile";
+import { updateUserInformation } from "~/lib/apiFunctions/Profile";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 const schema = z.object({
   password: z.string().optional(),
-  currentProgram: z.string().optional(),
+  degreeName: z.string().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
 });
 
-export default function Settings() {
+export default function Settings({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
+  const { user, setUser } = useAuthContext();
+  const { navigateBack } = useNavigationContext();
   const { theme } = useThemeContext();
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<settingsForm>({ resolver: zodResolver(schema) });
+    getValues,
+  } = useForm<settingsForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      password: "",
+      degreeName: user?.degreeName,
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+    },
+  });
 
-  // Handles submission of user data
+  const settingsMutation = useMutation({
+    mutationFn: updateUserInformation,
+    onSuccess: () => {
+      // queryClient.invalidateQueries("user");
+      setUser((prev) => ({
+        ...prev!,
+        degreeName: getValues("degreeName"),
+        firstName: getValues("firstName"),
+        lastName: getValues("lastName"),
+      }));
+      reset();
+      navigateBack();
+    },
+    onError: (error) => {
+      console.log(error);
+      Alert.alert("Error", "An error occurred while updating your information");
+    },
+  });
+
   const onSubmit = (data: settingsForm) => {
-    // setIsSubmitting(true);
-    // createMutation.mutate({
-    //   title: data.title,
-    //   description: data.description,
-    //   numberOfSpots: parseInt(data.numberOfSpots),
-    //   expiresAt: data.expiryDate,
-    //});
-    console.log(data);
+    if (data.firstName === "" || data.lastName === "") {
+      Alert.alert(
+        "Fields are Required",
+        "First Name and Last Name are required",
+      );
+      return;
+    }
+    settingsMutation.mutate(data);
   };
 
-  return (
-    <ScrollView>
-      <View style={{ backgroundColor: theme.colors.tertiary }}>
-        {/*    TODO change pfp */}
-        {/*    text inputs for password, current program, first name and last name*/}
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ marginTop: 20, marginBottom: 15 }}>
-              <Text
-                style={{
-                  marginLeft: 20,
-                  marginBottom: 3,
-                  fontFamily: "Nunito-Medium",
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-              >
-                First Name
-              </Text>
-              <TextInput
-                style={[styles.inputBox, { color: theme.colors.text }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="firstName"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ marginTop: 20, marginBottom: 15 }}>
-              <Text
-                style={{
-                  marginLeft: 20,
-                  marginBottom: 3,
-                  fontFamily: "Nunito-Medium",
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-              >
-                Last Name
-              </Text>
-              <TextInput
-                style={[styles.inputBox, { color: theme.colors.text }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="lastName"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ marginTop: 20, marginBottom: 15 }}>
-              <Text
-                style={{
-                  marginLeft: 20,
-                  marginBottom: 3,
-                  fontFamily: "Nunito-Medium",
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-              >
-                Current Program
-              </Text>
-              <TextInput
-                style={[styles.inputBox, { color: theme.colors.text }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="currentProgram"
-        />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ marginTop: 20, marginBottom: 15 }}>
-              <Text
-                style={{
-                  marginLeft: 20,
-                  marginBottom: 3,
-                  fontFamily: "Nunito-Medium",
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-              >
-                Password
-              </Text>
-              <TextInput
-                style={[styles.inputBox, { color: theme.colors.text }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </View>
-          )}
-          name="password"
-        />
-        <View style={{ marginTop: 100 }}>
-          <Button
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+          <Text
             style={{
-              width: 300,
+              color: "white",
+              fontSize: 18,
+            }}
+          >
+            Done
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView>
+        <View style={{ backgroundColor: theme.colors.tertiary }}>
+          <View
+            style={{
+              width: "90%",
               marginLeft: "auto",
               marginRight: "auto",
-              backgroundColor: theme.colors.primary,
             }}
-            onPress={handleSubmit(onSubmit)}
-            //disabled={isSubmitting}
           >
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "Roboto-Bold",
-                fontSize: 24,
-                lineHeight: 30,
+            <Controller
+              control={control}
+              rules={{
+                required: true,
               }}
-            >
-              Done
-            </Text>
-          </Button>
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={{ marginTop: 10 }}>
+                  <InputField
+                    label={"First Name"}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    autoCorrect={false}
+                    autoComplete={"off"}
+                    style={{ backgroundColor: theme.colors.tertiary }}
+                    disabled={settingsMutation.isPending}
+                  />
+                </View>
+              )}
+              name="firstName"
+            />
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={"Last Name"}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCorrect={false}
+                  autoComplete={"off"}
+                  style={{ backgroundColor: theme.colors.tertiary }}
+                  disabled={settingsMutation.isPending}
+                />
+              )}
+              name="lastName"
+            />
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={"Current Program"}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCorrect={false}
+                  autoComplete={"off"}
+                  disabled={settingsMutation.isPending}
+                  style={{ backgroundColor: theme.colors.tertiary }}
+                />
+              )}
+              name="degreeName"
+            />
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={"Password"}
+                  secureTextEntry={true}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCorrect={false}
+                  autoCapitalize={"none"}
+                  autoComplete={"off"}
+                  style={{ backgroundColor: theme.colors.tertiary }}
+                  disabled={settingsMutation.isPending}
+                />
+              )}
+              name="password"
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  formContainer: {
-    width: "90%",
-    marginTop: "8%",
-    height: 500,
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  inputBox: {
-    width: 350,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: "grey",
-    marginLeft: 20,
-  },
-});

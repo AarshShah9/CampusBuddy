@@ -52,7 +52,6 @@ export default function OrganizationSettings() {
   return (
     <ScrollView>
       <View style={{ backgroundColor: theme.colors.tertiary }}>
-        {/*    TODO change pfp */}
         <Controller
           control={control}
           rules={{

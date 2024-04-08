@@ -191,7 +191,11 @@ export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
   accountType: true,
-}).partial();
+})
+  .extend({
+    degreeName: z.string().nullable(),
+  })
+  .partial();
 
 export type UserUpdateType = z.infer<typeof UserUpdateSchema>;
 

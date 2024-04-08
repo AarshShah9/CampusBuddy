@@ -8,3 +8,10 @@ export type UserProfileHeaderType = {
     programs: string[];
   };
 };
+
+export type settingsForm = {
+  password?: string;
+  degreeName: string;
+  firstName: string;
+  lastName: string;
+};

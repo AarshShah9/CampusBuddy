@@ -118,6 +118,7 @@ const allowedEndpoints = [
   "/api/user/student",
   "/api/user/organization/new",
   "/api/user/profile",
+  "/api/user/me",
 
   // Organization-related endpoints
   "/api/orgs/test",
