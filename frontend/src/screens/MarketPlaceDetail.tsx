@@ -80,7 +80,7 @@ const ImageGallery = ({ images }: { images?: string[] }) => {
           {images && images.length > 0 ? (
             images.map((item, i) => (
               <TouchableOpacity
-                style={styles.ExampleContainer}
+                style={styles.ImageContainer}
                 key={i}
                 onPress={() => openImage(item)}
               >
@@ -95,7 +95,7 @@ const ImageGallery = ({ images }: { images?: string[] }) => {
               </TouchableOpacity>
             ))
           ) : (
-            <View style={styles.ExampleContainer}>
+            <View style={styles.ImageContainer}>
               <Text style={styles.ExampleText}>No images available</Text>
             </View>
           )}
@@ -132,8 +132,8 @@ const Profile = (item: { name: string; userId: string }) => {
       >
         <Image
           style={{
-            height: 30,
-            width: 30,
+            height: 35,
+            width: 35,
             backgroundColor: "red",
             borderRadius: 90,
             marginBottom: 5,
@@ -142,7 +142,7 @@ const Profile = (item: { name: string; userId: string }) => {
         />
         <TouchableOpacity onPress={onUserPress}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 5 }}
+            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 8, fontFamily:"Roboto-Reg" }}
           >
             {item.name}
           </Text>
@@ -152,7 +152,7 @@ const Profile = (item: { name: string; userId: string }) => {
         style={{
           width: 90,
           height: 40,
-          backgroundColor: "#afafaf",
+          backgroundColor: theme.colors.messageButtonColor,
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -203,7 +203,7 @@ const ItemDescription = (props: ItemDetail) => {
   return (
     <View
       style={{
-        width: "95%",
+        width: "92%",
         marginLeft: "auto",
         marginRight: "auto",
         marginTop: 5,
@@ -236,6 +236,14 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
+         <Text
+          style={[
+            styles.MainTitleText,
+            { color: theme.colors.text, fontSize: 18 },
+          ]}
+        >
+          Description
+        </Text>
         <Text style={[{ color: theme.colors.text }, styles.DescriptorText]}>
           {props.description}
         </Text>
@@ -243,7 +251,7 @@ const ItemDescription = (props: ItemDetail) => {
         <View style={{ flexDirection: "row" }}>
           <Text
             style={{
-              color: theme.colors.text,
+              color: "#898F9C" ,
               ...styles.DescriptorText,
             }}
           >
@@ -268,7 +276,12 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
-        <Text style={[{ color: theme.colors.text }, styles.MainTitleText]}>
+        <Text
+          style={[
+            styles.MainTitleText,
+            { color: theme.colors.text, fontSize: 18 },
+          ]}
+        >
           Seller Information
         </Text>
         <Profile name={props.sellerFullName} userId={props.sellerId} />
@@ -337,7 +350,7 @@ export default function MarketPlaceDetail({
 
   return (
     <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <ImageGallery images={marketplaceData?.images} />
         {marketplaceData && <ItemDescription {...marketplaceData} />}
       </ScrollView>
@@ -347,7 +360,7 @@ export default function MarketPlaceDetail({
 
 const styles = StyleSheet.create({
   // Can delete these after we get backend integration hooked up
-  ExampleContainer: {
+  ImageContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -362,24 +375,24 @@ const styles = StyleSheet.create({
   MainTitleText: {
     fontSize: 23,
     marginBottom: 5,
-    fontFamily: "Roboto-Medium",
+    fontFamily: "Nunito-Bold",
   },
   DescriptorText: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 8,
     fontFamily: "Roboto-Reg",
-    marginTop: 5,
+    marginTop: 8,
   },
   PriceText: {
-    fontSize: 20,
-    fontFamily: "Roboto-Bold",
-    marginBottom: 5,
+    fontSize: 18,
+    fontFamily: "Roboto-Reg",
+    marginBottom: 8,
   },
   DateText: {
     fontSize: 14,
-    marginTop: 5,
+    marginTop: 8,
     fontFamily: "Roboto-Reg",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   fullScreenContainer: {
     flex: 1,

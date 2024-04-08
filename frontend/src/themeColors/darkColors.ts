@@ -47,7 +47,8 @@ const darkColors = {
     profileTabs:"rgb(50,50,50)",
     googleAutoComplete:"rgb(250,250,250)",
     checkboxColor:"rgb(250,250,250)",
-    profilePicContainer:"rgb(225, 217, 209)"
+    profilePicContainer:"rgb(225, 217, 209)",
+    messageButtonColor: "rgb(128,128,128)",
   },
 };
 
