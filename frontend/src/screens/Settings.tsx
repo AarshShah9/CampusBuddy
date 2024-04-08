@@ -55,7 +55,6 @@ export default function Settings({
   const settingsMutation = useMutation({
     mutationFn: updateUserInformation,
     onSuccess: () => {
-      // queryClient.invalidateQueries("user");
       setUser((prev) => ({
         ...prev!,
         degreeName: getValues("degreeName"),
