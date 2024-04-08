@@ -61,3 +61,37 @@ export const getUserProfileItems = async (userId: string) => {
     return [];
   }
 };
+
+export const getOrgProfile = async (orgId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/orgItems/:id`, {
+        params: { id: orgId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const joinOrg = async (orgId: string) => {
+  try {
+    return await CBRequest("POST", `/api/orgs/join/:id`, {
+      params: { id: orgId },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const geOrganizationProfileEvents = async (orgId: string) => {
+  try {
+    return (
+      await CBRequest("GET", `/api/profile/orgEvents/:id`, {
+        params: { id: orgId },
+      })
+    ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

@@ -59,6 +59,11 @@ type AttendeesRoute = {
   id: string;
 };
 
+type OrganizationProfileRoute = {
+  page: "OrganizationProfile";
+  id: string;
+};
+
 type StudentSignUpRoute = {
   page: "StudentSignUp";
 };
@@ -76,6 +81,18 @@ type CommentsRoute = {
   id: string;
 };
 
+type OrganizationSettingsRoute = {
+  page: "OrganizationSettings";
+};
+
+type EditEventRoute = {
+  page: "EditEvent";
+};
+
+type QRCodeScannerRoute = {
+  page: "QRCodeScanner";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -87,9 +104,13 @@ export type NavigationFunctionArgs =
   | AttendeesRoute
   | StudentSignUpRoute
   | OrgSignUpRoute
+  | OrganizationProfileRoute
   | LookingForDetailsRoute
   | MarketPlaceDetailsRoute
   | CommentsRoute
+  | OrganizationSettingsRoute
+  | EditEventRoute
+  | QRCodeScannerRoute
   | SettingsRoute;
 
 export type NavigableStacks =

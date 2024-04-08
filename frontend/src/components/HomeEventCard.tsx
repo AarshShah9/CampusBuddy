@@ -1,6 +1,6 @@
 import LocationChip from "./LocationChip";
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { ThemedText } from "./ThemedComponents";
+import { Text } from "react-native-paper";
 import { convertUTCToLocalDate } from "~/lib/timeFunctions";
 import { EventItem } from "~/types/Events";
 import { useCallback } from "react";
@@ -9,63 +9,77 @@ import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "./LoadingSkeleton";
 
 type Props = {
-    event: EventItem,
-    isLoading: boolean
-}
+  event: EventItem;
+  isLoading: boolean;
+};
 export default function EventHomeCard({ event, isLoading }: Props) {
-    const { navigateTo } = useNavigationContext();
-    const openEventDetails = useCallback(() => {
-        if(event.event)
-            navigateTo({ page: "EventDetails", id: event.id });
-    }, [event]);
+  const { navigateTo } = useNavigationContext();
+  const openEventDetails = useCallback(() => {
+    const { id } = event;
+    if (event.event) navigateTo({ page: "EventDetails", id });
+    else navigateTo({ page: "OrganizationProfile", id });
+  }, [event]);
 
-    return (
-        <TouchableOpacity onPress={openEventDetails}>
-            <View style={styles.card}>
-                <View style={styles.cardCover}>
-                    <LoadingSkeleton show={isLoading} width="100%" height="100%">
-                        <Image
-                            style={{ width: "100%", height: "100%" }}
-                            source={{ uri: generateImageURL(event.image) }}
-                        />
-                    </LoadingSkeleton>
-                </View>
-                <View style={{ paddingHorizontal: 0 }}>
-                    <LoadingSkeleton show={isLoading} width="80%" height={16}>
-                        <ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
-                    </LoadingSkeleton>
-                    <View style={styles.eventDetailsContainer}>
-                        {isLoading ?
-                            <LoadingSkeleton show width={100} height={16} />
-                            :<>
-                                {!!event.time && (
-                                    <ThemedText style={styles.eventTime}>
-                                        {convertUTCToLocalDate(event.time)}
-                                    </ThemedText>
-                                )}
-                                <View>
-                                    {event.location && (
-                                        <LocationChip location={event.location} size="small" />
-                                    )}
-                                </View>
-                            </>
-                        }
-                    </View>
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
+  return (
+    <TouchableOpacity onPress={openEventDetails}>
+      <View
+        style={{
+          width: event.event ? 208 : 110,
+          height: 170,
+        }}
+      >
+        <View
+          style={[
+            styles.cardCover,
+            {
+              width: event.event ? 208 : 100,
+              height: 110,
+            },
+          ]}
+        >
+          {isLoading ? (
+            <LoadingSkeleton show width="100%" height="100%" />
+          ) : (
+            <Image
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              source={{ uri: generateImageURL(event.image) }}
+            />
+          )}
+        </View>
+        {isLoading ? (
+          <LoadingSkeleton show width="75%" height={16} />
+        ) : (
+          <Text style={styles.eventTitle}>{event.title}</Text>
+        )}
+        <View style={styles.eventDetailsContainer}>
+          {isLoading ? (
+            <LoadingSkeleton show width={100} height={16} />
+          ) : (
+            <>
+              {!!event.time && (
+                <Text style={styles.eventTime}>
+                  {convertUTCToLocalDate(event.time)}
+                </Text>
+              )}
+              <View>
+                {event.location && (
+                  <LocationChip location={event.location} size="small" />
+                )}
+              </View>
+            </>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 // prettier-ignore
 const styles = StyleSheet.create({
-    card: {
-        width: 208,
-        height: 170
-    },
     cardCover: {
-        width: 208,
-        height: 110,
         marginBottom: 5,
         borderRadius: 8,
         overflow: 'hidden'

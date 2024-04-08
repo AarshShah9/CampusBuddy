@@ -28,6 +28,7 @@ import {
 import { defaultDistance } from "../constants";
 import { sampleEventData } from "../prisma/dummyData";
 import { moderateText } from "../utils/moderateText";
+import { emailEventFlagged } from "../utils/emails";
 
 // test Event
 export const eventTest = async (req: Request, res: Response) => {
@@ -120,6 +121,26 @@ export const createVerifiedEvent = async (
           isFlagged: isFlagged,
         },
       });
+
+      // Send email to event creator if event is flagged
+      if (isFlagged) {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: loggedInUserId,
+          },
+        });
+
+        if (!user) {
+          throw new AppError(
+            AppErrorName.NOT_FOUND_ERROR,
+            "User not found",
+            404,
+            true,
+          );
+        }
+
+        await emailEventFlagged(user, event);
+      }
 
       const uniqueFileName = generateUniqueFileName(
         req.file!.originalname,
@@ -384,6 +405,12 @@ export const getAllEvents = async (req: RequestExtended, res: Response) => {
         location: true,
         organization: true,
       },
+      where: {
+        isPublic: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
     });
     res.status(200).json({
       message: "All events",
@@ -438,6 +465,7 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
         startTime: {
           gt: new Date(),
         },
+        isPublic: true,
       },
       include: {
         location: true,
@@ -458,6 +486,7 @@ export const getAllMapEvents = async (req: RequestExtended, res: Response) => {
     const marketPlaceItems = await prisma.item.findMany({
       where: {
         state: State.Available,
+        isPublic: true,
       },
       include: {
         location: true,
@@ -517,6 +546,7 @@ export const getAllVerifiedEvents = async (
     const allEvents = await prisma.event.findMany({
       where: {
         status: EventStatus.Verified,
+        isPublic: true,
       },
     });
     res.status(200).json({
@@ -536,6 +566,7 @@ export const getEventById = async (
 ) => {
   try {
     // Validate request id param
+    const loggedInUserId = req.userId;
     const eventId = IdParamSchema.parse(req.params).id;
 
     // Get event from db
@@ -546,21 +577,18 @@ export const getEventById = async (
       include: {
         location: true,
         eventResponses: true,
-        organization: true,
+        organization: {
+          include: {
+            userOrganizationRoles: {
+              include: {
+                role: true,
+              },
+            },
+          },
+        },
+        user: true,
       },
     });
-
-    const isLiked = event?.eventResponses.some(
-      (response) =>
-        response.userId === req.userId &&
-        response.participationStatus === "Interested",
-    );
-
-    const isAttending = event?.eventResponses.some(
-      (response) =>
-        response.userId === req.userId &&
-        response.participationStatus === "Going",
-    );
 
     if (!event) {
       // Throw error if event not found
@@ -574,15 +602,71 @@ export const getEventById = async (
       throw notFoundError;
     }
 
+    const isCreatedByUser: boolean = event.userId === loggedInUserId;
+    let hasPermission: boolean = false;
+    // Check if there is a group associated with the event data
+    if (event.organizationId) {
+      // check if the user has permission to delete the event
+      hasPermission = await checkUserPermission(
+        loggedInUserId!,
+        event.organizationId,
+        AppPermissionName.MANAGE_EVENTS,
+      );
+    }
+
+    const self = isCreatedByUser || hasPermission;
+
+    if (!self && !event.isPublic) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view event with id ${eventId}`,
+        403,
+        true,
+      );
+    }
+
+    const isLiked = event.eventResponses.some(
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Interested",
+    );
+
+    const isAttending = event.eventResponses.some(
+      (response) =>
+        response.userId === req.userId &&
+        response.participationStatus === "Going",
+    );
+
     res.status(200).json({
       message: "Event found",
       data: {
-        ...event,
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        location: {
+          latitude: event.location.latitude,
+          longitude: event.location.longitude,
+          name: event.location.name,
+        },
+        organization: {
+          organizationName: event.organization?.organizationName,
+          organizationId: event.organization?.id,
+          organizationImage: event.organization?.image,
+        },
+        startTime: event.startTime,
+        image: event.image,
         attendees: event.eventResponses.filter(
           (response) => response.participationStatus === "Going",
         ).length,
         isLiked: isLiked,
         isAttending: isAttending,
+        isFlagged: event.isFlagged,
+        isPublic: event.isPublic,
+        self: self,
+        userName: event.user.firstName + " " + event.user.lastName,
+        userId: event.user.id,
+        userImage: event.user.profilePic,
+        eventType: event.status,
       },
     });
   } catch (error) {
@@ -838,6 +922,7 @@ export const getMainPageEvents = async (
         AND: [
           {
             status: EventStatus.Verified,
+            isPublic: true,
           },
           {
             startTime: {
@@ -898,6 +983,7 @@ export const getMainPageEvents = async (
           },
           {
             status: EventStatus.Verified,
+            isPublic: true,
             endTime: {
               gt: new Date(),
             },
@@ -935,11 +1021,68 @@ export const getMainPageEvents = async (
       }),
     };
 
-    // TODO: Upcoming events from following
+    // to get the reformattedUpcoming events we have to filter the UserOrganizationRole and search for membership status as 'Member'
+    const userOrganizationRoles = await prisma.userOrganizationRole.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        role: {
+          select: {
+            roleName: true,
+          },
+        },
+        organization: true,
+      },
+    });
+
+    const filteredUserOrganizationRoles = userOrganizationRoles.filter(
+      (role) => role.role.roleName === "Member",
+    );
+
+    // find 5 of the most recent events that are happening in the organizations that the user is a member of
+    const organizationEvents = await prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            organizationId: {
+              in: filteredUserOrganizationRoles.map(
+                (role) => role.organizationId,
+              ),
+            },
+          },
+          {
+            startTime: {
+              gt: new Date(),
+            },
+          },
+          {
+            isPublic: true,
+          },
+        ],
+      },
+      include: {
+        location: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+      take: 5,
+    });
+
     const reformattedUpcomingEvents = {
       title: "Upcoming Events From Following",
       id: "2",
-      items: sampleEventData[1].items,
+      items: organizationEvents.map((event) => {
+        return {
+          id: event.id,
+          title: event.title,
+          time: event.startTime,
+          location: event.location.name,
+          image: event.image,
+          event: true,
+        };
+      }),
     };
 
     const reformattedTrendingEvents = {
@@ -1000,8 +1143,9 @@ export const getMainPageEvents = async (
           reformattedTrendingEvents,
           reformattedHappeningToday,
           reformattedExploreOrganizations,
-        ],
-        startingEvents: startingEvents,
+        ].filter((list) => list.items.length > 0),
+        startingEvents:
+          startingEvents.filter((event) => event.image !== null) || [],
       },
     });
   } catch (error: any) {
@@ -1164,6 +1308,93 @@ export const attendEvent = async (
       });
     }
 
+    res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const flipEventVisibility = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+
+    // Validate request id param
+    const eventId = IdParamSchema.parse(req.params).id;
+
+    // get the event from the database
+    const existingEvent = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+    });
+
+    if (!existingEvent) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found",
+        404,
+        true,
+      );
+    }
+
+    // Check if the user is the event's creator
+    const isCreatedByUser: boolean = existingEvent.userId === loggedInUserId;
+
+    // Check if there is a group associated with the event data
+    if (existingEvent.organizationId) {
+      // check if the user has permission to delete the event
+      const hasPermission = await checkUserPermission(
+        loggedInUserId!,
+        existingEvent.organizationId,
+        AppPermissionName.MANAGE_EVENTS,
+      );
+
+      // Check if the user has permission to manage events or if they are the event creator
+      if (hasPermission || isCreatedByUser) {
+        // update the event
+        await prisma.event.update({
+          where: { id: eventId },
+          data: {
+            isPublic: !existingEvent.isPublic,
+          },
+        });
+      } else {
+        console.error(
+          `User with userId: ${loggedInUserId} does not have permission to delete the event with eventId: ${eventId}`,
+        );
+
+        throw new AppError(
+          AppErrorName.PERMISSION_ERROR,
+          `User does not have permission to delete event`,
+          403,
+          true,
+        );
+      }
+      // Event not associated with an organization, check if user is the one who created the event
+    } else if (isCreatedByUser) {
+      // update the event
+      await prisma.event.update({
+        where: { id: eventId },
+        data: {
+          isPublic: !existingEvent.isPublic,
+        },
+      });
+    } else {
+      console.error(
+        `User with userId: ${loggedInUserId} does not have permission to delete the event with eventId: ${eventId}`,
+      );
+
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to delete event`,
+        403,
+        true,
+      );
+    }
     res.status(204).end();
   } catch (error: any) {
     next(error);

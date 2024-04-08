@@ -37,7 +37,7 @@ const Table = () => {
 
   useEffect(() => {
     fetchRequests().then(() => setIsLoading(false));
-  }, [fetchRequests, updateTrigger]);
+  }, [updateTrigger]);
 
   const handleAccept = async (id: string) => {
     try {

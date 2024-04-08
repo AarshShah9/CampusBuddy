@@ -122,6 +122,9 @@ const allowedEndpoints = [
   // Organization-related endpoints
   "/api/orgs/test",
   "/api/orgs/",
+  "/api/orgs/deleteProfilePicture/:id",
+  "/api/orgs/profilePicture/:id",
+  "/api/orgs/join/:id",
 
   // Institution-related endpoints
   "/api/institution/createInstitution",
@@ -142,6 +145,7 @@ const allowedEndpoints = [
   "/api/events/like/:id",
   "/api/events/attendees/:id",
   "/api/events/attend/:id",
+  "/api/events/public/:id",
 
   // Post-related endpoints
   "/api/post/test",
@@ -157,6 +161,8 @@ const allowedEndpoints = [
   "/api/profile/events/:id",
   "/api/profile/posts/:id",
   "/api/profile/items/:id",
+  "/api/profile/orgItems/:id",
+  "/api/profile/orgEvents/:id",
 
   // Miscellaneous endpoints
   "/Test",
@@ -190,6 +196,12 @@ export type IdRequiredEndPoints =
   | "/api/item/:id"
   | "/api/post/:id"
   | "/api/post/comments/:id"
+  | "/api/orgs/deleteProfilePicture/:id"
+  | "/api/orgs/profilePicture/:id"
+  | "/api/profile/orgItems/:id"
+  | "/api/orgs/join/:id"
+  | "/api/profile/orgEvents/:id"
+  | "/api/events/public/:id"
   | "/api/profile/items/:id";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {

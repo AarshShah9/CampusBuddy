@@ -10,6 +10,7 @@ import {
 } from "../utils/googleMapsApi";
 import { State } from "@prisma/client";
 import { moderateText } from "../utils/moderateText";
+import { emailItemFlagged } from "../utils/emails";
 
 // test Item
 export const itemTest = async (req: Request, res: Response) => {
@@ -45,11 +46,13 @@ export const getAllItems = async (req: RequestExtended, res: Response) => {
       },
       where: {
         institutionId: institution?.institutionId,
+        isPublic: true,
       },
       orderBy: {
         createdAt: "asc",
       },
     });
+
     const images = await prisma.image.findMany({
       where: {
         itemId: {
@@ -178,6 +181,11 @@ export const createItem = async (
         );
       }
 
+      // Send email to user if item is flagged
+      if (isFlagged) {
+        await emailItemFlagged(user, newItem);
+      }
+
       return newItem;
     });
 
@@ -276,6 +284,26 @@ export const getItemById = async (
       },
     });
 
+    if (!item) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Item with id ${itemId} not found`,
+        404,
+        true,
+      );
+    }
+
+    const self: boolean = req.userId === item.userId;
+
+    if (!self && item.isPublic === false) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `User does not have permission to view item with id ${itemId}`,
+        403,
+        true,
+      );
+    }
+
     const images = await prisma.image.findMany({
       where: {
         itemId: item?.id,
@@ -308,6 +336,7 @@ export const getItemById = async (
       sellerFullName: item.user.firstName + " " + item.user.lastName,
       sellerId: item.userId,
       images: images?.map((image) => image.url),
+      isFlagged: item.isFlagged,
     };
 
     res.status(200).json({
