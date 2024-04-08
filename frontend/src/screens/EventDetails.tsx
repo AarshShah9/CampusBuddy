@@ -12,7 +12,7 @@ import {
   ParamListBase,
   useRoute,
 } from "@react-navigation/native";
-import { useCallback, useLayoutEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
@@ -24,15 +24,12 @@ import useThemeContext from "~/hooks/useThemeContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
-import {
-  attendEvent,
-  getEventDetails,
-  likeEvent,
-} from "~/lib/apiFunctions/Events";
+import { attendEvent } from "~/lib/apiFunctions/Events";
+import useEventsContext from "~/hooks/useEventsContext";
 
 const IMG_HEIGHT = 300;
 
@@ -43,7 +40,9 @@ const IMG_HEIGHT = 300;
 export type EventDetailsType = {
   id: string;
   title: string;
+  self: boolean;
   description: string;
+  isFlagged: boolean;
   location: {
     latitude: number;
     longitude: number;
@@ -63,6 +62,7 @@ export type EventDetailsType = {
   userId: string;
   userImage: string;
   eventType: "NonVerified" | "Verified";
+  isPublic: boolean;
 };
 
 export default function EventDetails({
@@ -74,27 +74,15 @@ export default function EventDetails({
     params: { id, map = true },
   } = useRoute<any>();
   const { theme } = useThemeContext();
-  const { navigateTo, navigateBack } = useNavigationContext();
+  const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const { openModal, eventData, fetchEventDetails, refetchEventDetails } =
+    useEventsContext();
 
-  const { data: eventData, refetch } = useQuery<EventDetailsType>({
-    queryKey: ["event-details", id],
-    queryFn: () => getEventDetails(id),
-  });
-
-  const likeMutation = useMutation({
-    mutationFn: async ({
-      id,
-      previousState,
-    }: {
-      id: string;
-      previousState: boolean;
-    }) => {
-      await likeEvent(id);
-      refetch();
-    },
-  });
+  useEffect(() => {
+    fetchEventDetails(id);
+  }, [id, fetchEventDetails]);
 
   const attendMutation = useMutation({
     mutationFn: async ({
@@ -105,7 +93,7 @@ export default function EventDetails({
       previousState: boolean;
     }) => {
       await attendEvent(id);
-      refetch();
+      refetchEventDetails();
     },
   });
 
@@ -124,22 +112,6 @@ export default function EventDetails({
       });
     }
   }, [eventData]);
-
-  // TODO fix optimistic updates
-  const isOptimistic =
-    likeMutation.variables &&
-    (likeMutation.isPending ? !likeMutation.variables.previousState : false);
-
-  const isLiked = isOptimistic
-    ? !likeMutation.variables?.previousState
-    : eventData?.isLiked;
-
-  const userLiked = useCallback(() => {
-    likeMutation.mutate({
-      id,
-      previousState: eventData?.isLiked!,
-    });
-  }, [id, likeEvent, eventData?.isLiked]);
 
   const userAttendEvent = useCallback(() => {
     attendMutation.mutate({
@@ -173,55 +145,15 @@ export default function EventDetails({
     navigateTo({ page: "Attendees", id });
   }, [id]);
 
-  const onDelete = useCallback(() => {
-    Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        onPress: async () => {
-          navigateBack();
-        },
-      },
-    ]);
-  }, []);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <>
-          {!eventData?.self && (
-            <TouchableOpacity onPress={userLiked}>
-              <Entypo
-                name="heart"
-                size={28}
-                color={isLiked ? "red" : "white"} // TODO use theme context
-                style={{ opacity: isOptimistic ? 0.5 : 1 }}
-              />
-            </TouchableOpacity>
-          )}
-          {eventData?.self && (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                width: 60,
-              }}
-            >
-              <TouchableOpacity>
-                <Entypo name="edit" size={22} color={"white"} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onDelete}>
-                <Entypo name="trash" size={22} color={"white"} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </>
+        <TouchableOpacity onPress={() => openModal()}>
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
+        </TouchableOpacity>
       ),
     });
-  }, [navigation, isLiked, isOptimistic, userLiked, eventData]);
+  }, [navigation]);
 
   if (eventData && eventData.isFlagged) {
     Alert.alert(
@@ -298,11 +230,31 @@ export default function EventDetails({
                 {convertUTCToTimeAndDate(eventData?.startTime)}
               </Text>
             </LoadingSkeleton>
-            <LoadingSkeleton show={!eventData} width={120} height={16}>
-              {eventData?.location.name && (
-                <LocationChip location={eventData?.location.name} />
-              )}
-            </LoadingSkeleton>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <LoadingSkeleton show={!eventData} width={80} height={16}>
+                {eventData?.location.name && (
+                  <LocationChip location={eventData?.location.name} />
+                )}
+              </LoadingSkeleton>
+              <LoadingSkeleton show={!eventData} width={30} height={16}>
+                <>
+                  {eventData?.isLiked && (
+                    <Ionicons
+                      name="heart"
+                      size={20}
+                      color={"red"}
+                      style={{ paddingLeft: 6 }}
+                    />
+                  )}
+                </>
+              </LoadingSkeleton>
+            </View>
           </View>
           <TouchableOpacity onPress={viewCreator}>
             <View style={styles.eClubDetails}>
@@ -424,23 +376,25 @@ export default function EventDetails({
             backgroundColor: theme.colors.tertiary,
           }}
         >
-          <Button
-            style={styles.attendButton}
-            mode="contained"
-            onPress={userAttendEvent}
-          >
-            <Text
-              style={{
-                lineHeight: 30,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: "white",
-                fontFamily: "Nunito-Bold",
-              }}
+          {!eventData?.self && (
+            <Button
+              style={styles.attendButton}
+              mode="contained"
+              onPress={userAttendEvent}
             >
-              {eventData?.isAttending ? "Not Going" : "Attend"}
-            </Text>
-          </Button>
+              <Text
+                style={{
+                  lineHeight: 30,
+                  fontSize: 24,
+                  fontWeight: "bold",
+                  color: "white",
+                  fontFamily: "Nunito-Bold",
+                }}
+              >
+                {eventData?.isAttending ? "Not Going" : "Attend"}
+              </Text>
+            </Button>
+          )}
         </View>
       </Animated.ScrollView>
     </View>

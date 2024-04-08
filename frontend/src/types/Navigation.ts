@@ -85,6 +85,14 @@ type OrganizationSettingsRoute = {
   page: "OrganizationSettings";
 };
 
+type EditEventRoute = {
+  page: "EditEvent";
+};
+
+type QRCodeScannerRoute = {
+  page: "QRCodeScanner";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -101,6 +109,8 @@ export type NavigationFunctionArgs =
   | MarketPlaceDetailsRoute
   | CommentsRoute
   | OrganizationSettingsRoute
+  | EditEventRoute
+  | QRCodeScannerRoute
   | SettingsRoute;
 
 export type NavigableStacks =
