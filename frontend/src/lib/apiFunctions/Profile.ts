@@ -118,3 +118,9 @@ export const updateOrgInformation = async (
     body: data,
   });
 };
+
+export const deleteItem = async (id: string) => {
+  return await CBRequest("DELETE", `/api/item/:id`, {
+    params: { id },
+  });
+};

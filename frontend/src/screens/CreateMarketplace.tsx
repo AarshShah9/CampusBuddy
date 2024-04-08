@@ -83,9 +83,8 @@ export default function CreateMarketplace() {
       Alert.alert("Success", "Your item has been posted");
     },
     onError: (error) => {
-      console.log(error);
       setIsSubmitting(false);
-      alert("Error creating event");
+      Alert.alert("Error", error.message);
     },
   });
 

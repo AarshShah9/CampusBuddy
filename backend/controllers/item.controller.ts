@@ -257,6 +257,9 @@ export const deleteItem = async (
         true,
       );
     }
+    return res.status(200).json({
+      message: "Item deleted successfully",
+    });
   } catch (error: any) {
     next(error);
   }

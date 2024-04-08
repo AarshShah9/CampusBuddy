@@ -22,12 +22,18 @@ type eventsContext = {
 
   openModal: () => void;
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
+
+  openItemModal: (id: string) => void;
+  bottomSheetItemModalRef: React.RefObject<BottomSheetModalMethods>;
+
   eventData?: EventDetailsType;
   fetchEventDetails: (id: string) => void;
   refetchEventDetails: () => void;
   likeMutate: () => void;
   deleteMutate: () => void;
   flipPublicMutate: () => void;
+
+  itemId?: string;
 };
 const EventsContext = createContext<eventsContext | null>(null);
 
@@ -37,6 +43,10 @@ export const EventsContextProvider = ({
   const { dismiss } = useBottomSheetModal();
 
   const [currentEventId, setCurrentEventId] = useState<string | undefined>(
+    undefined,
+  );
+
+  const [currentItemId, setCurrentItemId] = useState<string | undefined>(
     undefined,
   );
 
@@ -107,7 +117,17 @@ export const EventsContextProvider = ({
     if (bottomSheetModalRef.current) bottomSheetModalRef.current.present();
   }, []);
 
+  const bottomSheetItemModalRef = useRef<BottomSheetModal>(null);
+
+  const openItemModal = useCallback((id: string) => {
+    if (bottomSheetItemModalRef.current)
+      bottomSheetItemModalRef.current.present();
+    setCurrentItemId(id);
+  }, []);
+
   const closeModal = useCallback(() => {
+    setCurrentEventId(undefined);
+    setCurrentItemId(undefined);
     dismiss();
   }, [dismiss]);
 
@@ -123,6 +143,9 @@ export const EventsContextProvider = ({
         likeMutate,
         deleteMutate,
         flipPublicMutate,
+        openItemModal,
+        bottomSheetItemModalRef,
+        itemId: currentItemId,
       }}
     >
       {children}
