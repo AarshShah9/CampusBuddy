@@ -340,6 +340,7 @@ export const getItemById = async (
       sellerId: item.userId,
       images: images?.map((image) => image.url),
       isFlagged: item.isFlagged,
+      self: self,
     };
 
     res.status(200).json({

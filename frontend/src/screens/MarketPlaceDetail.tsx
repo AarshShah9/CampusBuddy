@@ -142,7 +142,12 @@ const Profile = (item: { name: string; userId: string }) => {
         />
         <TouchableOpacity onPress={onUserPress}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 8, fontFamily:"Roboto-Reg" }}
+            style={{
+              color: theme.colors.text,
+              fontSize: 16,
+              marginLeft: 8,
+              fontFamily: "Roboto-Reg",
+            }}
           >
             {item.name}
           </Text>
@@ -236,7 +241,7 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
-         <Text
+        <Text
           style={[
             styles.MainTitleText,
             { color: theme.colors.text, fontSize: 18 },
@@ -251,7 +256,7 @@ const ItemDescription = (props: ItemDetail) => {
         <View style={{ flexDirection: "row" }}>
           <Text
             style={{
-              color: "#898F9C" ,
+              color: "#898F9C",
               ...styles.DescriptorText,
             }}
           >
@@ -334,12 +339,14 @@ export default function MarketPlaceDetail({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => openItemModal(id)}>
+        <TouchableOpacity
+          onPress={() => openItemModal(id, marketplaceData?.self!)}
+        >
           <Entypo name="dots-three-horizontal" size={24} color="white" />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, id, marketplaceData?.self]);
 
   if (marketplaceData && marketplaceData.isFlagged) {
     Alert.alert(

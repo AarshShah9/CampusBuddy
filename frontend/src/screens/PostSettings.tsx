@@ -10,15 +10,15 @@ import useThemeContext from "~/hooks/useThemeContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteItem } from "~/lib/apiFunctions/Profile";
 import useAuthContext from "~/hooks/useAuthContext";
+import { deletePost } from "~/lib/apiFunctions/LookingFor";
 
-export default function ItemSettings() {
+export default function PostSettings() {
   const { theme } = useThemeContext();
   const { navigateBack } = useNavigationContext();
   const queryClient = useQueryClient();
 
-  const { bottomSheetItemModalRef, item, closeModal } = useEventsContext();
+  const { bottomSheetPostModalRef, post, closeModal } = useEventsContext();
   const { user } = useAuthContext();
 
   const Backdrop = useCallback(
@@ -29,19 +29,19 @@ export default function ItemSettings() {
   );
 
   const deleteMutation = useMutation({
-    mutationFn: () => deleteItem(item?.id!),
+    mutationFn: () => deletePost(post?.id!),
     onSuccess: () => {
       closeModal();
       navigateBack();
-      Alert.alert("Success", "Item deleted successfully.");
+      Alert.alert("Success", "Post deleted successfully.");
       queryClient.invalidateQueries({
-        queryKey: ["search-marketplace-items"],
+        queryKey: ["search-page-posts"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["marketplace-detail", item?.id!],
+        queryKey: ["lookingFor-details", post?.id!],
       });
       queryClient.invalidateQueries({
-        queryKey: ["user-market", user?.id],
+        queryKey: ["user-posts", user?.id],
       });
     },
     onError: (err) => {
@@ -49,7 +49,7 @@ export default function ItemSettings() {
     },
   });
 
-  const self = item?.self;
+  const self = post?.self;
   const isPublic = true;
   const snapPoints = self ? ["50%"] : ["35%"];
 
@@ -120,7 +120,7 @@ export default function ItemSettings() {
   return (
     <BottomSheetModal
       enablePanDownToClose={true}
-      ref={bottomSheetItemModalRef}
+      ref={bottomSheetPostModalRef}
       index={0}
       snapPoints={snapPoints}
       backdropComponent={Backdrop}

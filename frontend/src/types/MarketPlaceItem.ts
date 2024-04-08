@@ -30,4 +30,5 @@ export type MarketPlaceItemResponse = {
   sellerId: string;
   images: string[];
   isFlagged: boolean;
+  self: boolean;
 };

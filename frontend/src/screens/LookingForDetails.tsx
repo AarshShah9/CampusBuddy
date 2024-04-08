@@ -10,16 +10,19 @@ import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import PersonChip from "~/components/PersonChip";
 import CommentsChip from "~/components/CommentsChip";
-import { useRoute } from "@react-navigation/native";
+import {
+  NavigationProp,
+  ParamListBase,
+  useRoute,
+} from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { getLookingForById } from "~/lib/apiFunctions/LookingFor";
-import {
-  convertUTCToLocalDate,
-  convertUTCToTimeAndDate,
-} from "~/lib/timeFunctions";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { generateImageURL } from "~/lib/CDNFunctions";
-import { useCallback } from "react";
+import React, { useCallback, useLayoutEffect } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { Entypo } from "@expo/vector-icons";
+import useEventsContext from "~/hooks/useEventsContext";
 
 /**
  * This component is responsible for loading Looking For Details based on passed ID.
@@ -35,10 +38,16 @@ type LookingForDetailsType = {
   userName: string;
   userImage: string;
   isFlagged: boolean;
+  self: boolean;
 };
 
-export default function LookingForDetails() {
+export default function LookingForDetails({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
   const { theme, inDarkMode } = useThemeContext();
+  const { openPostModal } = useEventsContext();
   let {
     params: { id },
   } = useRoute<any>();
@@ -56,6 +65,18 @@ export default function LookingForDetails() {
   const onUserPress = useCallback(() => {
     navigateTo({ page: "UserProfile", id: lookingForData?.userId ?? "" });
   }, [lookingForData?.userId]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => openPostModal(id, lookingForData?.self!)}
+        >
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, id, lookingForData?.self]);
 
   if (lookingForData && lookingForData.isFlagged) {
     Alert.alert(

@@ -17,14 +17,22 @@ import {
 import { EventDetailsType } from "~/screens/EventDetails";
 import { Alert } from "react-native";
 
+type modalData = {
+  self: boolean;
+  id: string;
+};
+
 type eventsContext = {
   closeModal: () => void;
 
   openModal: () => void;
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
 
-  openItemModal: (id: string) => void;
+  openItemModal: (id: string, self: boolean) => void;
   bottomSheetItemModalRef: React.RefObject<BottomSheetModalMethods>;
+
+  openPostModal: (id: string, self: boolean) => void;
+  bottomSheetPostModalRef: React.RefObject<BottomSheetModalMethods>;
 
   eventData?: EventDetailsType;
   fetchEventDetails: (id: string) => void;
@@ -33,8 +41,10 @@ type eventsContext = {
   deleteMutate: () => void;
   flipPublicMutate: () => void;
 
-  itemId?: string;
+  item?: modalData;
+  post?: modalData;
 };
+
 const EventsContext = createContext<eventsContext | null>(null);
 
 export const EventsContextProvider = ({
@@ -45,10 +55,8 @@ export const EventsContextProvider = ({
   const [currentEventId, setCurrentEventId] = useState<string | undefined>(
     undefined,
   );
-
-  const [currentItemId, setCurrentItemId] = useState<string | undefined>(
-    undefined,
-  );
+  const [currentItem, setCurrentItem] = useState<modalData>();
+  const [currentPost, setCurrentPost] = useState<modalData>();
 
   const { data: eventData, refetch: refetchEventDetails } =
     useQuery<EventDetailsType>({
@@ -111,23 +119,35 @@ export const EventsContextProvider = ({
     setCurrentEventId(id);
   }, []);
 
+  const bottomSheetItemModalRef = useRef<BottomSheetModal>(null);
+  const bottomSheetPostModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const openModal = useCallback(() => {
     if (bottomSheetModalRef.current) bottomSheetModalRef.current.present();
   }, []);
 
-  const bottomSheetItemModalRef = useRef<BottomSheetModal>(null);
-
-  const openItemModal = useCallback((id: string) => {
+  const openItemModal = useCallback((id: string, self: boolean) => {
     if (bottomSheetItemModalRef.current)
       bottomSheetItemModalRef.current.present();
-    setCurrentItemId(id);
+    setCurrentItem({
+      id,
+      self,
+    });
+  }, []);
+
+  const openPostModal = useCallback((id: string, self: boolean) => {
+    if (bottomSheetPostModalRef.current)
+      bottomSheetPostModalRef.current.present();
+    setCurrentPost({
+      id,
+      self,
+    });
   }, []);
 
   const closeModal = useCallback(() => {
     setCurrentEventId(undefined);
-    setCurrentItemId(undefined);
+    setCurrentItem(undefined);
     dismiss();
   }, [dismiss]);
 
@@ -145,7 +165,10 @@ export const EventsContextProvider = ({
         flipPublicMutate,
         openItemModal,
         bottomSheetItemModalRef,
-        itemId: currentItemId,
+        item: currentItem,
+        post: currentPost,
+        openPostModal,
+        bottomSheetPostModalRef,
       }}
     >
       {children}
