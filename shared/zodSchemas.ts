@@ -230,7 +230,6 @@ export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
 // Can only manually change the description and image
 export const OrganizationUpdateSchema = OrganizationSchema.omit({
   id: true,
-  organizationName: true,
   createdAt: true,
   updatedAt: true,
   institutionId: true,

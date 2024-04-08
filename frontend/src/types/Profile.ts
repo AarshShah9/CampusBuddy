@@ -15,3 +15,8 @@ export type settingsForm = {
   firstName: string;
   lastName: string;
 };
+
+export type OrganizationProfileForm = {
+  organizationName: string;
+  description: string;
+};

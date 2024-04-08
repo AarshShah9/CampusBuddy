@@ -1,6 +1,6 @@
 import { CBRequest } from "~/lib/CBRequest";
 import { EventData, EventType } from "~/types/Events";
-import { settingsForm } from "~/types/Profile";
+import { OrganizationProfileForm, settingsForm } from "~/types/Profile";
 
 export const getProfileSaved = async () => {
   try {
@@ -106,5 +106,15 @@ export const updateUserInformation = async (data: settingsForm) => {
 
   return await CBRequest("PATCH", "/api/user/me", {
     body: updatedData,
+  });
+};
+
+export const updateOrgInformation = async (
+  data: OrganizationProfileForm,
+  id: string,
+) => {
+  return await CBRequest("PATCH", "/api/orgs/:id", {
+    params: { id },
+    body: data,
   });
 };
