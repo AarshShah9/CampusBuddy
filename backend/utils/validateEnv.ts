@@ -17,6 +17,8 @@ const envSchema = z.object({
   EXPO_ACCESS_TOKEN: z.string(),
   GPT_KEY: z.string(),
   GPT_ORG: z.string(),
+  STRIPE_SK: z.string(),
+  STRIPE_PK: z.string(),
   // Add more environment variables as needed
 });
 
@@ -42,6 +44,8 @@ const env = {
   EXPO_ACCESS_TOKEN: process.env.EXPO_ACCESS_TOKEN!,
   GPT_KEY: process.env.GPT_KEY!,
   GPT_ORG: process.env.GPT_ORG!,
+  STRIPE_SK: process.env.STRIPE_SK!,
+  STRIPE_PK: process.env.STRIPE_PK!,
 };
 
 export { env, validateEnv };
