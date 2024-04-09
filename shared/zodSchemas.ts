@@ -386,10 +386,20 @@ export const CommentSchema = z.object({
   userId: z.string().uuid(),
   postId: z.string().uuid(),
   createdAt: z.coerce.date(),
-  text: z.string(),
+  updatedAt: z.coerce.date(),
+  content: z.string({
+    required_error: "Comment message is required",
+    invalid_type_error: "Invalid comment input",
+  }),
 });
 
 export type Comment = z.infer<typeof CommentSchema>;
+
+export const CommentCreateSchema = CommentSchema.pick({
+  content: true,
+});
+
+export type CommentCreateType = z.infer<typeof CommentCreateSchema>;
 
 /////////////////////////////////////////
 // USER ORGANIZATION ROLE SCHEMAS
@@ -516,19 +526,26 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // UTILITY SCHEMAS
 ///////////////////////////////
 
+export const IdSchema = z.coerce
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
-  id: z.coerce
-    .string()
-    .uuid()
-    .refine((data) => data.length > 0, {
-      message: "ID is invalid",
-    }),
+  id: IdSchema,
 });
 
 export const OrganizationRoleNameParamsSchema = z.object({
   organizationId: z.string().uuid(),
   roleName: UserRoleSchema,
+});
+
+export const CommentParamsSchema = z.object({
+  postId: IdSchema,
+  commentId: IdSchema,
 });
 
 ///////////////////////////////
