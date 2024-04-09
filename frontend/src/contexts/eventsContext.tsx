@@ -146,8 +146,6 @@ export const EventsContextProvider = ({
   }, []);
 
   const closeModal = useCallback(() => {
-    setCurrentEventId(undefined);
-    setCurrentItem(undefined);
     dismiss();
   }, [dismiss]);
 

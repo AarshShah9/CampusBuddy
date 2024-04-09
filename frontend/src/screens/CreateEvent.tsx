@@ -43,7 +43,7 @@ const schema = zod.object({
   startTime: zod.date(),
   endTime: zod.date(),
   locationPlaceId: zod.string(),
-  tags: zod.string().array(),
+  // tags: zod.string().array(),
   description: zod.string(),
 });
 // Component is responsible for allowing users to create a new event page
@@ -69,10 +69,10 @@ export default function CreateEvent() {
       startTime: new Date(),
       endTime: new Date(),
       locationPlaceId: "",
-      tags: [],
+      // tags: [],
       description: "",
     },
-    resolver: zodResolver(schema),
+    // resolver: zodResolver(schema),
   });
 
   // Handle submission of user data
@@ -82,6 +82,16 @@ export default function CreateEvent() {
         alert("Please upload an image");
         return;
       }
+
+      // TODO this is temporary, need to find a better way to validate
+      for (const key in data) {
+        // @ts-ignore
+        if (data[key] === "") {
+          Alert.alert("Cannot Create", "Please fill out all fields");
+          return;
+        }
+      }
+
       setIsSubmitting(true);
       createMutation.mutate(data);
     },
@@ -323,33 +333,31 @@ export default function CreateEvent() {
               )}
               name="locationPlaceId"
             />
-
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange } }) => (
-                <View style={[style.tagInput]}>
-                  <Text
-                    style={{
-                      marginBottom: 3,
-                      fontFamily: "Nunito-Medium",
-                      fontSize: 16,
-                      color: theme.colors.text,
-                    }}
-                  >
-                    Tags*
-                  </Text>
-                  <ItemTag
-                    controllerOnChange={onChange}
-                    editable={!isSubmitting}
-                  />
-                </View>
-              )}
-              name="tags"
-            />
-
+            {/*<Controller*/}
+            {/*  control={control}*/}
+            {/*  rules={{*/}
+            {/*    required: true,*/}
+            {/*  }}*/}
+            {/*  render={({ field: { onChange } }) => (*/}
+            {/*    <View style={[style.tagInput]}>*/}
+            {/*      <Text*/}
+            {/*        style={{*/}
+            {/*          marginBottom: 3,*/}
+            {/*          fontFamily: "Nunito-Medium",*/}
+            {/*          fontSize: 16,*/}
+            {/*          color: theme.colors.text,*/}
+            {/*        }}*/}
+            {/*      >*/}
+            {/*        Tags**/}
+            {/*      </Text>*/}
+            {/*      <ItemTag*/}
+            {/*        controllerOnChange={onChange}*/}
+            {/*        editable={!isSubmitting}*/}
+            {/*      />*/}
+            {/*    </View>*/}
+            {/*  )}*/}
+            {/*  name="tags"*/}
+            {/*/>*/}
             <Controller
               control={control}
               rules={{

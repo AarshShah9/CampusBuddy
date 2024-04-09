@@ -38,9 +38,6 @@ export default function PostSettings() {
         queryKey: ["search-page-posts"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["lookingFor-details", post?.id!],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["user-posts", user?.id],
       });
     },

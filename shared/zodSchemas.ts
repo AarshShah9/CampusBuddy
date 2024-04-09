@@ -300,7 +300,7 @@ export const PostSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  numberOfSpots: z.number().int().min(1),
+  numberOfSpots: z.number().int().min(1).nullable().optional(),
   expiresAt: z.coerce.date(),
   isPublic: z.boolean(),
   isFlagged: z.boolean(),

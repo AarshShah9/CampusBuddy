@@ -38,9 +38,6 @@ export default function ItemSettings() {
         queryKey: ["search-marketplace-items"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["marketplace-detail", item?.id!],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["user-market", user?.id],
       });
     },

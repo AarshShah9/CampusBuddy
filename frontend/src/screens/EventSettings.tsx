@@ -65,8 +65,9 @@ export default function EventSettings() {
       shown: eventData?.self,
       icon: <Ionicons name="create-outline" size={24} color={"black"} />,
       onClick: () => {
-        closeModal();
-        navigateTo({ page: "EditEvent" });
+        Alert.alert("Coming Soon", "This feature is not yet available.");
+        // closeModal();
+        // navigateTo({ page: "EditEvent" });
       },
     },
     {
