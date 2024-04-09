@@ -59,6 +59,7 @@ type authContext = {
     React.SetStateAction<OrganizationDataType | undefined>
   >;
   registerOrganization: (arg: organizationInformation) => Promise<void>;
+  isUserLoggedIn: () => Promise<boolean>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -166,6 +167,35 @@ export const AuthContextProvider = ({
     loadToken();
   }, []);
 
+  const isUserLoggedIn = useCallback(async () => {
+    try {
+      const token = await getTokenFromSecureStore(TOKEN_KEY);
+      setAxiosTokenHeader(token as string);
+      if (token) {
+        const loginRes = await CBRequest("GET", "/api/user/verify");
+        if (loginRes.data.type === "Organization_Admin") {
+          setUserType("Organization_Admin");
+          setOrganizationalUser(loginRes.data);
+          return true;
+        } else if (loginRes.data.type === "Student") {
+          setUserType("Student");
+          setUser(loginRes.data);
+          return true;
+        } else {
+          Alert.alert("Error Logging In", "Something went wrong!");
+          return false;
+        }
+      }
+      return false;
+    } catch (error) {
+      // remove the token from the secure store
+      await deleteTokenFromSecureStore(TOKEN_KEY);
+      removeAxiosTokenHeader();
+      console.log("Pre-existing login failed", error);
+      return false;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -179,6 +209,7 @@ export const AuthContextProvider = ({
         userType,
         organization: organzationalUser,
         setOrganization: setOrganizationalUser,
+        isUserLoggedIn,
       }}
     >
       {children}

@@ -12,15 +12,21 @@ import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "@react-navigation/native";
+import {
+  NavigationProp,
+  ParamListBase,
+  useRoute,
+} from "@react-navigation/native";
 import { getMarketPlaceItem } from "~/lib/apiFunctions/Items";
 import { MarketPlaceItemResponse } from "~/types/MarketPlaceItem";
 import Modal from "react-native-modal";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { Entypo } from "@expo/vector-icons";
+import useEventsContext from "~/hooks/useEventsContext";
 
 // Image Component of marketplace detail
 
@@ -136,7 +142,12 @@ const Profile = (item: { name: string; userId: string }) => {
         />
         <TouchableOpacity onPress={onUserPress}>
           <Text
-            style={{ color: theme.colors.text, fontSize: 16, marginLeft: 8, fontFamily:"Roboto-Reg" }}
+            style={{
+              color: theme.colors.text,
+              fontSize: 16,
+              marginLeft: 8,
+              fontFamily: "Roboto-Reg",
+            }}
           >
             {item.name}
           </Text>
@@ -230,7 +241,7 @@ const ItemDescription = (props: ItemDetail) => {
           borderBottomWidth: 1,
         }}
       >
-         <Text
+        <Text
           style={[
             styles.MainTitleText,
             { color: theme.colors.text, fontSize: 18 },
@@ -245,7 +256,7 @@ const ItemDescription = (props: ItemDetail) => {
         <View style={{ flexDirection: "row" }}>
           <Text
             style={{
-              color: "#898F9C" ,
+              color: "#898F9C",
               ...styles.DescriptorText,
             }}
           >
@@ -308,8 +319,13 @@ const ItemDescription = (props: ItemDetail) => {
 /**
  * This component is responsible for loading market details based on passed ID.
  * */
-export default function MarketPlaceDetail() {
+export default function MarketPlaceDetail({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
   const { theme } = useThemeContext();
+  const { openItemModal } = useEventsContext();
 
   const {
     params: { id },
@@ -319,6 +335,18 @@ export default function MarketPlaceDetail() {
     queryKey: ["marketplace-detail", id],
     queryFn: () => getMarketPlaceItem(id),
   });
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => openItemModal(id, marketplaceData?.self!)}
+        >
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, id, marketplaceData?.self]);
 
   if (marketplaceData && marketplaceData.isFlagged) {
     Alert.alert(

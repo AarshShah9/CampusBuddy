@@ -123,13 +123,9 @@ export const getAllPosts = async () => {
 };
 
 export const createPost = async (post: any) => {
-  try {
-    return await CBRequest("POST", "/api/post/", {
-      body: post,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  return await CBRequest("POST", "/api/post/", {
+    body: post,
+  });
 };
 
 export const getAttendees = async (id: string) => {

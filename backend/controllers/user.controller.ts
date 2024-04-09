@@ -120,7 +120,8 @@ export const signupAsStudent = async (
       to: email,
       subject: "Verify your account - CampusBuddy",
       html: `Verify your account by clicking the link!<br>
-      <a href="${url}">Click here</a>`,
+      <a href="${url}">Click here</a>
+        <p>${url}</p>`,
     };
 
     await transporter.sendMail(message);
@@ -1026,8 +1027,160 @@ export const getLoggedInUser = async (
   }
 };
 
-export const verify = async (req: Request, res: Response) => {
-  res.status(200).json({ message: "User is verified" });
+export const verify = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUser = req.userId;
+
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        id: loggedInUser!,
+      },
+      include: {
+        institution: true,
+        enrollments: {
+          include: {
+            program: {
+              select: {
+                programName: true,
+              },
+            },
+          },
+        },
+        UserOrganizationRole: {
+          include: {
+            role: true,
+            organization: {
+              select: {
+                organizationName: true,
+                description: true,
+                image: true,
+                events: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!existingUser || existingUser.institution === null) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    //checks if user is a student
+    if (existingUser.accountType === "Student") {
+      // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
+      const attendedEvents = await prisma.userEventResponse.count({
+        where: {
+          userId: existingUser.id,
+          participationStatus: ParticipationStatus.Going,
+          event: {
+            endTime: {
+              lte: new Date(),
+            },
+          },
+        },
+      });
+
+      // find the number of organizations the user is a member of
+      const orgs = await prisma.userOrganizationRole.count({
+        where: {
+          userId: existingUser.id,
+          role: {
+            roleName: "Member",
+          },
+        },
+      });
+
+      res.status(200).json({
+        data: {
+          id: existingUser.id,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          image: existingUser.profilePic,
+          programs: existingUser.enrollments.map(
+            (enrollment) => enrollment.program.programName,
+          ),
+          degreeName: existingUser.degreeName,
+          attended: attendedEvents,
+          following: orgs,
+          type: "Student",
+        },
+      });
+      //checks if user is organization owner
+    } else if (existingUser.accountType === "ApprovedOrg") {
+      const orgId = existingUser.UserOrganizationRole.map(
+        (UserOrganizationRole) => UserOrganizationRole.organizationId,
+      );
+
+      const organization = await prisma.organization.findUnique({
+        where: {
+          id: orgId[0],
+        },
+        include: {
+          userOrganizationRoles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      if (!organization) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Organization not found",
+          404,
+          true,
+        );
+      }
+
+      res.status(200).json({
+        message: "User is verified",
+        data: {
+          id: existingUser.id,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          organizationId: existingUser.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organizationId,
+          ),
+          organizationName: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) =>
+              UserOrganizationRole.organization.organizationName,
+          ),
+          organizationDescription: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) =>
+              UserOrganizationRole.organization.description,
+          ),
+          organizationImage: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.image,
+          ),
+          members: organization?.userOrganizationRoles.filter(
+            (userOrganizationRole) =>
+              userOrganizationRole.role.roleName === "Member",
+          ).length,
+          posts: existingUser?.UserOrganizationRole.map(
+            (UserOrganizationRole) => UserOrganizationRole.organization.events,
+          ).length,
+          type: "Organization_Admin",
+        },
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const generateJWT = async (req: Request, res: Response) => {
