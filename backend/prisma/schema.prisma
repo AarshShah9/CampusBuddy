@@ -142,6 +142,7 @@ model Event {
   endTime         DateTime            @map("end_time")
   isPublic        Boolean             @default(true) @map("is_public")
   isFlagged       Boolean             @default(false)
+  isPaid          Boolean             @default(false)
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)

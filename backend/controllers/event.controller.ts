@@ -119,6 +119,7 @@ export const createVerifiedEvent = async (
           status: EventStatus.Verified,
           isPublic: !isFlagged,
           isFlagged: isFlagged,
+          isPaid: validatedEventData.isPaid,
         },
       });
 
