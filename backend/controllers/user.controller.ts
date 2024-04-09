@@ -316,11 +316,11 @@ export const loginUser = async (
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
       // Create a firebase token
-      const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
+      // const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
 
       res.status(200).json({
         authToken,
-        firebaseToken,
+        // firebaseToken,
         data: {
           id: existingUser.id,
           firstName: existingUser.firstName,
@@ -350,7 +350,7 @@ export const loginUser = async (
       const authToken = jwt.sign({ ...loginTokenPayload }, jwtSecret);
 
       // Create a firebase token
-      const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
+      // const firebaseToken = await generateFirebaseCustomToken(existingUser.id);
 
       const orgId = existingUser.UserOrganizationRole.map(
         (UserOrganizationRole) => UserOrganizationRole.organizationId,
@@ -380,7 +380,7 @@ export const loginUser = async (
 
       res.status(200).json({
         authToken,
-        firebaseToken,
+        // firebaseToken,
         data: {
           id: existingUser.id,
           firstName: existingUser.firstName,
