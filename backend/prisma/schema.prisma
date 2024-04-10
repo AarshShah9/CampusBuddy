@@ -99,6 +99,7 @@ model User {
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
   pushTokens           PushToken[]
+  postAttendances      PostAttendance[]
 
   degreeName String? @map("degree_name")
 
@@ -170,25 +171,26 @@ model UserEventResponse {
 }
 
 model Post {
-  id                String        @id @default(uuid())
-  userId            String        @map("user_id")
-  organizationId    String?       @map("organization_id")
+  id                String           @id @default(uuid())
+  userId            String           @map("user_id")
+  organizationId    String?          @map("organization_id")
   image             String?
-  createdAt         DateTime      @unique @default(now()) @map("created_at")
+  createdAt         DateTime         @unique @default(now()) @map("created_at")
   title             String
   description       String?
-  isPublic          Boolean       @default(true)
-  isFlagged         Boolean       @default(false)
-  expiresAt         DateTime?     @map("expires_at")
-  numberOfSpots     Int?          @map("number_of_spots")
-  numberOfSpotsLeft Int?          @map("number_of_spots_left")
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  isPublic          Boolean          @default(true)
+  isFlagged         Boolean          @default(false)
+  expiresAt         DateTime?        @map("expires_at")
+  numberOfSpots     Int?             @map("number_of_spots")
+  numberOfSpotsLeft Int?             @map("number_of_spots_left")
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   type              PostType
   comments          Comment[]
   postTags          PostTag[]
-  institutionId     String        @map("institution_id")
-  Institution       Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId     String           @map("institution_id")
+  Institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  postAttendees     PostAttendance[]
 
   @@index([userId])
   @@index([organizationId])
@@ -214,6 +216,18 @@ model Comment {
   @@index([userId])
   @@index([postId])
   @@map("comment")
+}
+
+model PostAttendance {
+  postId String @map("post_id")
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId])
+  @@index([postId])
+  @@map("post_attendance")
 }
 
 model Organization {
