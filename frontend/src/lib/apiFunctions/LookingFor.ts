@@ -15,7 +15,7 @@ export const getLookingForById = async (id: string) => {
 export const getLookingForCommentsById = async (id: string) => {
   try {
     return (
-      await CBRequest("GET", `/api/post/comments/:id`, {
+      await CBRequest("GET", `/api/post/:id/comments`, {
         params: { id },
       })
     ).data;

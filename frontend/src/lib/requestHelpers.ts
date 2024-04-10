@@ -155,7 +155,7 @@ const allowedEndpoints = [
   "/api/item/",
   "/api/item/:id",
   "/api/post/:id",
-  "/api/post/comments/:id",
+  "/api/post/:id/comments",
 
   // profile related endpoints
   "/api/profile/saved",
@@ -197,7 +197,7 @@ export type IdRequiredEndPoints =
   | "/api/profile/posts/:id"
   | "/api/item/:id"
   | "/api/post/:id"
-  | "/api/post/comments/:id"
+  | "/api/post/:id/comments"
   | "/api/orgs/deleteProfilePicture/:id"
   | "/api/orgs/profilePicture/:id"
   | "/api/profile/orgItems/:id"
