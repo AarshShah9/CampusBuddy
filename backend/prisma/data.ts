@@ -62,6 +62,9 @@ export const ids = {
   postIds: {
     1: "20909dd0-c553-11ee-83fd-6f8d6c450910",
     2: "20909dd1-c553-11ee-83fd-6f8d6c450910",
+    3: "20909dd2-c553-11ee-83fd-6f8d6c450910",
+    4: "20909dd3-c553-11ee-83fd-6f8d6c450910",
+    5: "20909dd4-c553-11ee-83fd-6f8d6c450910",
   },
   itemIds: {
     1: "376a4ee0-e6df-11ee-bd3d-0242ac120002",
@@ -371,8 +374,6 @@ export const posts = [
     expiresAt: "2024-10-10T18:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 5,
-
-    // Other post details
   },
   {
     id: ids.postIds[2],
@@ -384,7 +385,42 @@ export const posts = [
     expiresAt: "2024-10-10T19:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 8,
-    // Other post details
+  },
+  {
+    id: ids.postIds[3],
+    userId: ids.userIds[4],
+    institutionId: ids.instituteIds[1],
+    title: "Squash partner",
+    description: "Lets play squash at 5pm",
+    createdAt: "2024-11-10T10:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 1,
+  },
+  {
+    id: ids.postIds[4],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Casual Chess Match",
+    description:
+      "Looking for 1 person to play chess with between noon and 2:30",
+    createdAt: "2024-11-10T11:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 0,
+  },
+  {
+    id: ids.postIds[5],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Found lost headphones in TFDL",
+    description:
+      "I found them on the fourth floor near the elevator. Msg me if you think its yours",
+    createdAt: "2024-10-10T06:00:00Z",
+    expiresAt: "2024-11-10T12:00:00Z",
+    type: PostType.LookingFor,
   },
 ];
 
