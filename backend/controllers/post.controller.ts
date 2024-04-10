@@ -3,6 +3,8 @@ import {
   PostCreateSchema,
   PostUpdateSchema,
   IdParamSchema,
+  CommentCreateSchema,
+  CommentParamsSchema,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client";
@@ -421,7 +423,7 @@ export const getPostCommentsById = async (
     const postComments = post.comments.map((comment) => {
       return {
         id: comment.id,
-        content: comment.text,
+        content: comment.content,
         createdAt: comment.createdAt,
         userId: comment.userId,
         userName: comment.user.firstName + " " + comment.user.lastName,
@@ -433,6 +435,162 @@ export const getPostCommentsById = async (
       message: "Post comments found",
       data: postComments,
     });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// create a new comment on a post
+export const createPostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+    // Validate that the comment has a message
+    let { content } = CommentCreateSchema.parse(req.body);
+    const loggedInUserId = req.userId;
+
+    const newComment = await prisma.comment.create({
+      data: {
+        userId: loggedInUserId!,
+        postId,
+        content,
+      },
+    });
+
+    if (!newComment) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Comment creation returned empty result.",
+        500,
+        true,
+      );
+    }
+
+    res.status(201).json({
+      message: "Comment created successfully",
+      data: newComment,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Update a comment
+export const updatePostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { postId, commentId } = CommentParamsSchema.parse(req.params);
+
+    // Validate that the comment has a message
+    let { content } = CommentCreateSchema.parse(req.body);
+    const loggedInUserId = req.userId;
+
+    // get the comment from the database
+    const existingComment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: { userId: true },
+    });
+
+    if (!existingComment) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Comment not found`,
+        404,
+        true,
+      );
+    }
+
+    // Check if the user has permission to update the comment
+    if (existingComment.userId !== loggedInUserId) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `You do not have permission to edit this comment`,
+        403,
+        true,
+      );
+    }
+
+    // Create a new comment
+    const newComment = await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        content,
+      },
+    });
+
+    if (!newComment) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Comment update returned empty result.",
+        500,
+        true,
+      );
+    }
+
+    res.status(201).json({
+      message: "Comment updated successfully",
+      data: newComment,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Delete a comment
+export const deletePostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { postId, commentId } = CommentParamsSchema.parse(req.params);
+    const loggedInUserId = req.userId;
+
+    // get the comment from the database
+    const existingComment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: { userId: true },
+    });
+
+    if (!existingComment) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Comment not found`,
+        404,
+        true,
+      );
+    }
+
+    // Check if the user has permission to update the comment
+    if (existingComment.userId !== loggedInUserId) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `You do not have permission to delete this comment`,
+        403,
+        true,
+      );
+    }
+
+    // Delete the comment
+    const newComment = await prisma.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+
+    res.status(204).end();
   } catch (error: any) {
     next(error);
   }
