@@ -170,31 +170,25 @@ model UserEventResponse {
 }
 
 model Post {
-  id             String  @id @default(uuid())
-  userId         String  @map("user_id")
-  organizationId String? @map("organization_id")
-
-  image       String?
-  createdAt   DateTime  @unique @default(now()) @map("created_at")
-  title       String
-  description String?
-  isPublic    Boolean   @default(true)
-  isFlagged   Boolean   @default(false)
-  expiresAt   DateTime? @map("expires_at")
-
-  numberOfSpots     Int? @map("number_of_spots")
-  numberOfSpotsLeft Int? @map("number_of_spots_left")
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  type PostType
-
-  comments Comment[]
-  postTags PostTag[]
-
-  institutionId String      @map("institution_id")
-  Institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  organizationId    String?       @map("organization_id")
+  image             String?
+  createdAt         DateTime      @unique @default(now()) @map("created_at")
+  title             String
+  description       String?
+  isPublic          Boolean       @default(true)
+  isFlagged         Boolean       @default(false)
+  expiresAt         DateTime?     @map("expires_at")
+  numberOfSpots     Int?          @map("number_of_spots")
+  numberOfSpotsLeft Int?          @map("number_of_spots_left")
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  type              PostType
+  comments          Comment[]
+  postTags          PostTag[]
+  institutionId     String        @map("institution_id")
+  Institution       Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([organizationId])
@@ -211,10 +205,11 @@ model Comment {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @map("user_id")
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content   String
   createdAt DateTime @unique @default(now()) @map("created_at")
-  text      String
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([postId])
