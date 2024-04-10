@@ -66,9 +66,15 @@ export default function Login() {
       }
     }
 
-    signIn(data.email, data.password, dev).then((succeeded) => {
-      if (succeeded) replaceStackWith("LandingGroup");
-      else Alert.alert("Error Logging In", "Something went wrong!");
+    if (dev) {
+      data.email = "tom@example.com";
+      data.password = "hashed-password1238";
+    }
+
+    signIn(data.email, data.password).then((succeeded) => {
+      if (succeeded) {
+        replaceStackWith("LandingGroup");
+      }
     });
   }, []);
 
@@ -248,7 +254,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginLeft: -35,
-    paddingBottom: 10,
+    paddingBottom: 15,
   },
 });
 

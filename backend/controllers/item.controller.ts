@@ -257,6 +257,9 @@ export const deleteItem = async (
         true,
       );
     }
+    return res.status(200).json({
+      message: "Item deleted successfully",
+    });
   } catch (error: any) {
     next(error);
   }
@@ -337,6 +340,7 @@ export const getItemById = async (
       sellerId: item.userId,
       images: images?.map((image) => image.url),
       isFlagged: item.isFlagged,
+      self: self,
     };
 
     res.status(200).json({

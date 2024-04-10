@@ -7,6 +7,7 @@ export type UserDataType = {
   following: number;
   organizations: number;
   programs: string[];
+  degreeName: string;
 };
 
 export type OrganizationDataType = {

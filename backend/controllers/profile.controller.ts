@@ -162,7 +162,7 @@ export const getProfileEvents = async (
         userId: userId,
         participationStatus: ParticipationStatus.Going,
         event: {
-          isPublic: self ? undefined : true,
+          isPublic: true,
         },
       },
       include: {
@@ -420,6 +420,7 @@ export const getOrganizationProfileEvents = async (
         userOrganizationRoles: {
           include: {
             organization: true,
+            role: true,
           },
         },
       },
@@ -436,14 +437,18 @@ export const getOrganizationProfileEvents = async (
 
     // if the user has a role within the organization then self is true
     const self = organization.userOrganizationRoles.some(
-      (role) => role.userId === req.userId,
+      (role) =>
+        role.userId === req.userId &&
+        (role.role.roleName === "Moderator" ||
+          role.role.roleName === "Admin" ||
+          role.role.roleName === "Owner"),
     );
 
     // get all events that the organization has created
     const events = await prisma.event.findMany({
       where: {
         organizationId: orgId,
-        isPublic: self ? true : undefined,
+        isPublic: self ? undefined : true,
       },
       include: {
         location: {

@@ -62,6 +62,9 @@ export const ids = {
   postIds: {
     1: "20909dd0-c553-11ee-83fd-6f8d6c450910",
     2: "20909dd1-c553-11ee-83fd-6f8d6c450910",
+    3: "20909dd2-c553-11ee-83fd-6f8d6c450910",
+    4: "20909dd3-c553-11ee-83fd-6f8d6c450910",
+    5: "20909dd4-c553-11ee-83fd-6f8d6c450910",
   },
   itemIds: {
     1: "376a4ee0-e6df-11ee-bd3d-0242ac120002",
@@ -76,6 +79,9 @@ export const ids = {
   commentIds: {
     1: "37e11780-c553-11ee-83fd-6f8d6c450910",
     2: "37e11781-c553-11ee-83fd-6f8d6c450910",
+    3: "37e11782-c553-11ee-83fd-6f8d6c450910",
+    4: "37e11783-c553-11ee-83fd-6f8d6c450910",
+    5: "37e11784-c553-11ee-83fd-6f8d6c450910",
   },
   programIds: {
     1: "c5ba3bc0-c5f5-11ee-83fd-6f8d6c450910",
@@ -135,6 +141,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
     profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    degreeName: null,
   },
   {
     id: ids.userIds[2],
@@ -145,6 +152,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[3],
@@ -155,6 +163,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Computer Science",
   },
   {
     id: ids.userIds[4],
@@ -165,6 +174,7 @@ export const users: User[] = [
     institutionId: null,
     accountType: UserType.Admin,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[5],
@@ -175,6 +185,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[6],
@@ -185,6 +196,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Arts",
   },
   {
     id: ids.userIds[7],
@@ -195,6 +207,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[8],
@@ -205,6 +218,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[9],
@@ -215,6 +229,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[10],
@@ -225,6 +240,7 @@ export const users: User[] = [
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
 ];
 
@@ -358,8 +374,6 @@ export const posts = [
     expiresAt: "2024-10-10T18:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 5,
-
-    // Other post details
   },
   {
     id: ids.postIds[2],
@@ -371,7 +385,42 @@ export const posts = [
     expiresAt: "2024-10-10T19:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 8,
-    // Other post details
+  },
+  {
+    id: ids.postIds[3],
+    userId: ids.userIds[4],
+    institutionId: ids.instituteIds[1],
+    title: "Squash partner",
+    description: "Lets play squash at 5pm",
+    createdAt: "2024-11-10T10:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 1,
+  },
+  {
+    id: ids.postIds[4],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Casual Chess Match",
+    description:
+      "Looking for 1 person to play chess with between noon and 2:30",
+    createdAt: "2024-11-10T11:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 0,
+  },
+  {
+    id: ids.postIds[5],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Found lost headphones in TFDL",
+    description:
+      "I found them on the fourth floor near the elevator. Msg me if you think its yours",
+    createdAt: "2024-10-10T06:00:00Z",
+    expiresAt: "2024-11-10T12:00:00Z",
+    type: PostType.LookingFor,
   },
 ];
 
@@ -519,18 +568,39 @@ export const images = [
 
 export const comments = [
   {
+    id: ids.commentIds[1],
     userId: ids.userIds[1],
     postId: ids.postIds[1],
-    text: "This is the first comment!",
+    content: "This is the first comment!",
     createdAt: "2024-10-10T18:00:00Z",
-    // Other post details
   },
   {
+    id: ids.commentIds[2],
+    userId: ids.userIds[2],
+    postId: ids.postIds[1],
+    content: "Cool post",
+    createdAt: "2024-10-10T18:30:00Z",
+  },
+  {
+    id: ids.commentIds[3],
+    userId: ids.userIds[3],
+    postId: ids.postIds[1],
+    content: "Hello!",
+    createdAt: "2024-10-10T18:40:00Z",
+  },
+  {
+    id: ids.commentIds[4],
     userId: ids.userIds[2],
     postId: ids.postIds[2],
-    text: "Another post here!",
+    content: "Another post here!",
     createdAt: "2024-10-10T19:00:00Z",
-    // Other post details
+  },
+  {
+    id: ids.commentIds[5],
+    userId: ids.userIds[1],
+    postId: ids.postIds[2],
+    content: ":D",
+    createdAt: "2024-10-10T19:21:00Z",
   },
 ];
 

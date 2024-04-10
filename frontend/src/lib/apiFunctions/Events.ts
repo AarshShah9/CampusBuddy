@@ -90,6 +90,18 @@ export const likeEvent = async (id: string) => {
   }
 };
 
+export const deleteEvent = async (id: string) => {
+  try {
+    return await CBRequest("DELETE", "/api/events/:id", {
+      params: {
+        id,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const attendEvent = async (id: string) => {
   try {
     return await CBRequest("POST", "/api/events/attend/:id", {
@@ -111,13 +123,9 @@ export const getAllPosts = async () => {
 };
 
 export const createPost = async (post: any) => {
-  try {
-    return await CBRequest("POST", "/api/post/", {
-      body: post,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  return await CBRequest("POST", "/api/post/", {
+    body: post,
+  });
 };
 
 export const getAttendees = async (id: string) => {
@@ -147,6 +155,17 @@ export const Search = async ({
         body: { query, limit: 10, page },
       })
     ).data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const flipPublic = async (id: string) => {
+  try {
+    return await CBRequest("POST", "/api/events/public/:id", {
+      params: {
+        id,
+      },
+    });
   } catch (err) {
     console.log(err);
   }

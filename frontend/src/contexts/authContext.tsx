@@ -51,11 +51,7 @@ type authContext = {
   organization?: OrganizationDataType;
   userType?: UserType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
-  signIn: (
-    email: string,
-    password: string,
-    dev: boolean,
-  ) => Promise<boolean | undefined>;
+  signIn: (email: string, password: string) => Promise<boolean | undefined>;
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
   setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
@@ -63,6 +59,7 @@ type authContext = {
     React.SetStateAction<OrganizationDataType | undefined>
   >;
   registerOrganization: (arg: organizationInformation) => Promise<void>;
+  isUserLoggedIn: () => Promise<boolean>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
@@ -110,48 +107,34 @@ export const AuthContextProvider = ({
     [],
   );
 
-  const signIn = useCallback(
-    async (email: string, password: string, dev: boolean) => {
-      try {
-        // TODO remove Soon
-        if (dev) {
-          const res = await CBRequest("GET", "/api/user/token", {});
-          setAxiosTokenHeader(res.authToken as string);
-          await setTokenInSecureStore(TOKEN_KEY, res.authToken as string);
-          setUser(res.data);
-          setUserType("Student");
-          return true;
-        } else {
-          // Actual login
-          const loginRes = await CBRequest("POST", "/api/user/loginUser", {
-            body: {
-              email,
-              password,
-            },
-          });
-          setAxiosTokenHeader(loginRes.authToken as string);
-          await setTokenInSecureStore(TOKEN_KEY, loginRes.authToken as string);
+  const signIn = useCallback(async (email: string, password: string) => {
+    try {
+      // Actual login
+      const loginRes = await CBRequest("POST", "/api/user/loginUser", {
+        body: {
+          email,
+          password,
+        },
+      });
+      setAxiosTokenHeader(loginRes.authToken as string);
+      await setTokenInSecureStore(TOKEN_KEY, loginRes.authToken as string);
 
-          if (loginRes.data.type === "Organization_Admin") {
-            setUserType("Organization_Admin");
-            setOrganizationalUser(loginRes.data);
-          } else if (loginRes.data.type === "Student") {
-            setUserType("Student");
-            setUser(loginRes.data);
-          } else {
-            Alert.alert("Error Logging In", "Something went wrong!");
-            return false;
-          }
-
-          return true;
-        }
-      } catch (error) {
-        console.log("An error occured while trying to sign in:\n", error);
+      if (loginRes.data.type === "Organization_Admin") {
+        setUserType("Organization_Admin");
+        setOrganizationalUser(loginRes.data);
+      } else if (loginRes.data.type === "Student") {
+        setUserType("Student");
+        setUser(loginRes.data);
+      } else {
+        Alert.alert("Error Logging In", "Something went wrong!");
         return false;
       }
-    },
-    [],
-  );
+      return true;
+    } catch (error) {
+      Alert.alert("Error Logging In", "Something went wrong!");
+      return false;
+    }
+  }, []);
 
   const logOut = useCallback(async () => {
     try {
@@ -184,6 +167,35 @@ export const AuthContextProvider = ({
     loadToken();
   }, []);
 
+  const isUserLoggedIn = useCallback(async () => {
+    try {
+      const token = await getTokenFromSecureStore(TOKEN_KEY);
+      setAxiosTokenHeader(token as string);
+      if (token) {
+        const loginRes = await CBRequest("GET", "/api/user/verify");
+        if (loginRes.data.type === "Organization_Admin") {
+          setUserType("Organization_Admin");
+          setOrganizationalUser(loginRes.data);
+          return true;
+        } else if (loginRes.data.type === "Student") {
+          setUserType("Student");
+          setUser(loginRes.data);
+          return true;
+        } else {
+          Alert.alert("Error Logging In", "Something went wrong!");
+          return false;
+        }
+      }
+      return false;
+    } catch (error) {
+      // remove the token from the secure store
+      await deleteTokenFromSecureStore(TOKEN_KEY);
+      removeAxiosTokenHeader();
+      console.log("Pre-existing login failed", error);
+      return false;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -197,6 +209,7 @@ export const AuthContextProvider = ({
         userType,
         organization: organzationalUser,
         setOrganization: setOrganizationalUser,
+        isUserLoggedIn,
       }}
     >
       {children}

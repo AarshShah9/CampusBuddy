@@ -3,6 +3,8 @@ import {
   PostCreateSchema,
   PostUpdateSchema,
   IdParamSchema,
+  CommentCreateSchema,
+  CommentParamsSchema,
 } from "../../shared/zodSchemas";
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client";
@@ -15,6 +17,10 @@ import UploadToS3, {
 import { RequestExtended } from "../middleware/verifyAuth";
 import { moderateText } from "../utils/moderateText";
 import { emailPostFlagged } from "../utils/emails";
+import {
+  addPostAttendance,
+  removePostAttendance,
+} from "../services/post.service";
 
 // test Post
 export const postTest = async (req: Request, res: Response) => {
@@ -377,6 +383,7 @@ export const getPostById = async (
       userName: post.user.firstName + " " + post.user.lastName,
       userImage: post.user.profilePic,
       isFlagged: post.isFlagged,
+      self: self,
     };
 
     res.status(200).json({
@@ -421,7 +428,7 @@ export const getPostCommentsById = async (
     const postComments = post.comments.map((comment) => {
       return {
         id: comment.id,
-        content: comment.text,
+        content: comment.content,
         createdAt: comment.createdAt,
         userId: comment.userId,
         userName: comment.user.firstName + " " + comment.user.lastName,
@@ -434,6 +441,220 @@ export const getPostCommentsById = async (
       data: postComments,
     });
   } catch (error: any) {
+    next(error);
+  }
+};
+
+// create a new comment on a post
+export const createPostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const postId = IdParamSchema.parse(req.params).id;
+    // Validate that the comment has a message
+    let { content } = CommentCreateSchema.parse(req.body);
+    const loggedInUserId = req.userId;
+
+    const newComment = await prisma.comment.create({
+      data: {
+        userId: loggedInUserId!,
+        postId,
+        content,
+      },
+    });
+
+    if (!newComment) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Comment creation returned empty result.",
+        500,
+        true,
+      );
+    }
+
+    res.status(201).json({
+      message: "Comment created successfully",
+      data: newComment,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Update a comment
+export const updatePostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { postId, commentId } = CommentParamsSchema.parse(req.params);
+
+    // Validate that the comment has a message
+    let { content } = CommentCreateSchema.parse(req.body);
+    const loggedInUserId = req.userId;
+
+    // get the comment from the database
+    const existingComment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: { userId: true },
+    });
+
+    if (!existingComment) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Comment not found`,
+        404,
+        true,
+      );
+    }
+
+    // Check if the user has permission to update the comment
+    if (existingComment.userId !== loggedInUserId) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `You do not have permission to edit this comment`,
+        403,
+        true,
+      );
+    }
+
+    // Create a new comment
+    const newComment = await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        content,
+      },
+    });
+
+    if (!newComment) {
+      throw new AppError(
+        AppErrorName.EMPTY_RESULT_ERROR,
+        "Comment update returned empty result.",
+        500,
+        true,
+      );
+    }
+
+    res.status(201).json({
+      message: "Comment updated successfully",
+      data: newComment,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Delete a comment
+export const deletePostComment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { postId, commentId } = CommentParamsSchema.parse(req.params);
+    const loggedInUserId = req.userId;
+
+    // get the comment from the database
+    const existingComment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: { userId: true },
+    });
+
+    if (!existingComment) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Comment not found`,
+        404,
+        true,
+      );
+    }
+
+    // Check if the user has permission to update the comment
+    if (existingComment.userId !== loggedInUserId) {
+      throw new AppError(
+        AppErrorName.PERMISSION_ERROR,
+        `You do not have permission to delete this comment`,
+        403,
+        true,
+      );
+    }
+
+    // Delete the comment
+    const newComment = await prisma.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+
+    res.status(204).end();
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// Handles user requests to toggle their attendance to a post
+export const toggleJoinLookingFor = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request post id param
+    const postId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userId;
+
+    // Get the post if it exists
+    const existingPost = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post not found`,
+        404,
+        true,
+      );
+    }
+
+    // check if the user is already attending
+    const attendance = await prisma.postAttendance.findUnique({
+      where: {
+        postId_userId: {
+          postId,
+          userId: loggedInUserId!,
+        },
+      },
+    });
+
+    // add users attence to the post
+    if (!attendance) {
+      const newAttendance = await addPostAttendance(
+        loggedInUserId!,
+        existingPost,
+      );
+
+      res.status(200).json({
+        message: `User attendance added to post: ${existingPost.title}`,
+      });
+    } else {
+      // remove the users attendance from the post
+      await removePostAttendance(loggedInUserId!, existingPost);
+
+      res.status(200).json({
+        message: `User attendance removed from post: ${existingPost.title}`,
+      });
+    }
+  } catch (error) {
     next(error);
   }
 };

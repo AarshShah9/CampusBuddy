@@ -1,5 +1,6 @@
 import { CBRequest } from "~/lib/CBRequest";
 import { EventData, EventType } from "~/types/Events";
+import { OrganizationProfileForm, settingsForm } from "~/types/Profile";
 
 export const getProfileSaved = async () => {
   try {
@@ -94,4 +95,32 @@ export const geOrganizationProfileEvents = async (orgId: string) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+export const updateUserInformation = async (data: settingsForm) => {
+  let updatedData = { ...data };
+
+  if (updatedData.password === "") {
+    delete updatedData.password;
+  }
+
+  return await CBRequest("PATCH", "/api/user/me", {
+    body: updatedData,
+  });
+};
+
+export const updateOrgInformation = async (
+  data: OrganizationProfileForm,
+  id: string,
+) => {
+  return await CBRequest("PATCH", "/api/orgs/:id", {
+    params: { id },
+    body: data,
+  });
+};
+
+export const deleteItem = async (id: string) => {
+  return await CBRequest("DELETE", `/api/item/:id`, {
+    params: { id },
+  });
 };
