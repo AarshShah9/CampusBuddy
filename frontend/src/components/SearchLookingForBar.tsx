@@ -30,7 +30,9 @@ export default function LookingForItem({
         <Text style={styles.description}>{description}</Text>
         <View style={styles.bottomContainer}>
           <CommentsChip />
-          {requiredMembers && <PersonChip numberOfUsers={requiredMembers} />}
+          {requiredMembers !== null && (
+            <PersonChip numberOfUsers={requiredMembers ?? 0} />
+          )}
         </View>
       </View>
     </TouchableOpacity>
