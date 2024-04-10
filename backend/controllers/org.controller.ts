@@ -669,7 +669,7 @@ export const manageNewOrganizationRequest = async (
  *    - If the user is already a member (or some other role) it removes them from the organization.
  *    - Owners cannot leave their own organization.
  */
-export const joinOrganization = async (
+export const toggleJoinOrganization = async (
   req: RequestExtended,
   res: Response,
   next: NextFunction,
