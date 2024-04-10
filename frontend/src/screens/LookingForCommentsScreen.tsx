@@ -21,17 +21,15 @@ function CommentField() {
   const [text, setText] = React.useState("");
   return (
     <View style={styles.addComment}>
-      <View style={styles.commentField}>
         <TextInput
           label="Add a Comment"
           mode="outlined"
           value={text}
           onChangeText={(text) => setText(text)}
         />
-      </View>
-      <View style={styles.replyButton}>
-        <Button mode="contained">Reply</Button>
-      </View>
+         <Button mode="contained" style={{justifyContent:"center"}}>
+            Reply
+          </Button>
     </View>
   );
 }
@@ -101,21 +99,12 @@ const styles = StyleSheet.create({
   },
   addComment: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 8,
     marginBottom: 32,
     borderTopWidth: 1,
   },
-  textInput: {
-    maxWidth: 100, // Set a minimum height
-    marginRight: 10, // Adjust margin as needed
-  },
-  commentField:{
-
-  },
-  replyButton :{
-
+  replyButton:{
   }
 });
