@@ -23,3 +23,9 @@ export const getLookingForCommentsById = async (id: string) => {
     console.log(err);
   }
 };
+
+export const deletePost = async (id: string) => {
+  return await CBRequest("DELETE", `/api/post/:id`, {
+    params: { id },
+  });
+};

@@ -383,6 +383,7 @@ export const getPostById = async (
       userName: post.user.firstName + " " + post.user.lastName,
       userImage: post.user.profilePic,
       isFlagged: post.isFlagged,
+      self: self,
     };
 
     res.status(200).json({

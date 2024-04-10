@@ -16,6 +16,8 @@ import EventSettings from "~/screens/EventSettings";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import CreateEvent from "~/screens/CreateEvent";
 import QRCodeScanner from "~/screens/QRCodeEventScanner";
+import ItemSettings from "~/screens/ItemSettings";
+import PostSettings from "~/screens/PostSettings";
 
 const Stack = createNativeStackNavigator();
 
@@ -165,6 +167,8 @@ export default function LandingGroup() {
             />
           </Stack.Navigator>
           <EventSettings />
+          <ItemSettings />
+          <PostSettings />
         </EventsContextProvider>
       </BottomSheetModalProvider>
     </ReactQueryProvider>

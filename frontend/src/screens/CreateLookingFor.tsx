@@ -23,7 +23,7 @@ import { useState } from "react";
 // React Hook Section
 const schema = zod.object({
   title: zod.string(),
-  tags: zod.string().array().optional(),
+  // tags: zod.string().array().optional(),
   description: zod.string(),
   numberOfSpots: zod.string(),
   expiryDate: zod.date(),
@@ -31,7 +31,7 @@ const schema = zod.object({
 
 type lookingForDetail = {
   title: string;
-  tags?: string[];
+  // tags?: string[];
   description: string;
   numberOfSpots: string;
   expiryDate: Date;
@@ -50,16 +50,25 @@ export default function CreateLookingFor() {
   } = useForm<lookingForDetail>({
     defaultValues: {
       title: "",
-      tags: [],
+      // tags: [],
       description: "",
       numberOfSpots: "0",
       expiryDate: new Date(),
     },
-    resolver: zodResolver(schema),
+    // resolver: zodResolver(schema),
   });
 
   // Handles submission of user data
   const onSubmit = (data: lookingForDetail) => {
+    // TODO this is temporary, need to find a better way to validate
+    for (const key in data) {
+      // @ts-ignore
+      if (data[key] === "" && key != "numberOfSpots") {
+        Alert.alert("Cannot Create", "Please fill out all fields");
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     createMutation.mutate({
       title: data.title,
@@ -121,28 +130,28 @@ export default function CreateLookingFor() {
           )}
           name="title"
         />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange } }) => (
-            <View style={{ marginLeft: 20 }}>
-              <Text
-                style={{
-                  marginBottom: 3,
-                  fontFamily: "Nunito-Medium",
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-              >
-                Tags*
-              </Text>
-              <ItemTag controllerOnChange={onChange} editable={isSubmitting} />
-            </View>
-          )}
-          name="tags"
-        />
+        {/*<Controller*/}
+        {/*  control={control}*/}
+        {/*  rules={{*/}
+        {/*    required: true,*/}
+        {/*  }}*/}
+        {/*  render={({ field: { onChange } }) => (*/}
+        {/*    <View style={{ marginLeft: 20 }}>*/}
+        {/*      <Text*/}
+        {/*        style={{*/}
+        {/*          marginBottom: 3,*/}
+        {/*          fontFamily: "Nunito-Medium",*/}
+        {/*          fontSize: 16,*/}
+        {/*          color: theme.colors.text,*/}
+        {/*        }}*/}
+        {/*      >*/}
+        {/*        Tags**/}
+        {/*      </Text>*/}
+        {/*      <ItemTag controllerOnChange={onChange} editable={isSubmitting} />*/}
+        {/*    </View>*/}
+        {/*  )}*/}
+        {/*  name="tags"*/}
+        {/*/>*/}
         <Controller
           control={control}
           rules={{

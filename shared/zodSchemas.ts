@@ -124,6 +124,7 @@ export const EventCreateSchema = EventSchema.omit({
   organizationId: true, // get from req.params if creating verified event
   image: true, // handled by the S3Uploader
   isPublic: true, // default value is false
+  isFlagged: true,
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -299,7 +300,7 @@ export const PostSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  numberOfSpots: z.number().int().min(1),
+  numberOfSpots: z.number().int().min(1).nullable().optional(),
   expiresAt: z.coerce.date(),
   isPublic: z.boolean(),
   isFlagged: z.boolean(),
@@ -317,6 +318,8 @@ export const PostCreateSchema = PostSchema.omit({
   image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified post
   public: true, // default value is false
+  isPublic: true,
+  isFlagged: true,
 });
 
 export type PostCreateType = z.infer<typeof PostCreateSchema>;
@@ -370,6 +373,8 @@ export const ItemCreateSchema = ItemSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
+  isPublic: true,
+  isFlagged: true,
 });
 /**
  * Update Item Schema
