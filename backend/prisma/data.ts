@@ -76,6 +76,9 @@ export const ids = {
   commentIds: {
     1: "37e11780-c553-11ee-83fd-6f8d6c450910",
     2: "37e11781-c553-11ee-83fd-6f8d6c450910",
+    3: "37e11782-c553-11ee-83fd-6f8d6c450910",
+    4: "37e11783-c553-11ee-83fd-6f8d6c450910",
+    5: "37e11784-c553-11ee-83fd-6f8d6c450910",
   },
   programIds: {
     1: "c5ba3bc0-c5f5-11ee-83fd-6f8d6c450910",
@@ -529,18 +532,39 @@ export const images = [
 
 export const comments = [
   {
+    id: ids.commentIds[1],
     userId: ids.userIds[1],
     postId: ids.postIds[1],
-    text: "This is the first comment!",
+    content: "This is the first comment!",
     createdAt: "2024-10-10T18:00:00Z",
-    // Other post details
   },
   {
+    id: ids.commentIds[2],
+    userId: ids.userIds[2],
+    postId: ids.postIds[1],
+    content: "Cool post",
+    createdAt: "2024-10-10T18:30:00Z",
+  },
+  {
+    id: ids.commentIds[3],
+    userId: ids.userIds[3],
+    postId: ids.postIds[1],
+    content: "Hello!",
+    createdAt: "2024-10-10T18:40:00Z",
+  },
+  {
+    id: ids.commentIds[4],
     userId: ids.userIds[2],
     postId: ids.postIds[2],
-    text: "Another post here!",
+    content: "Another post here!",
     createdAt: "2024-10-10T19:00:00Z",
-    // Other post details
+  },
+  {
+    id: ids.commentIds[5],
+    userId: ids.userIds[1],
+    postId: ids.postIds[2],
+    content: ":D",
+    createdAt: "2024-10-10T19:21:00Z",
   },
 ];
 
