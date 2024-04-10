@@ -17,6 +17,10 @@ import UploadToS3, {
 import { RequestExtended } from "../middleware/verifyAuth";
 import { moderateText } from "../utils/moderateText";
 import { emailPostFlagged } from "../utils/emails";
+import {
+  addPostAttendance,
+  removePostAttendance,
+} from "../services/post.service";
 
 // test Post
 export const postTest = async (req: Request, res: Response) => {
@@ -592,6 +596,64 @@ export const deletePostComment = async (
 
     res.status(204).end();
   } catch (error: any) {
+    next(error);
+  }
+};
+
+// Handles user requests to toggle their attendance to a post
+export const toggleJoinLookingFor = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request post id param
+    const postId = IdParamSchema.parse(req.params).id;
+    const loggedInUserId = req.userId;
+
+    // Get the post if it exists
+    const existingPost = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        `Post not found`,
+        404,
+        true,
+      );
+    }
+
+    // check if the user is already attending
+    const attendance = await prisma.postAttendance.findUnique({
+      where: {
+        postId_userId: {
+          postId,
+          userId: loggedInUserId!,
+        },
+      },
+    });
+
+    // add users attence to the post
+    if (!attendance) {
+      const newAttendance = await addPostAttendance(
+        loggedInUserId!,
+        existingPost,
+      );
+
+      res.status(200).json({
+        message: `User attendance added to post: ${existingPost.title}`,
+      });
+    } else {
+      // remove the users attendance from the post
+      await removePostAttendance(loggedInUserId!, existingPost);
+
+      res.status(200).json({
+        message: `User attendance removed from post: ${existingPost.title}`,
+      });
+    }
+  } catch (error) {
     next(error);
   }
 };

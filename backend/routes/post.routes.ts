@@ -10,6 +10,7 @@ import {
   createPostComment,
   updatePostComment,
   deletePostComment,
+  toggleJoinLookingFor,
 } from "../controllers/post.controller";
 import { upload } from "../utils/S3Uploader";
 import { verifyAuthentication } from "../middleware/verifyAuth";
@@ -21,6 +22,7 @@ router.use(verifyAuthentication); // Use auth middleware for all routes below
 router.get("/", getAllPosts);
 router.post("/", createLookingForPost);
 router.get("/:id", getPostById);
+router.post("/:id/toggleAttendance", toggleJoinLookingFor);
 router.get("/:id/comments/", getPostCommentsById);
 router.post("/:id/comments/", createPostComment);
 router.patch("/:postId/comments/:commentId", updatePostComment);
