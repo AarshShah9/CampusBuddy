@@ -15,8 +15,8 @@ import {
   ParamListBase,
   useRoute,
 } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
-import { getLookingForById } from "~/lib/apiFunctions/LookingFor";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { attendPost, getLookingForById } from "~/lib/apiFunctions/LookingFor";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import React, { useCallback, useLayoutEffect } from "react";
@@ -39,6 +39,7 @@ type LookingForDetailsType = {
   userImage: string;
   isFlagged: boolean;
   self: boolean;
+  isAttending: boolean;
 };
 
 export default function LookingForDetails({
@@ -57,9 +58,20 @@ export default function LookingForDetails({
     navigateTo({ page: "LookingForCommentsScreen", id });
   }, [navigateTo, id]);
 
-  const { data: lookingForData } = useQuery<LookingForDetailsType>({
+  const { data: lookingForData, refetch } = useQuery<LookingForDetailsType>({
     queryKey: ["lookingFor-details", id],
     queryFn: async () => getLookingForById(id),
+  });
+
+  const joinPostMutation = useMutation({
+    mutationFn: attendPost,
+    onSuccess: () => {
+      Alert.alert("Success", "Updated Successfully!");
+      refetch();
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message);
+    },
   });
 
   const onUserPress = useCallback(() => {
@@ -78,12 +90,33 @@ export default function LookingForDetails({
     });
   }, [navigation, id, lookingForData?.self]);
 
+  const joinPost = useCallback(() => {
+    Alert.alert("Join Post", "Are you sure you want to join this post?", [
+      {
+        text: "Join",
+        onPress: () => {
+          joinPostMutation.mutate(id);
+        },
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
+  }, []);
+
   if (lookingForData && lookingForData.isFlagged) {
     Alert.alert(
       "Under Review",
       "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
     );
   }
+
+  // Only show the button if the user is not the author of the post and (there are spots left or the user is attending)
+  const showButton =
+    !lookingForData?.self &&
+    ((lookingForData?.spotsLeft && lookingForData?.spotsLeft > 0) ||
+      lookingForData?.isAttending != null);
 
   return (
     <View
@@ -168,11 +201,13 @@ export default function LookingForDetails({
           </View>
           {/* Join Button */}
         </View>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <Button style={styles.joinButton} mode="contained">
-            Join
-          </Button>
-        </TouchableOpacity>
+        {showButton && (
+          <TouchableOpacity style={styles.buttonContainer} onPress={joinPost}>
+            <Button style={styles.joinButton} mode="contained">
+              {lookingForData?.isAttending ? "Leave" : "Join"}
+            </Button>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

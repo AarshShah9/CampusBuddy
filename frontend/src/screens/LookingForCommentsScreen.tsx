@@ -21,15 +21,19 @@ function CommentField() {
   const [text, setText] = React.useState("");
   return (
     <View style={styles.addComment}>
-        <TextInput
-          label="Add a Comment"
-          mode="outlined"
-          value={text}
-          onChangeText={(text) => setText(text)}
-        />
-         <Button mode="contained" style={{justifyContent:"center"}}>
-            Reply
-          </Button>
+      <TextInput
+        label="Add a Comment"
+        mode="outlined"
+        value={text}
+        onChangeText={(text) => setText(text)}
+        style={{ width: "75%" }}
+      />
+      <Button
+        mode="contained"
+        style={[styles.replyButton, { justifyContent: "center" }]}
+      >
+        Reply
+      </Button>
     </View>
   );
 }
@@ -55,7 +59,7 @@ export default function LookingForCommentsScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
-      keyboardVerticalOffset={72}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 72 : 0}
     >
       <View
         style={[
@@ -104,7 +108,9 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     marginBottom: 32,
     borderTopWidth: 1,
+    height: 40,
   },
-  replyButton:{
-  }
+  replyButton: {
+    height: 40,
+  },
 });
