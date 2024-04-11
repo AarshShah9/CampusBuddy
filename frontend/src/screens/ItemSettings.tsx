@@ -5,25 +5,21 @@ import {
 } from "@gorhom/bottom-sheet";
 import React, { useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
-import useAuthContext from "~/hooks/useAuthContext";
 import useEventsContext from "~/hooks/useEventsContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteItem } from "~/lib/apiFunctions/Profile";
+import useAuthContext from "~/hooks/useAuthContext";
 
-export default function EventSettings() {
+export default function ItemSettings() {
   const { theme } = useThemeContext();
-  const { userType } = useAuthContext();
-  const { navigateTo, navigateBack } = useNavigationContext();
+  const { navigateBack } = useNavigationContext();
+  const queryClient = useQueryClient();
 
-  const {
-    bottomSheetModalRef,
-    closeModal,
-    likeMutate,
-    eventData,
-    deleteMutate,
-    flipPublicMutate,
-  } = useEventsContext();
+  const { bottomSheetItemModalRef, item, closeModal } = useEventsContext();
+  const { user } = useAuthContext();
 
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -32,47 +28,40 @@ export default function EventSettings() {
     [],
   );
 
-  const isLiked = eventData && eventData?.isLiked;
-  const isPublic = eventData && eventData?.isPublic;
-  const snapPoints = eventData?.self ? ["50%"] : ["35%"];
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteItem(item?.id!),
+    onSuccess: () => {
+      closeModal();
+      navigateBack();
+      Alert.alert("Success", "Item deleted successfully.");
+      queryClient.invalidateQueries({
+        queryKey: ["search-marketplace-items"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["user-market", user?.id],
+      });
+    },
+    onError: (err) => {
+      Alert.alert("Error", err.message);
+    },
+  });
+
+  const self = item?.self;
+  const isPublic = true;
+  const snapPoints = self ? ["50%"] : ["35%"];
 
   const settings = [
     {
-      title: isLiked ? "Unlike" : "Like",
-      shown: !eventData?.self,
-      icon: (
-        <Entypo
-          name={isLiked ? "heart-outlined" : "heart"}
-          size={28}
-          color={"red"}
-        />
-      ),
-      onClick: () => {
-        likeMutate();
-      },
-    },
-    {
-      title: "Scan QR Code",
-      shown: eventData?.self,
-      icon: <Ionicons name="qr-code-outline" size={24} color={"black"} />,
-      onClick: () => {
-        closeModal();
-        navigateTo({ page: "QRCodeScanner" });
-      },
-    },
-    {
       title: "Edit",
-      shown: eventData?.self,
+      shown: self,
       icon: <Ionicons name="create-outline" size={24} color={"black"} />,
       onClick: () => {
         Alert.alert("Coming Soon", "This feature is not yet available.");
-        // closeModal();
-        // navigateTo({ page: "EditEvent" });
       },
     },
     {
       title: "Delete",
-      shown: eventData?.self,
+      shown: self,
       icon: <Ionicons name="trash-outline" size={24} color={"black"} />,
       onClick: () => {
         Alert.alert(
@@ -85,9 +74,8 @@ export default function EventSettings() {
             },
             {
               text: "Delete",
-              onPress: async () => {
-                deleteMutate();
-                navigateBack();
+              onPress: () => {
+                deleteMutation.mutate();
               },
             },
           ],
@@ -96,7 +84,7 @@ export default function EventSettings() {
     },
     {
       title: isPublic ? "Make Private" : "Make Public",
-      shown: eventData?.self,
+      shown: self,
       icon: (
         <Ionicons
           name={isPublic ? "lock-closed-outline" : "lock-open-outline"}
@@ -105,7 +93,7 @@ export default function EventSettings() {
         />
       ),
       onClick: () => {
-        flipPublicMutate();
+        Alert.alert("Coming Soon", "This feature is not yet available.");
       },
     },
     {
@@ -117,7 +105,7 @@ export default function EventSettings() {
       },
     },
     {
-      title: "Report this Event",
+      title: "Report this Item",
       shown: true,
       icon: <Ionicons name="flag-outline" size={24} color={"black"} />,
       onClick: () => {
@@ -129,7 +117,7 @@ export default function EventSettings() {
   return (
     <BottomSheetModal
       enablePanDownToClose={true}
-      ref={bottomSheetModalRef}
+      ref={bottomSheetItemModalRef}
       index={0}
       snapPoints={snapPoints}
       backdropComponent={Backdrop}

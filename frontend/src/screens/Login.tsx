@@ -72,7 +72,9 @@ export default function Login() {
     }
 
     signIn(data.email, data.password).then((succeeded) => {
-      if (succeeded) replaceStackWith("LandingGroup");
+      if (succeeded) {
+        replaceStackWith("LandingGroup");
+      }
     });
   }, []);
 

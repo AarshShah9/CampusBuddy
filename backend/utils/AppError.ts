@@ -46,6 +46,7 @@ enum AppErrorName {
   DATABASE_ERROR = "DatabaseError",
   PRISMA_ERROR = "PrismaError",
   INTERNAL_SERVER_ERROR = "InternalServerError",
+  NO_SPOT_AVAILABLE_ERROR = "NoSpotsAvailableError",
 }
 
 export { AppError, AppErrorName };

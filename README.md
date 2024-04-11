@@ -149,7 +149,7 @@ npm run start
 ### iOS Appstore EAS Commands
 
 ```bash
- eas secret:push --scope project --env-file ./.env
+eas secret:push --scope project --env-file ./.env
 
 eas build --platform ios
 eas submit -p ios --latest

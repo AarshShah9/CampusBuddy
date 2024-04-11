@@ -141,6 +141,7 @@ export const EventCreateSchema = EventSchema.omit({
   organizationId: true, // get from req.params if creating verified event
   image: true, // handled by the S3Uploader
   isPublic: true, // default value is false
+  isFlagged: true,
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -316,7 +317,7 @@ export const PostSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  numberOfSpots: z.number().int().min(1),
+  numberOfSpots: z.number().int().min(1).nullable().optional(),
   expiresAt: z.coerce.date(),
   isPublic: z.boolean(),
   isFlagged: z.boolean(),
@@ -334,6 +335,8 @@ export const PostCreateSchema = PostSchema.omit({
   image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified post
   public: true, // default value is false
+  isPublic: true,
+  isFlagged: true,
 });
 
 export type PostCreateType = z.infer<typeof PostCreateSchema>;
@@ -387,6 +390,8 @@ export const ItemCreateSchema = ItemSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
+  isPublic: true,
+  isFlagged: true,
 });
 /**
  * Update Item Schema
@@ -403,10 +408,20 @@ export const CommentSchema = z.object({
   userId: z.string().uuid(),
   postId: z.string().uuid(),
   createdAt: z.coerce.date(),
-  text: z.string(),
+  updatedAt: z.coerce.date(),
+  content: z.string({
+    required_error: "Comment message is required",
+    invalid_type_error: "Invalid comment input",
+  }),
 });
 
 export type Comment = z.infer<typeof CommentSchema>;
+
+export const CommentCreateSchema = CommentSchema.pick({
+  content: true,
+});
+
+export type CommentCreateType = z.infer<typeof CommentCreateSchema>;
 
 /////////////////////////////////////////
 // USER ORGANIZATION ROLE SCHEMAS
@@ -533,19 +548,26 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // UTILITY SCHEMAS
 ///////////////////////////////
 
+export const IdSchema = z.coerce
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
-  id: z.coerce
-    .string()
-    .uuid()
-    .refine((data) => data.length > 0, {
-      message: "ID is invalid",
-    }),
+  id: IdSchema,
 });
 
 export const OrganizationRoleNameParamsSchema = z.object({
   organizationId: z.string().uuid(),
   roleName: UserRoleSchema,
+});
+
+export const CommentParamsSchema = z.object({
+  postId: IdSchema,
+  commentId: IdSchema,
 });
 
 ///////////////////////////////
