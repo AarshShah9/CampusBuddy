@@ -95,6 +95,7 @@ model User {
   item                 Item[]
   comments             Comment[]
   events               Event[]
+  tickets              Ticket[]
   UserEventResponse    UserEventResponse[]
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
@@ -130,6 +131,20 @@ model Program {
   @@map("program")
 }
 
+model Ticket {
+  id      String  @id @default(uuid())
+  userId  String  @map("user_id")
+  eventId String  @map("event_id")
+  price   Int     @default(0)
+  used    Boolean @default(false)
+  User    User    @relation(fields: [userId], references: [id])
+  Event   Event   @relation(fields: [eventId], references: [id])
+
+  @@index([userId])
+  @@index([eventId])
+  @@map("ticket")
+}
+
 model Event {
   id              String              @id @default(uuid())
   userId          String              @map("user_id")
@@ -143,11 +158,13 @@ model Event {
   isPublic        Boolean             @default(true) @map("is_public")
   isFlagged       Boolean             @default(false)
   isPaid          Boolean             @default(false)
+  price           Int?                @map("price")
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   eventTags       EventTag[]
+  tickets         Ticket[]
   eventResponses  UserEventResponse[]
   locationPlaceId String
 

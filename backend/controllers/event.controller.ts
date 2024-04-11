@@ -120,6 +120,7 @@ export const createVerifiedEvent = async (
           isPublic: !isFlagged,
           isFlagged: isFlagged,
           isPaid: validatedEventData.isPaid,
+          price: validatedEventData.price,
         },
       });
 

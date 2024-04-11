@@ -108,6 +108,7 @@ export const EventSchema = z.object({
   isPublic: BooleanSchema,
   isFlagged: BooleanSchema,
   isPaid: BooleanSchema,
+  price: z.number().int().min(0).nullable(),
   image: z.string().nullable(),
 });
 
