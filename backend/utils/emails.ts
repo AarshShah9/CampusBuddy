@@ -1,4 +1,4 @@
-import { User, UserRole, Item, Post, Event } from "@prisma/client";
+import { User, UserRole, Item, Post, Event, Payment } from "@prisma/client";
 import transporter from "./mailer";
 
 export async function emailMembershipRequestApproved(
@@ -302,6 +302,63 @@ export async function emailEventRejected(
                             <p>Hello ${user.firstName},</p>
                             <p>${emailContent}</p>
                         `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function paymentProcessing(payment: Payment, user: User) {
+  const subject = "Payment Processing";
+  const emailContent = `Your payment is being processed. Your payment token is: ${payment.id}`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                                <p>Hello ${user.firstName},</p>
+                                <p>${emailContent}</p>
+                            `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function paymentSucceeded(payment: Payment, user: User) {
+  const subject = "Payment Succeeded";
+  const emailContent = `Your payment was successful. Your payment token is: ${payment.id}`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                                        <p>Hello ${user.firstName},</p>
+                                        <p>${emailContent}</p>
+                                    `,
+  };
+
+  // Send the email
+  await transporter.sendMail(message);
+}
+
+export async function paymentFailed(payment: Payment, user: User) {
+  const subject = "Payment Failed";
+  const emailContent = `Your payment failed. Your payment token is: ${payment.id}`;
+
+  // Create the email message
+  const message = {
+    from: process.env.MAILER_EMAIL,
+    to: user.email,
+    subject,
+    html: `
+                                                <p>Hello ${user.firstName},</p>
+                                                <p>${emailContent}</p>
+                                            `,
   };
 
   // Send the email
