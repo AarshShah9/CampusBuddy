@@ -29,3 +29,9 @@ export const deletePost = async (id: string) => {
     params: { id },
   });
 };
+
+export const attendPost = async (id: string) => {
+  return await CBRequest("POST", `/api/post/:id/toggleAttendance`, {
+    params: { id },
+  });
+};

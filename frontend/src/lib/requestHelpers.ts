@@ -156,6 +156,7 @@ const allowedEndpoints = [
   "/api/item/:id",
   "/api/post/:id",
   "/api/post/:id/comments",
+  "/api/post/:id/toggleAttendance",
 
   // profile related endpoints
   "/api/profile/saved",
@@ -204,6 +205,7 @@ export type IdRequiredEndPoints =
   | "/api/orgs/join/:id"
   | "/api/profile/orgEvents/:id"
   | "/api/events/public/:id"
+  | "/api/post/:id/toggleAttendance"
   | "/api/profile/items/:id";
 
 export type IdAndBodyRequiredEndPoints = "/api/orgs/:id";

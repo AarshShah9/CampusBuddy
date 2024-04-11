@@ -4,12 +4,12 @@ import { View, StyleSheet } from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import { Entypo } from '@expo/vector-icons';
 
-export default function CommentsChip() {
+export default function ReplyChip() {
     const { theme } = useThemeContext();
 
     return (
         <View style={[styles.container, {
-            backgroundColor: theme.colors.surface,
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
             borderColor: theme.colors.onSurface
         }]}>
             <View style={styles.innerContainer}>

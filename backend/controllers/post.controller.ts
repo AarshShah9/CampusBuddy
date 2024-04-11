@@ -373,6 +373,16 @@ export const getPostById = async (
       );
     }
 
+    // is attending the post
+    const isAttending = await prisma.postAttendance.findUnique({
+      where: {
+        postId_userId: {
+          postId: post.id,
+          userId: req.userId!,
+        },
+      },
+    });
+
     const postResponse = {
       id: post.id,
       title: post.title,
@@ -384,6 +394,7 @@ export const getPostById = async (
       userImage: post.user.profilePic,
       isFlagged: post.isFlagged,
       self: self,
+      isAttending,
     };
 
     res.status(200).json({
