@@ -10,4 +10,6 @@ declare module "@env" {
   export const ENV: string;
   export const GOOGLE_MAPS_API_KEY: string;
   export const EXPO_ACCESS_TOKEN: string;
+
+  export const PUBLISHABLE_KEY: string;
 }

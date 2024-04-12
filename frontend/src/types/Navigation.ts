@@ -97,6 +97,10 @@ type HelpRoute = {
   page: "Help";
 };
 
+type PaymentRoute = {
+  page: "EventPayment";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -116,6 +120,7 @@ export type NavigationFunctionArgs =
   | EditEventRoute
   | QRCodeScannerRoute
   | HelpRoute
+  | PaymentRoute
   | SettingsRoute;
 
 export type NavigableStacks =

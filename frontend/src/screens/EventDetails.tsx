@@ -114,10 +114,11 @@ export default function EventDetails({
   }, [eventData]);
 
   const userAttendEvent = useCallback(() => {
-    attendMutation.mutate({
-      id,
-      previousState: eventData?.isAttending!,
-    });
+    navigateTo({ page: "EventPayment" });
+    // attendMutation.mutate({
+    //   id,
+    //   previousState: eventData?.isAttending!,
+    // });
   }, [id, attendEvent, eventData?.isAttending]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
