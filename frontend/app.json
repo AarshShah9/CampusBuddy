@@ -2,14 +2,14 @@
   "expo": {
     "name": "CampusBuddy",
     "slug": "frontend",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/CampusBuddyIcon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./src/assets/CampusBuddyIcon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3a86ff"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {

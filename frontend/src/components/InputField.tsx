@@ -12,15 +12,26 @@ export default function InputField({ ...props }: any) {
   const { theme } = useThemeContext();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header2}>{props.name}</Text>
-
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors.tertiary,
+        },
+      ]}
+    >
+      <Text
+        style={[styles.header2, { backgroundColor: theme.colors.tertiary }]}
+      >
+        {props.name}
+      </Text>
       <TextInput
         secureTextEntry={hidePassword}
         underlineColorAndroid="transparent"
         style={[
           styles.input,
           {
+            backgroundColor: theme.colors.tertiary,
             borderColor: isFocused ? theme.colors.primary : "grey",
           },
         ]}
@@ -49,7 +60,6 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
     marginBottom: "3%",
-    backgroundColor: "white",
     outlineStyle: "none",
     overflow: "hidden",
     fontFamily: "Roboto-Reg",

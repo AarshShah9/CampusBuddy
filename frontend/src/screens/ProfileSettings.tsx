@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +24,7 @@ export default function ProfileSettings() {
   const { theme } = useThemeContext();
   const { logOut } = useAuthContext();
   const { navigateTo, replaceStackWith } = useNavigationContext();
+  const { userType } = useAuthContext();
 
   const { bottomSheetModalRef, closeModal } = useProfileContext();
   const Backdrop = useCallback(
@@ -37,13 +39,23 @@ export default function ProfileSettings() {
       title: "Settings and Privacy",
       onClick: () => {
         closeModal();
-        navigateTo({ page: "Settings" });
+        navigateTo({
+          page: userType === "Student" ? "Settings" : "OrganizationSettings",
+        });
       },
     },
-    { title: "Help", onClick: () => console.log("Help") },
+    {
+      title: "Help",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Help" });
+      },
+    },
     {
       title: "Report a Problem",
-      onClick: () => console.log("Report a Problem"),
+      onClick: () => {
+        Alert.alert("Coming Soon", "This feature is not yet available.");
+      },
     },
     {
       title: "Log Out",

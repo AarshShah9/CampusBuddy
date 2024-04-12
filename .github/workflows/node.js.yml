@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -48,6 +51,7 @@ jobs:
           echo EXPO_ACCESS_TOKEN=NA >> .env
           echo GPT_KEY=NA >> .env
           echo GPT_ORG=NA >> .env
+          echo GOOGLE_SERVICE_ACCOUNT_KEY=${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} >> .env
 
       - name: Install Root Dependencies
         run: npm ci

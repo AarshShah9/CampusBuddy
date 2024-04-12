@@ -49,6 +49,33 @@ export const UserType = z.enum([
 ]);
 
 ///////////////////////////////
+// MODERATION SCHEMAS
+///////////////////////////////
+export const ModerationSchemaItem = z.object({
+  itemId: z.string().uuid(),
+});
+
+export type ModerationItem = z.infer<typeof ModerationSchemaItem>;
+
+export const ModerationSchemaPost = z.object({
+  postId: z.string().uuid(),
+});
+
+export type ModerationPost = z.infer<typeof ModerationSchemaPost>;
+
+export const ModerationSchemaEvent = z.object({
+  eventId: z.string().uuid(),
+});
+
+export type ModerationEvent = z.infer<typeof ModerationSchemaEvent>;
+
+export const ModerationSchemaRejection = z.object({
+  rejectionReason: z.string(),
+});
+
+export type ModerationRejection = z.infer<typeof ModerationSchemaRejection>;
+
+///////////////////////////////
 // EVENT SCHEMAS
 ///////////////////////////////
 
@@ -79,6 +106,7 @@ export const EventSchema = z.object({
     invalid_type_error: "Invalid datetime string",
   }),
   isPublic: BooleanSchema,
+  isFlagged: BooleanSchema,
   image: z.string().nullable(),
 });
 
@@ -96,6 +124,7 @@ export const EventCreateSchema = EventSchema.omit({
   organizationId: true, // get from req.params if creating verified event
   image: true, // handled by the S3Uploader
   isPublic: true, // default value is false
+  isFlagged: true,
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -114,15 +143,29 @@ export type EventUpdateType = z.infer<typeof EventUpdateSchema>;
 ///////////////////////////////
 // USER SCHEMAS
 ///////////////////////////////
+export const PasswordSchema = z
+  .string({ required_error: "Password is required." })
+  .min(8, { message: "Password must be at least 8 characters long" })
+  .regex(/[A-Z]/, {
+    message: "Password must contain at least one uppercase letter",
+  })
+  .regex(/[0-9]/, { message: "Password must contain at least one number" });
+
+export const EmailSchema = z
+  .string({ required_error: "Email is required." })
+  .email({ message: "Invalid email format" })
+  .max(254); // RFC 5321 max 256 with angle brackets
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  firstName: z.string().min(2).max(20),
-  lastName: z.string().min(2).max(20),
-  email: z.string().email({ message: "Invalid email address" }).min(5),
-  password: z
-    .string()
-    .min(8, { message: "Password must be greater than 8 characters long" }),
+  firstName: z
+    .string({ required_error: "First name is required." })
+    .max(50, { message: "Max 50 characters" }),
+  lastName: z
+    .string({ required_error: "Last name is required." })
+    .max(50, { message: "Max 50 characters" }),
+  email: EmailSchema,
+  password: PasswordSchema,
   profilePic: z.string().nullable(),
   accountType: UserType,
   institutionId: z.string().uuid().nullable(),
@@ -149,7 +192,11 @@ export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
   accountType: true,
-}).partial();
+})
+  .extend({
+    degreeName: z.string().nullable(),
+  })
+  .partial();
 
 export type UserUpdateType = z.infer<typeof UserUpdateSchema>;
 
@@ -184,7 +231,6 @@ export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
 // Can only manually change the description and image
 export const OrganizationUpdateSchema = OrganizationSchema.omit({
   id: true,
-  organizationName: true,
   createdAt: true,
   updatedAt: true,
   institutionId: true,
@@ -254,9 +300,10 @@ export const PostSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  numberOfSpots: z.number().int().min(1),
+  numberOfSpots: z.number().int().min(1).nullable().optional(),
   expiresAt: z.coerce.date(),
-  public: z.boolean(),
+  isPublic: z.boolean(),
+  isFlagged: z.boolean(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
@@ -271,6 +318,8 @@ export const PostCreateSchema = PostSchema.omit({
   image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified post
   public: true, // default value is false
+  isPublic: true,
+  isFlagged: true,
 });
 
 export type PostCreateType = z.infer<typeof PostCreateSchema>;
@@ -311,6 +360,8 @@ export const ItemSchema = z.object({
   price: z.coerce.number().min(1),
   condition: z.string(),
   locationPlaceId: z.string(),
+  isPublic: z.boolean(),
+  isFlagged: z.boolean(),
 });
 
 export type Item = z.infer<typeof ItemSchema>;
@@ -322,6 +373,8 @@ export const ItemCreateSchema = ItemSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
+  isPublic: true,
+  isFlagged: true,
 });
 /**
  * Update Item Schema
@@ -338,10 +391,20 @@ export const CommentSchema = z.object({
   userId: z.string().uuid(),
   postId: z.string().uuid(),
   createdAt: z.coerce.date(),
-  text: z.string(),
+  updatedAt: z.coerce.date(),
+  content: z.string({
+    required_error: "Comment message is required",
+    invalid_type_error: "Invalid comment input",
+  }),
 });
 
 export type Comment = z.infer<typeof CommentSchema>;
+
+export const CommentCreateSchema = CommentSchema.pick({
+  content: true,
+});
+
+export type CommentCreateType = z.infer<typeof CommentCreateSchema>;
 
 /////////////////////////////////////////
 // USER ORGANIZATION ROLE SCHEMAS
@@ -468,19 +531,26 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // UTILITY SCHEMAS
 ///////////////////////////////
 
+export const IdSchema = z.coerce
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
-  id: z.coerce
-    .string()
-    .uuid()
-    .refine((data) => data.length > 0, {
-      message: "ID is invalid",
-    }),
+  id: IdSchema,
 });
 
 export const OrganizationRoleNameParamsSchema = z.object({
   organizationId: z.string().uuid(),
   roleName: UserRoleSchema,
+});
+
+export const CommentParamsSchema = z.object({
+  postId: IdSchema,
+  commentId: IdSchema,
 });
 
 ///////////////////////////////
@@ -562,15 +632,9 @@ export const loginSchema = z.object({
   password: z.string(),
 });
 
-export const emailSchema = z.object({
-  email: z.string(),
-});
+export type loginType = z.infer<typeof loginSchema>;
 
-export const deleteSchema = z.object({
-  userId: z.string().uuid(),
-});
-
-export const tokenSchema = z.object({
+export const AuthTokenSchema = z.object({
   token: z.string(),
 });
 
@@ -593,4 +657,10 @@ export type PushTokenType = z.infer<typeof PushTokenSchema>;
 
 export const updateParticipantStatusSchema = z.object({
   status: ParticipationStatusSchema,
+});
+
+export const searchSchema = z.object({
+  query: z.string(),
+  page: z.number().int().min(1),
+  limit: z.number().int().min(1),
 });

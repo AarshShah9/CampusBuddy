@@ -21,6 +21,11 @@ type MarketPlaceDetailsRoute = {
   id: string;
 };
 
+type LookingForDetailsRoute = {
+  page: "LookingForDetails";
+  id: string;
+};
+
 type MessagesRoute = {
   page: "Messages";
 };
@@ -54,6 +59,11 @@ type AttendeesRoute = {
   id: string;
 };
 
+type OrganizationProfileRoute = {
+  page: "OrganizationProfile";
+  id: string;
+};
+
 type StudentSignUpRoute = {
   page: "StudentSignUp";
 };
@@ -64,6 +74,27 @@ type OrgSignUpRoute = {
 
 type SettingsRoute = {
   page: "Settings";
+};
+
+type CommentsRoute = {
+  page: "LookingForCommentsScreen";
+  id: string;
+};
+
+type OrganizationSettingsRoute = {
+  page: "OrganizationSettings";
+};
+
+type EditEventRoute = {
+  page: "EditEvent";
+};
+
+type QRCodeScannerRoute = {
+  page: "QRCodeScanner";
+};
+
+type HelpRoute = {
+  page: "Help";
 };
 
 export type NavigationFunctionArgs =
@@ -77,7 +108,14 @@ export type NavigationFunctionArgs =
   | AttendeesRoute
   | StudentSignUpRoute
   | OrgSignUpRoute
+  | OrganizationProfileRoute
+  | LookingForDetailsRoute
   | MarketPlaceDetailsRoute
+  | CommentsRoute
+  | OrganizationSettingsRoute
+  | EditEventRoute
+  | QRCodeScannerRoute
+  | HelpRoute
   | SettingsRoute;
 
 export type NavigableStacks =

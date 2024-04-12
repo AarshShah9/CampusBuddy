@@ -14,8 +14,11 @@ import item from "./routes/item.routes";
 import profile from "./routes/profile.routes";
 import notification from "./routes/notification.routes";
 import moderation from "./routes/moderation.routes";
+import search from "./routes/search.routes";
 import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
+import { initializeApp } from "firebase-admin/app";
+import * as admin from "firebase-admin";
 
 const app = express();
 const result = dotenv.config();
@@ -26,6 +29,16 @@ try {
 } catch (error) {
   throw new Error("Failed to validate environment variables" + error);
 }
+
+// const serviceAccountKeyString = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+// if (!serviceAccountKeyString) {
+//   throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY environment variable not found");
+// }
+// const serviceAccountKey = JSON.parse(serviceAccountKeyString);
+// // Initialize firebase Admin SDK
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccountKey as admin.ServiceAccount),
+// });
 
 const port = process.env.PORT;
 
@@ -62,6 +75,7 @@ app.use("/api/item", item);
 app.use("/api/profile", profile);
 app.use("/api/notification", notification);
 app.use("/api/moderation", moderation);
+app.use("/api/search", search);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");

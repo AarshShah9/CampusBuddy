@@ -67,6 +67,21 @@ export default function CreateMarketplace() {
       Alert.alert("Image Required", "Please upload at least one image");
       return;
     }
+
+    // TODO this is temporary, need to find a better way to validate
+    for (const key in data) {
+      // @ts-ignore
+      if (data[key] === "") {
+        Alert.alert("Cannot Create", "Please fill out all fields");
+        return;
+      }
+    }
+
+    if (!checkedItem) {
+      Alert.alert("Cannot Create", "Please select a condition");
+      return;
+    }
+
     setIsSubmitting(true);
     createMutation.mutate(data);
   };
@@ -83,9 +98,8 @@ export default function CreateMarketplace() {
       Alert.alert("Success", "Your item has been posted");
     },
     onError: (error) => {
-      console.log(error);
       setIsSubmitting(false);
-      alert("Error creating event");
+      Alert.alert("Error", error.message);
     },
   });
 

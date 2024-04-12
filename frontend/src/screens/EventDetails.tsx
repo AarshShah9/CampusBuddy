@@ -1,7 +1,18 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Button } from "react-native-paper";
-import { useRoute } from "@react-navigation/native";
-import { useCallback, useLayoutEffect } from "react";
+import {
+  NavigationProp,
+  ParamListBase,
+  useRoute,
+} from "@react-navigation/native";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
@@ -13,22 +24,46 @@ import useThemeContext from "~/hooks/useThemeContext";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
-import {
-  attendEvent,
-  getEventDetails,
-  likeEvent,
-} from "~/lib/apiFunctions/Events";
-import { NavigationProp, ParamListBase } from "@react-navigation/native";
+import { attendEvent } from "~/lib/apiFunctions/Events";
+import useEventsContext from "~/hooks/useEventsContext";
 
 const IMG_HEIGHT = 300;
 
 /**
  * This component is responsible for loading event details based on passed ID.
  * */
+
+export type EventDetailsType = {
+  id: string;
+  title: string;
+  self: boolean;
+  description: string;
+  isFlagged: boolean;
+  location: {
+    latitude: number;
+    longitude: number;
+    name: string;
+  };
+  organization: {
+    organizationName: string;
+    organizationId: string;
+    organizationImage: string;
+  };
+  startTime: string;
+  image: string;
+  attendees: number;
+  isAttending: boolean;
+  isLiked: boolean;
+  userName: string;
+  userId: string;
+  userImage: string;
+  eventType: "NonVerified" | "Verified";
+  isPublic: boolean;
+};
 
 export default function EventDetails({
   navigation,
@@ -42,23 +77,12 @@ export default function EventDetails({
   const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
+  const { openModal, eventData, fetchEventDetails, refetchEventDetails } =
+    useEventsContext();
 
-  const { data: eventData, refetch } = useQuery({
-    queryKey: ["event-details", id],
-    queryFn: () => getEventDetails(id),
-  });
-  const likeMutation = useMutation({
-    mutationFn: async ({
-      id,
-      previousState,
-    }: {
-      id: string;
-      previousState: boolean;
-    }) => {
-      await likeEvent(id);
-      refetch();
-    },
-  });
+  useEffect(() => {
+    fetchEventDetails(id);
+  }, [id, fetchEventDetails]);
 
   const attendMutation = useMutation({
     mutationFn: async ({
@@ -69,7 +93,7 @@ export default function EventDetails({
       previousState: boolean;
     }) => {
       await attendEvent(id);
-      refetch();
+      refetchEventDetails();
     },
   });
 
@@ -88,22 +112,6 @@ export default function EventDetails({
       });
     }
   }, [eventData]);
-
-  // TODO fix optimistic updates
-  const isOptimistic =
-    likeMutation.variables &&
-    (likeMutation.isPending ? !likeMutation.variables.previousState : false);
-
-  const isLiked = isOptimistic
-    ? !likeMutation.variables?.previousState
-    : eventData?.isLiked;
-
-  const userLiked = useCallback(() => {
-    likeMutation.mutate({
-      id,
-      previousState: eventData?.isLiked!,
-    });
-  }, [id, likeEvent, eventData?.isLiked]);
 
   const userAttendEvent = useCallback(() => {
     attendMutation.mutate({
@@ -140,17 +148,34 @@ export default function EventDetails({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={userLiked}>
-          <Entypo
-            name="heart"
-            size={28}
-            color={isLiked ? "red" : "white"} // TODO use theme context
-            style={{ opacity: isOptimistic ? 0.5 : 1 }}
-          />
+        <TouchableOpacity onPress={() => openModal()}>
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
         </TouchableOpacity>
       ),
     });
-  }, [navigation, isLiked, isOptimistic, userLiked]);
+  }, [navigation]);
+
+  if (eventData && eventData.isFlagged) {
+    Alert.alert(
+      "Under Review",
+      "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
+    );
+  }
+
+  const viewCreator = useCallback(() => {
+    if (eventData?.eventType === "Verified") {
+      navigateTo({
+        page: "OrganizationProfile",
+        id: eventData?.organization.organizationId,
+      });
+    } else {
+      navigateTo({ page: "UserProfile", id: eventData?.userId! });
+    }
+  }, [
+    eventData?.eventType,
+    eventData?.organization.organizationId,
+    eventData?.userId,
+  ]);
 
   return (
     <View style={[styles.mainContainer]}>
@@ -205,35 +230,66 @@ export default function EventDetails({
                 {convertUTCToTimeAndDate(eventData?.startTime)}
               </Text>
             </LoadingSkeleton>
-            <LoadingSkeleton show={!eventData} width={120} height={16}>
-              {eventData?.location.name && (
-                <LocationChip location={eventData?.location.name} />
-              )}
-            </LoadingSkeleton>
-          </View>
-          <View style={styles.eClubDetails}>
-            <Image
+            <View
               style={{
-                height: 30,
-                width: 30,
-                backgroundColor: "red",
-                borderRadius: 90,
-                marginBottom: 5,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
               }}
-              source={require("~/assets/Campus_Buddy_Logo.png")}
-            />
-            <LoadingSkeleton show={!eventData} width={60} height={16}>
-              <Text
-                style={{
-                  fontFamily: "Roboto-Medium",
-                  fontSize: 18,
-                  color: theme.colors.text,
-                }}
-              >
-                {eventData?.organization?.organizationName}
-              </Text>
-            </LoadingSkeleton>
+            >
+              <LoadingSkeleton show={!eventData} width={80} height={16}>
+                {eventData?.location.name && (
+                  <LocationChip location={eventData?.location.name} />
+                )}
+              </LoadingSkeleton>
+              <LoadingSkeleton show={!eventData} width={30} height={16}>
+                <>
+                  {eventData?.isLiked && (
+                    <Ionicons
+                      name="heart"
+                      size={20}
+                      color={"red"}
+                      style={{ paddingLeft: 6 }}
+                    />
+                  )}
+                </>
+              </LoadingSkeleton>
+            </View>
           </View>
+          <TouchableOpacity onPress={viewCreator}>
+            <View style={styles.eClubDetails}>
+              <Image
+                style={{
+                  height: 30,
+                  width: 30,
+                  backgroundColor: "grey",
+                  borderRadius: 90,
+                  marginBottom: 5,
+                }}
+                source={{
+                  uri:
+                    eventData?.eventType === "Verified"
+                      ? generateImageURL(
+                          eventData?.organization?.organizationImage,
+                        )
+                      : generateImageURL(eventData?.userImage),
+                }}
+              />
+              <LoadingSkeleton show={!eventData} width={60} height={16}>
+                <Text
+                  style={{
+                    fontFamily: "Roboto-Medium",
+                    fontSize: 18,
+                    color: theme.colors.text,
+                  }}
+                >
+                  {eventData?.eventType === "Verified"
+                    ? eventData?.organization?.organizationName
+                    : eventData?.userName}
+                </Text>
+              </LoadingSkeleton>
+            </View>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={seeAttendees}>
           <View
@@ -320,23 +376,25 @@ export default function EventDetails({
             backgroundColor: theme.colors.tertiary,
           }}
         >
-          <Button
-            style={styles.attendButton}
-            mode="contained"
-            onPress={userAttendEvent}
-          >
-            <Text
-              style={{
-                lineHeight: 30,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: "white",
-                fontFamily: "Nunito-Bold",
-              }}
+          {!eventData?.self && (
+            <Button
+              style={styles.attendButton}
+              mode="contained"
+              onPress={userAttendEvent}
             >
-              {eventData?.isAttending ? "Not Going" : "Attend"}
-            </Text>
-          </Button>
+              <Text
+                style={{
+                  lineHeight: 30,
+                  fontSize: 24,
+                  fontWeight: "bold",
+                  color: "white",
+                  fontFamily: "Nunito-Bold",
+                }}
+              >
+                {eventData?.isAttending ? "Not Going" : "Attend"}
+              </Text>
+            </Button>
+          )}
         </View>
       </Animated.ScrollView>
     </View>

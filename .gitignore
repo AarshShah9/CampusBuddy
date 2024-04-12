@@ -76,6 +76,11 @@ dashboard/yarn-debug.log*
 dashboard/yarn-error.log*
 dashboard/.env
 
+backend/serviceAccountKey.json
 
+# secret files
+secrets/*
+secrets/
+secrets
 
 

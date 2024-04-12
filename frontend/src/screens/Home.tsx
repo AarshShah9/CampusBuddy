@@ -73,7 +73,6 @@ export default function Home() {
       queryFn: fetchMainEvents,
     });
 
-  // TODO Replace this with skeleton loading
   useEffect(() => {
     if (isLoading) startLoading();
     else stopLoading();
@@ -96,47 +95,61 @@ export default function Home() {
         data={allEvents}
         estimatedItemSize={20}
         extraData={queryIsLoading}
+        contentContainerStyle={
+          !queryIsLoading && startingEvents.length === 0
+            ? { paddingVertical: 20 }
+            : {}
+        }
         renderItem={({ item }) => (
           <HorizontalScrollElement item={item} isLoading={queryIsLoading} />
         )}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
-          <View
-            style={{
-              justifyContent: "center",
-              marginBottom: 32,
-              alignItems: "center",
-            }}
-          >
-            <Carousel
-              loop={true}
-              autoplay={true}
-              autoplayInterval={5000}
-              showsControls={false}
-              style={{
-                width: screenWidth,
-                height: 214,
-              }}
-            >
-              {startingEvents.map((item) => (
-                <LoadingSkeleton
-                  key={item.image}
-                  show={queryIsLoading}
-                  width={screenWidth}
-                  height={214}
-                  radius="square"
+          <>
+            {!queryIsLoading && startingEvents.length !== 0 && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  marginBottom: 32,
+                  alignItems: "center",
+                }}
+              >
+                <Carousel
+                  loop={true}
+                  autoplay={true}
+                  autoplayInterval={5000}
+                  showsControls={false}
+                  style={{
+                    width: screenWidth,
+                    height: 214,
+                  }}
                 >
-                  <TouchableOpacity onPress={() => openEventDetails(item.id)}>
-                    <Image
-                      key={item.image}
-                      source={{ uri: generateImageURL(item.image) }}
-                      style={{ width: screenWidth, height: 214 }}
-                    />
-                  </TouchableOpacity>
-                </LoadingSkeleton>
-              ))}
-            </Carousel>
-          </View>
+                  {startingEvents.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.image}
+                        onPress={() => openEventDetails(item.id)}
+                      >
+                        <Image
+                          key={item.image}
+                          source={{ uri: generateImageURL(item.image) }}
+                          style={{ width: screenWidth, height: 214 }}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Carousel>
+              </View>
+            )}
+            {queryIsLoading && (
+              <LoadingSkeleton
+                show
+                width={screenWidth}
+                height={214}
+                radius="square"
+              />
+            )}
+          </>
         }
       />
     </View>

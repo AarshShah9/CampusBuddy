@@ -9,13 +9,9 @@ export const createMarketPlaceItem = async (
   item: MarketPlaceItem,
   images: ImagePickerAsset[],
 ): Promise<any> => {
-  try {
-    return await uploadImagesRequest("post", "/api/item/", images, {
-      body: item,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  return await uploadImagesRequest("post", "/api/item/", images, {
+    body: item,
+  });
 };
 
 export const getMarketPlaceItems = async () => {

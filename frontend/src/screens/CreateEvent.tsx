@@ -30,6 +30,7 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import { createEvent } from "~/lib/apiFunctions/Events";
 import { useMutation } from "@tanstack/react-query";
+import useAuthContext from "~/hooks/useAuthContext";
 
 const IMG_HEIGHT = 300;
 
@@ -42,7 +43,7 @@ const schema = zod.object({
   startTime: zod.date(),
   endTime: zod.date(),
   locationPlaceId: zod.string(),
-  tags: zod.string().array(),
+  // tags: zod.string().array(),
   description: zod.string(),
 });
 // Component is responsible for allowing users to create a new event page
@@ -54,6 +55,7 @@ export default function CreateEvent() {
   const [image, setImage] = useState<ImagePickerAsset>();
   const [resetLocationValue, setResetLocationValue] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { userType, organization } = useAuthContext();
 
   const {
     control,
@@ -67,10 +69,10 @@ export default function CreateEvent() {
       startTime: new Date(),
       endTime: new Date(),
       locationPlaceId: "",
-      tags: [],
+      // tags: [],
       description: "",
     },
-    resolver: zodResolver(schema),
+    // resolver: zodResolver(schema),
   });
 
   // Handle submission of user data
@@ -80,6 +82,16 @@ export default function CreateEvent() {
         alert("Please upload an image");
         return;
       }
+
+      // TODO this is temporary, need to find a better way to validate
+      for (const key in data) {
+        // @ts-ignore
+        if (data[key] === "") {
+          Alert.alert("Cannot Create", "Please fill out all fields");
+          return;
+        }
+      }
+
       setIsSubmitting(true);
       createMutation.mutate(data);
     },
@@ -87,7 +99,15 @@ export default function CreateEvent() {
   );
 
   const createMutation = useMutation({
-    mutationFn: (data: createEventType) => createEvent(data, image!),
+    mutationFn: (data: createEventType) => {
+      let verified: boolean = false;
+      if (userType === "Student") {
+        verified = false;
+      } else if (userType === "Organization_Admin") {
+        verified = true;
+      }
+      return createEvent(data, image!, verified, organization?.id ?? "-1");
+    },
     onSuccess: () => {
       reset();
       setImage(undefined);
@@ -313,33 +333,31 @@ export default function CreateEvent() {
               )}
               name="locationPlaceId"
             />
-
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange } }) => (
-                <View style={[style.tagInput]}>
-                  <Text
-                    style={{
-                      marginBottom: 3,
-                      fontFamily: "Nunito-Medium",
-                      fontSize: 16,
-                      color: theme.colors.text,
-                    }}
-                  >
-                    Tags*
-                  </Text>
-                  <ItemTag
-                    controllerOnChange={onChange}
-                    editable={!isSubmitting}
-                  />
-                </View>
-              )}
-              name="tags"
-            />
-
+            {/*<Controller*/}
+            {/*  control={control}*/}
+            {/*  rules={{*/}
+            {/*    required: true,*/}
+            {/*  }}*/}
+            {/*  render={({ field: { onChange } }) => (*/}
+            {/*    <View style={[style.tagInput]}>*/}
+            {/*      <Text*/}
+            {/*        style={{*/}
+            {/*          marginBottom: 3,*/}
+            {/*          fontFamily: "Nunito-Medium",*/}
+            {/*          fontSize: 16,*/}
+            {/*          color: theme.colors.text,*/}
+            {/*        }}*/}
+            {/*      >*/}
+            {/*        Tags**/}
+            {/*      </Text>*/}
+            {/*      <ItemTag*/}
+            {/*        controllerOnChange={onChange}*/}
+            {/*        editable={!isSubmitting}*/}
+            {/*      />*/}
+            {/*    </View>*/}
+            {/*  )}*/}
+            {/*  name="tags"*/}
+            {/*/>*/}
             <Controller
               control={control}
               rules={{

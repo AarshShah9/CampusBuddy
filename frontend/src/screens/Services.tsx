@@ -4,6 +4,7 @@ import {
   Pressable,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import LookingForItem from "~/components/SearchLookingForBar";
 import { ThemedText } from "~/components/ThemedComponents";
@@ -11,6 +12,7 @@ import useAppContext from "~/hooks/useAppContext";
 import { services } from "~/mockData/ServicesData";
 import useEventsContext from "~/hooks/useEventsContext";
 import { useCallback, useEffect, useState } from "react";
+import useNavigationContext from "~/hooks/useNavigationContext";
 import { getAllPosts } from "~/lib/apiFunctions/Events";
 import { useQuery } from "@tanstack/react-query";
 import { FlashList } from "@shopify/flash-list";
@@ -73,6 +75,7 @@ export default function Services() {
                 title={item.title}
                 description={item.description}
                 requiredMembers={item.spotsLeft}
+                id={item.id}
               />
             </View>
           </Pressable>

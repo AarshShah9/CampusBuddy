@@ -24,30 +24,7 @@ import useAuthContext from "~/hooks/useAuthContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
 import ErrorText from "~/components/ErrorText";
 import useNavigationContext from "~/hooks/useNavigationContext";
-
-const schema = zod
-  .object({
-    orgEmail: zod.string(),
-    organizationName: zod.string(),
-    institutionId: zod.string(),
-    description: zod.string(),
-    firstName: zod.string(),
-    lastName: zod.string(),
-    password: zod
-      .string()
-      .min(8, { message: "Password must be at least 8 characters long" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number",
-      }),
-    rePassword: zod.string(),
-  })
-  .refine((data) => data.password === data.rePassword, {
-    message: "Passwords do not match",
-    path: ["rePassword"],
-  });
+import { OrganizationRegistrationSchema } from "~/types/schemas";
 
 export default function OrganizationSignUp() {
   let lastStep = 2;
@@ -65,7 +42,7 @@ export default function OrganizationSignUp() {
     formState: { errors },
     trigger,
   } = useForm<organizationInformation>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(OrganizationRegistrationSchema),
   });
 
   useEffect(() => {
@@ -104,7 +81,7 @@ export default function OrganizationSignUp() {
         ]);
         break;
       case 2:
-        result = await trigger(["description", "password", "rePassword"]);
+        result = await trigger(["description", "password", "confirmPassword"]);
         break;
     }
 
@@ -155,8 +132,8 @@ export default function OrganizationSignUp() {
                       render={({ field: { onChange, onBlur, value } }) => (
                         <InputField
                           label={
-                            errors.orgEmail ? (
-                              <ErrorText error={"An Email is required."} />
+                            errors.orgEmail && errors.orgEmail.message ? (
+                              <ErrorText error={errors.orgEmail.message} />
                             ) : (
                               "Email"
                             )
@@ -180,8 +157,8 @@ export default function OrganizationSignUp() {
                       render={({ field: { onChange, onBlur, value } }) => (
                         <InputField
                           label={
-                            errors.orgEmail ? (
-                              <ErrorText error={"First Name is required."} />
+                            errors.firstName && errors.firstName.message ? (
+                              <ErrorText error={errors.firstName.message} />
                             ) : (
                               "First Name"
                             )
@@ -204,8 +181,8 @@ export default function OrganizationSignUp() {
                       render={({ field: { onChange, onBlur, value } }) => (
                         <InputField
                           label={
-                            errors.orgEmail ? (
-                              <ErrorText error={"Last name is required."} />
+                            errors.lastName && errors.lastName.message ? (
+                              <ErrorText error={errors.lastName.message} />
                             ) : (
                               "Last Name"
                             )
@@ -228,9 +205,10 @@ export default function OrganizationSignUp() {
                       render={({ field: { onChange, onBlur, value } }) => (
                         <InputField
                           label={
-                            errors.organizationName ? (
+                            errors.organizationName &&
+                            errors.organizationName.message ? (
                               <ErrorText
-                                error={"Organization Name is required."}
+                                error={errors.organizationName.message}
                               />
                             ) : (
                               "Organization Name"
@@ -246,8 +224,8 @@ export default function OrganizationSignUp() {
                       )}
                       name="organizationName"
                     />
-                    {errors.organizationName && (
-                      <ErrorText error={"University Name is required."} />
+                    {errors.institutionId && errors.institutionId.message && (
+                      <ErrorText error={errors.institutionId.message} />
                     )}
                     <Controller
                       control={control}
@@ -300,8 +278,9 @@ export default function OrganizationSignUp() {
                             autoCapitalize={"none"}
                             autoComplete={"off"}
                             label={
-                              errors.description ? (
-                                <ErrorText error={"Description is required."} />
+                              errors.description &&
+                              errors.description.message ? (
+                                <ErrorText error={errors.description.message} />
                               ) : (
                                 "Description"
                               )
@@ -345,10 +324,13 @@ export default function OrganizationSignUp() {
                       render={({ field: { onChange, onBlur, value } }) => (
                         <InputField
                           label={
-                            errors.rePassword ? (
-                              <ErrorText error={"Password Doesn't Match."} />
+                            errors.confirmPassword &&
+                            errors.confirmPassword.message ? (
+                              <ErrorText
+                                error={errors.confirmPassword.message}
+                              />
                             ) : (
-                              "Re-enter Password"
+                              "Confirm Password"
                             )
                           }
                           onBlur={onBlur}
@@ -361,7 +343,7 @@ export default function OrganizationSignUp() {
                           style={{ backgroundColor: theme.colors.tertiary }}
                         />
                       )}
-                      name="rePassword"
+                      name="confirmPassword"
                     />
                   </>
                 )}

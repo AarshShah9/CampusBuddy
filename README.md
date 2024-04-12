@@ -146,3 +146,11 @@ npm run start
   - https://docs.expo.dev/versions/latest/sdk/map-view/
 
 
+### iOS Appstore EAS Commands
+
+```bash
+eas secret:push --scope project --env-file ./.env
+
+eas build --platform ios
+eas submit -p ios --latest
+```

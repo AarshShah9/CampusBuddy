@@ -2,9 +2,9 @@ import type { PropsWithChildren } from "react";
 import { createContext, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { UserDataType } from "~/types/User";
+import { OrganizationDataType, UserDataType, UserType } from "~/types/User";
 import { CBRequest } from "~/lib/CBRequest";
-import useNavigationContext from "~/hooks/useNavigationContext";
+import { Alert } from "react-native";
 
 const setAxiosTokenHeader = (token: string) =>
   (axios.defaults.headers.common["Authorization"] = `Bearer ${token}`);
@@ -29,7 +29,7 @@ export type userRegistrationData = {
   firstName: string;
   lastName: string;
   password: string;
-  rePassword?: string;
+  confirmPassword?: string;
 };
 export type institution = {
   id: string;
@@ -43,24 +43,33 @@ export type organizationInformation = {
   institutionId: string;
   description: string;
   password: string;
-  rePassword?: string;
+  confirmPassword?: string;
 };
 
 type authContext = {
   user?: UserDataType;
+  organization?: OrganizationDataType;
+  userType?: UserType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<boolean | undefined>;
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
   setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
+  setOrganization: React.Dispatch<
+    React.SetStateAction<OrganizationDataType | undefined>
+  >;
   registerOrganization: (arg: organizationInformation) => Promise<void>;
+  isUserLoggedIn: () => Promise<boolean>;
 };
 const AuthContext = createContext<authContext | null>(null);
 
 export const AuthContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
+  const [userType, setUserType] = useState<UserType>();
   const [user, setUser] = useState<UserDataType>();
+  const [organzationalUser, setOrganizationalUser] =
+    useState<OrganizationDataType>();
 
   const registerUser = useCallback(async (data: userRegistrationData) => {
     try {
@@ -69,6 +78,7 @@ export const AuthContextProvider = ({
       console.log(error);
     }
   }, []);
+
   const registerOrganization = useCallback(
     async (data: organizationInformation) => {
       try {
@@ -99,12 +109,30 @@ export const AuthContextProvider = ({
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      const res = await CBRequest("GET", "/api/user/token", {}); // TODO - implement this with proper login
-      setAxiosTokenHeader(res.authToken as string);
-      await setTokenInSecureStore(TOKEN_KEY, res.authToken as string);
-      setUser(res.data);
+      // Actual login
+      const loginRes = await CBRequest("POST", "/api/user/loginUser", {
+        body: {
+          email,
+          password,
+        },
+      });
+      setAxiosTokenHeader(loginRes.authToken as string);
+      await setTokenInSecureStore(TOKEN_KEY, loginRes.authToken as string);
+
+      if (loginRes.data.type === "Organization_Admin") {
+        setUserType("Organization_Admin");
+        setOrganizationalUser(loginRes.data);
+      } else if (loginRes.data.type === "Student") {
+        setUserType("Student");
+        setUser(loginRes.data);
+      } else {
+        Alert.alert("Error Logging In", "Something went wrong!");
+        return false;
+      }
+      return true;
     } catch (error) {
-      console.log("An error occured while trying to sign in:\n", error);
+      Alert.alert("Error Logging In", "Something went wrong!");
+      return false;
     }
   }, []);
 
@@ -113,6 +141,8 @@ export const AuthContextProvider = ({
       await deleteTokenFromSecureStore(TOKEN_KEY);
       removeAxiosTokenHeader();
       setUser(undefined);
+      setOrganizationalUser(undefined);
+      setUserType(undefined);
     } catch (error) {
       console.log(error);
     }
@@ -137,6 +167,35 @@ export const AuthContextProvider = ({
     loadToken();
   }, []);
 
+  const isUserLoggedIn = useCallback(async () => {
+    try {
+      const token = await getTokenFromSecureStore(TOKEN_KEY);
+      setAxiosTokenHeader(token as string);
+      if (token) {
+        const loginRes = await CBRequest("GET", "/api/user/verify");
+        if (loginRes.data.type === "Organization_Admin") {
+          setUserType("Organization_Admin");
+          setOrganizationalUser(loginRes.data);
+          return true;
+        } else if (loginRes.data.type === "Student") {
+          setUserType("Student");
+          setUser(loginRes.data);
+          return true;
+        } else {
+          Alert.alert("Error Logging In", "Something went wrong!");
+          return false;
+        }
+      }
+      return false;
+    } catch (error) {
+      // remove the token from the secure store
+      await deleteTokenFromSecureStore(TOKEN_KEY);
+      removeAxiosTokenHeader();
+      console.log("Pre-existing login failed", error);
+      return false;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -147,6 +206,10 @@ export const AuthContextProvider = ({
         getInstitutions,
         registerOrganization,
         setUser,
+        userType,
+        organization: organzationalUser,
+        setOrganization: setOrganizationalUser,
+        isUserLoggedIn,
       }}
     >
       {children}

@@ -41,6 +41,7 @@ const Map = ({
 
   const openMarketPlaceDetail = useCallback(
     (id: string) => {
+      if (showInfo) return;
       navigateTo({ page: "MarketPlaceDetail", id });
     },
     [navigateTo, items],

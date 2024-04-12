@@ -1,6 +1,6 @@
 import { View, FlatList } from "react-native";
+import { Text } from "react-native-paper";
 import EventHomeCard from "~/components/HomeEventCard";
-import { ThemedText } from "~/components/ThemedComponents";
 import { EventData, EventItem } from "~/types/Events";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 
@@ -16,12 +16,12 @@ const Cards = ({ item, isLoading }: { item: EventItem, isLoading: boolean }) => 
 export default function HorizontalScrollElement({ item, isLoading }: { item: EventData, isLoading: boolean }) {
     return (
         <View style={{ paddingLeft: 20 }}>
-            {/* Text displaying the title of the horizontal scroll element */}
-            <LoadingSkeleton show={isLoading} width="40%" height={23} radius={18}>
-                <ThemedText style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
+            {isLoading ? 
+                <LoadingSkeleton show width="40%" height={23} radius={18} />
+                :<Text style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
                     {item.title}
-                </ThemedText>
-            </LoadingSkeleton>
+                </Text>
+            }
             {/* FlatList renders a horizontal scrollable list of cards */}
             <View style={{ marginTop: 16, marginBottom: 24 }}>
                 <FlatList

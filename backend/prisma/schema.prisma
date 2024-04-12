@@ -99,6 +99,9 @@ model User {
   subscriptions        TopicSubscription[]
   UserOrganizationRole UserOrganizationRole[]
   pushTokens           PushToken[]
+  postAttendances      PostAttendance[]
+
+  degreeName String? @map("degree_name")
 
   @@index([email])
   @@index([institutionId])
@@ -139,7 +142,7 @@ model Event {
   startTime       DateTime            @map("start_time")
   endTime         DateTime            @map("end_time")
   isPublic        Boolean             @default(true) @map("is_public")
-  isFlagged         Boolean             @default(false)
+  isFlagged       Boolean             @default(false)
   status          EventStatus
   image           String?
   user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -168,31 +171,26 @@ model UserEventResponse {
 }
 
 model Post {
-  id             String  @id @default(uuid())
-  userId         String  @map("user_id")
-  organizationId String? @map("organization_id")
-
-  image       String?
-  createdAt   DateTime  @unique @default(now()) @map("created_at")
-  title       String
-  description String?
-  isPublic    Boolean   @default(true)
-  isFlagged     Boolean   @default(false)
-  expiresAt   DateTime? @map("expires_at")
-
-  numberOfSpots     Int? @map("number_of_spots")
-  numberOfSpotsLeft Int? @map("number_of_spots_left")
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  type PostType
-
-  comments Comment[]
-  postTags PostTag[]
-
-  institutionId String      @map("institution_id")
-  Institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  id                String           @id @default(uuid())
+  userId            String           @map("user_id")
+  organizationId    String?          @map("organization_id")
+  image             String?
+  createdAt         DateTime         @unique @default(now()) @map("created_at")
+  title             String
+  description       String?
+  isPublic          Boolean          @default(true)
+  isFlagged         Boolean          @default(false)
+  expiresAt         DateTime?        @map("expires_at")
+  numberOfSpots     Int?             @map("number_of_spots")
+  numberOfSpotsLeft Int?             @map("number_of_spots_left")
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  type              PostType
+  comments          Comment[]
+  postTags          PostTag[]
+  institutionId     String           @map("institution_id")
+  Institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  postAttendees     PostAttendance[]
 
   @@index([userId])
   @@index([organizationId])
@@ -209,14 +207,27 @@ model Comment {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @map("user_id")
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content   String
   createdAt DateTime @unique @default(now()) @map("created_at")
-  text      String
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([postId])
   @@map("comment")
+}
+
+model PostAttendance {
+  postId String @map("post_id")
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId])
+  @@index([postId])
+  @@map("post_attendance")
 }
 
 model Organization {
@@ -352,7 +363,7 @@ model Item {
   institutionId String       @map("institution_id")
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   isPublic      Boolean      @default(true)
-  isFlagged       Boolean      @default(false)
+  isFlagged     Boolean      @default(false)
   title         String
   description   String?
   price         Int

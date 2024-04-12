@@ -62,6 +62,9 @@ export const ids = {
   postIds: {
     1: "20909dd0-c553-11ee-83fd-6f8d6c450910",
     2: "20909dd1-c553-11ee-83fd-6f8d6c450910",
+    3: "20909dd2-c553-11ee-83fd-6f8d6c450910",
+    4: "20909dd3-c553-11ee-83fd-6f8d6c450910",
+    5: "20909dd4-c553-11ee-83fd-6f8d6c450910",
   },
   itemIds: {
     1: "376a4ee0-e6df-11ee-bd3d-0242ac120002",
@@ -76,6 +79,9 @@ export const ids = {
   commentIds: {
     1: "37e11780-c553-11ee-83fd-6f8d6c450910",
     2: "37e11781-c553-11ee-83fd-6f8d6c450910",
+    3: "37e11782-c553-11ee-83fd-6f8d6c450910",
+    4: "37e11783-c553-11ee-83fd-6f8d6c450910",
+    5: "37e11784-c553-11ee-83fd-6f8d6c450910",
   },
   programIds: {
     1: "c5ba3bc0-c5f5-11ee-83fd-6f8d6c450910",
@@ -131,30 +137,33 @@ export const users: User[] = [
     firstName: "John",
     lastName: "Doe",
     email: "john@example.com",
-    password: "hashed-password123",
+    password: "Hashed-password123",
     institutionId: ids.instituteIds[1],
     accountType: UserType.ApprovedOrg,
     profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
+    degreeName: null,
   },
   {
     id: ids.userIds[2],
     firstName: "Jane",
     lastName: "Smith",
     email: "jane@example.com",
-    password: "hashed-password4569",
+    password: "Hashed-password4569",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[3],
     firstName: "Tom",
     lastName: "Dee",
     email: "tom@example.com",
-    password: "hashed-password1238",
+    password: "Hashed-password1238",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Computer Science",
   },
   {
     id: ids.userIds[4],
@@ -165,66 +174,73 @@ export const users: User[] = [
     institutionId: null,
     accountType: UserType.Admin,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[5],
     firstName: "Wendy",
     lastName: "Kim",
     email: "wendyk@example.com",
-    password: "hashed-password8893",
+    password: "Hashed-password8893",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[6],
     firstName: "Doug",
     lastName: "Smith",
     email: "d_smith@example.com",
-    password: "hashed-password2814",
+    password: "Hashed-password2814",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: "Arts",
   },
   {
     id: ids.userIds[7],
     firstName: "Kamil",
     lastName: "Stock",
     email: "k_stock@example.com",
-    password: "hashed-password7510",
+    password: "Hashed-password7510",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[8],
     firstName: "Peter",
     lastName: "Johnson",
     email: "p_johnson@example.com",
-    password: "hashed-password1110",
+    password: "Hashed-password1110",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[9],
     firstName: "Gary",
     lastName: "Scott",
     email: "g_scott@example.com",
-    password: "hashed-password1111",
+    password: "Hashed-password1111",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
   {
     id: ids.userIds[10],
     firstName: "Michael",
     lastName: "Galvan",
     email: "m_galvan@example.com",
-    password: "hashed-password1112",
+    password: "Hashed-password1112",
     institutionId: ids.instituteIds[1],
     accountType: UserType.PendingOrg,
     profilePic: null,
+    degreeName: null,
   },
 ];
 
@@ -359,8 +375,6 @@ export const posts = [
     expiresAt: "2024-10-10T18:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 5,
-
-    // Other post details
   },
   {
     id: ids.postIds[2],
@@ -523,18 +537,39 @@ export const images = [
 
 export const comments = [
   {
+    id: ids.commentIds[1],
     userId: ids.userIds[1],
     postId: ids.postIds[1],
-    text: "This is the first comment!",
+    content: "This is the first comment!",
     createdAt: "2024-10-10T18:00:00Z",
-    // Other post details
   },
   {
+    id: ids.commentIds[2],
+    userId: ids.userIds[2],
+    postId: ids.postIds[1],
+    content: "Cool post",
+    createdAt: "2024-10-10T18:30:00Z",
+  },
+  {
+    id: ids.commentIds[3],
+    userId: ids.userIds[3],
+    postId: ids.postIds[1],
+    content: "Hello!",
+    createdAt: "2024-10-10T18:40:00Z",
+  },
+  {
+    id: ids.commentIds[4],
     userId: ids.userIds[2],
     postId: ids.postIds[2],
-    text: "Another post here!",
+    content: "Another post here!",
     createdAt: "2024-10-10T19:00:00Z",
-    // Other post details
+  },
+  {
+    id: ids.commentIds[5],
+    userId: ids.userIds[1],
+    postId: ids.postIds[2],
+    content: ":D",
+    createdAt: "2024-10-10T19:21:00Z",
   },
 ];
 
@@ -651,7 +686,7 @@ export const roles = [
 ];
 
 export const organizationRolePermissions = [
-  // add all permissions for owner of org1
+  // add all default permissions for owner of org1
   {
     organizationId: ids.organizationIds[1],
     roleId: ids.roleIds[UserRole.Owner],
@@ -728,11 +763,266 @@ export const organizationRolePermissions = [
     roleId: ids.roleIds[UserRole.Moderator],
     permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
   },
+  // org 1 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[1],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
   // org2
+  // add all default permissions for owner of org2
   {
     organizationId: ids.organizationIds[2],
     roleId: ids.roleIds[UserRole.Owner],
     permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 2 moderator
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 2 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[2],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
+  // org3
+  // add all default permissions for owner of org3
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 3 moderator
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 3 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[3],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+
+  // org4
+  // add all default permissions for owner of org4
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.VIEW_ANALYTICS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_ORGANIZATION],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Owner],
+    permissionId: ids.permissionIds[AppPermissionName.DELETE_ORGANIZATION],
+  },
+  // Org 4 moderator
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_EVENTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_POSTS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.MANAGE_MEMBERS],
+  },
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Moderator],
+    permissionId: ids.permissionIds[AppPermissionName.APPROVE_MEMBER_REQUESTS],
+  },
+  // org 4 member -> can only create posts
+  {
+    organizationId: ids.organizationIds[4],
+    roleId: ids.roleIds[UserRole.Member],
+    permissionId: ids.permissionIds[AppPermissionName.CREATE_POSTS],
   },
 ];
 

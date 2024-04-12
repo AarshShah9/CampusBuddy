@@ -5,7 +5,7 @@ class ExtendableError extends Error {
   constructor(
     name: string,
     message: string,
-    statusCode: number = 500,
+    statusCode: number,
     isOperational: boolean,
   ) {
     super(message);
@@ -24,8 +24,8 @@ class AppError extends ExtendableError {
   constructor(
     name: string,
     message: string,
-    statusCode: number,
-    isOperational: boolean,
+    statusCode: number = 500,
+    isOperational: boolean = true,
   ) {
     super(name, message, statusCode, isOperational);
     Object.setPrototypeOf(this, AppError.prototype);
@@ -45,6 +45,8 @@ enum AppErrorName {
   EMPTY_RESULT_ERROR = "EmptyResultError",
   DATABASE_ERROR = "DatabaseError",
   PRISMA_ERROR = "PrismaError",
+  INTERNAL_SERVER_ERROR = "InternalServerError",
+  NO_SPOT_AVAILABLE_ERROR = "NoSpotsAvailableError",
 }
 
 export { AppError, AppErrorName };
