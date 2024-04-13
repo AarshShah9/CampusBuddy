@@ -114,11 +114,11 @@ export default function EventDetails({
   }, [eventData]);
 
   const userAttendEvent = useCallback(() => {
-    // navigateTo({ page: "EventPayment" });
-    attendMutation.mutate({
-      id,
-      previousState: eventData?.isAttending!,
-    });
+    navigateTo({ page: "EventPayment" });
+    // attendMutation.mutate({
+    //   id,
+    //   previousState: eventData?.isAttending!,
+    // });
   }, [id, attendEvent, eventData?.isAttending]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -149,22 +149,30 @@ export default function EventDetails({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => openModal()}
-          style={{ flexDirection: "row" }}
-        >
+        <>
           {eventData?.eventType === "Verified" && (
-            <MaterialIcons
-              name="verified"
-              size={24}
-              color="white"
-              style={{
-                marginRight: 15,
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  "Verified",
+                  "This event is created by a verified organization.",
+                );
               }}
-            />
+            >
+              <MaterialIcons
+                name="verified"
+                size={24}
+                color="white"
+                style={{
+                  marginRight: 15,
+                }}
+              />
+            </TouchableOpacity>
           )}
-          <Entypo name="dots-three-horizontal" size={24} color="white" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => openModal()}>
+            <Entypo name="dots-three-horizontal" size={24} color="white" />
+          </TouchableOpacity>
+        </>
       ),
     });
   }, [navigation]);

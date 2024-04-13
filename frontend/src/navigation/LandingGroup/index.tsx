@@ -184,11 +184,8 @@ export default function LandingGroup() {
                   headerTitleStyle: {
                     color: theme.colors.onSecondary,
                   },
+                  presentation: "modal",
                   headerStyle: { backgroundColor: theme.colors.primary },
-                  headerTitle: "",
-                  headerShown: true,
-                  headerBackTitle: "Back",
-                  headerTintColor: theme.colors.onSecondary,
                 }}
               />
             </Stack.Navigator>

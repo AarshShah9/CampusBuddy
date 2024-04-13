@@ -11,12 +11,13 @@ import {
 import { useEffect, useState } from "react";
 import {
   Alert,
-  Button,
   Keyboard,
   TouchableWithoutFeedback,
   View,
+  Text,
+  StyleSheet,
 } from "react-native";
-import { GOOGLE_MAPS_API_KEY } from "@env";
+import { Button } from "react-native-paper";
 
 export default function EventPayment() {
   const [isApplePaySupported, setIsApplePaySupported] = useState(false);
@@ -77,54 +78,31 @@ export default function EventPayment() {
       >
         <PlatformPayButton
           onPress={pay}
-          type={PlatformPay.ButtonType.Order}
+          type={PlatformPay.ButtonType.Pay}
           appearance={PlatformPay.ButtonStyle.Black}
-          borderRadius={4}
+          borderRadius={10}
           style={{
             width: "100%",
             height: 50,
-            borderRadius: 10,
           }}
         />
-        <AddressSheet
-          defaultValues={{
-            phone: "111-222-3333",
-            address: {
-              country: "United States",
-              city: "San Francisco",
-            },
-          }}
-          additionalFields={{
-            phoneNumber: "required",
-          }}
-          allowedCountries={["CA"]}
-          primaryButtonTitle={"Use this address"}
-          sheetTitle={"Shipping Address"}
-          googlePlacesApiKey={GOOGLE_MAPS_API_KEY}
-          visible={addressSheetVisible}
-          onSubmit={async (addressDetails) => {
-            setAddressSheetVisible(false);
-          }}
-          onError={(error) => {
-            if (error.code === AddressSheetError.Failed) {
-              Alert.alert("There was an error.", "Check the logs for details.");
-              console.log(error?.localizedMessage);
-            }
-            setAddressSheetVisible(false);
-          }}
-        />
-        <CardField
-          postalCodeEnabled={true}
-          placeholders={{
-            number: "4242 4242 4242 4242",
-          }}
-          style={{
-            width: "100%",
-            height: 50,
-            marginVertical: 30,
-          }}
-          onCardChange={handleCardDetailsChange}
-        />
+        <View style={styles.container}>
+          <View style={styles.line} />
+          <Text style={styles.text}>Or pay with card</Text>
+          <View style={styles.line} />
+        </View>
+        {/*<CardField*/}
+        {/*  postalCodeEnabled={true}*/}
+        {/*  placeholders={{*/}
+        {/*    number: "4242 4242 4242 4242",*/}
+        {/*  }}*/}
+        {/*  style={{*/}
+        {/*    width: "100%",*/}
+        {/*    height: 50,*/}
+        {/*    marginVertical: 30,*/}
+        {/*  }}*/}
+        {/*  onCardChange={handleCardDetailsChange}*/}
+        {/*/>*/}
         <CardForm
           style={{
             width: "100%",
@@ -133,11 +111,46 @@ export default function EventPayment() {
           }}
         />
         <Button
-          title="Add Shipping Address"
-          onPress={() => setAddressSheetVisible(true)}
-        />
-        <Button title="Pay with Card" onPress={payWithCard} />
+          style={{
+            borderRadius: 8,
+            width: "100%",
+            height: 48,
+          }}
+          mode="contained"
+          onPress={payWithCard}
+        >
+          <Text
+            style={{
+              lineHeight: 30,
+              fontSize: 24,
+              fontWeight: "bold",
+              color: "white",
+              fontFamily: "Nunito-Bold",
+            }}
+          >
+            Pay
+          </Text>
+        </Button>
       </View>
     </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row", // Align items in a row
+    alignItems: "center", // Center items vertically
+    marginTop: 20,
+  },
+  line: {
+    flex: 1, // Take up equal space on both sides of the text
+    height: 1, // Line thickness
+    backgroundColor: "black", // Line color
+  },
+  text: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "400",
+    paddingHorizontal: 10, // Space on the sides of the text
+  },
+});
