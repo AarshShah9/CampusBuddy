@@ -13,7 +13,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { useCallback, useEffect, useLayoutEffect } from "react";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -114,11 +114,11 @@ export default function EventDetails({
   }, [eventData]);
 
   const userAttendEvent = useCallback(() => {
-    navigateTo({ page: "EventPayment" });
-    // attendMutation.mutate({
-    //   id,
-    //   previousState: eventData?.isAttending!,
-    // });
+    // navigateTo({ page: "EventPayment" });
+    attendMutation.mutate({
+      id,
+      previousState: eventData?.isAttending!,
+    });
   }, [id, attendEvent, eventData?.isAttending]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -149,7 +149,20 @@ export default function EventDetails({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => openModal()}>
+        <TouchableOpacity
+          onPress={() => openModal()}
+          style={{ flexDirection: "row" }}
+        >
+          {eventData?.eventType === "Verified" && (
+            <MaterialIcons
+              name="verified"
+              size={24}
+              color="white"
+              style={{
+                marginRight: 15,
+              }}
+            />
+          )}
           <Entypo name="dots-three-horizontal" size={24} color="white" />
         </TouchableOpacity>
       ),
@@ -392,7 +405,7 @@ export default function EventDetails({
                   fontFamily: "Nunito-Bold",
                 }}
               >
-                {eventData?.isAttending ? "Not Going" : "Attend"}
+                {eventData?.isAttending ? "Not Going" : "Sign Up"}
               </Text>
             </Button>
           )}
