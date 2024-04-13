@@ -21,6 +21,7 @@ import PostSettings from "~/screens/PostSettings";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { PUBLISHABLE_KEY } from "@env";
 import EventPayment from "~/screens/EventPayment";
+import Analytics from "~/screens/Analytics";
 
 const Stack = createNativeStackNavigator();
 
