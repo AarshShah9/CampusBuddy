@@ -99,6 +99,16 @@ type HelpRoute = {
 
 type PaymentRoute = {
   page: "EventPayment";
+  eventId: string;
+};
+
+type PricingRoute = {
+  page: "EventPricing";
+  image: string;
+  title: string;
+  subtitle: string;
+  price: number;
+  eventId: string;
 };
 
 type AnalyticsRoute = {
@@ -126,6 +136,7 @@ export type NavigationFunctionArgs =
   | HelpRoute
   | PaymentRoute
   | AnalyticsRoute
+  | PricingRoute
   | SettingsRoute;
 
 export type NavigableStacks =

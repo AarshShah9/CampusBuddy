@@ -18,21 +18,24 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-paper";
+import { useRoute } from "@react-navigation/native";
+import { useMutation } from "@tanstack/react-query";
+import { attendEvent } from "~/lib/apiFunctions/Events";
+import useEventsContext from "~/hooks/useEventsContext";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function EventPayment() {
   const [isApplePaySupported, setIsApplePaySupported] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const { confirmPayment } = useStripe();
-  const [billingDetails, setBillingDetails] = useState({
-    name: "",
-    email: "",
-    line1: "",
-    city: "",
-    postal_code: "",
-    state: "",
-    country: "",
-  });
+
   const [addressSheetVisible, setAddressSheetVisible] = useState(false);
+  const { refetchEventDetails } = useEventsContext();
+  const { navigateTo } = useNavigationContext();
+
+  const {
+    params: { eventId },
+  } = useRoute<any>();
 
   useEffect(() => {
     (async function () {
@@ -40,7 +43,16 @@ export default function EventPayment() {
     })();
   }, [isPlatformPaySupported]);
 
-  // ...
+  const attendMutation = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      await attendEvent(id);
+    },
+    onSuccess: () => {
+      refetchEventDetails();
+      navigateTo({ page: "EventDetails", id: eventId });
+      Alert.alert("Success", "You have successfully got the tickets!");
+    },
+  });
 
   const pay = async () => {
     // ...
@@ -53,10 +65,14 @@ export default function EventPayment() {
   };
 
   const payWithCard = async () => {
-    if (!paymentMethod) {
-      alert("Please fill in your credit card details.");
-      return;
-    }
+    attendMutation.mutate({
+      id: eventId,
+    });
+
+    // if (!paymentMethod) {
+    //   alert("Please fill in your credit card details.");
+    //   return;
+    // }
     // // Assuming you have a payment intent or similar setup
     // const { error, paymentIntent } = await confirmPayment("client_secret", {
     //   type: "Card",
@@ -109,6 +125,15 @@ export default function EventPayment() {
             height: 170,
             marginVertical: 30,
           }}
+          defaultValues={{
+            countryCode: "CA",
+          }}
+          placeholders={{
+            number: "4242 4242 4242 4242",
+            expiration: "09/26",
+            cvc: "813",
+            postalCode: "A1A 1A1",
+          }}
         />
         <Button
           style={{
@@ -138,19 +163,19 @@ export default function EventPayment() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row", // Align items in a row
-    alignItems: "center", // Center items vertically
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 20,
   },
   line: {
-    flex: 1, // Take up equal space on both sides of the text
-    height: 1, // Line thickness
-    backgroundColor: "black", // Line color
+    flex: 1,
+    height: 1,
+    backgroundColor: "black",
   },
   text: {
     textAlign: "center",
     fontSize: 16,
     fontWeight: "400",
-    paddingHorizontal: 10, // Space on the sides of the text
+    paddingHorizontal: 10,
   },
 });

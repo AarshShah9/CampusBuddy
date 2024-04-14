@@ -22,6 +22,7 @@ import { StripeProvider } from "@stripe/stripe-react-native";
 import { PUBLISHABLE_KEY } from "@env";
 import EventPayment from "~/screens/EventPayment";
 import Analytics from "~/screens/Analytics";
+import EventPricing from "~/screens/EventPricing";
 
 const Stack = createNativeStackNavigator();
 
@@ -166,6 +167,20 @@ export default function LandingGroup() {
               <Stack.Screen
                 name={"QRCodeScanner"}
                 component={QRCodeScanner}
+                options={{
+                  headerTitleStyle: {
+                    color: theme.colors.onSecondary,
+                  },
+                  headerStyle: { backgroundColor: theme.colors.primary },
+                  headerTitle: "",
+                  headerShown: true,
+                  headerBackTitle: "Back",
+                  headerTintColor: theme.colors.onSecondary,
+                }}
+              />
+              <Stack.Screen
+                name={"EventPricing"}
+                component={EventPricing}
                 options={{
                   headerTitleStyle: {
                     color: theme.colors.onSecondary,
