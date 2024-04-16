@@ -16,6 +16,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { classNames } from "../lib/className";
 import { Outlet, useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../lib/constants";
 
 const navigation = [
   {
@@ -75,10 +76,8 @@ export default function Layout() {
 
   const fetchRequests = async () => {
     try {
-      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
       const authToken = localStorage.getItem("token");
-      console.log(authToken);
-      const response = await fetch(`http://localhost:3000/api/user/me/`, {
+      const response = await fetch(`${BACKEND_URL}/api/user/me/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -325,10 +324,10 @@ export default function Layout() {
                     />
                     <span className="hidden lg:flex lg:items-center">
                       <span
-                        className="ml-4 text-sm font-semibold leading-6 text-gray-900"
+                        className="ml-4 text-sm font-semibold leading-6 text-gray -900"
                         aria-hidden="true"
                       >
-                        {/* {request.firstName}, {request.lastName} */}
+                        {requests[0]?.firstName} {requests[0]?.lastName}
                       </span>
                       <ChevronDownIcon
                         className="ml-2 h-5 w-5 text-gray-400"

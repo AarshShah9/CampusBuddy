@@ -27,18 +27,14 @@ const ItemTable = () => {
 
   const fetchRequests = async () => {
     try {
-      // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
       const authToken = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:3000/api/moderation/items/`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
+      const response = await fetch(`${BACKEND_URL}/api/moderation/items/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
-      );
+      });
       if (response.ok) {
         const res = await response.json();
         setRequests(res.data);
@@ -53,66 +49,61 @@ const ItemTable = () => {
   }, [updateTrigger]);
 
   console.log(requests);
-  // const handleAccept = async (id: string) => {
-  //   try {
-  //     setIsLoading(true);
-  //     // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-  //     const acceptBody: OrganizationApprovalType = {
-  //       decision: "Approved",
-  //     };
-  //     const authToken = localStorage.getItem("token");
+  const handleAccept = async (id: string) => {
+    try {
+      setIsLoading(true);
+      const authToken = localStorage.getItem("token");
 
-  //     const response = await fetch(
-  //       `${BACKEND_URL}/api/orgs/${id}/orgApproval`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${authToken}`,
-  //         },
-  //         body: JSON.stringify(acceptBody),
-  //       },
-  //     );
-  //     if (response.ok) {
-  //       setUpdateTrigger((prev) => !prev);
-  //     } else {
-  //       console.error("Failed to approve organization request");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating organization requests:", error);
-  //   }
-  // };
+      const response = await fetch(
+        `${BACKEND_URL}/api/moderation/items/approve`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ itemId: id }),
+        },
+      );
+      if (response.ok) {
+        setUpdateTrigger((prev) => !prev);
+      } else {
+        console.error("Failed to approve flagged item");
+      }
+    } catch (error) {
+      console.error("Error updating flagged item:", error);
+    }
+  };
 
-  // const handleDecline = async (id: string, rejectionReason?: string) => {
-  //   try {
-  //     setIsLoading(true);
-  //     // Replace 'your-api-endpoint' with your actual backend endpoint to fetch pending organization requests
-  //     const rejectBody: OrganizationApprovalType = {
-  //       decision: "Rejected",
-  //       rejectionReason,
-  //     };
-  //     const authToken = localStorage.getItem("token");
+  const handleDecline = async (id: string, rejectionReason?: string) => {
+    try {
+      setIsLoading(true);
+      const rejectBody = {
+        rejectionReason,
+        itemId: id,
+      };
+      const authToken = localStorage.getItem("token");
 
-  //     const response = await fetch(
-  //       `${BACKEND_URL}/api/orgs/${id}/orgApproval`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${authToken}`,
-  //         },
-  //         body: JSON.stringify(rejectBody),
-  //       },
-  //     );
-  //     if (response.ok) {
-  //       setUpdateTrigger((prev) => !prev);
-  //     } else {
-  //       console.error("Failed to reject organization request");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating organization requests:", error);
-  //   }
-  // };
+      const response = await fetch(
+        `${BACKEND_URL}/api/moderation/items/reject`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(rejectBody),
+        },
+      );
+      if (response.ok) {
+        setUpdateTrigger((prev) => !prev);
+      } else {
+        console.error("Failed to reject flagged item");
+      }
+    } catch (error) {
+      console.error("Error updating flagged item:", error);
+    }
+  };
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -192,29 +183,23 @@ const ItemTable = () => {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {formatDateTime(request.createdAt.toString())}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {/* {request.owner.firstName} {request.owner.lastName} */}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                         <button
-                          // onClick={() => handleAccept(request.organization.id)}
+                          onClick={() => handleAccept(request.id)}
                           className="text-indigo-600 hover:text-indigo-900"
                         >
                           Accept
-                          <span className="sr-only">
-                            {/* ,{request.organization.organizationName} */}
-                          </span>
+                          <span className="sr-only"></span>
                         </button>
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                         <button
-                          // onClick={() => handleDecline(request.organization.id)}
+                          onClick={() => handleDecline(request.id)}
                           className="text-indigo-600 hover:text-indigo-900"
                         >
                           Decline
-                          <span className="sr-only">
-                            {/* , {request.organization.organizationName} */}
-                          </span>
+                          <span className="sr-only"></span>
                         </button>
                       </td>
                     </tr>
