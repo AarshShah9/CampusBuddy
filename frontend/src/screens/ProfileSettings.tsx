@@ -93,9 +93,9 @@ export default function ProfileSettings() {
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
-          <>
+          <View key={i}>
             {setting.show && (
-              <TouchableOpacity key={i} onPress={setting.onClick}>
+              <TouchableOpacity onPress={setting.onClick}>
                 <View
                   style={[
                     styles.settingContainer,
@@ -117,7 +117,7 @@ export default function ProfileSettings() {
                 </View>
               </TouchableOpacity>
             )}
-          </>
+          </View>
         ))}
       </View>
     </BottomSheetModal>
