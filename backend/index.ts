@@ -19,6 +19,7 @@ import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
 import { initializeApp } from "firebase-admin/app";
 import * as admin from "firebase-admin";
+import seed from "./routes/seed.route";
 
 const app = express();
 const result = dotenv.config();
@@ -76,6 +77,7 @@ app.use("/api/profile", profile);
 app.use("/api/notification", notification);
 app.use("/api/moderation", moderation);
 app.use("/api/search", search);
+app.use("/api/seed", seed);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
