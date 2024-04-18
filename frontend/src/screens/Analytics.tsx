@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
-import { PieChart, BarChart, LineChart } from "react-native-gifted-charts";
 import PieChartAnalytics from "~/components/PieChartAnalytics";
 import Statistics from "~/components/Statistics";
 
