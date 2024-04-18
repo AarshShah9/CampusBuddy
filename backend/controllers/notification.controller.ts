@@ -1,15 +1,22 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { PushTokenSchema } from "../../shared/zodSchemas";
+import {
+  ChatNotificationSchema,
+  PushTokenSchema,
+} from "../../shared/zodSchemas";
 import {
   EventWithResponses,
   sendEventNotifications,
   getEventsWithinTimeRange,
   pushNotificationTest,
+  SendPushNotificationProps,
+  sendPushNotifications,
+  getUserPushTokens,
 } from "../services/pushNotification.service";
 import { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { AppError, AppErrorName } from "../utils/AppError";
 
 export const testNotification = async (
   req: RequestExtended,
@@ -109,6 +116,64 @@ export const sendUpcomingEventRemindersTest = async (
     res.status(200).json({
       success: true,
       message: "Upcoming event reminder notifications sent",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const sendChatNotification = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+    const { recipientId, message } = ChatNotificationSchema.parse(req.body);
+
+    // get the recipient's registered push tokens
+    const pushTokens = await getUserPushTokens(recipientId);
+
+    // User does not have any registered push tokens
+    if (pushTokens.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "Notification processing successful" });
+    }
+
+    // get sending user's name
+    const user = await prisma.user.findUnique({
+      where: { id: loggedInUserId },
+      select: {
+        firstName: true,
+        lastName: true,
+      },
+    });
+    if (!user) {
+      // this should never happen
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+    // construct the notification
+    const pushNotification: SendPushNotificationProps = {
+      title: `${user.firstName} ${user.lastName}`,
+      body: message,
+    };
+
+    // const tickets: ExpoPushTicket[] = [];
+    // send the notification
+    const tickets: ExpoPushTicket[] = await sendPushNotifications(
+      pushTokens,
+      pushNotification,
+    );
+
+    res.status(202).json({
+      success: true,
+      message: "Message notifications sent",
     });
   } catch (error: any) {
     next(error);

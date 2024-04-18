@@ -7,6 +7,7 @@ import { Expo } from "expo-server-sdk";
 import prisma from "../prisma/client";
 import { Event, UserEventResponse } from "@prisma/client";
 import { calculateTimeDifference } from "../utils/timeFormater";
+import { AppError, AppErrorName } from "../utils/AppError";
 
 // Create a new Expo SDK client
 let expo = new Expo({
@@ -26,12 +27,12 @@ export type EventWithResponses = {
 };
 
 export type SendPushNotificationProps = {
-  title: string;
-  body: string;
-  data: Object;
-  subtitle: string; // ios only
-  sound: "default" | null; // ios only
-  priority: "default" | "normal" | "high"; // ios only
+  title?: string;
+  body?: string;
+  data?: Object;
+  subtitle?: string; // ios only
+  sound?: "default" | null; // ios only
+  priority?: "default" | "normal" | "high"; // ios only
   // could add other properties, see https://docs.expo.dev/push-notifications/sending-notifications/
 };
 
@@ -238,4 +239,29 @@ export async function pushNotificationTest(token: ExpoPushToken) {
       priority: "default",
     },
   ]);
+}
+
+// Return a list of all of the user's registered push tokens
+export async function getUserPushTokens(userId: string): Promise<string[]> {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      pushTokens: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(
+      AppErrorName.NOT_FOUND_ERROR,
+      "User not found",
+      404,
+      true,
+    );
+  }
+
+  const pushTokens = user.pushTokens.map((token) => token.pushToken);
+
+  return pushTokens;
 }
