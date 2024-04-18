@@ -13,7 +13,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { useCallback, useEffect, useLayoutEffect } from "react";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -30,6 +30,7 @@ import useNavigationContext from "~/hooks/useNavigationContext";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 import { attendEvent } from "~/lib/apiFunctions/Events";
 import useEventsContext from "~/hooks/useEventsContext";
+import { limitTextToMax } from "~/lib/helperFunctions";
 
 const IMG_HEIGHT = 300;
 
@@ -77,21 +78,20 @@ export default function EventDetails({
   const { navigateTo } = useNavigationContext();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffSet = useScrollViewOffset(scrollRef);
-  const { openModal, eventData, fetchEventDetails, refetchEventDetails } =
-    useEventsContext();
+  const {
+    openModal,
+    eventData,
+    fetchEventDetails,
+    refetchEventDetails,
+    isLoading,
+  } = useEventsContext();
 
   useEffect(() => {
     fetchEventDetails(id);
   }, [id, fetchEventDetails]);
 
   const attendMutation = useMutation({
-    mutationFn: async ({
-      id,
-      previousState,
-    }: {
-      id: string;
-      previousState: boolean;
-    }) => {
+    mutationFn: async ({ id }: { id: string }) => {
       await attendEvent(id);
       refetchEventDetails();
     },
@@ -114,10 +114,21 @@ export default function EventDetails({
   }, [eventData]);
 
   const userAttendEvent = useCallback(() => {
-    attendMutation.mutate({
-      id,
-      previousState: eventData?.isAttending!,
-    });
+    //   TODO If cost is 0, just attend the event, and run the mutation
+    if (eventData?.isAttending) {
+      attendMutation.mutate({
+        id,
+      });
+    } else {
+      navigateTo({
+        page: "EventPricing",
+        title: eventData?.title ?? "",
+        subtitle: "1x Ticket",
+        image: eventData?.image ?? "",
+        price: 50,
+        eventId: id,
+      });
+    }
   }, [id, attendEvent, eventData?.isAttending]);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
@@ -148,9 +159,30 @@ export default function EventDetails({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => openModal()}>
-          <Entypo name="dots-three-horizontal" size={24} color="white" />
-        </TouchableOpacity>
+        <>
+          {eventData?.eventType === "Verified" && (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  "Verified",
+                  "This event is created by a verified organization.",
+                );
+              }}
+            >
+              <MaterialIcons
+                name="verified"
+                size={24}
+                color="white"
+                style={{
+                  marginRight: 15,
+                }}
+              />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity onPress={() => openModal()}>
+            <Entypo name="dots-three-horizontal" size={24} color="white" />
+          </TouchableOpacity>
+        </>
       ),
     });
   }, [navigation]);
@@ -284,7 +316,10 @@ export default function EventDetails({
                   }}
                 >
                   {eventData?.eventType === "Verified"
-                    ? eventData?.organization?.organizationName
+                    ? limitTextToMax(
+                        eventData?.organization?.organizationName,
+                        10,
+                      )
                     : eventData?.userName}
                 </Text>
               </LoadingSkeleton>
@@ -376,7 +411,7 @@ export default function EventDetails({
             backgroundColor: theme.colors.tertiary,
           }}
         >
-          {!eventData?.self && (
+          {!isLoading && !eventData?.self && (
             <Button
               style={styles.attendButton}
               mode="contained"
@@ -391,7 +426,7 @@ export default function EventDetails({
                   fontFamily: "Nunito-Bold",
                 }}
               >
-                {eventData?.isAttending ? "Not Going" : "Attend"}
+                {eventData?.isAttending ? "Not Going" : "Sign Up"}
               </Text>
             </Button>
           )}
