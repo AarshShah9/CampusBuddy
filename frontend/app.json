@@ -45,7 +45,7 @@
       [
         "@stripe/stripe-react-native",
         {
-          "merchantIdentifier": "",
+          "merchantIdentifier": "merchant.com.example.campusbuddy",
           "enableGooglePay": true
         }
       ]
