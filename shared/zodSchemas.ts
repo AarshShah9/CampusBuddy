@@ -91,19 +91,24 @@ export const EventSchema = z.object({
     })
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
-  description: z.string().min(3).max(255).nullable(),
+  description: z
+    .string()
+    .max(255, {
+      message: "Description must contain fewer than 255 characters",
+    })
+    .nullable(),
   locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
       required_error: "Please select a date and time",
-      invalid_type_error: "Invalid datetime string",
+      invalid_type_error: "Invalid datetime",
     })
     .refine((value) => value > new Date(), {
       message: "Start time must be in the future",
     }),
   endTime: z.coerce.date({
     required_error: "Please select a date and time",
-    invalid_type_error: "Invalid datetime string",
+    invalid_type_error: "Invalid datetime",
   }),
   isPublic: BooleanSchema,
   isFlagged: BooleanSchema,
