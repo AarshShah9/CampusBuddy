@@ -1,6 +1,8 @@
 import express from "express";
 import {
   sendChatNotification,
+  sendEventRemindersTest,
+  sendShowcaseNotification,
   sendUpcomingEventRemindersTest,
   storePushToken,
   testNotification,
@@ -18,5 +20,7 @@ router.post(
 );
 
 router.get("/sendUpcomingEventReminders", sendUpcomingEventRemindersTest); // TODO: remove, for testing
+router.get("/sendEventReminders/:id", sendEventRemindersTest); // send reminder to users attending event
+router.get("/showcaseNotification", sendShowcaseNotification); // hardcode push token and event
 
 export default router;
