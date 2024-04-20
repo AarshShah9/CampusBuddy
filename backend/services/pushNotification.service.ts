@@ -165,24 +165,34 @@ export async function getEventsWithinTimeRange(
   return formattedEvents;
 }
 
+// function to create a notification body based on the time until the start time
+export function timeDiffNotificationBody(
+  startTime: Date,
+  targetTime?: Date | undefined,
+): string {
+  let out = "Starts in ";
+  const timeDifference: string = calculateTimeDifference(startTime, targetTime);
+  if (timeDifference === "") {
+    out = "Event expired";
+  } else {
+    out += timeDifference;
+  }
+  return out;
+}
+
 // Sends the formatted time before the event starts
 function constructEventReminderNotification(
   event: EventWithResponses,
 ): SendPushNotificationProps {
   // Create a notification specific to this event
-  let startsIn = "Starts in ";
-  const timeDifference: string = calculateTimeDifference(event.event.startTime);
-  if (timeDifference === "") {
-    startsIn = "Event expired";
-  } else {
-    startsIn += timeDifference;
-  }
+  const startsIn = timeDiffNotificationBody(event.event.startTime);
 
   const pushNotificationProps: SendPushNotificationProps = {
     title: event.event.title,
     body: startsIn,
     data: {
-      eventId: event.event.id,
+      page: "EventDetails",
+      id: event.event.id,
     },
     subtitle: "",
     sound: "default",
@@ -232,8 +242,12 @@ export async function pushNotificationTest(token: ExpoPushToken) {
   await expo.sendPushNotificationsAsync([
     {
       to: token,
-      title: "Test Notification!",
+      title: "Here is an Event!",
       body: "Notification Body",
+      data: {
+        page: "EventDetails",
+        id: "79bc4af1-c551-11ee-83fd-6f8d6c450910", // id for spikeball event
+      },
       subtitle: "",
       sound: "default",
       priority: "default",
