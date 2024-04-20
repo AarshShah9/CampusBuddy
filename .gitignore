@@ -83,4 +83,7 @@ secrets/*
 secrets/
 secrets
 
+/frontend/android
+/frontend/ios
+
 
