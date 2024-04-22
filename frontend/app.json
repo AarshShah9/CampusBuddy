@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#3a86ff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "config": {
@@ -41,6 +43,17 @@
         "projectId": "6fdddfb2-ae12-471d-ac8a-feaff7a00ee5"
       }
     },
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.example.campusbuddy",
+          "enableGooglePay": true
+        }
+      ],
+      "expo-font",
+      "expo-secure-store"
+    ],
     "owner": "campusbuddy"
   }
 }

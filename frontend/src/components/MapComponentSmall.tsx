@@ -30,6 +30,7 @@ const Map = ({
       <View style={styles.mapBox}>
         <MapView
           provider={PROVIDER_GOOGLE}
+          pointerEvents="none"
           style={styles.map}
           initialRegion={{
             latitude,

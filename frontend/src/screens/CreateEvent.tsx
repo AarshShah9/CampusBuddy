@@ -31,21 +31,11 @@ import useNavigationContext from "~/hooks/useNavigationContext";
 import { createEvent } from "~/lib/apiFunctions/Events";
 import { useMutation } from "@tanstack/react-query";
 import useAuthContext from "~/hooks/useAuthContext";
+import { EventCreateSchema, EventCreateType } from "~/types/schemas";
+import ErrorText from "~/components/ErrorText";
 
 const IMG_HEIGHT = 300;
 
-export type createEventType = z.infer<typeof schema>;
-
-// React Hook Related
-const schema = zod.object({
-  title: zod.string(),
-  date: zod.date(),
-  startTime: zod.date(),
-  endTime: zod.date(),
-  locationPlaceId: zod.string(),
-  // tags: zod.string().array(),
-  description: zod.string(),
-});
 // Component is responsible for allowing users to create a new event page
 export default function CreateEvent() {
   const { theme } = useThemeContext();
@@ -57,39 +47,46 @@ export default function CreateEvent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userType, organization } = useAuthContext();
 
+  function roundUpToHour(date: Date): Date {
+    const millisecondsInHour = 60 * 60 * 1000;
+
+    const timeInMilliseconds = date.getTime(); //  milliseconds since epoch
+    const roundedTimeInMilliseconds =
+      Math.ceil(timeInMilliseconds / millisecondsInHour) * millisecondsInHour;
+
+    return new Date(roundedTimeInMilliseconds);
+  }
+
+  function defaultStartTime() {
+    return roundUpToHour(new Date());
+  }
+
+  function defaultEndTime() {
+    const roundedDate = roundUpToHour(new Date());
+    return new Date(roundedDate.getTime() + 60 * 60 * 1000); // 1 hour later than rounded date
+  }
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<createEventType>({
+  } = useForm<EventCreateType>({
     defaultValues: {
-      title: "",
-      date: new Date(),
-      startTime: new Date(),
-      endTime: new Date(),
-      locationPlaceId: "",
-      // tags: [],
+      startTime: defaultStartTime(),
+      endTime: defaultEndTime(),
       description: "",
+      // tags: [],
     },
-    // resolver: zodResolver(schema),
+    resolver: zodResolver(EventCreateSchema),
   });
 
   // Handle submission of user data
   const onSubmit = useCallback(
-    (data: createEventType) => {
+    (data: EventCreateType) => {
       if (!image) {
         alert("Please upload an image");
         return;
-      }
-
-      // TODO this is temporary, need to find a better way to validate
-      for (const key in data) {
-        // @ts-ignore
-        if (data[key] === "") {
-          Alert.alert("Cannot Create", "Please fill out all fields");
-          return;
-        }
       }
 
       setIsSubmitting(true);
@@ -99,7 +96,7 @@ export default function CreateEvent() {
   );
 
   const createMutation = useMutation({
-    mutationFn: (data: createEventType) => {
+    mutationFn: (data: EventCreateType) => {
       let verified: boolean = false;
       if (userType === "Student") {
         verified = false;
@@ -227,6 +224,9 @@ export default function CreateEvent() {
                   value={value}
                   editable={!isSubmitting}
                 />
+                {errors.title && errors.title.message && (
+                  <ErrorText error={errors.title.message} />
+                )}
               </View>
             )}
             name="title"
@@ -270,6 +270,11 @@ export default function CreateEvent() {
               )}
               name="startTime"
             />
+            <Text>
+              {errors.startTime && errors.startTime.message && (
+                <ErrorText error={errors.startTime.message} />
+              )}
+            </Text>
             <Controller
               control={control}
               rules={{
@@ -308,6 +313,11 @@ export default function CreateEvent() {
               )}
               name="endTime"
             />
+            <Text>
+              {errors.endTime && errors.endTime.message && (
+                <ErrorText error={errors.endTime.message} />
+              )}
+            </Text>
             <Controller
               control={control}
               rules={{
@@ -329,6 +339,9 @@ export default function CreateEvent() {
                     controllerOnChange={onChange}
                     reset={resetLocationValue}
                   />
+                  {errors.locationPlaceId && errors.locationPlaceId.message && (
+                    <ErrorText error={errors.locationPlaceId.message} />
+                  )}
                 </View>
               )}
               name="locationPlaceId"
@@ -373,7 +386,7 @@ export default function CreateEvent() {
                       color: theme.colors.text,
                     }}
                   >
-                    Event Description:*
+                    Event Description:
                   </Text>
                   <TextInput
                     style={[
@@ -390,6 +403,9 @@ export default function CreateEvent() {
               )}
               name="description"
             />
+            {errors.description && errors.description.message && (
+              <ErrorText error={errors.description.message} />
+            )}
           </View>
           <View style={{ paddingBottom: 30, marginTop: 15 }}>
             <Button

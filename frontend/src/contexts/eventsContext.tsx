@@ -40,6 +40,7 @@ type eventsContext = {
   likeMutate: () => void;
   deleteMutate: () => void;
   flipPublicMutate: () => void;
+  isLoading?: boolean;
 
   item?: modalData;
   post?: modalData;
@@ -58,12 +59,15 @@ export const EventsContextProvider = ({
   const [currentItem, setCurrentItem] = useState<modalData>();
   const [currentPost, setCurrentPost] = useState<modalData>();
 
-  const { data: eventData, refetch: refetchEventDetails } =
-    useQuery<EventDetailsType>({
-      queryKey: ["event-details", currentEventId],
-      queryFn: () => getEventDetails(currentEventId!),
-      enabled: !!currentEventId,
-    });
+  const {
+    data: eventData,
+    refetch: refetchEventDetails,
+    isLoading,
+  } = useQuery<EventDetailsType>({
+    queryKey: ["event-details", currentEventId],
+    queryFn: () => getEventDetails(currentEventId!),
+    enabled: !!currentEventId,
+  });
 
   const likeMutation = useMutation({
     mutationFn: async (id: string) => likeEvent(id),
@@ -167,6 +171,7 @@ export const EventsContextProvider = ({
         post: currentPost,
         openPostModal,
         bottomSheetPostModalRef,
+        isLoading,
       }}
     >
       {children}
