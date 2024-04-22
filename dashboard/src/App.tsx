@@ -14,6 +14,8 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
+    } else {
+      navigate("/dashboard/orgTable");
     }
   }, []);
 
