@@ -1,14 +1,5 @@
-import {
-  PlatformPayButton,
-  isPlatformPaySupported,
-  PlatformPay,
-  CardField,
-  useStripe,
-  AddressSheet,
-  AddressSheetError,
-  CardForm,
-} from "@stripe/stripe-react-native";
-import { useEffect, useState } from "react";
+import { CardForm } from "@stripe/stripe-react-native";
+import { useState } from "react";
 import {
   Alert,
   Keyboard,
@@ -27,7 +18,7 @@ import useNavigationContext from "~/hooks/useNavigationContext";
 export default function EventPayment() {
   const [isApplePaySupported, setIsApplePaySupported] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
-  const { confirmPayment } = useStripe();
+  // const { confirmPayment } = useStripe();
 
   const [addressSheetVisible, setAddressSheetVisible] = useState(false);
   const { refetchEventDetails } = useEventsContext();
@@ -37,11 +28,11 @@ export default function EventPayment() {
     params: { eventId },
   } = useRoute<any>();
 
-  useEffect(() => {
-    (async function () {
-      setIsApplePaySupported(await isPlatformPaySupported());
-    })();
-  }, [isPlatformPaySupported]);
+  // useEffect(() => {
+  //   (async function () {
+  //     setIsApplePaySupported(await isPlatformPaySupported());
+  //   })();
+  // }, [isPlatformPaySupported]);
 
   const attendMutation = useMutation({
     mutationFn: async ({ id }: { id: string }) => {
@@ -54,15 +45,15 @@ export default function EventPayment() {
     },
   });
 
-  const pay = async () => {
-    // ...
-  };
-
-  const handleCardDetailsChange = (cardDetails: any) => {
-    if (cardDetails.complete) {
-      setPaymentMethod(cardDetails);
-    }
-  };
+  // const pay = async () => {
+  //   // ...
+  // };
+  //
+  // const handleCardDetailsChange = (cardDetails: any) => {
+  //   if (cardDetails.complete) {
+  //     setPaymentMethod(cardDetails);
+  //   }
+  // };
 
   const payWithCard = async () => {
     attendMutation.mutate({
@@ -92,21 +83,21 @@ export default function EventPayment() {
           padding: 16,
         }}
       >
-        <PlatformPayButton
-          onPress={pay}
-          type={PlatformPay.ButtonType.Pay}
-          appearance={PlatformPay.ButtonStyle.Black}
-          borderRadius={10}
-          style={{
-            width: "100%",
-            height: 50,
-          }}
-        />
-        <View style={styles.container}>
-          <View style={styles.line} />
-          <Text style={styles.text}>Or pay with card</Text>
-          <View style={styles.line} />
-        </View>
+        {/*<PlatformPayButton*/}
+        {/*  onPress={pay}*/}
+        {/*  type={PlatformPay.ButtonType.Pay}*/}
+        {/*  appearance={PlatformPay.ButtonStyle.Black}*/}
+        {/*  borderRadius={10}*/}
+        {/*  style={{*/}
+        {/*    width: "100%",*/}
+        {/*    height: 50,*/}
+        {/*  }}*/}
+        {/*/>*/}
+        {/*<View style={styles.container}>*/}
+        {/*  <View style={styles.line} />*/}
+        {/*  <Text style={styles.text}>Or pay with card</Text>*/}
+        {/*  <View style={styles.line} />*/}
+        {/*</View>*/}
         {/*<CardField*/}
         {/*  postalCodeEnabled={true}*/}
         {/*  placeholders={{*/}
