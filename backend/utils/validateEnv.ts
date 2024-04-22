@@ -17,6 +17,8 @@ const envSchema = z.object({
   EXPO_ACCESS_TOKEN: z.string(),
   GPT_KEY: z.string(),
   GPT_ORG: z.string(),
+  SENDGRID_API_KEY: z.string(),
+  SENDGRID_EMAIL: z.string(),
   // Add more environment variables as needed
 });
 
@@ -42,6 +44,8 @@ const env = {
   EXPO_ACCESS_TOKEN: process.env.EXPO_ACCESS_TOKEN!,
   GPT_KEY: process.env.GPT_KEY!,
   GPT_ORG: process.env.GPT_ORG!,
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY!,
+  SENDGRID_EMAIL: process.env.SENDGRID_EMAIL!,
 };
 
 export { env, validateEnv };
