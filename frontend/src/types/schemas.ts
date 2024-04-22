@@ -81,13 +81,9 @@ export const EventCreateSchema = zod
       required_error: "Please select a date and time",
       invalid_type_error: "Invalid datetime",
     }),
-    description: zod
-      .string()
-      .max(255, {
-        message: "Description must contain fewer than 255 characters",
-      })
-      .optional(),
-
+    description: zod.string().max(255, {
+      message: "Description must contain fewer than 255 characters",
+    }),
     locationPlaceId: zod
       .string({ required_error: "Location is required." })
       .max(255),

@@ -57,9 +57,14 @@ export default function CreateEvent() {
     return new Date(roundedTimeInMilliseconds);
   }
 
-  const roundedDate = roundUpToHour(new Date());
-  const defaultStartTime = roundedDate;
-  const defaultEndTime = new Date(roundedDate.getTime() + 60 * 60 * 1000); // 1 hour later than start
+  function defaultStartTime() {
+    return roundUpToHour(new Date());
+  }
+
+  function defaultEndTime() {
+    const roundedDate = roundUpToHour(new Date());
+    return new Date(roundedDate.getTime() + 60 * 60 * 1000); // 1 hour later than rounded date
+  }
 
   const {
     control,
@@ -68,8 +73,9 @@ export default function CreateEvent() {
     reset,
   } = useForm<EventCreateType>({
     defaultValues: {
-      startTime: defaultStartTime,
-      endTime: defaultEndTime,
+      startTime: defaultStartTime(),
+      endTime: defaultEndTime(),
+      description: "",
       // tags: [],
     },
     resolver: zodResolver(EventCreateSchema),
@@ -368,7 +374,7 @@ export default function CreateEvent() {
             <Controller
               control={control}
               rules={{
-                required: false,
+                required: true,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <View>

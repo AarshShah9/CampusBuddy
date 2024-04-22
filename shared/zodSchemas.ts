@@ -91,12 +91,9 @@ export const EventSchema = z.object({
     })
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
-  description: z
-    .string()
-    .max(255, {
-      message: "Description must contain fewer than 255 characters",
-    })
-    .nullable(),
+  description: z.string().max(255, {
+    message: "Description must contain fewer than 255 characters",
+  }),
   locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
