@@ -85,6 +85,36 @@ type OrganizationSettingsRoute = {
   page: "OrganizationSettings";
 };
 
+type EditEventRoute = {
+  page: "EditEvent";
+};
+
+type QRCodeScannerRoute = {
+  page: "QRCodeScanner";
+};
+
+type HelpRoute = {
+  page: "Help";
+};
+
+type PaymentRoute = {
+  page: "EventPayment";
+  eventId: string;
+};
+
+type PricingRoute = {
+  page: "EventPricing";
+  image: string;
+  title: string;
+  subtitle: string;
+  price: number;
+  eventId: string;
+};
+
+type AnalyticsRoute = {
+  page: "Analytics";
+};
+
 export type NavigationFunctionArgs =
   | UserProfileRoute
   | ChatScreenRoute
@@ -101,6 +131,12 @@ export type NavigationFunctionArgs =
   | MarketPlaceDetailsRoute
   | CommentsRoute
   | OrganizationSettingsRoute
+  | EditEventRoute
+  | QRCodeScannerRoute
+  | HelpRoute
+  | PaymentRoute
+  | AnalyticsRoute
+  | PricingRoute
   | SettingsRoute;
 
 export type NavigableStacks =

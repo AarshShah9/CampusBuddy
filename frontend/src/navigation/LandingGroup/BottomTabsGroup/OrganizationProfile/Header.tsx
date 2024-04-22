@@ -16,6 +16,7 @@ import useAuthContext from "~/hooks/useAuthContext";
 import useProfileContext from "~/hooks/useProfileContext";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { ThemedText } from "~/components/ThemedComponents";
+import { limitTextToMax } from "~/lib/helperFunctions";
 
 export default function Header() {
   const { theme } = useThemeContext();
@@ -85,7 +86,7 @@ export default function Header() {
             justifyContent: "flex-start",
           }}
         >
-          {organization?.organizationDescription}
+          {limitTextToMax(organization?.organizationDescription?.[0] ?? "", 46)}
         </ThemedText>
       </View>
     </View>

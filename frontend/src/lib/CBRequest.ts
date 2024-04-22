@@ -1,14 +1,16 @@
 import { ImagePickerAsset } from "expo-image-picker";
 import axios, { Method } from "axios";
 import {
-    AllowedEndpoints,
-    generateUrl,
-    IdRequiredEndpointOptions,
-    IdRequiredEndPoints,
-    NonIdRequiredEndPoints,
-    prepareImageData,
-    prepareImagesData,
-    RequestArgs,
+  AllowedEndpoints,
+  generateUrl,
+  IdAndBodyRequiredEndpointOptions,
+  IdAndBodyRequiredEndPoints,
+  IdRequiredEndpointOptions,
+  IdRequiredEndPoints,
+  NonIdRequiredEndPoints,
+  prepareImageData,
+  prepareImagesData,
+  RequestArgs,
 } from "~/lib/requestHelpers";
 
 /**
@@ -23,34 +25,52 @@ import {
  *                  - params: An object representing additional URL parameters to be included in the request.
  * @returns A promise that resolves with the response data from the request.
  */
-export async function CBRequest(method: Method, endpoint: NonIdRequiredEndPoints, options?: RequestArgs): Promise<any>
-export async function CBRequest(method: Method, endpoint: IdRequiredEndPoints, options: IdRequiredEndpointOptions): Promise<any>
-export async function CBRequest(method: Method, endpoint: AllowedEndpoints, options: RequestArgs = {}) {
-    // TODO Extend any provided headers with a testing-related header (should be removed in production).
-    const headers = {
-        ...options.headers,
-        "ngrok-skip-browser-warning": "skip", // Indicate this is for bypassing specific ngrok warnings during development/testing.
-    };
+export async function CBRequest(
+  method: Method,
+  endpoint: NonIdRequiredEndPoints,
+  options?: RequestArgs,
+): Promise<any>;
+export async function CBRequest(
+  method: Method,
+  endpoint: IdRequiredEndPoints,
+  options: IdRequiredEndpointOptions,
+): Promise<any>;
+export async function CBRequest(
+  method: Method,
+  endpoint: IdAndBodyRequiredEndPoints,
+  options: IdAndBodyRequiredEndpointOptions,
+): Promise<any>;
 
-    // Generate the full URL with any necessary parameter substitutions.
-    const url = generateUrl(endpoint, options.params);
+export async function CBRequest(
+  method: Method,
+  endpoint: AllowedEndpoints,
+  options: RequestArgs = {},
+) {
+  // TODO Extend any provided headers with a testing-related header (should be removed in production).
+  const headers = {
+    ...options.headers,
+    "ngrok-skip-browser-warning": "skip", // Indicate this is for bypassing specific ngrok warnings during development/testing.
+  };
 
-    // Execute the HTTP request using axios and return the response data.
-    try {
-        const response = await axios({
-            method,
-            url,
-            headers: headers,
-            data: options.body,
-            params: options.params,
-        });
+  // Generate the full URL with any necessary parameter substitutions.
+  const url = generateUrl(endpoint, options.params);
 
-        return response.data;
-    } catch (error) {
-        console.error("Error during HTTP request:", error);
-        throw error;
-    }
-};
+  // Execute the HTTP request using axios and return the response data.
+  try {
+    const response = await axios({
+      method,
+      url,
+      headers: headers,
+      data: options.body,
+      params: options.params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error during HTTP request:", error);
+    throw error;
+  }
+}
 
 /**
  * Uploads an image by making either a POST or PATCH request to the specified endpoint.
@@ -62,43 +82,43 @@ export async function CBRequest(method: Method, endpoint: AllowedEndpoints, opti
  * @param options - Request configuration, including URL parameters.
  */
 export async function uploadImageRequest(
-    method: "post" | "patch",
-    endpoint: AllowedEndpoints,
-    selectedImage: ImagePickerAsset,
-    options: RequestArgs,
+  method: "post" | "patch",
+  endpoint: AllowedEndpoints,
+  selectedImage: ImagePickerAsset,
+  options: RequestArgs,
 ) {
-    try {
-        const formData = prepareImageData(selectedImage, options.body);
-        const url = generateUrl(endpoint, options.params);
-        return await axios({
-            method,
-            url,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
-};
+  try {
+    const formData = prepareImageData(selectedImage, options.body);
+    const url = generateUrl(endpoint, options.params);
+    return await axios({
+      method,
+      url,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
 
 export async function uploadImagesRequest(
-    method: "post" | "patch",
-    endpoint: AllowedEndpoints,
-    selectedImages: ImagePickerAsset[],
-    options: RequestArgs,
+  method: "post" | "patch",
+  endpoint: AllowedEndpoints,
+  selectedImages: ImagePickerAsset[],
+  options: RequestArgs,
 ) {
-    try {
-        const formData = prepareImagesData(selectedImages, options.body);
-        const url = generateUrl(endpoint, options.params);
-        return await axios({
-            method,
-            url,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
-};
+  try {
+    const formData = prepareImagesData(selectedImages, options.body);
+    const url = generateUrl(endpoint, options.params);
+    return await axios({
+      method,
+      url,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}

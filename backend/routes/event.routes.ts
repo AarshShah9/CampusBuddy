@@ -5,6 +5,7 @@ import {
   createVerifiedEvent,
   deleteEvent,
   eventTest,
+  flipEventVisibility,
   getAllEvents,
   getAllEventsByOrganization,
   getAllMapEvents,
@@ -32,11 +33,11 @@ router.get("/organization/:id", getAllEventsByOrganization);
 router.get("/recent/", getRecentEvents); // with pagination params
 router.get("/:id", getEventById);
 router.get("/user/:id", getEventByUserId);
-router.post("/like/:id", LikeEvent);
-router.post("/attend/:id", attendEvent);
-
 router.get("/attendees/:id", getAttendees);
 
+router.post("/public/:id", flipEventVisibility);
+router.post("/like/:id", LikeEvent);
+router.post("/attend/:id", attendEvent);
 router.post("/organization/:id", upload.single("file"), createVerifiedEvent);
 router.post("/", upload.single("file"), createEvent);
 router.patch("/:id", upload.single("file"), updateEvent);

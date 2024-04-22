@@ -1,9 +1,9 @@
 import {
-    RefreshControl,
-    View,
-    Image,
-    Dimensions,
-    TouchableOpacity,
+  RefreshControl,
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import HorizontalScrollElement from "~/components/HorizontalScrollElement";
@@ -20,18 +20,18 @@ import { EventData, EventType } from "~/types/Events";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 
 const fetchMainEvents = async (): Promise<{
-    allEvents: EventData[];
-    startingEvents: EventType[];
+  allEvents: EventData[];
+  startingEvents: EventType[];
 }> => {
-    try {
-        const {
-            data: { allEvents, startingEvents },
-        } = await getMainEvents();
-        return { allEvents, startingEvents };
-    } catch (error) {
-        console.error("An error occured while fetching main events:\n", error);
-        return { allEvents: [], startingEvents: [] };
-    }
+  try {
+    const {
+      data: { allEvents, startingEvents },
+    } = await getMainEvents();
+    return { allEvents, startingEvents };
+  } catch (error) {
+    console.error("An error occured while fetching main events:\n", error);
+    return { allEvents: [], startingEvents: [] };
+  }
 };
 
 export default function Home() {
@@ -49,98 +49,108 @@ export default function Home() {
         );
     }, [sendLocalNotification]);
 
-    const screenWidth = Dimensions.get("window").width;
-    const { startLoading, stopLoading } = useLoadingContext();
+  const screenWidth = Dimensions.get("window").width;
+  const { startLoading, stopLoading } = useLoadingContext();
 
-    const { navigateTo } = useNavigationContext();
+  const { navigateTo } = useNavigationContext();
 
-    const openEventDetails = useCallback((id: string) => {
-        navigateTo({ page: "EventDetails", id });
-    }, []);
+  const openEventDetails = useCallback((id: string) => {
+    navigateTo({ page: "EventDetails", id });
+  }, []);
 
-    const { refreshing, triggerRefresh, stopRefresh } = useRefreshControl();
+  const { refreshing, triggerRefresh, stopRefresh } = useRefreshControl();
 
-    const onPullRefresh = useCallback(() => {
-        triggerRefresh(() => {
-            refetch();
-        });
-    }, []);
+  const onPullRefresh = useCallback(() => {
+    triggerRefresh(() => {
+      refetch();
+    });
+  }, []);
 
-    const { data, isLoading, refetch, isFetchedAfterMount, isFetching } =
-        useQuery({
-            queryKey: ["home-page-events"],
-            queryFn: fetchMainEvents,
-        });
+  const { data, isLoading, refetch, isFetchedAfterMount, isFetching } =
+    useQuery({
+      queryKey: ["home-page-events"],
+      queryFn: fetchMainEvents,
+    });
 
-  // TODO Replace this with skeleton loading
   useEffect(() => {
     if (isLoading) startLoading();
     else stopLoading();
   }, [isLoading]);
 
-    const queryIsLoading = isFetching && isFetchedAfterMount;
-    useEffect(() => {
-        if (!queryIsLoading) stopRefresh();
-    }, [queryIsLoading]);
+  const queryIsLoading = isFetching && isFetchedAfterMount;
+  useEffect(() => {
+    if (!queryIsLoading) stopRefresh();
+  }, [queryIsLoading]);
 
-    const allEvents = data ? data.allEvents : [];
-    const startingEvents = data ? data.startingEvents : [];
+  const allEvents = data ? data.allEvents : [];
+  const startingEvents = data ? data.startingEvents : [];
 
-    return (
-        <View style={{ flex: 1 }}>
-            <FlashList
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onPullRefresh} />
-                }
-                data={allEvents}
-                estimatedItemSize={20}
-                extraData={queryIsLoading}
-                renderItem={({ item }) => <HorizontalScrollElement item={item} isLoading={queryIsLoading} />}
-                keyExtractor={(item) => item.id}
-                ListHeaderComponent={
-                    <View
-                        style={{
-                            justifyContent: "center",
-                            marginBottom: 32,
-                            alignItems: "center",
-                        }}
-                    >
-                        <Carousel
-                            loop={true}
-                            autoplay={true}
-                            autoplayInterval={5000}
-                            showsControls={false}
-                            style={{
-                                width: screenWidth,
-                                height: 214,
-                            }}
-                        >
-                            {startingEvents.map((item) => { 
-                                if(queryIsLoading)
-                                    return (
-                                        <LoadingSkeleton
-                                            key={item.image}
-                                            show
-                                            width={screenWidth}
-                                            height={214}
-                                            radius="square"
-                                        />
-                                    )
-
-                                return (
-                                    <TouchableOpacity key={item.image} onPress={() => openEventDetails(item.id)}>
-                                        <Image
-                                            key={item.image}
-                                            source={{ uri: generateImageURL(item.image) }}
-                                            style={{ width: screenWidth, height: 214 }}
-                                        />
-                                    </TouchableOpacity>
-                                )
-                            })}
-                        </Carousel>
-                    </View>
-                }
-            />
-        </View>
-    );
+  return (
+    <View style={{ flex: 1 }}>
+      <FlashList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onPullRefresh} />
+        }
+        data={allEvents}
+        estimatedItemSize={20}
+        extraData={queryIsLoading}
+        contentContainerStyle={
+          !queryIsLoading && startingEvents.length === 0
+            ? { paddingVertical: 20 }
+            : {}
+        }
+        renderItem={({ item }) => (
+          <HorizontalScrollElement item={item} isLoading={queryIsLoading} />
+        )}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <>
+            {!queryIsLoading && startingEvents.length !== 0 && (
+              <View
+                style={{
+                  justifyContent: "center",
+                  marginBottom: 32,
+                  alignItems: "center",
+                }}
+              >
+                <Carousel
+                  loop={true}
+                  autoplay={true}
+                  autoplayInterval={5000}
+                  showsControls={false}
+                  style={{
+                    width: screenWidth,
+                    height: 214,
+                  }}
+                >
+                  {startingEvents.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        key={item.image}
+                        onPress={() => openEventDetails(item.id)}
+                      >
+                        <Image
+                          key={item.image}
+                          source={{ uri: generateImageURL(item.image) }}
+                          style={{ width: screenWidth, height: 214 }}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Carousel>
+              </View>
+            )}
+            {queryIsLoading && (
+              <LoadingSkeleton
+                show
+                width={screenWidth}
+                height={214}
+                radius="square"
+              />
+            )}
+          </>
+        }
+      />
+    </View>
+  );
 }

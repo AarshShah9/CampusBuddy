@@ -118,10 +118,12 @@ const allowedEndpoints = [
   "/api/user/student",
   "/api/user/organization/new",
   "/api/user/profile",
+  "/api/user/me",
 
   // Organization-related endpoints
   "/api/orgs/test",
   "/api/orgs/",
+  "/api/orgs/:id",
   "/api/orgs/deleteProfilePicture/:id",
   "/api/orgs/profilePicture/:id",
   "/api/orgs/join/:id",
@@ -145,6 +147,7 @@ const allowedEndpoints = [
   "/api/events/like/:id",
   "/api/events/attendees/:id",
   "/api/events/attend/:id",
+  "/api/events/public/:id",
 
   // Post-related endpoints
   "/api/post/test",
@@ -152,7 +155,8 @@ const allowedEndpoints = [
   "/api/item/",
   "/api/item/:id",
   "/api/post/:id",
-  "/api/post/comments/:id",
+  "/api/post/:id/comments",
+  "/api/post/:id/toggleAttendance",
 
   // profile related endpoints
   "/api/profile/saved",
@@ -194,15 +198,24 @@ export type IdRequiredEndPoints =
   | "/api/profile/posts/:id"
   | "/api/item/:id"
   | "/api/post/:id"
-  | "/api/post/comments/:id"
+  | "/api/post/:id/comments"
   | "/api/orgs/deleteProfilePicture/:id"
   | "/api/orgs/profilePicture/:id"
   | "/api/profile/orgItems/:id"
   | "/api/orgs/join/:id"
   | "/api/profile/orgEvents/:id"
+  | "/api/events/public/:id"
+  | "/api/post/:id/toggleAttendance"
   | "/api/profile/items/:id";
 
+export type IdAndBodyRequiredEndPoints = "/api/orgs/:id";
+
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
+  params: { id: string };
+};
+
+export type IdAndBodyRequiredEndpointOptions = Omit<RequestArgs, "params"> & {
+  body: any;
   params: { id: string };
 };
 

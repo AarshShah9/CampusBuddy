@@ -21,6 +21,7 @@ import {
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useAuthContext from "~/hooks/useAuthContext";
 import { ThemedText } from "~/components/ThemedComponents";
+import { limitTextToMax } from "~/lib/helperFunctions";
 
 export type OrganizationProfileHeaderType = {
   organization: {
@@ -162,7 +163,7 @@ export default function Header() {
             justifyContent: "flex-start",
           }}
         >
-          {organizationData?.organization.description}
+          {limitTextToMax(organizationData?.organization.description ?? "", 46)}
         </ThemedText>
       </View>
     </View>

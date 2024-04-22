@@ -10,16 +10,19 @@ import { Button } from "react-native-paper";
 import useThemeContext from "~/hooks/useThemeContext";
 import PersonChip from "~/components/PersonChip";
 import CommentsChip from "~/components/CommentsChip";
-import { useRoute } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
-import { getLookingForById } from "~/lib/apiFunctions/LookingFor";
 import {
-  convertUTCToLocalDate,
-  convertUTCToTimeAndDate,
-} from "~/lib/timeFunctions";
+  NavigationProp,
+  ParamListBase,
+  useRoute,
+} from "@react-navigation/native";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { attendPost, getLookingForById } from "~/lib/apiFunctions/LookingFor";
+import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import { generateImageURL } from "~/lib/CDNFunctions";
-import { useCallback } from "react";
+import React, { useCallback, useLayoutEffect } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { Entypo } from "@expo/vector-icons";
+import useEventsContext from "~/hooks/useEventsContext";
 
 /**
  * This component is responsible for loading Looking For Details based on passed ID.
@@ -35,10 +38,17 @@ type LookingForDetailsType = {
   userName: string;
   userImage: string;
   isFlagged: boolean;
+  self: boolean;
+  isAttending: boolean;
 };
 
-export default function LookingForDetails() {
+export default function LookingForDetails({
+  navigation,
+}: {
+  navigation: NavigationProp<ParamListBase>;
+}) {
   const { theme, inDarkMode } = useThemeContext();
+  const { openPostModal } = useEventsContext();
   let {
     params: { id },
   } = useRoute<any>();
@@ -48,14 +58,52 @@ export default function LookingForDetails() {
     navigateTo({ page: "LookingForCommentsScreen", id });
   }, [navigateTo, id]);
 
-  const { data: lookingForData } = useQuery<LookingForDetailsType>({
+  const { data: lookingForData, refetch } = useQuery<LookingForDetailsType>({
     queryKey: ["lookingFor-details", id],
     queryFn: async () => getLookingForById(id),
+  });
+
+  const joinPostMutation = useMutation({
+    mutationFn: attendPost,
+    onSuccess: () => {
+      Alert.alert("Success", "Updated Successfully!");
+      refetch();
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message);
+    },
   });
 
   const onUserPress = useCallback(() => {
     navigateTo({ page: "UserProfile", id: lookingForData?.userId ?? "" });
   }, [lookingForData?.userId]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => openPostModal(id, lookingForData?.self!)}
+        >
+          <Entypo name="dots-three-horizontal" size={24} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, id, lookingForData?.self]);
+
+  const joinPost = useCallback(() => {
+    Alert.alert("Join Post", "Are you sure you want to join this post?", [
+      {
+        text: "Join",
+        onPress: () => {
+          joinPostMutation.mutate(id);
+        },
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
+  }, []);
 
   if (lookingForData && lookingForData.isFlagged) {
     Alert.alert(
@@ -63,6 +111,12 @@ export default function LookingForDetails() {
       "This item has been flagged as it may not meet our guidelines. Please contact us if you have any questions.",
     );
   }
+
+  // Only show the button if the user is not the author of the post and (there are spots left or the user is attending)
+  const showButton =
+    !lookingForData?.self &&
+    ((lookingForData?.spotsLeft && lookingForData?.spotsLeft > 0) ||
+      lookingForData?.isAttending != null);
 
   return (
     <View
@@ -147,11 +201,13 @@ export default function LookingForDetails() {
           </View>
           {/* Join Button */}
         </View>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <Button style={styles.joinButton} mode="contained">
-            Join
-          </Button>
-        </TouchableOpacity>
+        {showButton && (
+          <TouchableOpacity style={styles.buttonContainer} onPress={joinPost}>
+            <Button style={styles.joinButton} mode="contained">
+              {lookingForData?.isAttending ? "Leave" : "Join"}
+            </Button>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

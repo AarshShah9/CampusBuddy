@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import useProfileContext from "~/hooks/useProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,11 +43,30 @@ export default function ProfileSettings() {
           page: userType === "Student" ? "Settings" : "OrganizationSettings",
         });
       },
+      show: true,
     },
-    { title: "Help", onClick: () => console.log("Help") },
+    {
+      title: "Analytics",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Analytics" });
+      },
+      show: userType === "Organization_Admin",
+    },
+    {
+      title: "Help",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Help" });
+      },
+      show: true,
+    },
     {
       title: "Report a Problem",
-      onClick: () => console.log("Report a Problem"),
+      onClick: () => {
+        Alert.alert("Coming Soon", "This feature is not yet available.");
+      },
+      show: true,
     },
     {
       title: "Log Out",
@@ -54,6 +74,7 @@ export default function ProfileSettings() {
         logOut();
         replaceStackWith("AuthenticationGroup");
       },
+      show: true,
     },
   ];
 
@@ -72,21 +93,31 @@ export default function ProfileSettings() {
     >
       <View style={styles.contentContainer}>
         {settings.map((setting, i) => (
-          <TouchableOpacity key={i} onPress={setting.onClick}>
-            <View
-              style={[
-                styles.settingContainer,
-                {
-                  borderBottomColor: theme.colors.backdrop,
-                },
-              ]}
-            >
-              <Text style={[styles.settingText, { color: theme.colors.text }]}>
-                {setting.title}
-              </Text>
-              <Ionicons name="chevron-forward" size={16} color={"#3a86ff"} />
-            </View>
-          </TouchableOpacity>
+          <View key={i}>
+            {setting.show && (
+              <TouchableOpacity onPress={setting.onClick}>
+                <View
+                  style={[
+                    styles.settingContainer,
+                    {
+                      borderBottomColor: theme.colors.backdrop,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[styles.settingText, { color: theme.colors.text }]}
+                  >
+                    {setting.title}
+                  </Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={"#3a86ff"}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
         ))}
       </View>
     </BottomSheetModal>

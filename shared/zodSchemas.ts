@@ -91,19 +91,21 @@ export const EventSchema = z.object({
     })
     .min(3, { message: "Title must contain 3 or more characters" })
     .max(255),
-  description: z.string().min(3).max(255).nullable(),
+  description: z.string().max(255, {
+    message: "Description must contain fewer than 255 characters",
+  }),
   locationPlaceId: z.string().min(3).max(255),
   startTime: z.coerce
     .date({
       required_error: "Please select a date and time",
-      invalid_type_error: "Invalid datetime string",
+      invalid_type_error: "Invalid datetime",
     })
     .refine((value) => value > new Date(), {
       message: "Start time must be in the future",
     }),
   endTime: z.coerce.date({
     required_error: "Please select a date and time",
-    invalid_type_error: "Invalid datetime string",
+    invalid_type_error: "Invalid datetime",
   }),
   isPublic: BooleanSchema,
   isFlagged: BooleanSchema,
@@ -124,6 +126,7 @@ export const EventCreateSchema = EventSchema.omit({
   organizationId: true, // get from req.params if creating verified event
   image: true, // handled by the S3Uploader
   isPublic: true, // default value is false
+  isFlagged: true,
 }).refine((data) => data.endTime > data.startTime, {
   message: "End time must be later than start time.",
   path: ["endTime"],
@@ -191,7 +194,11 @@ export const UserUpdateSchema = UserSchema.omit({
   id: true,
   email: true,
   accountType: true,
-}).partial();
+})
+  .extend({
+    degreeName: z.string().nullable(),
+  })
+  .partial();
 
 export type UserUpdateType = z.infer<typeof UserUpdateSchema>;
 
@@ -226,7 +233,6 @@ export type OrganizationCreateType = z.infer<typeof OrganizationCreateSchema>;
 // Can only manually change the description and image
 export const OrganizationUpdateSchema = OrganizationSchema.omit({
   id: true,
-  organizationName: true,
   createdAt: true,
   updatedAt: true,
   institutionId: true,
@@ -296,7 +302,7 @@ export const PostSchema = z.object({
     }),
   title: z.string(),
   description: z.string().nullable(),
-  numberOfSpots: z.number().int().min(1),
+  numberOfSpots: z.number().int().min(1).nullable().optional(),
   expiresAt: z.coerce.date(),
   isPublic: z.boolean(),
   isFlagged: z.boolean(),
@@ -314,6 +320,8 @@ export const PostCreateSchema = PostSchema.omit({
   image: true, // Update value after image is created
   organizationId: true, // get from req.params if creating verified post
   public: true, // default value is false
+  isPublic: true,
+  isFlagged: true,
 });
 
 export type PostCreateType = z.infer<typeof PostCreateSchema>;
@@ -367,6 +375,8 @@ export const ItemCreateSchema = ItemSchema.omit({
   id: true, // Default value autoincrement
   userId: true, // get from authtoken
   createdAt: true, // default value is current date, handled by the db
+  isPublic: true,
+  isFlagged: true,
 });
 /**
  * Update Item Schema
@@ -383,10 +393,20 @@ export const CommentSchema = z.object({
   userId: z.string().uuid(),
   postId: z.string().uuid(),
   createdAt: z.coerce.date(),
-  text: z.string(),
+  updatedAt: z.coerce.date(),
+  content: z.string({
+    required_error: "Comment message is required",
+    invalid_type_error: "Invalid comment input",
+  }),
 });
 
 export type Comment = z.infer<typeof CommentSchema>;
+
+export const CommentCreateSchema = CommentSchema.pick({
+  content: true,
+});
+
+export type CommentCreateType = z.infer<typeof CommentCreateSchema>;
 
 /////////////////////////////////////////
 // USER ORGANIZATION ROLE SCHEMAS
@@ -513,19 +533,26 @@ export type TopicSubscription = z.infer<typeof TopicSubscriptionSchema>;
 // UTILITY SCHEMAS
 ///////////////////////////////
 
+export const IdSchema = z.coerce
+  .string()
+  .uuid()
+  .refine((data) => data.length > 0, {
+    message: "ID is invalid",
+  });
+
 // Schema for validating an ID integer parameter
 export const IdParamSchema = z.object({
-  id: z.coerce
-    .string()
-    .uuid()
-    .refine((data) => data.length > 0, {
-      message: "ID is invalid",
-    }),
+  id: IdSchema,
 });
 
 export const OrganizationRoleNameParamsSchema = z.object({
   organizationId: z.string().uuid(),
   roleName: UserRoleSchema,
+});
+
+export const CommentParamsSchema = z.object({
+  postId: IdSchema,
+  commentId: IdSchema,
 });
 
 ///////////////////////////////
