@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
 import useLoadingContext from "~/hooks/useLoadingContext";
@@ -8,7 +8,6 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function MapsPage() {
   const { location } = useAppContext();
-  console.log("location: ", location);
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {

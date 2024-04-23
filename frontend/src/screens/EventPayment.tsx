@@ -1,4 +1,8 @@
-import { CardForm } from "@stripe/stripe-react-native";
+import {
+  CardForm,
+  PlatformPay,
+  PlatformPayButton,
+} from "@stripe/stripe-react-native";
 import { useState } from "react";
 import {
   Alert,
@@ -83,21 +87,21 @@ export default function EventPayment() {
           padding: 16,
         }}
       >
-        {/*<PlatformPayButton*/}
-        {/*  onPress={pay}*/}
-        {/*  type={PlatformPay.ButtonType.Pay}*/}
-        {/*  appearance={PlatformPay.ButtonStyle.Black}*/}
-        {/*  borderRadius={10}*/}
-        {/*  style={{*/}
-        {/*    width: "100%",*/}
-        {/*    height: 50,*/}
-        {/*  }}*/}
-        {/*/>*/}
-        {/*<View style={styles.container}>*/}
-        {/*  <View style={styles.line} />*/}
-        {/*  <Text style={styles.text}>Or pay with card</Text>*/}
-        {/*  <View style={styles.line} />*/}
-        {/*</View>*/}
+        <PlatformPayButton
+          onPress={() => {}}
+          type={PlatformPay.ButtonType.Pay}
+          appearance={PlatformPay.ButtonStyle.Black}
+          borderRadius={10}
+          style={{
+            width: "100%",
+            height: 50,
+          }}
+        />
+        <View style={styles.container}>
+          <View style={styles.line} />
+          <Text style={styles.text}>Or pay with card</Text>
+          <View style={styles.line} />
+        </View>
         {/*<CardField*/}
         {/*  postalCodeEnabled={true}*/}
         {/*  placeholders={{*/}
