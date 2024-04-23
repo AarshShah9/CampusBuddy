@@ -8,6 +8,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function MapsPage() {
   const { location } = useAppContext();
+  console.log("location: ", location);
   const { startLoading, stopLoading } = useLoadingContext();
 
   const {

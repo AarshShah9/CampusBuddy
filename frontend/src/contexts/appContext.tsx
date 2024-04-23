@@ -12,18 +12,19 @@ import { LocationObject } from "expo-location";
 type appContext = {
   dismissKeyboard: () => void;
   getLocationPermission: () => Promise<void>;
-  getLocation: () => Promise<any>;
+  getLocation: () => Promise<() => void>;
   location: LocationObject | undefined;
 };
+
 const AppContext = createContext<appContext | null>(null);
 
 export const AppContextProvider = ({
   children,
-}: PropsWithChildren): JSX.Element => {
+}: PropsWithChildren<any>): JSX.Element => {
+  const [location, setLocation] = useState<LocationObject>();
   const dismissKeyboard = useCallback(() => {
     Keyboard.dismiss();
   }, []);
-  const [location, setLocation] = useState<LocationObject>();
 
   const getLocationPermission = useCallback(async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -34,17 +35,37 @@ export const AppContextProvider = ({
   }, []);
 
   const getLocation = useCallback(async () => {
-    return await Location.getCurrentPositionAsync({});
+    const lastKnownLocation = await Location.getLastKnownPositionAsync({});
+    if (lastKnownLocation) {
+      setLocation(lastKnownLocation);
+    }
+
+    const updateFrequency = 100000; // Update frequency in milliseconds
+    let lastUpdateTime = Date.now();
+
+    const subscriber = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: 10,
+        timeInterval: 5000,
+      },
+      (newLocation) => {
+        const now = Date.now();
+        if (now - lastUpdateTime >= updateFrequency) {
+          setLocation(newLocation);
+          lastUpdateTime = now;
+        }
+      },
+    );
+    return () => subscriber.remove();
   }, []);
 
   useEffect(() => {
     (async () => {
       await getLocationPermission();
-      await getLocation().then((res) => {
-        setLocation(res);
-      });
+      await getLocation();
     })();
-  }, []);
+  }, [getLocation, getLocationPermission]);
 
   return (
     <AppContext.Provider
