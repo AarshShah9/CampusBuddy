@@ -7,6 +7,7 @@ import { Expo } from "expo-server-sdk";
 import prisma from "../prisma/client";
 import { Event, UserEventResponse } from "@prisma/client";
 import { calculateTimeDifference } from "../utils/timeFormater";
+import { events, ids } from "../prisma/data";
 
 // Create a new Expo SDK client
 let expo = new Expo({
@@ -231,11 +232,19 @@ export async function pushNotificationTest(token: ExpoPushToken) {
   await expo.sendPushNotificationsAsync([
     {
       to: token,
-      title: "Test Notification!",
-      body: "Notification Body",
+      title: events[0].title,
+      body: "Event Coming Up Soon",
       subtitle: "",
       sound: "default",
       priority: "default",
+      data: {
+        route: true,
+        routeName: "EventDetails",
+        routeParams: {
+          eventId: events[0].id,
+        },
+        imageUrl: events[0].image,
+      },
     },
   ]);
 }

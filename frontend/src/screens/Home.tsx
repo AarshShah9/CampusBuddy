@@ -13,12 +13,13 @@ import useLoadingContext from "~/hooks/useLoadingContext";
 import { useQuery } from "@tanstack/react-query";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
-import usePushNotifications from "~/hooks/usePushNotifications";
+// import usePushNotifications from "~/hooks/usePushNotifications";
 import useRefreshControl from "~/hooks/useRefreshControl";
 import { getMainEvents } from "~/lib/apiFunctions/Events";
 import { EventData, EventType } from "~/types/Events";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
 import useAppContext from "~/hooks/useAppContext";
+import usePushNotifications from "~/hooks/usePushNotifications";
 
 const fetchMainEvents = async (): Promise<{
   allEvents: EventData[];
