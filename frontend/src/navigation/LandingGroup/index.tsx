@@ -6,7 +6,7 @@ import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import { ChatsContextProvider } from "~/contexts/chatsContext";
 import { ChatContextProvider } from "~/contexts/chatContext";
-import EventSettings from "~/screens/EventSettings";
+import EventSettings from "~/screens/EventDetails/EventSettings";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import ItemSettings from "~/screens/ItemSettings";
 import PostSettings from "~/screens/PostSettings";
@@ -20,27 +20,27 @@ export default function LandingGroup() {
 
     return (
         <ReactQueryProvider>
-            <ChatsContextProvider>
-                <ChatContextProvider>
-                    <StripeProvider
-                        publishableKey={PUBLISHABLE_KEY}
-                        merchantIdentifier="merchant.com.campusbuddy" // todo
-                        urlScheme="your-url-scheme" // todo
-                    >
-                        <EventsContextProvider>
-                            <BottomSheetModalProvider>
+            <StripeProvider
+                publishableKey={PUBLISHABLE_KEY}
+                merchantIdentifier="merchant.com.campusbuddy" // todo
+                urlScheme="your-url-scheme" // todo
+            >
+                <BottomSheetModalProvider> 
+                    <EventsContextProvider>
+                        <ChatsContextProvider>
+                            <ChatContextProvider>
                                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                                     <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
                                     <Stack.Screen name="Messages" component={MessagesGroup} />
                                 </Stack.Navigator>
-                                <EventSettings />
-                                <ItemSettings />
-                                <PostSettings />
-                            </BottomSheetModalProvider>
-                        </EventsContextProvider>
-                    </StripeProvider>
-                </ChatContextProvider>
-            </ChatsContextProvider>
+                            </ChatContextProvider>
+                        </ChatsContextProvider>
+                        
+                        <ItemSettings />
+                        <PostSettings />
+                    </EventsContextProvider>
+                </BottomSheetModalProvider>
+            </StripeProvider>
         </ReactQueryProvider>
     );
 }

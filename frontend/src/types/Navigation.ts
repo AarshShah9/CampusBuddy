@@ -1,3 +1,23 @@
+export type DuplicatedScreen = 
+  "UserProfile" |
+  "EventDetails" |
+  "LookingForDetails" |
+  "LookingForCommentsScreen" |
+  "MarketPlaceDetail" |
+  "Attendees" |
+  "MapDetails" |
+  "OrganizationProfile" |
+  "EditEvent" |
+  "QRCodeScanner" |
+  "EventPricing" |
+  "EventPayment";
+
+export type CurrentMainTab = "Home" | "Search" | "CreatePost" | "Maps" | "Profile";
+
+type RouteNameProp = {
+  routeName: string
+}
+
 type UserProfileRoute = {
   page: "UserProfile";
   id: string;
@@ -85,7 +105,7 @@ type OrganizationSettingsRoute = {
   page: "OrganizationSettings";
 };
 
-type EditEventRoute = {
+type EditEventRoute =  {
   page: "EditEvent";
 };
 

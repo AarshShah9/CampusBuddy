@@ -1,20 +1,32 @@
-import { createContext, PropsWithChildren, useCallback } from "react";
-import { NavigableStacks, NavigationFunctionArgs } from "~/types/Navigation";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { createContext, PropsWithChildren, useCallback, useState } from "react";
+import { CurrentMainTab, DuplicatedScreen, NavigableStacks, NavigationFunctionArgs } from "~/types/Navigation";
+import { StackActions, useNavigation, useNavigationState } from "@react-navigation/native";
 
 type contextObject = {
     navigateTo: (arg: NavigationFunctionArgs) => void
     navigateBack: () => void,
     replaceStackWith: (arg: NavigableStacks) => void,
-    setNavigationOptions: (arg: any) => void
+    setNavigationOptions: (arg: any) => void,
+    updateCurrentMaintab: (arg: CurrentMainTab) => void
 };
 const NavigationContext = createContext<contextObject | null>(null);
 
+const duplicatedScreens: DuplicatedScreen[] = ["UserProfile", "EventDetails", "LookingForDetails", "LookingForCommentsScreen", "MarketPlaceDetail", "Attendees", "MapDetails", "OrganizationProfile", "EditEvent", "QRCodeScanner", "EventPricing", "EventPayment"]
+
 export const NavigationContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
+    const [currentMainTab, setCurrentMainTab] = useState<CurrentMainTab>("Home");
+    const updateCurrentMaintab = useCallback((arg: CurrentMainTab) => {
+        setCurrentMainTab(arg)
+    }, [])
+
     const { navigate, goBack, dispatch, setOptions } = useNavigation<any>();
     const navigateTo = useCallback(({ page, ...params }: NavigationFunctionArgs) => {
-        navigate(page, { ...params })
-    }, [navigate])
+        let pageToRoute: string = page;
+        if(duplicatedScreens.includes(page as any)) {
+            pageToRoute = `${page}-${currentMainTab}`;
+        }
+        navigate(pageToRoute, { ...params })
+    }, [navigate, currentMainTab])
     const navigateBack = useCallback(() => {
         goBack()
     }, [])
@@ -28,7 +40,7 @@ export const NavigationContextProvider = ({ children }: PropsWithChildren): JSX.
     return (
         <NavigationContext.Provider 
             value={{ 
-                navigateTo, navigateBack, 
+                navigateTo, navigateBack, updateCurrentMaintab,
                 replaceStackWith, setNavigationOptions
             }}
         >

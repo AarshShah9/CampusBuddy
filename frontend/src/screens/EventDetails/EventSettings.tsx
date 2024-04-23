@@ -9,21 +9,27 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import useAuthContext from "~/hooks/useAuthContext";
-import useEventsContext from "~/hooks/useEventsContext";
+import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { EventDetailsType } from ".";
 
-export default function EventSettings() {
+type Props = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
+  closeModal: () => void;
+  likeMutate: () => void;
+  eventData?: EventDetailsType;
+  deleteMutate: () => void;
+  flipPublicMutate: () => void;
+}
+export default function EventSettings({
+  bottomSheetModalRef,
+  closeModal,
+  likeMutate,
+  eventData,
+  deleteMutate,
+  flipPublicMutate,
+}: Props) {
   const { theme } = useThemeContext();
-  const { userType } = useAuthContext();
   const { navigateTo, navigateBack } = useNavigationContext();
-
-  const {
-    bottomSheetModalRef,
-    closeModal,
-    likeMutate,
-    eventData,
-    deleteMutate,
-    flipPublicMutate,
-  } = useEventsContext();
 
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
