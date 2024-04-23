@@ -36,37 +36,125 @@ export default function LandingGroup() {
             <ChatsContextProvider>
                 <ChatContextProvider>
                     <StripeProvider
-        publishableKey={PUBLISHABLE_KEY}
-        merchantIdentifier="merchant.com.campusbuddy" // todo
-        urlScheme="your-url-scheme" // todo
-      >
-        <BottomSheetModalProvider>
-          <EventsContextProvider>
-                            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                                <Stack.Screen
-                name="BottomTabsGroup"
-                component={BottomTabsGroup}
-              />
-                                <Stack.Screen name="Messages" component={MessagesGroup} />
-                                {/*  TODO ALL OF THESE SCREENS STACKING IS BOGGING DOWN THE APP */}
-              <Stack.Screen
-                                    name="UserProfile"
-                                    component={ProfilePage}
-                                    options={{
-                                        title: "",
-                                        headerShown: true,
-                                        headerBackTitle: "Home",
-                                        headerTintColor: theme.colors.onSecondary,
-                                        headerTitleStyle: {
-                                            color: theme.colors.onSecondary,
-                                        },
-                                        headerStyle: { backgroundColor: theme.colors.primary },
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="EventDetails"
-                                    component={EventDetails}
-                                    options={{
+                        publishableKey={PUBLISHABLE_KEY}
+                        merchantIdentifier="merchant.com.campusbuddy" // todo
+                        urlScheme="your-url-scheme" // todo
+                    >
+                        <EventsContextProvider>
+                            <BottomSheetModalProvider>
+                                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                                    <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
+                                    <Stack.Screen name="Messages" component={MessagesGroup} />
+                                    {/*  TODO ALL OF THESE SCREENS STACKING IS BOGGING DOWN THE APP */}
+                                    <Stack.Screen
+                                        name="UserProfile"
+                                        component={ProfilePage}
+                                        options={{
+                                            title: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Home",
+                                            headerTintColor: theme.colors.onSecondary,
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="EventDetails"
+                                        component={EventDetails}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                            headerTitle: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Back",
+                                            headerTintColor: theme.colors.onSecondary,
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="LookingForDetails"
+                                        component={LookingForDetails}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                            headerTitle: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Back",
+                                            headerTintColor: theme.colors.onSecondary,
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="LookingForCommentsScreen"
+                                        component={LookingForCommentsScreen}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                            headerTitle: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Back",
+                                            headerTintColor: theme.colors.onSecondary,
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="MarketPlaceDetail"
+                                        component={MarketPlaceDetail}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                            headerTitle: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Back",
+                                            headerTintColor: theme.colors.onSecondary,
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="Attendees"
+                                        component={Attendees}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="MapDetails"
+                                        component={MapDetails}
+                                        options={{
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            presentation: "modal",
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="OrganizationProfile"
+                                        component={OrganizationProfile}
+                                        options={{
+                                            title: "",
+                                            headerShown: true,
+                                            headerBackTitle: "Home",
+                                            headerTintColor: theme.colors.onSecondary,
+                                            headerTitleStyle: {
+                                                color: theme.colors.onSecondary,
+                                            },
+                                            headerStyle: { backgroundColor: theme.colors.primary },
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name={"EditEvent"}
+                                        component={CreateEvent}
+                                        options={{
                                         headerTitleStyle: {
                                             color: theme.colors.onSecondary,
                                         },
@@ -75,12 +163,12 @@ export default function LandingGroup() {
                                         headerShown: true,
                                         headerBackTitle: "Back",
                                         headerTintColor: theme.colors.onSecondary,
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="LookingForDetails"
-                                    component={LookingForDetails}
-                                    options={{
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name={"QRCodeScanner"}
+                                        component={QRCodeScanner}
+                                        options={{
                                         headerTitleStyle: {
                                             color: theme.colors.onSecondary,
                                         },
@@ -89,12 +177,12 @@ export default function LandingGroup() {
                                         headerShown: true,
                                         headerBackTitle: "Back",
                                         headerTintColor: theme.colors.onSecondary,
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="LookingForCommentsScreen"
-                                    component={LookingForCommentsScreen}
-                                    options={{
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name={"EventPricing"}
+                                        component={EventPricing}
+                                        options={{
                                         headerTitleStyle: {
                                             color: theme.colors.onSecondary,
                                         },
@@ -103,119 +191,28 @@ export default function LandingGroup() {
                                         headerShown: true,
                                         headerBackTitle: "Back",
                                         headerTintColor: theme.colors.onSecondary,
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="MarketPlaceDetail"
-                                    component={MarketPlaceDetail}
-                                    options={{
-                                        headerTitleStyle: {
-                                            color: theme.colors.onSecondary,
-                                        },
-                                        headerStyle: { backgroundColor: theme.colors.primary },
-                                        headerTitle: "",
-                                        headerShown: true,
-                                        headerBackTitle: "Back",
-                                        headerTintColor: theme.colors.onSecondary,
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="Attendees"
-                                    component={Attendees}
-                                    options={{
-                                        headerTitleStyle: {
-                                            color: theme.colors.onSecondary,
-                                        },
-                                        headerStyle: { backgroundColor: theme.colors.primary },
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="MapDetails"
-                                    component={MapDetails}
-                                    options={{
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name={"EventPayment"}
+                                        component={EventPayment}
+                                        options={{
                                         headerTitleStyle: {
                                             color: theme.colors.onSecondary,
                                         },
                                         presentation: "modal",
                                         headerStyle: { backgroundColor: theme.colors.primary },
-                                    }}
-                                />
-                                <Stack.Screen
-                                    name="OrganizationProfile"
-                                    component={OrganizationProfile}
-                                    options={{
-                                        title: "",
-                                        headerShown: true,
-                                        headerBackTitle: "Home",
-                                        headerTintColor: theme.colors.onSecondary,
-                                        headerTitleStyle: {
-                                            color: theme.colors.onSecondary,
-                                        },
-                                        headerStyle: { backgroundColor: theme.colors.primary },
-                                    }}
-                                />
-                              <Stack.Screen
-                name={"EditEvent"}
-                component={CreateEvent}
-                options={{
-                  headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                  },
-                  headerStyle: { backgroundColor: theme.colors.primary },
-                  headerTitle: "",
-                  headerShown: true,
-                  headerBackTitle: "Back",
-                  headerTintColor: theme.colors.onSecondary,
-                }}
-              />
-              <Stack.Screen
-                name={"QRCodeScanner"}
-                component={QRCodeScanner}
-                options={{
-                  headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                  },
-                  headerStyle: { backgroundColor: theme.colors.primary },
-                  headerTitle: "",
-                  headerShown: true,
-                  headerBackTitle: "Back",
-                  headerTintColor: theme.colors.onSecondary,
-                }}
-              />
-              <Stack.Screen
-                name={"EventPricing"}
-                component={EventPricing}
-                options={{
-                  headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                  },
-                  headerStyle: { backgroundColor: theme.colors.primary },
-                  headerTitle: "",
-                  headerShown: true,
-                  headerBackTitle: "Back",
-                  headerTintColor: theme.colors.onSecondary,
-                }}
-              />
-              <Stack.Screen
-                name={"EventPayment"}
-                component={EventPayment}
-                options={{
-                  headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                  },
-                  presentation: "modal",
-                  headerStyle: { backgroundColor: theme.colors.primary },
-                }}
-              />
-            </Stack.Navigator>
-                          <EventSettings />
-            <ItemSettings />
-            <PostSettings />
-          </EventsContextProvider>
-                    </ChatContextProvider>
-                </ChatsContextProvider>
-            </BottomSheetModalProvider>
-      </StripeProvider>
-    </ReactQueryProvider>
+                                        }}
+                                    />
+                                </Stack.Navigator>
+                                <EventSettings />
+                                <ItemSettings />
+                                <PostSettings />
+                            </BottomSheetModalProvider>
+                        </EventsContextProvider>
+                    </StripeProvider>
+                </ChatContextProvider>
+            </ChatsContextProvider>
+        </ReactQueryProvider>
     );
 }
