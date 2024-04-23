@@ -320,7 +320,6 @@ export const events = [
     isPublic: true,
     status: EventStatus.Verified,
     image: "https://d2epenzoyf672m.cloudfront.net/pfp/calgaryExpo.jpg",
-    isFlagged: true,
   },
   {
     id: ids.eventIds[5],
@@ -454,8 +453,42 @@ export const posts = [
     expiresAt: "2024-10-10T19:00:00Z",
     type: PostType.LookingFor,
     numberOfSpots: 8,
-    isFlagged: true,
-    // Other post details
+  },
+  {
+    id: ids.postIds[3],
+    userId: ids.userIds[4],
+    institutionId: ids.instituteIds[1],
+    title: "Squash partner",
+    description: "Lets play squash at 5pm",
+    createdAt: "2024-11-10T10:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 1,
+  },
+  {
+    id: ids.postIds[4],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Casual Chess Match",
+    description:
+      "Looking for 1 person to play chess with between noon and 2:30",
+    createdAt: "2024-11-10T11:00:00Z",
+    expiresAt: "2024-11-10T19:00:00Z",
+    type: PostType.LookingFor,
+    numberOfSpots: 1,
+    numberOfSpotsLeft: 0,
+  },
+  {
+    id: ids.postIds[5],
+    userId: ids.userIds[1],
+    institutionId: ids.instituteIds[1],
+    title: "Found lost headphones in TFDL",
+    description:
+      "I found them on the fourth floor near the elevator. Msg me if you think its yours",
+    createdAt: "2024-10-10T06:00:00Z",
+    expiresAt: "2024-11-10T12:00:00Z",
+    type: PostType.LookingFor,
   },
 ];
 
@@ -543,7 +576,6 @@ export const items = [
     condition: "Used_Good",
     locationPlaceId: locations[0].placeId,
     state: State.Available,
-    isFlagged: true,
   },
   {
     id: ids.itemIds[8],
@@ -556,7 +588,6 @@ export const items = [
     condition: "Used_Good",
     locationPlaceId: locations[1].placeId,
     state: State.Available,
-    isFlagged: true,
   },
 ];
 
