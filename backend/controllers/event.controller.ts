@@ -1070,10 +1070,18 @@ export const getMainPageEvents = async (
       take: 5,
     });
 
+    // filter out the ones that the user is already attending from OrganizationEvents and the ones from both the topTrendingEvents and trendingEvents based on event id
+    const filteredOrganizationEvents = organizationEvents.filter(
+      (event) =>
+        !attendingEvents.map((event) => event.id).includes(event.id) &&
+        !topTrendingEvents.map((event) => event.id).includes(event.id) &&
+        !trendingEvents.map((event) => event.id).includes(event.id),
+    );
+
     const reformattedUpcomingEvents = {
       title: "Upcoming Events From Following",
       id: "2",
-      items: organizationEvents.map((event) => {
+      items: filteredOrganizationEvents.map((event) => {
         return {
           id: event.id,
           title: event.title,
