@@ -10,7 +10,7 @@ type Request = {
   organization: OrganizationType;
   owner: UserWithoutPasswordType;
 };
-const Table = () => {
+const OrgTable = () => {
   const [requests, setRequests] = useState<Request[]>([]);
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -223,4 +223,4 @@ const Table = () => {
   );
 };
 
-export default Table;
+export default OrgTable;
