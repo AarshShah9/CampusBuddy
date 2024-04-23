@@ -5,16 +5,20 @@ import Login from "./components/Login";
 import PostTable from "./components/PostTable";
 import EventTable from "./components/EventTable";
 import ItemTable from "./components/ItemTable";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
-    } else {
+    } else if (
+      (token && location.pathname === "/") ||
+      location.pathname === "/login"
+    ) {
       navigate("/dashboard/orgTable");
     }
   }, []);
