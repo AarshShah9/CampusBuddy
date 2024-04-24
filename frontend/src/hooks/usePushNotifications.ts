@@ -5,6 +5,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { storeUserPushToken } from "~/lib/apiFunctions/PushNotification";
 import { EXPO_ACCESS_TOKEN } from "@env";
+import { useNavigation } from "@react-navigation/native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -85,6 +86,22 @@ export default function usePushNotifications(
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
   >();
+  const navigation = useNavigation<any>();
+  const onTap = (notification: Notifications.NotificationResponse) => {
+    onTapNotification?.(notification);
+    if (notification.notification.request.content.data?.route) {
+      switch (notification.notification.request.content.data.routeName) {
+        case "EventDetails":
+          navigation.navigate("EventDetails", {
+            id: notification.notification.request.content.data.routeParams
+              .eventId,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
@@ -126,8 +143,8 @@ export default function usePushNotifications(
       });
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener(
-        (response) => onTapNotification?.(response),
+      Notifications.addNotificationResponseReceivedListener((response) =>
+        onTap(response),
       );
 
     return () => {

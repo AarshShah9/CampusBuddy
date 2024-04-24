@@ -52,6 +52,8 @@ jobs:
           echo GPT_KEY=NA >> .env
           echo GPT_ORG=NA >> .env
           echo GOOGLE_SERVICE_ACCOUNT_KEY=${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} >> .env
+          echo SENDGRID_API_KEY=NA >> .env
+          echo SENDGRID_EMAIL=NA >> .env
 
       - name: Install Root Dependencies
         run: npm ci

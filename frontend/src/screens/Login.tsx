@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   View,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -109,62 +110,45 @@ export default function Login() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
     >
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <MainContainer $primary={theme.colors.primary}>
-          {/*  only show the logo if the keyboard is hidden */}
-          <LogoContainer>
-            {!isKeyboardVisible && (
-              <Image
-                style={{ marginTop: 42 }}
-                source={require("~/assets/Campus_Buddy_Logo.png")}
-              />
-            )}
-          </LogoContainer>
-          <OverlayContainer $color={theme.colors.tertiary}>
-            <Header $color={theme.colors.text}>{"Login"}</Header>
-            <FormContainer>
-              <Controller
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <InputField
-                    label={
-                      errors.email ? (
-                        <ErrorText error={"Email is required."} />
-                      ) : (
-                        "Email"
-                      )
-                    }
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    autoCorrect={false}
-                    autoCapitalize={"none"}
-                    autoComplete={"off"}
-                    style={{ backgroundColor: theme.colors.tertiary }}
-                  />
-                )}
-                name="email"
-              />
-
-              <Controller
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.inputContainer}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <MainContainer $primary={theme.colors.primary}>
+            {/*  only show the logo if the keyboard is hidden */}
+            <LogoContainer>
+              {!isKeyboardVisible && (
+                <Image
+                  style={{ marginTop: 42 }}
+                  source={require("~/assets/Campus_Buddy_Logo.png")}
+                />
+              )}
+              {isKeyboardVisible && (
+                <Header $color={theme.colors.text}>{"Login"}</Header>
+              )}
+            </LogoContainer>
+            <OverlayContainer $color={theme.colors.tertiary}>
+              <Header $color={theme.colors.text}>
+                {!isKeyboardVisible && "Login"}
+              </Header>
+              <FormContainer>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
                       label={
-                        errors.password ? (
-                          <ErrorText error={"Password is required."} />
+                        errors.email ? (
+                          <ErrorText error={"Email is required."} />
                         ) : (
-                          "Password"
+                          "Email"
                         )
                       }
-                      secureTextEntry={!passwordVisible}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
@@ -173,73 +157,102 @@ export default function Login() {
                       autoComplete={"off"}
                       style={{ backgroundColor: theme.colors.tertiary }}
                     />
-                    <TouchableOpacity
-                      onPress={() => setPasswordVisible(!passwordVisible)}
-                      style={styles.icon}
-                    >
-                      <MaterialCommunityIcons
-                        name={passwordVisible ? "eye-off" : "eye"}
-                        size={24}
-                        color="grey"
+                  )}
+                  name="email"
+                />
+
+                <Controller
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={styles.inputContainer}>
+                      <InputField
+                        label={
+                          errors.password ? (
+                            <ErrorText error={"Password is required."} />
+                          ) : (
+                            "Password"
+                          )
+                        }
+                        secureTextEntry={!passwordVisible}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoCapitalize={"none"}
+                        autoComplete={"off"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
                       />
-                    </TouchableOpacity>
-                  </View>
-                )}
-                name="password"
-              />
-              <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
-                <Text
+                      <TouchableOpacity
+                        onPress={() => setPasswordVisible(!passwordVisible)}
+                        style={styles.icon}
+                      >
+                        <MaterialCommunityIcons
+                          name={passwordVisible ? "eye-off" : "eye"}
+                          size={24}
+                          color="grey"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  name="password"
+                />
+                <StyledButton mode="contained" onPress={handleSubmit(onSubmit)}>
+                  <Text
+                    style={{
+                      lineHeight: 30,
+                      fontSize: 24,
+                      fontWeight: "bold",
+                      color: "white",
+                      fontFamily: "Nunito-Bold",
+                    }}
+                  >
+                    Login
+                  </Text>
+                </StyledButton>
+                <View
                   style={{
-                    lineHeight: 30,
-                    fontSize: 24,
-                    fontWeight: "bold",
-                    color: "white",
-                    fontFamily: "Nunito-Bold",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 64,
+                    marginLeft: "auto",
+                    marginRight: "auto",
                   }}
-                >
-                  Login
-                </Text>
-              </StyledButton>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: 64,
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                }}
-              >
-                <Text
-                  style={{
-                    marginRight: 5,
-                    fontSize: 16,
-                    fontFamily: "Roboto-Reg",
-                    color: theme.colors.text,
-                  }}
-                >
-                  Don't have an account?
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigateTo({ page: "StudentSignUp" });
-                  }}
-                  activeOpacity={0.7}
                 >
                   <Text
                     style={{
-                      color: theme.colors.primary,
+                      marginRight: 5,
+                      fontSize: 16,
                       fontFamily: "Roboto-Reg",
+                      color: theme.colors.text,
                     }}
                   >
-                    Sign up
+                    Don't have an account?
                   </Text>
-                </TouchableOpacity>
-              </View>
-            </FormContainer>
-          </OverlayContainer>
-        </MainContainer>
-      </TouchableWithoutFeedback>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigateTo({ page: "StudentSignUp" });
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={{
+                        color: theme.colors.primary,
+                        fontFamily: "Roboto-Reg",
+                      }}
+                    >
+                      Sign up
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </FormContainer>
+            </OverlayContainer>
+          </MainContainer>
+        </TouchableWithoutFeedback>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

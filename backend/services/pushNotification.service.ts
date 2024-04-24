@@ -282,7 +282,5 @@ export async function getUserPushTokens(userId: string): Promise<string[]> {
     );
   }
 
-  const pushTokens = user.pushTokens.map((token) => token.pushToken);
-
-  return pushTokens;
+  return user.pushTokens.map((token) => token.pushToken);
 }
