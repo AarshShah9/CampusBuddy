@@ -30,7 +30,7 @@ export default function Login() {
       })
       .then((data) => {
         localStorage.setItem("token", data.authToken);
-        navigate("/dashboard/table");
+        navigate("/dashboard/orgTable");
       });
   };
 
