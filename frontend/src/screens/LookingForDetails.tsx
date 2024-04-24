@@ -229,7 +229,6 @@ const styles = StyleSheet.create({
     margin: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomStyle: "solid",
     borderBottomColor: "grey",
   },
   profileContainer: {
