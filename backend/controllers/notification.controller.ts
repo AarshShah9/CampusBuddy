@@ -3,6 +3,7 @@ import prisma from "../prisma/client";
 import { RequestExtended } from "../middleware/verifyAuth";
 import {
   ChatNotificationSchema,
+  EventReminderSchema,
   IdParamSchema,
   PushTokenSchema,
 } from "../../shared/zodSchemas";
@@ -16,7 +17,7 @@ import {
   getUserPushTokens,
   timeDiffNotificationBody,
 } from "../services/pushNotification.service";
-import { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
+import Expo, { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { AppError, AppErrorName } from "../utils/AppError";
 
@@ -166,7 +167,6 @@ export const sendChatNotification = async (
       body: message,
     };
 
-    // const tickets: ExpoPushTicket[] = [];
     // send the notification
     const tickets: ExpoPushTicket[] = await sendPushNotifications(
       pushTokens,
@@ -212,7 +212,6 @@ export const sendEventRemindersTest = async (
         },
       },
     });
-    console.log("upcomingEvent", upcomingEvent);
 
     if (!upcomingEvent) {
       console.log("Event not found");
@@ -257,10 +256,18 @@ export const sendShowcaseNotification = async (
   next: NextFunction,
 ) => {
   try {
-    const pushToken = ""; // insert the device's push token
-    const eventId = "79bc4af1-c551-11ee-83fd-6f8d6c450910"; // spikeball eventId
-    // const eventTitle = "Spikeball 4 Cause";
+    // Get the push token and eventId from request body
+    const { pushToken, eventId } = EventReminderSchema.parse(req.body);
 
+    // Check if push token is valid
+    if (!Expo.isExpoPushToken(pushToken)) {
+      console.error(`Push token ${pushToken} is not a valid Expo push token`);
+      return res.status(500).json({
+        message: `Error sending push notifications for event, invalid push token`,
+      });
+    }
+
+    // fetch the event
     const event = await prisma.event.findUnique({
       where: {
         id: eventId,
@@ -275,19 +282,25 @@ export const sendShowcaseNotification = async (
         true,
       );
     }
-    const startsIn = timeDiffNotificationBody(event.startTime);
+
+    // create the notification props
     const notification: SendPushNotificationProps = {
       title: event.title,
-      body: startsIn,
-      data: {
-        page: "EventDetails",
-        id: eventId,
-      },
+      // body: startsIn,
+      body: "Event Coming Up Soon",
       subtitle: "",
       sound: "default",
       priority: "default",
+      data: {
+        route: true,
+        routeName: "EventDetails",
+        routeParams: {
+          eventId: eventId,
+        },
+      },
     };
 
+    // Send the notification
     try {
       const eventTickets = await sendPushNotifications(
         [pushToken],

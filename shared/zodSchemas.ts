@@ -671,3 +671,8 @@ export const ChatNotificationSchema = z.object({
   recipientId: z.string().uuid(),
   message: z.string(),
 });
+
+// for showcase route
+export const EventReminderSchema = PushTokenSchema.extend({
+  eventId: z.string().uuid(),
+});
