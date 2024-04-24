@@ -71,7 +71,6 @@ function ProfileScreens() {
                     options={{
                         title: "Settings",
                         headerShown: true,
-                        headerBackTitle: "Home",
                         headerTintColor: theme.colors.onSecondary,
                         headerTitleStyle: {
                             color: theme.colors.onSecondary,
@@ -99,11 +98,7 @@ function ProfileScreens() {
                     options={{
                         title: "Organization Settings",
                         headerShown: true,
-                        headerBackTitle: "Home",
                         headerTintColor: theme.colors.onSecondary,
-                        headerTitleStyle: {
-                            color: theme.colors.onSecondary,
-                        },
                         headerStyle: {
                             backgroundColor: theme.colors.primary,
                         },
@@ -117,11 +112,7 @@ function ProfileScreens() {
                     options={{
                         title: "Analytics",
                         headerShown: true,
-                        headerBackTitle: "Home",
                         headerTintColor: theme.colors.onSecondary,
-                        headerTitleStyle: {
-                            color: theme.colors.onSecondary,
-                        },
                         headerStyle: {
                             backgroundColor: theme.colors.primary,
                         },
@@ -134,11 +125,7 @@ function ProfileScreens() {
                 options={{
                     title: "Help",
                     headerShown: true,
-                    headerBackTitle: "Home",
                     headerTintColor: theme.colors.onSecondary,
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: {
                         backgroundColor: theme.colors.primary,
                     },

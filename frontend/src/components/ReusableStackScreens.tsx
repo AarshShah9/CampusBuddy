@@ -19,7 +19,7 @@ const Stack = createNativeStackNavigator();
 
 type Props = {
     name: CurrentMainTab,
-    component: () => JSX.Element,
+    component: () => JSX.Element | null,
     options?: NativeStackNavigationOptions
 }
 

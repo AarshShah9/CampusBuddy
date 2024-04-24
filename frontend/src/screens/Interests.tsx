@@ -58,10 +58,12 @@ const AddInterestButton = () => {
 
 const ShowMoreButton = () => {
     return (
-        <View style={styles.showMoreButton}>
-            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
-            <Text style={styles.showMoreButtonText}>Show more interests</Text>
-        </View>
+        <TouchableOpacity>
+            <View style={styles.showMoreButton}>
+                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                <Text style={styles.showMoreButtonText}>Show more interests</Text>
+            </View>
+        </TouchableOpacity>
     )
 }
 
