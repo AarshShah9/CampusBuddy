@@ -9,15 +9,14 @@ import HorizontalScrollElement from "~/components/HorizontalScrollElement";
 import Carousel from "pinar";
 import { useCallback, useEffect, useState } from "react";
 import useLoadingContext from "~/hooks/useLoadingContext";
-import useEventsContext from "~/hooks/useEventsContext";
 import { CarousalItem, EventData } from "~/types/Events";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import { getMainEvents } from "~/lib/apiFunctions/Events";
 
 export default function VerticalScrollComponent() {
   const screenWidth = Dimensions.get("window").width;
   const { startLoading, stopLoading } = useLoadingContext();
-  const { getMainEvents } = useEventsContext();
   const [events, setEvents] = useState<EventData[]>([]);
   const [startingEvents, setStartingEvents] = useState<CarousalItem[]>([]);
 
@@ -80,4 +79,3 @@ export default function VerticalScrollComponent() {
     />
   );
 }
-

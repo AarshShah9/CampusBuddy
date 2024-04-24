@@ -402,7 +402,7 @@ export default function CreateMarketplace() {
                       color: theme.colors.text,
                     }}
                   >
-                    Event Description:*
+                    Description:*
                   </Text>
                   <TextInput
                     editable={!isSubmitting}

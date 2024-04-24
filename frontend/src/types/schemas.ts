@@ -59,3 +59,39 @@ export const OrganizationRegistrationSchema = zod
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const EventCreateSchema = zod
+  .object({
+    title: zod
+      .string({
+        required_error: "Title is required",
+        invalid_type_error: "Title must be a string",
+      })
+      .min(3, { message: "Title must contain 3 or more characters" })
+      .max(255),
+    startTime: zod.coerce
+      .date({
+        required_error: "Please select a date and time",
+        invalid_type_error: "Invalid datetime",
+      })
+      .refine((value) => value > new Date(), {
+        message: "Start time must be in the future",
+      }),
+    endTime: zod.coerce.date({
+      required_error: "Please select a date and time",
+      invalid_type_error: "Invalid datetime",
+    }),
+    description: zod.string().max(255, {
+      message: "Description must contain fewer than 255 characters",
+    }),
+    locationPlaceId: zod
+      .string({ required_error: "Location is required." })
+      .max(255),
+    // tags: zod.string().array(),
+  })
+  .refine((data) => data.endTime > data.startTime, {
+    message: "End time must be later than start time.",
+    path: ["endTime"],
+  });
+
+export type EventCreateType = zod.infer<typeof EventCreateSchema>;
