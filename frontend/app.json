@@ -2,7 +2,7 @@
   "expo": {
     "name": "CampusBuddy",
     "slug": "frontend",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./src/assets/CampusBuddyIcon.png",
     "userInterfaceStyle": "automatic",
@@ -20,7 +20,10 @@
         "usesNonExemptEncryption": false,
         "googleMapsApiKey": "AIzaSyDNqXs5VfojrTbjYKVOilqaYlkfMW1BnJE"
       },
-      "bundleIdentifier": "com.example.campusbuddy"
+      "bundleIdentifier": "com.example.campusbuddy",
+      "infoPlist": {
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
+      }
     },
     "android": {
       "adaptiveIcon": {
