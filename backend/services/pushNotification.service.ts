@@ -7,7 +7,8 @@ import { Expo } from "expo-server-sdk";
 import prisma from "../prisma/client";
 import { Event, UserEventResponse } from "@prisma/client";
 import { calculateTimeDifference } from "../utils/timeFormater";
-import { events, ids } from "../prisma/data";
+import { AppError, AppErrorName } from "../utils/AppError";
+import { events } from "../prisma/data";
 
 // Create a new Expo SDK client
 let expo = new Expo({
@@ -27,12 +28,12 @@ export type EventWithResponses = {
 };
 
 export type SendPushNotificationProps = {
-  title: string;
-  body: string;
-  data: Object;
-  subtitle: string; // ios only
-  sound: "default" | null; // ios only
-  priority: "default" | "normal" | "high"; // ios only
+  title?: string;
+  body?: string;
+  data?: Object;
+  subtitle?: string; // ios only
+  sound?: "default" | null; // ios only
+  priority?: "default" | "normal" | "high"; // ios only
   // could add other properties, see https://docs.expo.dev/push-notifications/sending-notifications/
 };
 
@@ -165,28 +166,41 @@ export async function getEventsWithinTimeRange(
   return formattedEvents;
 }
 
+// function to create a notification body based on the time until the start time
+export function timeDiffNotificationBody(
+  startTime: Date,
+  targetTime?: Date | undefined,
+): string {
+  let out = "Starts in ";
+  const timeDifference: string = calculateTimeDifference(startTime, targetTime);
+  if (timeDifference === "") {
+    out = "Event expired";
+  } else {
+    out += timeDifference;
+  }
+  return out;
+}
+
 // Sends the formatted time before the event starts
 function constructEventReminderNotification(
   event: EventWithResponses,
 ): SendPushNotificationProps {
   // Create a notification specific to this event
-  let startsIn = "Starts in ";
-  const timeDifference: string = calculateTimeDifference(event.event.startTime);
-  if (timeDifference === "") {
-    startsIn = "Event expired";
-  } else {
-    startsIn += timeDifference;
-  }
+  const startsIn = timeDiffNotificationBody(event.event.startTime);
 
   const pushNotificationProps: SendPushNotificationProps = {
     title: event.event.title,
     body: startsIn,
-    data: {
-      eventId: event.event.id,
-    },
     subtitle: "",
     sound: "default",
     priority: "default",
+    data: {
+      route: true,
+      routeName: "EventDetails",
+      routeParams: {
+        eventId: event.event.id,
+      },
+    },
   };
 
   return pushNotificationProps;
@@ -246,4 +260,27 @@ export async function pushNotificationTest(token: ExpoPushToken) {
       },
     },
   ]);
+}
+
+// Return a list of all of the user's registered push tokens
+export async function getUserPushTokens(userId: string): Promise<string[]> {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      pushTokens: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(
+      AppErrorName.NOT_FOUND_ERROR,
+      "User not found",
+      404,
+      true,
+    );
+  }
+
+  return user.pushTokens.map((token) => token.pushToken);
 }
