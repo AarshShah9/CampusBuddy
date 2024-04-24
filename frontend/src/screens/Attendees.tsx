@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, FlatList } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
 import { useQuery } from "@tanstack/react-query";
 import AttendeeCard from "~/components/AttendeeCard";
@@ -44,9 +44,9 @@ export default function Attendees() {
       }}
     >
       <View style={[styles.headerContainer]}>
-        <TouchableOpacity onPress={() => navigateBack()}>
+        <TouchableOpacity style={{ marginLeft: -15 }} onPress={() => navigateBack()}>
           {/*TODO MAKE the back button aligned*/}
-          <AntDesign name="caretleft" size={24} color="white" />
+          <Feather name="chevron-left" size={32} color="white" />
         </TouchableOpacity>
         <SearchArea setSearchQuery={setSearchQueryCallback} />
       </View>
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: "100%",
-    height: 40,
     justifyContent: "space-between",
     paddingHorizontal: 20,
+    paddingVertical: 15,
     flexDirection: "row",
     alignItems: "flex-start",
   },

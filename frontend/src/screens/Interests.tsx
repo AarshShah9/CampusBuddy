@@ -73,7 +73,7 @@ export default function Interests() {
             <Text style={styles.topText}>Suggested interests based on your profile</Text>
             <AddInterestButton />
             <View style={styles.interestsContainer}>
-                {interests.map(interest => <InterestComponent interest={interest} />)}
+                {interests.map(interest => <InterestComponent key={interest} interest={interest} />)}
             </View>
             <ShowMoreButton />
         </View>

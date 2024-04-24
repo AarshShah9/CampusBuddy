@@ -14,6 +14,26 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react
 import useThemeContext from "~/hooks/useThemeContext";
 import { CurrentMainTab } from "~/types/Navigation";
 import { memo } from "react";
+import { TouchableOpacity, Text } from "react-native";
+import { Feather } from '@expo/vector-icons';
+import useNavigationContext from "~/hooks/useNavigationContext";
+
+const MapDetailsLeftHeader = () => {
+    const { navigateBack } = useNavigationContext();
+    
+    return (
+        <TouchableOpacity onPress={navigateBack} 
+            style={{ 
+                marginLeft: -15,
+                flexDirection: "row",
+                alignItems: "center"
+            }}
+        >
+          <Feather name="chevron-left" size={32} color="white" />
+          <Text style={{ color: "white", fontSize: 17 }}>Back</Text>
+        </TouchableOpacity>
+    )
+}
 
 const Stack = createNativeStackNavigator();
 
@@ -35,11 +55,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 options={{
                     title: "",
                     headerShown: true,
-                    headerBackTitle: "Home",
                     headerTintColor: theme.colors.onSecondary,
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                 }}
             />
@@ -102,20 +118,14 @@ function ReusableStackScreens({ name, component, options }: Props) {
             <Stack.Screen
                 name={`Attendees-${name}`}
                 component={Attendees}
-                options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
-                    headerStyle: { backgroundColor: theme.colors.primary },
-                }}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name={`MapDetails-${name}`}
                 component={MapDetails}
                 options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
+                    headerTitle: "",
+                    headerLeft: MapDetailsLeftHeader,
                     presentation: "modal",
                     headerStyle: { backgroundColor: theme.colors.primary },
                 }}
@@ -126,11 +136,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 options={{
                     title: "",
                     headerShown: true,
-                    headerBackTitle: "Home",
                     headerTintColor: theme.colors.onSecondary,
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                 }}
             />

@@ -6,7 +6,6 @@ type contextObject = {
     navigateTo: (arg: NavigationFunctionArgs) => void
     navigateBack: () => void,
     replaceStackWith: (arg: NavigableStacks) => void,
-    setNavigationOptions: (arg: any) => void,
     updateCurrentMaintab: (arg: CurrentMainTab) => void
 };
 const NavigationContext = createContext<contextObject | null>(null);
@@ -19,7 +18,7 @@ export const NavigationContextProvider = ({ children }: PropsWithChildren): JSX.
         setCurrentMainTab(arg)
     }, [])
 
-    const { navigate, goBack, dispatch, setOptions } = useNavigation<any>();
+    const { navigate, goBack, dispatch } = useNavigation<any>();
     const navigateTo = useCallback(({ page, ...params }: NavigationFunctionArgs) => {
         let pageToRoute: string = page;
         if(duplicatedScreens.includes(page as any)) {
@@ -33,15 +32,12 @@ export const NavigationContextProvider = ({ children }: PropsWithChildren): JSX.
     const replaceStackWith = useCallback((stack: NavigableStacks) => {
         dispatch(StackActions.replace(stack));
     }, [])
-    const setNavigationOptions = useCallback((arg: any) => {
-        setOptions(arg)
-    }, [])
 
     return (
         <NavigationContext.Provider 
             value={{ 
                 navigateTo, navigateBack, updateCurrentMaintab,
-                replaceStackWith, setNavigationOptions
+                replaceStackWith
             }}
         >
             {children}
