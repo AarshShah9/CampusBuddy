@@ -18,16 +18,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as zod from "zod";
-import { z } from "zod";
 import { Button, ProgressBar } from "react-native-paper";
-import ItemTag from "~/components/ItemTags";
 import { useCallback, useState } from "react";
 import LocationInputModal from "~/components/LocationInputModal";
 import { imageGetter } from "~/lib/requestHelpers";
 import { ImagePickerAsset } from "expo-image-picker";
-import useLoadingContext from "~/hooks/useLoadingContext";
-import useNavigationContext from "~/hooks/useNavigationContext";
 import { createEvent } from "~/lib/apiFunctions/Events";
 import { useMutation } from "@tanstack/react-query";
 import useAuthContext from "~/hooks/useAuthContext";

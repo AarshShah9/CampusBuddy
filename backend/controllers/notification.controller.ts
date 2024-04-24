@@ -1,15 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma/client";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { PushTokenSchema } from "../../shared/zodSchemas";
+import {
+  ChatNotificationSchema,
+  EventReminderSchema,
+  IdParamSchema,
+  PushTokenSchema,
+} from "../../shared/zodSchemas";
 import {
   EventWithResponses,
   sendEventNotifications,
   getEventsWithinTimeRange,
   pushNotificationTest,
+  SendPushNotificationProps,
+  sendPushNotifications,
+  getUserPushTokens,
+  timeDiffNotificationBody,
 } from "../services/pushNotification.service";
-import { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
+import Expo, { ExpoPushTicket, ExpoPushToken } from "expo-server-sdk";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { AppError, AppErrorName } from "../utils/AppError";
 
 export const testNotification = async (
   req: RequestExtended,
@@ -109,6 +119,202 @@ export const sendUpcomingEventRemindersTest = async (
     res.status(200).json({
       success: true,
       message: "Upcoming event reminder notifications sent",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const sendChatNotification = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUserId = req.userId;
+    const { recipientId, message } = ChatNotificationSchema.parse(req.body);
+
+    // get the recipient's registered push tokens
+    const pushTokens = await getUserPushTokens(recipientId);
+
+    // User does not have any registered push tokens
+    if (pushTokens.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "Notification processing successful" });
+    }
+
+    // get sending user's name
+    const user = await prisma.user.findUnique({
+      where: { id: loggedInUserId },
+      select: {
+        firstName: true,
+        lastName: true,
+      },
+    });
+    if (!user) {
+      // this should never happen
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+    // construct the notification
+    const pushNotification: SendPushNotificationProps = {
+      title: `${user.firstName} ${user.lastName}`,
+      body: message,
+    };
+
+    // send the notification
+    const tickets: ExpoPushTicket[] = await sendPushNotifications(
+      pushTokens,
+      pushNotification,
+    );
+
+    res.status(202).json({
+      success: true,
+      message: "Message notifications sent",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// send reminder for any event
+export const sendEventRemindersTest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Validate request id param
+    const eventId = IdParamSchema.parse(req.params).id;
+
+    const upcomingEvent = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: {
+        eventResponses: {
+          where: {
+            participationStatus: "Going",
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pushTokens: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!upcomingEvent) {
+      console.log("Event not found");
+      res.status(404).json({
+        success: true,
+        message: "Event not found",
+      });
+      return;
+    }
+
+    const usersWithPushTokens = upcomingEvent.eventResponses.map(
+      (response) => ({
+        id: response.user.id,
+        pushTokens: response.user.pushTokens.map(
+          (pushToken) => pushToken.pushToken,
+        ),
+      }),
+    );
+
+    const formattedEvent = {
+      event: upcomingEvent,
+      responses: upcomingEvent.eventResponses,
+      usersWithPushTokens,
+    };
+
+    const tickets: ExpoPushTicket[] = await sendEventNotifications([
+      formattedEvent,
+    ]);
+    res.status(200).json({
+      success: true,
+      message: "Upcoming event reminder notifications sent",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// controller to send an event notification during the final showcase
+export const sendShowcaseNotification = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Get the push token and eventId from request body
+    const { pushToken, eventId } = EventReminderSchema.parse(req.body);
+
+    // Check if push token is valid
+    if (!Expo.isExpoPushToken(pushToken)) {
+      console.error(`Push token ${pushToken} is not a valid Expo push token`);
+      return res.status(500).json({
+        message: `Error sending push notifications for event, invalid push token`,
+      });
+    }
+
+    // fetch the event
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+    });
+
+    if (!event) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "Event not found! notification not sent",
+        404,
+        true,
+      );
+    }
+
+    // create the notification props
+    const notification: SendPushNotificationProps = {
+      title: event.title,
+      // body: startsIn,
+      body: "Event Coming Up Soon",
+      subtitle: "",
+      sound: "default",
+      priority: "default",
+      data: {
+        route: true,
+        routeName: "EventDetails",
+        routeParams: {
+          eventId: eventId,
+        },
+      },
+    };
+
+    // Send the notification
+    try {
+      const eventTickets = await sendPushNotifications(
+        [pushToken],
+        notification,
+      );
+    } catch (error) {
+      console.error(`Error sending push notifications for event`, error);
+      return res.status(500).json({
+        message: `Error sending push notifications for event`,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: `Showcase notifications sent for event`,
     });
   } catch (error: any) {
     next(error);

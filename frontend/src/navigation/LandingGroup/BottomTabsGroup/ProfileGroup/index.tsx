@@ -13,14 +13,9 @@ import OrganizationEvents from "~/screens/OrganizationEvents";
 import HelpScreen from "~/screens/HelpScreen";
 import Analytics from "~/screens/Analytics";
 import ReusableStackScreens from "~/components/ReusableStackScreens";
-import { useEffect, useLayoutEffect } from "react";
-import useNavigationContext from "~/hooks/useNavigationContext";
 import Interests from "~/screens/Interests";
 
 export default function ProfileGroup() {
-  const { updateCurrentMaintab } = useNavigationContext();
-
-  useEffect(() => updateCurrentMaintab("Profile"), []);
 
   return (
     <ProfileContextProvider>

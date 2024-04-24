@@ -5,6 +5,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { storeUserPushToken } from "~/lib/apiFunctions/PushNotification";
 import { EXPO_ACCESS_TOKEN } from "@env";
+import { useNavigation } from "@react-navigation/native";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -81,10 +82,26 @@ const registerForPushNotificationsAsync = async () => {
 export default function usePushNotifications(
     onTapNotification?: (response: Notifications.NotificationResponse) => void,
 ) {
-    const [expoPushToken, setExpoPushToken] = useState("");
-    const [notification, setNotification] = useState<
-        Notifications.Notification | undefined
-    >();
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState<
+    Notifications.Notification | undefined
+  >();
+  const navigation = useNavigation<any>();
+  const onTap = (notification: Notifications.NotificationResponse) => {
+    onTapNotification?.(notification);
+    if (notification.notification.request.content.data?.route) {
+      switch (notification.notification.request.content.data.routeName) {
+        case "EventDetails":
+          navigation.navigate("EventDetails", {
+            id: notification.notification.request.content.data.routeParams
+              .eventId,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
     const notificationListener = useRef<Notifications.Subscription>();
     const responseListener = useRef<Notifications.Subscription>();
@@ -123,10 +140,10 @@ export default function usePushNotifications(
                 setNotification(notification);
             });
 
-        responseListener.current =
-            Notifications.addNotificationResponseReceivedListener(
-                (response) => onTapNotification?.(response),
-            );
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) =>
+        onTap(response),
+      );
 
         return () => {
             Notifications.removeNotificationSubscription(

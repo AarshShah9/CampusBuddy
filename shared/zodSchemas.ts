@@ -666,3 +666,13 @@ export const searchSchema = z.object({
   page: z.number().int().min(1),
   limit: z.number().int().min(1),
 });
+
+export const ChatNotificationSchema = z.object({
+  recipientId: z.string().uuid(),
+  message: z.string(),
+});
+
+// for showcase route
+export const EventReminderSchema = PushTokenSchema.extend({
+  eventId: z.string().uuid(),
+});

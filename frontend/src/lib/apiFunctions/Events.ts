@@ -1,6 +1,6 @@
 import { CBRequest, uploadImageRequest } from "../CBRequest";
 import { ImagePickerAsset } from "expo-image-picker";
-import { createEventType } from "~/screens/CreateEvent";
+import { EventCreateType } from "~/types/schemas";
 import { AttendeeResponse } from "~/types/Events";
 
 export async function getHomePageEvents() {
@@ -26,7 +26,7 @@ export const getMainEvents = async () => {
 };
 
 export const createEvent = async (
-  event: createEventType,
+  event: EventCreateType,
   image: ImagePickerAsset,
   verified: boolean = false,
   id: string,

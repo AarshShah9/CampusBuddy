@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Map from "~/components/Map";
 import useAppContext from "~/hooks/useAppContext";
 import useLoadingContext from "~/hooks/useLoadingContext";

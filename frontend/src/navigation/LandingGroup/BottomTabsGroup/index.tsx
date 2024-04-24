@@ -11,6 +11,8 @@ import { ParamListBase, RouteProp } from "@react-navigation/native";
 import MapsGroup from "./MapsGroup";
 import HomeGroup from "./HomeGroup/";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import useNavigationContext from "~/hooks/useNavigationContext";
+import { CurrentMainTab } from "~/types/Navigation";
 
 type ScreenOptions = (props: {
     route: RouteProp<ParamListBase, string>;
@@ -26,7 +28,7 @@ const screenOptions: ScreenOptions = ({ route }) => ({
             iconName = focused ? "search" : "search-outline";
         else if (route.name === "CreatePostGroup")
             iconName = focused ? "add-circle" : "add-circle-outline";
-        else if (route.name === "MapsGroup")
+        else if (route.name === "MapsGroup") {
             return (
                 // TODO fix icon
                 <Entypo
@@ -37,20 +39,9 @@ const screenOptions: ScreenOptions = ({ route }) => ({
                     }}
                 />
             );
+        }
         else if (route.name === "ProfileGroup")
             iconName = focused ? "person" : "person-outline";
-        else if (route.name === "Marketplace")
-            return (
-                <MaterialCommunityIcons
-                    {...{
-                        name: focused ? "shopping" : "shopping-outline",
-                        size: 24,
-                        color,
-                    }}
-                />
-            );
-        else if (route.name === "Settings")
-            iconName = focused ? "settings" : "ios-settings-sharp";
 
         return <Ionicons {...{ name: iconName, size: 24, color }} />;
     },
@@ -60,6 +51,8 @@ const BottomTab = createMaterialBottomTabNavigator();
 
 export default function BottomTabsComponent() {
     const { theme } = useThemeContext();
+
+    const { updateCurrentMaintab: updateCurrentTab } = useNavigationContext();
     
     return (
         <BottomTab.Navigator
@@ -71,11 +64,36 @@ export default function BottomTabsComponent() {
             initialRouteName="Home"
             screenOptions={screenOptions}
         >
-            <BottomTab.Screen name="HomeGroup" component={HomeGroup} />
-            <BottomTab.Screen name="SearchGroup" component={SearchGroup} />
-            <BottomTab.Screen name="CreatePostGroup" component={AddFriendsGroup} />
-            <BottomTab.Screen name="MapsGroup" component={MapsGroup} />
-            <BottomTab.Screen name="ProfileGroup" component={ProfileGroup} />
+            <BottomTab.Screen 
+                name="HomeGroup" component={HomeGroup}
+                listeners={{
+                    tabPress: (e) => updateCurrentTab("Home")
+                }}
+            />
+            <BottomTab.Screen
+                name="SearchGroup" component={SearchGroup}
+                listeners={{
+                    tabPress: (e) => updateCurrentTab("Search")
+                }}
+            />
+            <BottomTab.Screen
+                name="CreatePostGroup" component={AddFriendsGroup}
+                listeners={{
+                    tabPress: (e) => updateCurrentTab("CreatePost")
+                }}
+            />
+            <BottomTab.Screen
+                name="MapsGroup" component={MapsGroup}
+                listeners={{
+                    tabPress: (e) => updateCurrentTab("Maps")
+                }}
+            />
+            <BottomTab.Screen
+                name="ProfileGroup" component={ProfileGroup}
+                listeners={{
+                    tabPress: (e) => updateCurrentTab("Profile")
+                }}
+            />
         </BottomTab.Navigator>
     )
 }

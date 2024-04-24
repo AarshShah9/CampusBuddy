@@ -18,6 +18,7 @@ import useRefreshControl from "~/hooks/useRefreshControl";
 import { getMainEvents } from "~/lib/apiFunctions/Events";
 import { EventData, EventType } from "~/types/Events";
 import LoadingSkeleton from "~/components/LoadingSkeleton";
+import useAppContext from "~/hooks/useAppContext";
 
 const fetchMainEvents = async (): Promise<{
   allEvents: EventData[];
@@ -36,18 +37,20 @@ const fetchMainEvents = async (): Promise<{
 
 export default function Home() {
     const { sendLocalNotification } = usePushNotifications();
+  const { dismissKeyboard } = useAppContext();
 
-    useEffect(() => {
-        sendLocalNotification({
-            title: "🎉Welcome to Campus Buddy🎉",
-            body: `Your journey to a better campus experience just began!`,
-        }).catch((error) =>
-            console.log(
-                "An error occured when trying to send a notification:\n",
-                error,
-            ),
-        );
-    }, [sendLocalNotification]);
+  // useEffect(() => {
+  //   if (!expoPushToken) return;
+  //   sendLocalNotification({
+  //     title: "🎉Welcome to Campus Buddy🎉",
+  //     body: `Your journey to a better campus experience just began!`,
+  //   }).catch((error) =>
+  //     console.log(
+  //       "An error occured when trying to send a notification:\n",
+  //       error,
+  //     ),
+  //   );
+  // }, [expoPushToken]);
 
   const screenWidth = Dimensions.get("window").width;
   const { startLoading, stopLoading } = useLoadingContext();
@@ -84,6 +87,10 @@ export default function Home() {
 
   const allEvents = data ? data.allEvents : [];
   const startingEvents = data ? data.startingEvents : [];
+
+  useEffect(() => {
+    dismissKeyboard();
+  }, [dismissKeyboard]);
 
   return (
     <View style={{ flex: 1 }}>
