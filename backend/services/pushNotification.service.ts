@@ -243,7 +243,6 @@ export async function pushNotificationTest(token: ExpoPushToken) {
         routeParams: {
           eventId: events[0].id,
         },
-        imageUrl: events[0].image,
       },
     },
   ]);
