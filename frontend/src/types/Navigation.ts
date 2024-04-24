@@ -117,6 +117,10 @@ type HelpRoute = {
   page: "Help";
 };
 
+type InterestsRoute = {
+  page: "Interests";
+};
+
 type PaymentRoute = {
   page: "EventPayment";
   eventId: string;
@@ -154,6 +158,7 @@ export type NavigationFunctionArgs =
   | EditEventRoute
   | QRCodeScannerRoute
   | HelpRoute
+  | InterestsRoute
   | PaymentRoute
   | AnalyticsRoute
   | PricingRoute

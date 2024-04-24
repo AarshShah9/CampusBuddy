@@ -2,11 +2,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ReactQueryProvider from "~/contexts/queryContext";
 import { EventsContextProvider } from "~/contexts/eventsContext";
 import BottomTabsGroup from "./BottomTabsGroup";
-import useThemeContext from "~/hooks/useThemeContext";
 import MessagesGroup from "./MessagesGroup";
 import { ChatsContextProvider } from "~/contexts/chatsContext";
 import { ChatContextProvider } from "~/contexts/chatContext";
-import EventSettings from "~/screens/EventDetails/EventSettings";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import ItemSettings from "~/screens/ItemSettings";
 import PostSettings from "~/screens/PostSettings";
@@ -16,8 +14,6 @@ import { PUBLISHABLE_KEY } from "@env";
 const Stack = createNativeStackNavigator();
 
 export default function LandingGroup() {
-    const { theme } = useThemeContext();
-
     return (
         <ReactQueryProvider>
             <StripeProvider
@@ -35,7 +31,6 @@ export default function LandingGroup() {
                                 </Stack.Navigator>
                             </ChatContextProvider>
                         </ChatsContextProvider>
-                        
                         <ItemSettings />
                         <PostSettings />
                     </EventsContextProvider>

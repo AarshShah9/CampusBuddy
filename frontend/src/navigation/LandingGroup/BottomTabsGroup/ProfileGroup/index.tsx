@@ -15,6 +15,7 @@ import Analytics from "~/screens/Analytics";
 import ReusableStackScreens from "~/components/ReusableStackScreens";
 import { useLayoutEffect } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import Interests from "~/screens/Interests";
 
 export default function ProfileGroup() {
     const { updateCurrentMaintab } = useNavigationContext();
@@ -48,6 +49,18 @@ function ProfileScreens() {
                     options={{
                         title: "Profile",
                         header: Header,
+                    }}
+                />
+            )}
+            {userType === "Student" && (
+                <Stack.Screen
+                    name="Interests"
+                    component={Interests}
+                    options={{
+                        headerTintColor: theme.colors.onSecondary,
+                        headerStyle: {
+                            backgroundColor: theme.colors.primary,
+                        },
                     }}
                 />
             )}
