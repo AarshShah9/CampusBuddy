@@ -1,17 +1,18 @@
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import ReusableStackScreens from "~/components/ReusableStackScreens";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import MapsPage from "~/screens/MapsPage";
 
 export default function MapsGroup() {
-    const { updateCurrentMaintab } = useNavigationContext();
+  const { updateCurrentMaintab } = useNavigationContext();
 
-    useLayoutEffect(() => updateCurrentMaintab("Maps"), [])
+  useEffect(() => updateCurrentMaintab("Maps"), []);
 
-    return (
-        <ReusableStackScreens
-            name="Maps" component={MapsPage}
-            options={{ headerShown: false }}
-        />
-    );
+  return (
+    <ReusableStackScreens
+      name="Maps"
+      component={MapsPage}
+      options={{ headerShown: false }}
+    />
+  );
 }

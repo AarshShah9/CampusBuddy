@@ -10,20 +10,22 @@ import { useLayoutEffect, useEffect } from "react";
 const Stack = createNativeStackNavigator();
 
 export default function SearchGroup() {
-    const { updateCurrentMaintab } = useNavigationContext();
+  const { updateCurrentMaintab } = useNavigationContext();
 
-    useLayoutEffect(() => updateCurrentMaintab("Search"), [])
-    
-    const { userType } = useAuthContext();
+  useEffect(() => updateCurrentMaintab("Search"), []);
 
-    const data = userType === "Student" ? 
-    { component: SearchTabs, options: { header: Header } }
-    :{ component: Events, options: undefined }
+  const { userType } = useAuthContext();
 
-    return (
-        <ReusableStackScreens 
-            name="Search" component={data.component} 
-            options={data.options}
-        />
-    );
+  const data =
+    userType === "Student"
+      ? { component: SearchTabs, options: { header: Header } }
+      : { component: Events, options: undefined };
+
+  return (
+    <ReusableStackScreens
+      name="Search"
+      component={data.component}
+      options={data.options}
+    />
+  );
 }
