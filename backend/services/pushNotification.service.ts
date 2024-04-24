@@ -8,6 +8,7 @@ import prisma from "../prisma/client";
 import { Event, UserEventResponse } from "@prisma/client";
 import { calculateTimeDifference } from "../utils/timeFormater";
 import { AppError, AppErrorName } from "../utils/AppError";
+import { events } from "../prisma/data";
 
 // Create a new Expo SDK client
 let expo = new Expo({
@@ -190,13 +191,16 @@ function constructEventReminderNotification(
   const pushNotificationProps: SendPushNotificationProps = {
     title: event.event.title,
     body: startsIn,
-    data: {
-      page: "EventDetails",
-      id: event.event.id,
-    },
     subtitle: "",
     sound: "default",
     priority: "default",
+    data: {
+      route: true,
+      routeName: "EventDetails",
+      routeParams: {
+        eventId: event.event.id,
+      },
+    },
   };
 
   return pushNotificationProps;
@@ -242,15 +246,18 @@ export async function pushNotificationTest(token: ExpoPushToken) {
   await expo.sendPushNotificationsAsync([
     {
       to: token,
-      title: "Here is an Event!",
-      body: "Notification Body",
-      data: {
-        page: "EventDetails",
-        id: "79bc4af1-c551-11ee-83fd-6f8d6c450910", // id for spikeball event
-      },
+      title: events[0].title,
+      body: "Event Coming Up Soon",
       subtitle: "",
       sound: "default",
       priority: "default",
+      data: {
+        route: true,
+        routeName: "EventDetails",
+        routeParams: {
+          eventId: events[0].id,
+        },
+      },
     },
   ]);
 }
