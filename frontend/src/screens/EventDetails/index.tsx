@@ -435,6 +435,7 @@ import EventSettings from "./EventSettings";
             </View>
             <EventSettings 
                 {...{ 
+                    eventData,
                     bottomSheetModalRef,
                     closeModal,
                     likeMutate,

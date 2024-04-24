@@ -16,7 +16,7 @@ type Props = {
   bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
   closeModal: () => void;
   likeMutate: () => void;
-  eventData?: EventDetailsType;
+  eventData: EventDetailsType | undefined;
   deleteMutate: () => void;
   flipPublicMutate: () => void;
 }

@@ -55,6 +55,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 options={{
                     title: "",
                     headerShown: true,
+                    headerBackTitle: "Back",
                     headerTintColor: theme.colors.onSecondary,
                     headerStyle: { backgroundColor: theme.colors.primary },
                 }}
@@ -63,9 +64,6 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 name={`EventDetails-${name}`}
                 component={EventDetails}
                 options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                     headerTitle: "",
                     headerShown: true,
@@ -77,9 +75,6 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 name={`LookingForDetails-${name}`}
                 component={LookingForDetails}
                 options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                     headerTitle: "",
                     headerShown: true,
@@ -91,9 +86,6 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 name={`LookingForCommentsScreen-${name}`}
                 component={LookingForCommentsScreen}
                 options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                     headerTitle: "",
                     headerShown: true,
@@ -105,9 +97,6 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 name={`MarketPlaceDetail-${name}`}
                 component={MarketPlaceDetail}
                 options={{
-                    headerTitleStyle: {
-                        color: theme.colors.onSecondary,
-                    },
                     headerStyle: { backgroundColor: theme.colors.primary },
                     headerTitle: "",
                     headerShown: true,
@@ -136,6 +125,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 options={{
                     title: "",
                     headerShown: true,
+                    headerBackTitle: "Back",
                     headerTintColor: theme.colors.onSecondary,
                     headerStyle: { backgroundColor: theme.colors.primary },
                 }}
@@ -144,53 +134,44 @@ function ReusableStackScreens({ name, component, options }: Props) {
                 name={`EditEvent-${name}`}
                 component={CreateEvent}
                 options={{
-                headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                },
-                headerStyle: { backgroundColor: theme.colors.primary },
-                headerTitle: "",
-                headerShown: true,
-                headerBackTitle: "Back",
-                headerTintColor: theme.colors.onSecondary,
+                    headerStyle: { backgroundColor: theme.colors.primary },
+                    headerTitle: "",
+                    headerShown: true,
+                    headerBackTitle: "Back",
+                    headerTintColor: theme.colors.onSecondary,
                 }}
             />
             <Stack.Screen
                 name={`QRCodeScanner-${name}`}
                 component={QRCodeScanner}
                 options={{
-                headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                },
-                headerStyle: { backgroundColor: theme.colors.primary },
-                headerTitle: "",
-                headerShown: true,
-                headerBackTitle: "Back",
-                headerTintColor: theme.colors.onSecondary,
+                    headerStyle: { backgroundColor: theme.colors.primary },
+                    headerTitle: "",
+                    headerShown: true,
+                    headerBackTitle: "Back",
+                    headerTintColor: theme.colors.onSecondary,
                 }}
             />
             <Stack.Screen
                 name={`EventPricing-${name}`}
                 component={EventPricing}
                 options={{
-                headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                },
-                headerStyle: { backgroundColor: theme.colors.primary },
-                headerTitle: "",
-                headerShown: true,
-                headerBackTitle: "Back",
-                headerTintColor: theme.colors.onSecondary,
+                    headerStyle: { backgroundColor: theme.colors.primary },
+                    headerTitle: "",
+                    headerShown: true,
+                    headerBackTitle: "Back",
+                    headerTintColor: theme.colors.onSecondary,
                 }}
             />
             <Stack.Screen
                 name={`EventPayment-${name}`}
                 component={EventPayment}
                 options={{
-                headerTitleStyle: {
-                    color: theme.colors.onSecondary,
-                },
-                presentation: "modal",
-                headerStyle: { backgroundColor: theme.colors.primary },
+                    headerTitleStyle: {
+                        color: theme.colors.onSecondary,
+                    },
+                    presentation: "modal",
+                    headerStyle: { backgroundColor: theme.colors.primary },
                 }}
             />
         </Stack.Navigator>
