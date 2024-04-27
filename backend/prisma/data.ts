@@ -288,7 +288,7 @@ export const users: User[] = [
     email: "m_galvan@example.com",
     password: "Hashed-password1112",
     institutionId: ids.instituteIds[1],
-    accountType: UserType.PendingOrg,
+    accountType: UserType.ApprovedOrg,
     profilePic: null,
     degreeName: null,
   },
@@ -389,20 +389,36 @@ export const events = [
       "https://hips.hearstapps.com/hmg-prod/images/christmas-party-christmas-party-ideas-6500abe3c7c45.jpg",
   },
   {
-    id: ids.eventIds[8],
+    id: ids.eventIds[7],
     userId: ids.userIds[1],
     title: "New Year's Celebration!",
     organizationId: ids.organizationIds[3],
     description:
       "Call in the new year at Canadian Brewhouse. Enjoy live music and get 25% off all drinks",
     locationPlaceId: locations[8].placeId,
-    createdAt: "2024-10-10T15:00:00Z",
+    createdAt: "2024-04-21T15:00:00Z",
     startTime: "2024-12-31T18:00:00Z",
     endTime: "2025-01-01T09:00:00Z",
     isPublic: true,
     status: EventStatus.Verified,
     image:
       "https://www.windowworld.com/uploads/images/news/new-years-eve-friends-sparklers.jpg",
+  },
+  {
+    id: ids.eventIds[8],
+    userId: ids.userIds[10],
+    title: "Nursing X Engg",
+    organizationId: ids.organizationIds[4],
+    description:
+      "Calling all Nurses and Engineers for the combination made in heaven!!!",
+    locationPlaceId: locations[8].placeId,
+    createdAt: "2024-04-10T15:00:00Z",
+    startTime: "2024-04-27T18:00:00Z",
+    endTime: "2024-04-27T09:00:00Z",
+    isPublic: true,
+    status: EventStatus.Verified,
+    image:
+      "https://www.betterup.com/hs-fs/hubfs/Dinner-With-Friends.jpg?width=957&name=Dinner-With-Friends.jpg",
   },
 ];
 
@@ -465,6 +481,22 @@ export const userEventResponses = [
   {
     userId: ids.userIds[4],
     eventId: ids.eventIds[3],
+    participationStatus: ParticipationStatus.Going,
+  },
+  // nursing event
+  {
+    userId: ids.userIds[3],
+    eventId: ids.eventIds[8],
+    participationStatus: ParticipationStatus.Going,
+  },
+  {
+    userId: ids.userIds[4],
+    eventId: ids.eventIds[8],
+    participationStatus: ParticipationStatus.Going,
+  },
+  {
+    userId: ids.userIds[5],
+    eventId: ids.eventIds[8],
     participationStatus: ParticipationStatus.Going,
   },
 ];
@@ -782,7 +814,7 @@ export const organizations = [
   },
   {
     id: ids.organizationIds[4],
-    organizationName: "Engineering Student Society",
+    organizationName: "ESS",
     description:
       "The University of Calgary Engineering Student Society (ESS) works hard to ensure engineering students have the information and services they need.",
     createdAt: "2024-07-15T11:31:00Z",
@@ -842,7 +874,7 @@ export const userOrganizationRoles = [
     userId: ids.userIds[10],
     organizationId: ids.organizationIds[4],
     roleId: ids.roleIds[UserRole.Owner],
-    status: UserOrgStatus.Pending,
+    status: UserOrgStatus.Approved,
   },
 ];
 
