@@ -49,7 +49,7 @@ export type organizationInformation = {
 type authContext = {
   user?: UserDataType;
   organization?: OrganizationDataType;
-  userType?: UserType;
+  userType: UserType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<boolean | undefined>;
   logOut: () => Promise<void>;
@@ -66,7 +66,7 @@ const AuthContext = createContext<authContext | null>(null);
 export const AuthContextProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const [userType, setUserType] = useState<UserType>();
+  const [userType, setUserType] = useState<UserType>("Student");
   const [user, setUser] = useState<UserDataType>();
   const [organzationalUser, setOrganizationalUser] =
     useState<OrganizationDataType>();
@@ -142,7 +142,6 @@ export const AuthContextProvider = ({
       removeAxiosTokenHeader();
       setUser(undefined);
       setOrganizationalUser(undefined);
-      setUserType(undefined);
     } catch (error) {
       console.log(error);
     }

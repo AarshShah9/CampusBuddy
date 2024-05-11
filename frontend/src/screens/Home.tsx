@@ -36,7 +36,7 @@ const fetchMainEvents = async (): Promise<{
 };
 
 export default function Home() {
-  const { expoPushToken, sendLocalNotification } = usePushNotifications();
+    const { sendLocalNotification } = usePushNotifications();
   const { dismissKeyboard } = useAppContext();
 
   // useEffect(() => {

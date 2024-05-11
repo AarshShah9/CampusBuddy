@@ -36,6 +36,14 @@ export default function ProfileSettings() {
 
   const settings = [
     {
+      title: "Interests",
+      onClick: () => {
+        closeModal();
+        navigateTo({ page: "Interests" });
+      },
+      show: userType === "Student",
+    },
+    {
       title: "Settings and Privacy",
       onClick: () => {
         closeModal();
