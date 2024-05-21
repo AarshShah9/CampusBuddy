@@ -8,6 +8,7 @@ export type UserDataType = {
   organizations: number;
   programs: string[];
   degreeName: string;
+  firstTimeLogin: boolean;
 };
 
 export type OrganizationDataType = {

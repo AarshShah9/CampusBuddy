@@ -162,6 +162,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: true,
   },
   {
     id: ids.userIds[2],
@@ -175,6 +176,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: true,
   },
   {
     id: ids.userIds[3],
@@ -188,6 +190,7 @@ export const users: User[] = [
     degreeName: "Computer Science",
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[4],
@@ -201,6 +204,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[5],
@@ -214,6 +218,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[6],
@@ -227,6 +232,7 @@ export const users: User[] = [
     degreeName: "Arts",
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[7],
@@ -240,6 +246,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[8],
@@ -253,6 +260,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[9],
@@ -266,6 +274,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
   {
     id: ids.userIds[10],
@@ -279,6 +288,7 @@ export const users: User[] = [
     degreeName: null,
     otp: null,
     otpExpiry: null,
+    firstTimeLogin: false,
   },
 ];
 

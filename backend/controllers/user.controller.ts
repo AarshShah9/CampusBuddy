@@ -283,6 +283,17 @@ export const loginUser = async (
 
     //checks if user is a student
     if (existingUser.accountType === "Student") {
+      if (existingUser.firstTimeLogin) {
+        await prisma.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            firstTimeLogin: false,
+          },
+        });
+      }
+
       // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
       const attendedEvents = await prisma.userEventResponse.count({
         where: {
@@ -335,10 +346,22 @@ export const loginUser = async (
           attended: attendedEvents,
           following: orgs,
           type: "Student",
+          firstTimeLogin: existingUser.firstTimeLogin,
         },
       });
       //checks if user is organization owner
     } else if (existingUser.accountType === "ApprovedOrg") {
+      if (existingUser.firstTimeLogin) {
+        await prisma.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            firstTimeLogin: false,
+          },
+        });
+      }
+
       // Confirm password matches
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
@@ -409,6 +432,7 @@ export const loginUser = async (
             (UserOrganizationRole) => UserOrganizationRole.organization.events,
           ).length,
           type: "Organization_Admin",
+          firstTimeLogin: existingUser.firstTimeLogin,
         },
       });
       //user not a student, or an approved organization owner
