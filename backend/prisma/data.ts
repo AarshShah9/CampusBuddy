@@ -160,6 +160,8 @@ export const users: User[] = [
     accountType: UserType.ApprovedOrg,
     profilePic: "https://d2epenzoyf672m.cloudfront.net/pfp/doctorstrange.webp",
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[2],
@@ -171,21 +173,25 @@ export const users: User[] = [
     accountType: UserType.PendingOrg,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[3],
-    firstName: "Tom",
-    lastName: "Dee",
-    email: "tom@example.com",
+    firstName: "Aarsh",
+    lastName: "Shah",
+    email: "aarsh.shah@ucalgary.ca",
     password: "Hashed-password1238",
     institutionId: ids.instituteIds[1],
     accountType: UserType.Student,
     profilePic: null,
     degreeName: "Computer Science",
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[4],
-    firstName: "Aarsh",
+    firstName: "AS",
     lastName: "Shah",
     email: "aarsh@live.ca",
     password: "password123",
@@ -193,6 +199,8 @@ export const users: User[] = [
     accountType: UserType.Admin,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[5],
@@ -204,6 +212,8 @@ export const users: User[] = [
     accountType: UserType.Student,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[6],
@@ -215,6 +225,8 @@ export const users: User[] = [
     accountType: UserType.Student,
     profilePic: null,
     degreeName: "Arts",
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[7],
@@ -226,6 +238,8 @@ export const users: User[] = [
     accountType: UserType.Student,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[8],
@@ -237,6 +251,8 @@ export const users: User[] = [
     accountType: UserType.PendingOrg,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[9],
@@ -248,6 +264,8 @@ export const users: User[] = [
     accountType: UserType.PendingOrg,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
   {
     id: ids.userIds[10],
@@ -259,6 +277,8 @@ export const users: User[] = [
     accountType: UserType.PendingOrg,
     profilePic: null,
     degreeName: null,
+    otp: null,
+    otpExpiry: null,
   },
 ];
 

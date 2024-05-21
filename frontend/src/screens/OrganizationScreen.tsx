@@ -102,287 +102,270 @@ export default function OrganizationSignUp() {
         showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <MainContainer $color={theme.colors.primary}>
-            <HeaderContainer>
-              <TouchableOpacity
-                onPress={onBack}
-                style={{ marginTop: "10%", marginLeft: "3%" }}
-                activeOpacity={0.7}
-              >
-                <AntDesign name="caretleft" size={24} color="white" />
-              </TouchableOpacity>
-              <HeaderText $textColor={theme.colors.mainText}>
-                Organization Sign Up
-              </HeaderText>
-            </HeaderContainer>
-            <View
-              style={[
-                styles.overlayContainer,
-                { backgroundColor: theme.colors.tertiary },
-              ]}
-            >
-              <FormContainer>
-                {step === 1 && (
-                  <>
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
-                          label={
-                            errors.orgEmail && errors.orgEmail.message ? (
-                              <ErrorText error={errors.orgEmail.message} />
-                            ) : (
-                              "Email"
-                            )
-                          }
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          autoCorrect={false}
-                          autoCapitalize={"none"}
-                          autoComplete={"off"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
-                        />
-                      )}
-                      name="orgEmail"
-                    />
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
-                          label={
-                            errors.firstName && errors.firstName.message ? (
-                              <ErrorText error={errors.firstName.message} />
-                            ) : (
-                              "First Name"
-                            )
-                          }
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          autoCorrect={false}
-                          autoComplete={"off"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
-                        />
-                      )}
-                      name="firstName"
-                    />
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
-                          label={
-                            errors.lastName && errors.lastName.message ? (
-                              <ErrorText error={errors.lastName.message} />
-                            ) : (
-                              "Last Name"
-                            )
-                          }
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          autoCorrect={false}
-                          autoComplete={"off"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
-                        />
-                      )}
-                      name="lastName"
-                    />
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
-                          label={
-                            errors.organizationName &&
-                            errors.organizationName.message ? (
-                              <ErrorText
-                                error={errors.organizationName.message}
-                              />
-                            ) : (
-                              "Organization Name"
-                            )
-                          }
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          autoCorrect={false}
-                          autoComplete={"off"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
-                        />
-                      )}
-                      name="organizationName"
-                    />
-                    {errors.institutionId && errors.institutionId.message && (
-                      <ErrorText error={errors.institutionId.message} />
+          <View
+            style={[
+              styles.overlayContainer,
+              { backgroundColor: theme.colors.tertiary },
+            ]}
+          >
+            <FormContainer>
+              {step === 1 && (
+                <>
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.orgEmail && errors.orgEmail.message ? (
+                            <ErrorText error={errors.orgEmail.message} />
+                          ) : (
+                            "Email"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoCapitalize={"none"}
+                        autoComplete={"off"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
                     )}
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <>
-                          <Dropdown
-                            style={styles.dropdown}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
-                            data={institutions}
-                            onBlur={onBlur}
-                            maxHeight={300}
-                            labelField="name"
-                            valueField="id"
-                            placeholder="Select School"
-                            value={value}
-                            onChange={(value) => {
-                              onChange(value.id);
-                            }}
-                          />
-                        </>
-                      )}
-                      name="institutionId"
-                    />
-                  </>
-                )}
-                {step === 2 && (
-                  <>
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <View style={{ marginTop: 10, marginBottom: 15 }}>
-                          <TextInput
-                            style={{
-                              ...styles.inputBox,
-                              backgroundColor: theme.colors.tertiary,
-                            }}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            autoCorrect={false}
-                            autoCapitalize={"none"}
-                            autoComplete={"off"}
-                            label={
-                              errors.description &&
-                              errors.description.message ? (
-                                <ErrorText error={errors.description.message} />
-                              ) : (
-                                "Description"
-                              )
-                            }
-                          />
-                        </View>
-                      )}
-                      name="description"
-                    />
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
-                          label={
-                            errors.password && errors.password.message ? (
-                              <ErrorText error={errors.password.message} />
-                            ) : (
-                              "Password"
-                            )
-                          }
+                    name="orgEmail"
+                  />
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.firstName && errors.firstName.message ? (
+                            <ErrorText error={errors.firstName.message} />
+                          ) : (
+                            "First Name"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoComplete={"off"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
+                    )}
+                    name="firstName"
+                  />
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.lastName && errors.lastName.message ? (
+                            <ErrorText error={errors.lastName.message} />
+                          ) : (
+                            "Last Name"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoComplete={"off"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
+                    )}
+                    name="lastName"
+                  />
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.organizationName &&
+                          errors.organizationName.message ? (
+                            <ErrorText
+                              error={errors.organizationName.message}
+                            />
+                          ) : (
+                            "Organization Name"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoComplete={"off"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
+                    )}
+                    name="organizationName"
+                  />
+                  {errors.institutionId && errors.institutionId.message && (
+                    <ErrorText error={errors.institutionId.message} />
+                  )}
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <>
+                        <Dropdown
+                          style={styles.dropdown}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          iconStyle={styles.iconStyle}
+                          data={institutions}
+                          onBlur={onBlur}
+                          maxHeight={300}
+                          labelField="name"
+                          valueField="id"
+                          placeholder="Select School"
+                          value={value}
+                          onChange={(value) => {
+                            onChange(value.id);
+                          }}
+                        />
+                      </>
+                    )}
+                    name="institutionId"
+                  />
+                </>
+              )}
+              {step === 2 && (
+                <>
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <View style={{ marginTop: 10, marginBottom: 15 }}>
+                        <TextInput
+                          style={{
+                            ...styles.inputBox,
+                            backgroundColor: theme.colors.tertiary,
+                          }}
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
                           autoCorrect={false}
                           autoCapitalize={"none"}
                           autoComplete={"off"}
-                          textContentType={"password"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
-                        />
-                      )}
-                      name="password"
-                    />
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <InputField
                           label={
-                            errors.confirmPassword &&
-                            errors.confirmPassword.message ? (
-                              <ErrorText
-                                error={errors.confirmPassword.message}
-                              />
+                            errors.description && errors.description.message ? (
+                              <ErrorText error={errors.description.message} />
                             ) : (
-                              "Confirm Password"
+                              "Description"
                             )
                           }
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          autoCorrect={false}
-                          autoCapitalize={"none"}
-                          autoComplete={"off"}
-                          textContentType={"password"}
-                          style={{ backgroundColor: theme.colors.tertiary }}
                         />
-                      )}
-                      name="confirmPassword"
-                    />
-                  </>
-                )}
-                <StyledButton
-                  mode="contained"
-                  onPress={step === lastStep ? handleSubmit(onSubmit) : onNext}
+                      </View>
+                    )}
+                    name="description"
+                  />
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.password && errors.password.message ? (
+                            <ErrorText error={errors.password.message} />
+                          ) : (
+                            "Password"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoCapitalize={"none"}
+                        autoComplete={"off"}
+                        textContentType={"password"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
+                    )}
+                    name="password"
+                  />
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={
+                          errors.confirmPassword &&
+                          errors.confirmPassword.message ? (
+                            <ErrorText error={errors.confirmPassword.message} />
+                          ) : (
+                            "Confirm Password"
+                          )
+                        }
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        autoCorrect={false}
+                        autoCapitalize={"none"}
+                        autoComplete={"off"}
+                        textContentType={"password"}
+                        style={{ backgroundColor: theme.colors.tertiary }}
+                      />
+                    )}
+                    name="confirmPassword"
+                  />
+                </>
+              )}
+              <StyledButton
+                mode="contained"
+                onPress={step === lastStep ? handleSubmit(onSubmit) : onNext}
+              >
+                <Text
+                  style={{
+                    lineHeight: 30,
+                    fontSize: 24,
+                    fontWeight: "bold",
+                    color: "white",
+                    fontFamily: "Nunito-Bold",
+                  }}
                 >
-                  <Text
-                    style={{
-                      lineHeight: 30,
-                      fontSize: 24,
-                      fontWeight: "bold",
-                      color: "white",
-                      fontFamily: "Nunito-Bold",
-                    }}
-                  >
-                    {step === lastStep ? "Submit" : "Next"}
-                  </Text>
-                </StyledButton>
-                <ClickLink $color={theme.colors.primary}>
-                  <Text style={{ color: theme.colors.text }}>
-                    Join an organization{" "}
-                  </Text>
-                  <Text
-                    onPress={() => {
-                      Alert.alert("Coming soon!", "Stay tuned for updates.");
-                    }}
-                    style={{
-                      color: theme.colors.primary,
-                      fontSize: 16,
-                      fontFamily: "Roboto-Reg",
-                    }}
-                  >
-                    here.
-                  </Text>
-                </ClickLink>
-              </FormContainer>
-            </View>
-          </MainContainer>
+                  {step === lastStep ? "Submit" : "Next"}
+                </Text>
+              </StyledButton>
+              <ClickLink $color={theme.colors.primary}>
+                <Text style={{ color: theme.colors.text }}>
+                  Join an organization{" "}
+                </Text>
+                <Text
+                  onPress={() => {
+                    Alert.alert("Coming soon!", "Stay tuned for updates.");
+                  }}
+                  style={{
+                    color: theme.colors.primary,
+                    fontSize: 16,
+                    fontFamily: "Roboto-Reg",
+                  }}
+                >
+                  here.
+                </Text>
+              </ClickLink>
+            </FormContainer>
+          </View>
         </TouchableWithoutFeedback>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -390,35 +373,9 @@ export default function OrganizationSignUp() {
 }
 
 // Component
-const MainContainer = styled(View)<{ $color: string }>`
-  height: 100%;
-  background-color: ${(props) => props.$color};
-`;
-const OverlayContainer = styled(View)<{ $color: string }>`
-  alignitems: center;
-  height: 85%;
-  width: 100%;
-  border-top-left-radius: 76px;
-  background-color: ${(props) => props.$color};
-`;
-const HeaderContainer = styled(View)`
-  width: 100%;
-  height: 15%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
-const HeaderText = styled(Text)<{ $textColor: string }>`
-  margin: 32px auto 0px auto;
-  color: ${(props) => props.$textColor};
-  font-size: 28px;
-  font-weight: bold;
-  font-family: Nunito-Bold;
-`;
-
 const FormContainer = styled(View)`
   width: 90%;
-  margin-top: 18%;
+  margin-top: 10%;
   height: 500px;
 `;
 
