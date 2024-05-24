@@ -9,6 +9,7 @@ import About from "../sections/About";
 
 const navigation = [
   { name: "Our Clients", href: "#logo-cloud" },
+  { name: "About", href: "#about" },
   { name: "Team", href: "#team" },
 ];
 
@@ -121,7 +122,7 @@ export default function Home() {
       <div id="logo-cloud">
         <LogoCloud />
       </div>
-      <div>
+      <div id="about">
         <About />
       </div>
       <div id="team">
