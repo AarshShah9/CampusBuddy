@@ -6,7 +6,7 @@ import AuthenticationGroup from "./AuthenticationGroup";
 import LandingGroup from "./LandingGroup";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContextProvider } from "~/contexts/navigationContext";
-import EventSettings from "~/screens/EventSettings";
+import EventSettings from "~/screens/EventDetails/EventSettings";
 
 const Stack = createNativeStackNavigator();
 

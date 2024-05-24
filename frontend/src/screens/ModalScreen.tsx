@@ -1,11 +1,10 @@
 import { View } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
 import { ThemedText } from "~/components/ThemedComponents";
-import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function ModalScreen() {
-  const { setNavigationOptions } = useNavigationContext();
+  const { setOptions: setNavigationOptions } = useNavigation<any>();
   const { params: { type } } = useRoute<any>();
 
   useLayoutEffect(() => {

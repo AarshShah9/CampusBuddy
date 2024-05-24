@@ -16,8 +16,8 @@ import { Button } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 import { attendEvent } from "~/lib/apiFunctions/Events";
-import useEventsContext from "~/hooks/useEventsContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import useEventDetails from "~/hooks/useEventDetails";
 
 export default function EventPayment() {
   const [isApplePaySupported, setIsApplePaySupported] = useState(false);
@@ -25,12 +25,13 @@ export default function EventPayment() {
   // const { confirmPayment } = useStripe();
 
   const [addressSheetVisible, setAddressSheetVisible] = useState(false);
-  const { refetchEventDetails } = useEventsContext();
   const { navigateTo } = useNavigationContext();
 
   const {
     params: { eventId },
   } = useRoute<any>();
+
+  const { refetchEventDetails } = useEventDetails(eventId);
 
   // useEffect(() => {
   //   (async function () {

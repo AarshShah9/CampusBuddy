@@ -676,3 +676,13 @@ export const ChatNotificationSchema = z.object({
 export const EventReminderSchema = PushTokenSchema.extend({
   eventId: z.string().uuid(),
 });
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordChangePasswordSchema = z.object({
+  email: z.string().email(),
+  password: PasswordSchema,
+  otp: z.string(),
+});

@@ -7,7 +7,6 @@ import {
   loginUser,
   logoutUser,
   removeUserById,
-  resetPassword,
   updateUser,
   verifyExistingOrgSignup,
   verifyStudentSignup,
@@ -21,12 +20,16 @@ import {
   removeProfilePic,
   profilePageData,
   testFirebaseToken,
+  resetPasswordSendOTP,
+  resetPasswordChangePassword,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 import { upload } from "../utils/S3Uploader";
 
 const router = express.Router();
 
+router.post("/getOTP", resetPasswordSendOTP);
+router.post("/changePassword", resetPasswordChangePassword);
 router.get("/profile", verifyAuthentication, profilePageData);
 router.get("/firebaseToken/:id", testFirebaseToken); // TODO: remove, for testing firebase token
 router.get("/token", generateJWT); // TODO - Remove this endpoint - for testing only
@@ -40,7 +43,6 @@ router.get("/verify/organization/new/:token", verifyNewOrgSignup);
 router.get("/verify/organization/:id/:token", verifyExistingOrgSignup);
 router.post("/loginUser", loginUser);
 router.post("/logoutUser", verifyAuthentication, logoutUser);
-router.post("/resetPassword", resetPassword); // should we be authenticated?
 router.get("/", verifyAuthentication, getAllUsers);
 router.get("/me", verifyAuthentication, getLoggedInUser);
 router.get("/:id", verifyAuthentication, getUserById);
