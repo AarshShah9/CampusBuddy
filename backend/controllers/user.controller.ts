@@ -10,6 +10,8 @@ import {
   UserCreateType,
   UserUpdateSchema,
   UserUpdateType,
+  resetPasswordSchema,
+  resetPasswordChangePasswordSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -281,6 +283,17 @@ export const loginUser = async (
 
     //checks if user is a student
     if (existingUser.accountType === "Student") {
+      if (existingUser.firstTimeLogin) {
+        await prisma.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            firstTimeLogin: false,
+          },
+        });
+      }
+
       // find the amount of events the user has attended (participationStatus = Going, and endDate is in the past) inside the userEventResponse table
       const attendedEvents = await prisma.userEventResponse.count({
         where: {
@@ -333,10 +346,22 @@ export const loginUser = async (
           attended: attendedEvents,
           following: orgs,
           type: "Student",
+          firstTimeLogin: existingUser.firstTimeLogin,
         },
       });
       //checks if user is organization owner
     } else if (existingUser.accountType === "ApprovedOrg") {
+      if (existingUser.firstTimeLogin) {
+        await prisma.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            firstTimeLogin: false,
+          },
+        });
+      }
+
       // Confirm password matches
       const loginTokenPayload: loginJwtPayloadType = {
         id: existingUser.id,
@@ -407,6 +432,7 @@ export const loginUser = async (
             (UserOrganizationRole) => UserOrganizationRole.organization.events,
           ).length,
           type: "Organization_Admin",
+          firstTimeLogin: existingUser.firstTimeLogin,
         },
       });
       //user not a student, or an approved organization owner
@@ -428,29 +454,6 @@ export const logoutUser = async (req: Request, res: Response) => {
     success: true,
     message: "User logged out",
   });
-};
-
-// will have to be changed later
-// reset password
-export const resetPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { email, password } = loginSchema.parse(req.body);
-
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        password: password,
-      },
-    });
-  } catch (error: any) {
-    next(error);
-  }
 };
 
 // remove User
@@ -1482,6 +1485,135 @@ export const testFirebaseToken = async (
     res.status(200).json({
       message: `Firebase token generated`,
       data: firebaseToken,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// The reset password flow goes as so:
+// Reset Password function Send OTP
+// 1. User enters their email and requests a password reset
+// 2. A code is sent to the user's email that they can use to reset their password, it expires after 10 minutes
+
+// Reset Password function, change password with OTP
+// 3. User enters the code and a new password
+// 4. The code is verified and the password is changed
+
+export const resetPasswordSendOTP = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { email } = resetPasswordSchema.parse(req.body);
+
+    const otp = generateOTP(6);
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    const user = await prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        otp,
+        otpExpiry,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    // Send the OTP to the user's email
+    const message = {
+      to: email,
+      subject: `Password Reset OTP: ${otp} - CampusBuddy`,
+      html: `Your OTP is: ${otp}`,
+    };
+
+    await transporter.sendMail(message);
+
+    res.status(200).json({
+      message: `OTP sent successfully - ${email}`,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+function generateOTP(length: number) {
+  const digits = "0123456789";
+  let otp = "";
+  for (let i = 0; i < length; i++) {
+    otp += digits[Math.floor(Math.random() * 10)];
+  }
+  return otp;
+}
+
+export const resetPasswordChangePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { email, otp, password } = resetPasswordChangePasswordSchema.parse(
+      req.body,
+    );
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    if (!user.otp || !user.otpExpiry) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "No OTP found for user",
+        400,
+        true,
+      );
+    }
+
+    if (user.otp !== otp || user.otpExpiry < new Date()) {
+      throw new AppError(
+        AppErrorName.INVALID_INPUT_ERROR,
+        "Invalid OTP",
+        400,
+        true,
+      );
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    await prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        password: hashedPassword,
+        otp: null,
+        otpExpiry: null,
+      },
+    });
+
+    res.status(200).json({
+      message: "Password reset successfully",
     });
   } catch (error: any) {
     next(error);

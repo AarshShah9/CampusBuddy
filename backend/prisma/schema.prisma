@@ -103,6 +103,11 @@ model User {
 
   degreeName String? @map("degree_name")
 
+  otp       String?
+  otpExpiry DateTime?
+
+  firstTimeLogin Boolean @default(false) @map("signed_in")
+
   @@index([email])
   @@index([institutionId])
   @@map("user")
