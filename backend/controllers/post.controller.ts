@@ -423,6 +423,9 @@ export const getPostCommentsById = async (
           include: {
             user: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         },
       },
     });

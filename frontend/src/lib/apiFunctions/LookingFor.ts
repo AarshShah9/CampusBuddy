@@ -35,3 +35,10 @@ export const attendPost = async (id: string) => {
     params: { id },
   });
 };
+
+export const commentOnPost = async (id: string, comment: string) => {
+  return await CBRequest("POST", `/api/post/:id/comments/`, {
+    params: { id },
+    body: { content: comment },
+  });
+};
