@@ -5,6 +5,8 @@ import Team from "../sections/Team";
 import MainLanding from "../sections/MainLanding";
 import SubscribeForUpdates from "../sections/SubscribeForUpdates";
 import LogoCloud from "../sections/LogoCloud";
+import UVPSection from "../sections/UVPSection";
+import Feature from "../sections/Feature";
 
 const navigation = [
   { name: "Our Clients", href: "#logo-cloud" },
@@ -117,12 +119,14 @@ export default function Home() {
         </Dialog>
       </header>
       <MainLanding />
-      <div id="logo-cloud">
+      <UVPSection/>
+      <Feature/>
+      {/* <div id="logo-cloud">
         <LogoCloud />
-      </div>
-      <div id="team">
+      </div> */}
+      {/* <div id="team">
         <Team />
-      </div>
+      </div> */}
 
       <SubscribeForUpdates />
     </div>
