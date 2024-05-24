@@ -4,7 +4,7 @@ export default function About() {
     return (
       <div className="flex flex-col items-center px-6 py-10 mx-auto max-w-7xl">
         <div className="max-w-4xl text-center">
-          <h2 className="mb-8 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             About
           </h2>
           <div className="flex flex-wrap justify-center">
@@ -22,13 +22,13 @@ export default function About() {
             </div>
             <div className="w-full p-4 pb-16">
               <p className="text-lg leading-8 text-gray-600">
-                This vision led to the creation of.
+                This vision led to the creation of...
               </p>
             </div>
           </div>
         </div>
         <div className="w-full">
-          <h2 className="mb-8 text-3xl font-bold tracking-tight text-center text-gray-900 sm:text-4xl">Campus Buddy</h2>
+          <h1 className="mb-4 text-3xl font-bold tracking-tight text-center text-gray-900 sm:text-7xl">Campus Buddy</h1>
           <div className="relative w-full h-40">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-full blur-sm" />
             <div className="absolute inset-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
