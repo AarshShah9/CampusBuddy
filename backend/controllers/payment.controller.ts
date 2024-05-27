@@ -11,6 +11,8 @@ import prisma from "../prisma/client";
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+// TODO
+// Ensure 2 day payment lag-time -> hold money for 2 days until after the event passed
 export const createPaymentIntent = async (
   req: RequestExtended,
   res: Response,
@@ -22,6 +24,12 @@ export const createPaymentIntent = async (
     const paymentIntent = await stripe.paymentIntents.create({
       amount: parsedPaymentData.amount,
       currency: parsedPaymentData.currency,
+    });
+
+    const evnetDate = await prisma.event.findUnique({
+      where: {
+        id: parsedPaymentData.eventId,
+      },
     });
 
     await prisma.payment.create({
