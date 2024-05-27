@@ -1,10 +1,24 @@
-import React from "react";
-import { View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+  ScrollView,
+  TextInput as RNTextInput,
+} from "react-native";
 import useThemeContext from "~/hooks/useThemeContext";
 import CommentsBar from "~/components/CommentsBar";
 import { useRoute } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
-import { getLookingForCommentsById } from "~/lib/apiFunctions/LookingFor";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  attendPost,
+  commentOnPost,
+  getLookingForCommentsById,
+} from "~/lib/apiFunctions/LookingFor";
 import { ThemedText } from "~/components/ThemedComponents";
 import { Button, TextInput } from "react-native-paper";
 
@@ -17,20 +31,55 @@ export type commentType = {
   userName: string;
 };
 
-function CommentField() {
+function CommentField({ id, refetch }: { id: string; refetch: () => void }) {
   const [text, setText] = React.useState("");
+  const inputRef = useRef<RNTextInput>(null);
+
+  const joinPostMutation = useMutation({
+    mutationFn: () => commentOnPost(id, text),
+    onSuccess: () => {
+      setText("");
+      refetch();
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message);
+    },
+  });
+
+  const submitComment = useCallback(() => {
+    joinPostMutation.mutate();
+  }, [text]);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   return (
     <View style={styles.addComment}>
-      <TextInput
-        label="Add a Comment"
-        mode="outlined"
+      <RNTextInput
+        ref={inputRef}
         value={text}
         onChangeText={(text) => setText(text)}
-        style={{ width: "75%" }}
+        placeholder={"Add a Comment"}
+        style={{
+          width: "75%",
+          backgroundColor: "white",
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: "grey",
+          marginTop: 10,
+          marginBottom: 10,
+          padding: 10,
+          height: 40,
+        }}
       />
       <Button
         mode="contained"
         style={[styles.replyButton, { justifyContent: "center" }]}
+        onPress={submitComment}
+        disabled={joinPostMutation.isPending || text.length === 0}
       >
         Reply
       </Button>
@@ -49,6 +98,7 @@ export default function LookingForCommentsScreen() {
     data: comments,
     isLoading,
     isFetching,
+    refetch,
   } = useQuery<commentType[]>({
     queryKey: ["comments", id],
     queryFn: async () => getLookingForCommentsById(id),
@@ -56,29 +106,40 @@ export default function LookingForCommentsScreen() {
   });
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 72 : 0}
-    >
-      <View
-        style={[
-          styles.mainContainer,
-          { backgroundColor: theme.colors.onPrimary }, // Color incorrect for dark mode
-        ]}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, backgroundColor: theme.colors.tertiary }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 72 : 0}
       >
-        <View>
-          {comments &&
-            comments.map((comment, i) => <CommentsBar {...comment} key={i} />)}
-          {comments?.length === 0 && !isLoading && !isFetching && (
-            <ThemedText style={styles.noCommentsText}>No Comments</ThemedText>
-          )}
+        <View
+          style={[
+            styles.mainContainer,
+            {
+              backgroundColor: theme.colors.onPrimary,
+              marginBottom: 40,
+            },
+          ]}
+        >
+          <ScrollView
+            style={{
+              flexGrow: 1,
+            }}
+          >
+            {comments &&
+              comments.map((comment, i) => (
+                <CommentsBar {...comment} key={i} />
+              ))}
+            {comments?.length === 0 && !isLoading && !isFetching && (
+              <ThemedText style={styles.noCommentsText}>No Comments</ThemedText>
+            )}
+          </ScrollView>
+          <View style={{ height: 40 }}>
+            <CommentField id={id} refetch={refetch} />
+          </View>
         </View>
-        <View>
-          <CommentField />
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -105,12 +166,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingTop: 8,
-    marginBottom: 32,
-    borderTopWidth: 1,
-    height: 40,
+    height: 55,
+    borderTopColor: "grey",
+    borderTopWidth: 0.2,
   },
   replyButton: {
     height: 40,
+    marginTop: 10,
   },
 });

@@ -10,7 +10,6 @@ type EventSearchCardProps = {
 };
 
 export default function EventSearchCard(props: EventSearchCardProps) {
-
   return (
     <StyledCard>
       <StyledCover
@@ -27,7 +26,6 @@ export default function EventSearchCard(props: EventSearchCardProps) {
         </Card.Content>
         <Card.Content>
           <HostText>{props.clubName}</HostText>
-          {/*<Card.Content></Card.Content>*/}
         </Card.Content>
       </Card.Content>
     </StyledCard>
