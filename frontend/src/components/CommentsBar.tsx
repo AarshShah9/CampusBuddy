@@ -1,38 +1,71 @@
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 import ReplyChip from "./ReplyChip";
 import { commentType } from "~/screens/LookingForCommentsScreen";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
+import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function CommentsBar(props: commentType) {
+  // 6 different heights for comment card
+  let heightCommentCard = 0;
+  if (props.content.length < 50) {
+    heightCommentCard = 100;
+  } else if (props.content.length < 100) {
+    heightCommentCard = 120;
+  } else if (props.content.length < 150) {
+    heightCommentCard = 140;
+  } else if (props.content.length < 200) {
+    heightCommentCard = 160;
+  } else if (props.content.length < 250) {
+    heightCommentCard = 180;
+  } else {
+    heightCommentCard = 200;
+  }
+
+  const { navigateTo } = useNavigationContext();
+
+  const navigateToProfile = () => {
+    navigateTo({ page: "UserProfile", id: props.userId });
+  };
+
   return (
-    <View style={styles.mainContainer}>
+    <View
+      style={[
+        styles.mainContainer,
+        {
+          height: heightCommentCard,
+        },
+      ]}
+    >
       {/* Header Bar */}
       <View style={styles.dataContainer}>
         <View style={styles.headerContainer}>
-          <View style={styles.profileContainer}>
-            {/* Profile Pic */}
-            {props?.userImage && (
-              <Image
+          <TouchableOpacity onPress={navigateToProfile}>
+            <View style={styles.profileContainer}>
+              {/* Profile Pic */}
+              {props?.userImage && (
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    backgroundColor: "grey",
+                    borderRadius: 90,
+                    marginBottom: 5,
+                  }}
+                  source={{ uri: generateImageURL(props.userImage) }}
+                />
+              )}
+              <Text
                 style={{
-                  height: 30,
-                  width: 30,
-                  backgroundColor: "grey",
-                  borderRadius: 90,
-                  marginBottom: 5,
+                  marginLeft: 8,
+                  fontWeight: "500",
                 }}
-                source={{ uri: generateImageURL(props.userImage) }}
-              />
-            )}
-            <Text
-              style={{
-                marginLeft: 8,
-              }}
-            >
-              {props.userName}
-            </Text>
-          </View>
+              >
+                {props.userName}
+              </Text>
+            </View>
+          </TouchableOpacity>
           <Text>{convertUTCToTimeAndDate(props.createdAt)}</Text>
         </View>
         {/* Comment Section */}
@@ -41,9 +74,9 @@ export default function CommentsBar(props: commentType) {
         </View>
       </View>
       {/* Up Vote and DownVote Section */}
-      <View style={styles.chipStyleContainer}>
-        <ReplyChip />
-      </View>
+      {/*<View style={styles.chipStyleContainer}>*/}
+      {/*  <ReplyChip />*/}
+      {/*</View>*/}
     </View>
   );
 }
@@ -51,7 +84,6 @@ export default function CommentsBar(props: commentType) {
 const styles = StyleSheet.create({
   mainContainer: {
     width: "auto",
-    height: 200,
     paddingHorizontal: 16,
     flexDirection: "column",
     justifyContent: "space-between",

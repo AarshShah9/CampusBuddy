@@ -157,6 +157,7 @@ const allowedEndpoints = [
   "/api/post/:id",
   "/api/post/:id/comments",
   "/api/post/:id/toggleAttendance",
+  "/api/post/:id/comments/",
 
   // profile related endpoints
   "/api/profile/saved",
@@ -208,7 +209,9 @@ export type IdRequiredEndPoints =
   | "/api/post/:id/toggleAttendance"
   | "/api/profile/items/:id";
 
-export type IdAndBodyRequiredEndPoints = "/api/orgs/:id";
+export type IdAndBodyRequiredEndPoints =
+  | "/api/orgs/:id"
+  | "/api/post/:id/comments/";
 
 export type IdRequiredEndpointOptions = Omit<RequestArgs, "body" | "params"> & {
   params: { id: string };
