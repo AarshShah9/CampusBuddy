@@ -27,7 +27,7 @@ export default function Feature(){
                     </div>
                     <div className="mx-4 w-11/12">
                         <h2  className="lg:text-3xl  font-bold tracking-tight text-gray-900   ">Customize your own profile</h2>
-                        <p className="xl:text-2xl  leading-8 text-gray-600 pt-4 ">Keep track of all the events that you have attended or upcoming to share with peers, and check events that other users are attending to find events to attend with your peers!</p>
+                        <p className="lg:text-2xl  leading-8 text-gray-600 pt-4 ">Keep track of all the events that you have attended or upcoming to share with peers, and check events that other users are attending to find events to attend with your peers!</p>
                     </div>
                 </div>
                 <div className="lg:flex-row flex p-14">
