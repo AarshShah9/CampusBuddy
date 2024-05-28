@@ -9,11 +9,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 LogBox.ignoreLogs([""]);
 
 export default function App() {
-  return (
-    <ContextFactory>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Navigation />
-      </GestureHandlerRootView>
-    </ContextFactory>
-  );
+    return (
+        <ContextFactory>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <Navigation />
+            </GestureHandlerRootView>
+        </ContextFactory>
+    );
 }
