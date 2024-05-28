@@ -15,6 +15,7 @@ import profile from "./routes/profile.routes";
 import notification from "./routes/notification.routes";
 import moderation from "./routes/moderation.routes";
 import search from "./routes/search.routes";
+import tag from "./routes/tag.routes";
 import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
 import { initializeApp } from "firebase-admin/app";
@@ -78,6 +79,7 @@ app.use("/api/notification", notification);
 app.use("/api/moderation", moderation);
 app.use("/api/search", search);
 app.use("/api/seed", seed);
+app.use("/api/tags", tag);
 
 app.get("/Test", (req: Request, res: Response) => {
   console.log("The backend is hit");
