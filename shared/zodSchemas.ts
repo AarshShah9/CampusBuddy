@@ -80,11 +80,7 @@ export type ModerationRejection = z.infer<typeof ModerationSchemaRejection>;
 ///////////////////////////////
 
 export const PaymentSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
   eventId: z.string().uuid(),
-  paymentIntentId: z.string(),
-  amount: z.number(),
   currency: z.string(),
 });
 
