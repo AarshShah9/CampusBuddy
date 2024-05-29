@@ -47,6 +47,8 @@ enum AppErrorName {
   PRISMA_ERROR = "PrismaError",
   INTERNAL_SERVER_ERROR = "InternalServerError",
   NO_SPOT_AVAILABLE_ERROR = "NoSpotsAvailableError",
+  EVENT_NOT_PAID_ERROR = "EventNotPaidError",
+  EVENT_INVALID_PRICE_ERROR = "EventInvalidPriceError",
 }
 
 export { AppError, AppErrorName };

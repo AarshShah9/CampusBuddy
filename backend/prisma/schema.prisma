@@ -153,6 +153,7 @@ model Payment {
   paymentIntentId String @map("payment_intent_id")
   amount          Int    @map("amount")
   currency        String @map("currency")
+  status          String @map("status")
 
   @@index([userId])
   @@index([eventId])

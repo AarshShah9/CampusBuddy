@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { RequestExtended } from "../middleware/verifyAuth";
 import prisma from "../prisma/client";
+import { AppError, AppErrorName } from "../utils/AppError";
+import { number } from "zod";
 
 // will create a ticket record and add to user's tickets as well as event's tickets
 export const purchaseTicket = async (
@@ -10,27 +12,60 @@ export const purchaseTicket = async (
 ) => {
   const { eventId, userId } = req.body;
 
-  const price = await prisma.event.findUnique({
-    where: {
-      id: eventId,
-    },
-    select: {
-      price: true,
-    },
-  });
-
   try {
-    if (price !== null) {
-      const ticket = await prisma.ticket.create({
-        data: {
-          eventId: eventId,
-          userId: userId,
-          price: price.price || 0,
-          used: false,
+    const newTicket = await prisma.$transaction(async (prisma) => {
+      // pull event from db
+      const event = await prisma.event.findUnique({
+        where: {
+          id: eventId,
         },
       });
 
-      res.status(201).json(ticket.id);
+      // check if event exists and is paid
+      if (!event || !event.isPaid) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Event not found or is not paid",
+          404,
+          true,
+        );
+      }
+
+      // pull user from db
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      // check if user exists
+      if (!user) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "User not found",
+          404,
+          true,
+        );
+      }
+
+      // create ticket
+      // wrap with check to ensure ticker price is valid
+      if (event.price !== null) {
+        const ticket = await prisma.ticket.create({
+          data: {
+            eventId: eventId,
+            userId: userId,
+            price: event.price,
+            used: false,
+          },
+        });
+
+        return ticket;
+      }
+    });
+
+    if (newTicket) {
+      res.status(201).json(newTicket.id);
     } else {
       res.status(404).json("Event not found");
     }

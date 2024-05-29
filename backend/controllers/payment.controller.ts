@@ -6,9 +6,11 @@ import {
   paymentSucceeded,
   paymentFailed,
 } from "../utils/emails";
+import { AppError, AppErrorName } from "../utils/AppError";
 import prisma from "../prisma/client";
 
 import Stripe from "stripe";
+import { env } from "process";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // TODO
@@ -18,34 +20,83 @@ export const createPaymentIntent = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const userId = req.body.userId;
   const parsedPaymentData = PaymentSchema.parse(req.body);
 
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: parsedPaymentData.amount,
-      currency: parsedPaymentData.currency,
-    });
+  const newPayment = await prisma.$transaction(async (prisma) => {
+    try {
+      // pull event from db
+      const event = await prisma.event.findUnique({
+        where: {
+          id: parsedPaymentData.eventId,
+        },
+      });
 
-    const evnetDate = await prisma.event.findUnique({
-      where: {
-        id: parsedPaymentData.eventId,
-      },
-    });
+      // check if event exists
+      if (!event) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Event not found",
+          404,
+          true,
+        );
+      }
 
-    await prisma.payment.create({
-      data: {
-        userId: parsedPaymentData.userId,
-        eventId: parsedPaymentData.eventId,
-        paymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-      },
-    });
+      // check if event is paid -> throws error if not
+      if (!event.isPaid) {
+        throw new AppError(
+          AppErrorName.EVENT_NOT_PAID_ERROR,
+          "Event is already paid",
+          400,
+          true,
+        );
+      }
 
-    res.status(201).json(paymentIntent.client_secret);
-  } catch (error) {
-    next(error);
-  }
+      // check if event price is set and not null or undefined or negative or 0
+      if (
+        event.price === null ||
+        event.price === undefined ||
+        event.price === 0
+      ) {
+        throw new AppError(
+          AppErrorName.INVALID_INPUT_ERROR,
+          "Event price is not set",
+          400,
+          true,
+        );
+      }
+
+      // create payment intent
+      const paymentIntent: Stripe.PaymentIntent =
+        await stripe.paymentIntents.create({
+          amount: event.price * 100,
+          capture_method: "manual", // hold money until 2 days after event -> logic to be implemented via a cron
+          currency: "cad",
+          metadata: {
+            userId: userId,
+            eventId: event.id,
+          },
+        });
+
+      // create payment in db
+      const newPayment = await prisma.payment.create({
+        data: {
+          userId: userId,
+          eventId: event.id,
+          paymentIntentId: paymentIntent.id,
+          amount: event.price,
+          currency: "cad",
+          status: paymentIntent.status,
+        },
+      });
+
+      return newPayment;
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  res.status(201).json(newPayment);
 };
 
 export const verifyPayment = async (
@@ -56,7 +107,8 @@ export const verifyPayment = async (
   const { paymentIntentId } = req.body;
 
   try {
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent: Stripe.PaymentIntent =
+      await stripe.paymentIntents.retrieve(paymentIntentId);
 
     res.status(200).json(paymentIntent.status);
   } catch (error) {
