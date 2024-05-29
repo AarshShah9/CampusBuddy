@@ -166,6 +166,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   messagesArea: {
     flex: 1,
+    paddingHorizontal: 10
   },
   typingArea: {
     paddingTop: 6,
