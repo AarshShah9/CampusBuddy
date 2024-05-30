@@ -24,10 +24,10 @@ export default function MainLanding() {
           </div>
         </div>
         <div className="text-center">
-          <h1 className=" font-bold tracking-tight text-gray-900 sm:text-6xl">
+          <h1 className=" font-bold tracking-tight text-gray-900 sm:text-6xl text-2xl">
             The one-stop shop for all your campus needs
           </h1>
-          <p className="mt-6 sm:text-2xl leading-8 text-gray-600">
+          <p className="mt-6 sm:text-2xl text-sm leading-8 text-gray-600">
             CampusBuddy is a platform that connects students with resources and
             opportunities on campus. We are launching soon and can't wait for
             you to join us.
