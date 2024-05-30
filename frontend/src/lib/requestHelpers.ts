@@ -174,6 +174,7 @@ const allowedEndpoints = [
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
   "/api/notification/storePushToken",
+  "/api/notification/sendChatNotification",
   "/api/search/",
 ] as const;
 

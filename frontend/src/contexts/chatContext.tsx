@@ -35,6 +35,7 @@ import {
     messageConverter,
 } from "~/lib/firestoreConfig";
 import usePushNotifications from "~/hooks/usePushNotifications";
+import { CBRequest } from "~/lib/CBRequest";
 
 const getSortedKey = (arg1: string, arg2: string) =>
     getSortedArray(arg1, arg2).join("");
@@ -247,7 +248,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                                     if(!oldConversationObject.firstTime){
                                         sendLocalNotification({
                                             title: `New Mesage from ${otherEndUserId}`,
-                                            body: `You have a new message`,
+                                            body: `Internal notification`,
                                         }).catch((error) =>
                                             console.log(
                                                 "An error occured when trying to send a notification:\n",
@@ -369,9 +370,14 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                         updatedAt: timestamp,
                     });
             }
-            //await /api/notifyUser?userId=${otherEndUserId}
+            await CBRequest("POST", "/api/notification/sendChatNotification", {
+                body: {
+                    recipientId: otherEndUserId, 
+                    message: `External notification: You have a new message from ${currentUserId}`
+                }
+            })
         },
-        [conversations],
+        [currentUserId, conversations],
     );
 
     /**
