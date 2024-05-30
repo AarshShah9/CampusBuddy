@@ -16,18 +16,16 @@ import {
     or,
     onSnapshot,
     and,
-    Query,
     startAfter,
-    Unsubscribe,
     updateDoc,
     doc,
     serverTimestamp,
     addDoc,
     Timestamp,
 } from "firebase/firestore";
-import { FirestoreMessageObject, MessageObject } from "~/types/Chat";
+import { OpenedConversation, UnopenedConversation } from "~/types/Chat";
 import { UserDataType } from "~/types/User";
-import { getSortedArray, initialNumberOfMessages } from "~/lib/helperFunctions";
+import { getSortedArray, initialNumberOfMessages, getSortedKey } from "~/lib/helperFunctions";
 import useChatsContext from "~/hooks/useChatsContext";
 import {
     conversationConverter,
@@ -37,9 +35,6 @@ import {
 import usePushNotifications from "~/hooks/usePushNotifications";
 import { CBRequest } from "~/lib/CBRequest";
 
-const getSortedKey = (arg1: string, arg2: string) =>
-    getSortedArray(arg1, arg2).join("");
-
 const currentIsFirstParticipant = (
     currentUserId: string,
     otherEndUserId: string,
@@ -48,15 +43,7 @@ const currentIsFirstParticipant = (
     return result === currentUserId;
 };
 
-type UnopenedConversation = { status: "not-opened" };
-type OpenedConversation = {
-    status: "opened";
-    messagesQuery: Query<MessageObject, FirestoreMessageObject>;
-    listener: Unsubscribe;
-    messages: MessageObject[];
-    endReached: boolean;
-    firstTime: boolean;
-};
+
 type ConversationsCache = {
     [key: string]: OpenedConversation | UnopenedConversation;
 };
@@ -68,8 +55,9 @@ type contextObject = {
     createNewMessage: (otherEndUserId: string, message: string) => Promise<void>;
     getConversation: (
         otherEndUserId: string,
-    ) => OpenedConversation | UnopenedConversation;
+    ) => OpenedConversation | UnopenedConversation | undefined;
     updateMessagesReadStatus: (arg: string) => void;
+    startConversation: (otherEndUserId: string) => Promise<void>;
     getNumberOfUnreadMessages: (
         arg1: string,
         arg2: { firstParticipant: number; secondParticipant: number },
@@ -79,7 +67,7 @@ const ChatContext = createContext<contextObject | null>(null);
 
 export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     // Getting the user from chats context since it wraps this context
-    const { user, conversations, conversationsRef } = useChatsContext();
+    const { user, conversations, conversationsRef, createNewEmptyConversation } = useChatsContext();
 
     // An array of strings which represents conversations, for example: ['user1-user2', 'user2-user5']
     const conversationPairs = conversations.map((conv) =>
@@ -95,8 +83,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     );
 
     // This is a custom cache which keeps track of opened chats so as to prevent recreating the realtime listeners
-    const [conversationsCache, setConversationsCache] =
-        useState<ConversationsCache>({});
+    const [conversationsCache, setConversationsCache] = useState<ConversationsCache>({});
 
     /**
      * Function to add, or delete an entry from the conversations cache
@@ -213,7 +200,6 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         (otherEndUserId: string) => {
             const conversationKey = getSortedKey(currentUserId, otherEndUserId);
             const conversation = conversationsCache[conversationKey];
-
             if (conversation.status === "not-opened") {
                 setConversationsCache((old) => {
                     let newConversationsCache = { ...old };
@@ -293,12 +279,31 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         [currentUserId, conversationsCache, setConversationsCache, sendLocalNotification],
     );
 
+    type IsPending = { state: true, otherEndUserId: string }
+    type IsNotPending = { state: false }
+    const [pendingConversationOpen, setPendingConversationOpen] = useState<IsPending | IsNotPending>({
+        state: false
+    });
+
+    useEffect(() => {
+        if(pendingConversationOpen.state) {
+            openConversation(pendingConversationOpen.otherEndUserId);
+            setPendingConversationOpen({ state: false })
+        }
+    }, [conversationsCache, pendingConversationOpen])
+
+    const startConversation = useCallback(async (otherEndUserId: string) => {
+        await createNewEmptyConversation(otherEndUserId);
+        setPendingConversationOpen({ state: true, otherEndUserId });
+    }, [openConversation, createNewEmptyConversation])
+
     /**
      * Function to retrieve a conversation cache entry
      */
     const getConversation = useCallback(
         (otherEndUserId: string) => {
-            return conversationsCache[getSortedKey(currentUserId, otherEndUserId)];
+            return conversationsCache[getSortedKey(currentUserId, otherEndUserId)] as
+            (OpenedConversation | UnopenedConversation | undefined);
         },
         [conversationsCache],
     );
@@ -487,6 +492,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 createNewMessage,
                 getConversation,
                 getNumberOfUnreadMessages,
+                startConversation
             }}
         >
             {children}

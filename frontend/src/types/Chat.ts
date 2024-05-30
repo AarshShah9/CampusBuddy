@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Query, Timestamp, Unsubscribe } from "firebase/firestore";
 
 export type ChatScreenParams = {
   userId: string;
@@ -47,4 +47,15 @@ export type FirestoreConversationObject = {
   };
   createdAt: Timestamp;
   updatedAt: Timestamp;
+};
+
+export type UnopenedConversation = { status: "not-opened" };
+
+export type OpenedConversation = {
+    status: "opened";
+    messagesQuery: Query<MessageObject, FirestoreMessageObject>;
+    listener: Unsubscribe;
+    messages: MessageObject[];
+    endReached: boolean;
+    firstTime: boolean;
 };

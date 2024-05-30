@@ -20,11 +20,18 @@ export const NavigationContextProvider = ({ children }: PropsWithChildren): JSX.
 
     const { navigate, goBack, dispatch } = useNavigation<any>();
     const navigateTo = useCallback(({ page, ...params }: NavigationFunctionArgs) => {
-        let pageToRoute: string = page;
-        if(duplicatedScreens.includes(page as any)) {
-            pageToRoute = `${page}-${currentMainTab}`;
+        if(page === "ChatScreen"){
+            navigate('Messages', {
+                screen: page, params,
+            });
         }
-        navigate(pageToRoute, { ...params })
+        else {
+            let pageToRoute: string = page;
+            if(duplicatedScreens.includes(page as any)) {
+                pageToRoute = `${page}-${currentMainTab}`;
+            }
+            navigate(pageToRoute, { ...params })
+        }
     }, [navigate, currentMainTab])
     const navigateBack = useCallback(() => {
         goBack()

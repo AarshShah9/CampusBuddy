@@ -15,6 +15,8 @@ export const limitTextToMax = (arg: string, maxCharacters: number) => {
  */
 export const getSortedArray = (...args: string[]) => args.sort();
 
+export const getSortedKey = (arg1: string, arg2: string) => getSortedArray(arg1, arg2).join("");
+
 /**
  * Function that takes in a string and returns a regex that checks if the given string is within the target text
  * @param filter
