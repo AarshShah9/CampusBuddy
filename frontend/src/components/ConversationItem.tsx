@@ -50,7 +50,7 @@ export default function ConversationItem({
     getUserDataApi(userId)
       .then(
         (item) =>
-          item && setFetchedData({ userName: item.name, icon: item.icon }),
+          item && setFetchedData({ userName: item.name, icon: item.icon ?? "#" }),
       )
       .catch((err) => console.log("error occured", err));
   }, [userId]);

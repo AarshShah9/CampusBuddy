@@ -245,22 +245,29 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                                         conversationKey
                                     ] as OpenedConversation;
 
-                                    if(!oldConversationObject.firstTime){
-                                        sendLocalNotification({
-                                            title: `New Mesage from ${otherEndUserId}`,
-                                            body: `Internal notification`,
-                                        }).catch((error) =>
-                                            console.log(
-                                                "An error occured when trying to send a notification:\n",
-                                                error,
-                                            ),
-                                        );
-                                    }
-
                                     const items = snapshot
                                         .docChanges()
                                         .filter((item) => item.type === "added")
                                         .map((item) => item.doc.data());
+
+                                    if(!oldConversationObject.firstTime && !items.some(item => item.senderId === currentUserId)){
+                                        CBRequest("GET", "/api/user/getUserNameById/:id", {
+                                            params: { id: otherEndUserId } 
+                                        })
+                                        .then((res: any) => {
+                                            if(!!res.body.name) {
+                                                sendLocalNotification({
+                                                    title: res.body.name,
+                                                    body: items[0].message.content,
+                                                }).catch((error) =>
+                                                    console.log(
+                                                        "An error occured when trying to send a notification:\n",
+                                                        error,
+                                                    ),
+                                                );
+                                            }
+                                        })
+                                    }
 
                                     newConversationsCache[conversationKey] = {
                                         status: "opened",
@@ -371,10 +378,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     });
             }
             await CBRequest("POST", "/api/notification/sendChatNotification", {
-                body: {
-                    recipientId: otherEndUserId, 
-                    message: `External notification: You have a new message from ${currentUserId}`
-                }
+                body: { recipientId: otherEndUserId, message }
             })
         },
         [currentUserId, conversations],
