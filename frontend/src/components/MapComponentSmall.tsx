@@ -1,5 +1,5 @@
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { StyleSheet, View } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from "react-native-maps";
+import { StyleSheet, View, Platform } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { darkModeStyle } from "~/components/Map";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -29,7 +29,7 @@ const Map = ({
     <View>
       <View style={styles.mapBox}>
         <MapView
-          provider={PROVIDER_GOOGLE}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
           pointerEvents="none"
           style={styles.map}
           initialRegion={{
