@@ -151,6 +151,7 @@ model Payment {
   userId          String @map("user_id")
   eventId         String @map("event_id")
   paymentIntentId String @map("payment_intent_id")
+  paymentDate     DateTime @map("payment_date") @db.Date
   amount          Int    @map("amount")
   currency        String @map("currency")
   status          String @map("status")

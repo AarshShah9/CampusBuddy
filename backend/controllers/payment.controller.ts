@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { RequestExtended } from "../middleware/verifyAuth";
-import { PaymentSchema, Payment } from "../../shared/zodSchemas";
+import {
+  PaymentSchema,
+  Payment,
+  PaymentRegisterSchema,
+  PaymentCancelSchema,
+} from "../../shared/zodSchemas";
 import {
   paymentProcessing,
   paymentSucceeded,
@@ -8,9 +13,10 @@ import {
 } from "../utils/emails";
 import { AppError, AppErrorName } from "../utils/AppError";
 import prisma from "../prisma/client";
-
+import cron from "node-cron";
 import Stripe from "stripe";
 import { env } from "process";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // TODO
@@ -21,7 +27,7 @@ export const createPaymentIntent = async (
   next: NextFunction,
 ) => {
   const userId = req.body.userId;
-  const parsedPaymentData = PaymentSchema.parse(req.body);
+  const parsedPaymentData = PaymentRegisterSchema.parse(req.body);
 
   const newPayment = await prisma.$transaction(async (prisma) => {
     try {
@@ -66,27 +72,21 @@ export const createPaymentIntent = async (
         );
       }
 
-      // create payment intent
-      const paymentIntent: Stripe.PaymentIntent =
-        await stripe.paymentIntents.create({
-          amount: event.price * 100,
-          capture_method: "manual", // hold money until 2 days after event -> logic to be implemented via a cron
-          currency: "cad",
-          metadata: {
-            userId: userId,
-            eventId: event.id,
-          },
-        });
+      // increment date of collection by 2 days
+      // after the event
+      let paymentDate = new Date(event.startTime.getDate());
+      paymentDate.setDate(paymentDate.getDate() + 2);
 
       // create payment in db
       const newPayment = await prisma.payment.create({
         data: {
           userId: userId,
           eventId: event.id,
-          paymentIntentId: paymentIntent.id,
+          paymentIntentId: "",
+          paymentDate: paymentDate,
           amount: event.price,
           currency: "cad",
-          status: paymentIntent.status,
+          status: "pending",
         },
       });
 
@@ -115,6 +115,138 @@ export const verifyPayment = async (
     next(error);
   }
 };
+
+export const cancelPayment = async (
+  req: RequestExtended,
+  res: Response,
+  next: NextFunction,
+) => {
+  const paymentId = PaymentCancelSchema.parse(req.body).id;
+
+  const cancelledPayment = await prisma.$transaction(async (prisma) => {
+    try {
+      const payment = await prisma.payment.findUnique({
+        where: {
+          id: paymentId,
+          paymentIntentId: "",
+        },
+      });
+
+      if (!payment) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Payment not found",
+          404,
+          true,
+        );
+      }
+
+      // check if payment is already cancelled
+      if (payment.status === "cancelled") {
+        throw new AppError(
+          AppErrorName.INVALID_INPUT_ERROR,
+          "Payment is already cancelled",
+          400,
+          true,
+        );
+      }
+
+      // check if payment is already succeeded
+      if (payment.status === "succeeded") {
+        throw new AppError(
+          AppErrorName.INVALID_INPUT_ERROR,
+          "Payment is already succeeded",
+          400,
+          true,
+        );
+      }
+
+      // check if current date is after event date
+      const currentDate = new Date();
+      const event = await prisma.event.findUnique({
+        where: {
+          id: payment.eventId,
+        },
+      });
+
+      if (event === null) {
+        throw new AppError(
+          AppErrorName.NOT_FOUND_ERROR,
+          "Event not found",
+          404,
+          true,
+        );
+      } else {
+        if (currentDate > event.startTime) {
+          throw new AppError(
+            AppErrorName.INVALID_INPUT_ERROR,
+            "Event already passed",
+            400,
+            true,
+          );
+        }
+
+        // cancel payment
+        const cancelledPayment = await prisma.payment.update({
+          where: {
+            id: paymentId,
+          },
+          data: {
+            status: "cancelled",
+          },
+        });
+
+        return cancelledPayment;
+      }
+    } catch (error) {
+      next(error);
+    }
+
+    res.status(200).json(cancelledPayment);
+  });
+};
+
+export const paymentProcessor = cron.schedule("0 0 * * *", async () => {
+  try {
+    const pendingPayments = await prisma.payment.findMany({
+      where: {
+        status: "pending",
+      },
+    });
+
+    for (const pendingPayment of pendingPayments) {
+      // filter pendingPayments to only those that are 2 days after the event
+      if (new Date().getDate() === pendingPayment.paymentDate.getDate()) {
+        const paymentIntent: Stripe.PaymentIntent =
+          await stripe.paymentIntents.create({
+            amount: pendingPayment.amount * 100, // convert to cents
+            currency: pendingPayment.currency,
+            payment_method_types: ["card"],
+            capture_method: "automatic",
+            metadata: {
+              paymentId: pendingPayment.id,
+            },
+          });
+
+        await prisma.payment.update({
+          where: {
+            id: pendingPayment.id,
+          },
+          data: {
+            paymentIntentId: paymentIntent.id,
+          },
+        });
+      }
+    }
+  } catch (error) {
+    throw new AppError(
+      AppErrorName.INTERNAL_SERVER_ERROR,
+      `Payment processor error -> ${error}`,
+      500,
+      true,
+    );
+  }
+});
 
 // This endpoint's URL needs to be registered with Stripe
 export const stripeWebhook = async (
@@ -147,25 +279,49 @@ export const stripeWebhook = async (
     case "payment_intent.processing":
       const paymentIntentProcessing = event.data.object;
 
+      // update payment in db to processing
+      await prisma.payment.update({
+        where: {
+          id: paymentIntentProcessing.metadata.paymentId,
+        },
+        data: {
+          status: "processing",
+        },
+      });
+
+      // get payment from db
       payment = await prisma.payment.findUnique({
         where: {
           id: paymentIntentProcessing.id,
         },
       });
 
+      // get user from db
       user = await prisma.user.findUnique({
         where: {
           id: payment?.userId,
         },
       });
 
+      // send email to user
       await paymentProcessing(payment!, user!);
 
+      // logging statement for testing -> take our during production
       console.log("Payment processing:", paymentIntentProcessing.id);
       break;
 
     case "payment_intent.succeeded":
       const paymentIntentSucceeded = event.data.object;
+
+      // update payment in db to succeeded
+      await prisma.payment.update({
+        where: {
+          id: paymentIntentSucceeded.metadata.paymentId,
+        },
+        data: {
+          status: "succeeded",
+        },
+      });
 
       payment = await prisma.payment.findUnique({
         where: {
@@ -186,6 +342,16 @@ export const stripeWebhook = async (
 
     case "payment_intent.payment_failed":
       const paymentIntentFailed = event.data.object;
+
+      // update payment in db to succeeded
+      await prisma.payment.update({
+        where: {
+          id: paymentIntentFailed.metadata.paymentId,
+        },
+        data: {
+          status: "failed",
+        },
+      });
 
       payment = await prisma.payment.findUnique({
         where: {

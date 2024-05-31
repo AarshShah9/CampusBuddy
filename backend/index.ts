@@ -19,6 +19,7 @@ import ticketing from "./routes/ticketing.routes";
 import payment from "./routes/payment.routes";
 import { validateEnv } from "./utils/validateEnv";
 import { upcomingEventReminderTask } from "./utils/cronTasks";
+import { paymentProcessor } from "./controllers/payment.controller";
 import { initializeApp } from "firebase-admin/app";
 import * as admin from "firebase-admin";
 
@@ -91,8 +92,14 @@ app.use(errorHandler);
 
 // Start task to send out event reminders
 if (process.env.ENV !== "GA") {
-  console.log("Starting CRON Job");
+  console.log("Starting CRON Job for event reminders");
   upcomingEventReminderTask.start();
+}
+
+// Start task to check pending payments
+if (process.env.ENV !== "GA") {
+  console.log("Starting CRON Job for payment processing");
+  paymentProcessor.start();
 }
 
 // server start
