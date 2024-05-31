@@ -16,9 +16,7 @@ import {
   or,
   onSnapshot,
   and,
-
   startAfter,
-
   updateDoc,
   doc,
   serverTimestamp,
@@ -49,15 +47,6 @@ const currentIsFirstParticipant = (
   return result === currentUserId;
 };
 
-type UnopenedConversation = { status: "not-opened" };
-type OpenedConversation = {
-  status: "opened";
-  messagesQuery: Query<MessageObject, FirestoreMessageObject>;
-  listener: Unsubscribe;
-  messages: MessageObject[];
-  endReached: boolean;
-  firstTime: boolean;
-};
 type ConversationsCache = {
   [key: string]: OpenedConversation | UnopenedConversation;
 };
@@ -216,7 +205,6 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     (otherEndUserId: string) => {
       const conversationKey = getSortedKey(currentUserId, otherEndUserId);
       const conversation = conversationsCache[conversationKey];
-
       if (conversation.status === "not-opened") {
         setConversationsCache((old) => {
           let newConversationsCache = { ...old };
@@ -251,23 +239,27 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                   const items = snapshot
                     .docChanges()
                     .filter((item) => item.type === "added")
-                    .map((item) => item.doc.data());if (!oldConversationObject.firstTime&&
+                    .map((item) => item.doc.data());
+
+                  if (
+                    !oldConversationObject.firstTime &&
                     !items.some((item) => item.senderId === currentUserId)
                   ) {
                     CBRequest("GET", "/api/user/getUserNameById/:id", {
                       params: { id: otherEndUserId },
                     }).then((res: any) => {
-                      if (!!res.body.name) {sendLocalNotification({
-                      title: res.body.name,
-                      body: items[0].message.content,
-                    }).catch((error) =>
-                      console.log(
-                        "An error occured when trying to send a notification:\n",
-                        error,
-                      ),
-                    );
-                  }
-});
+                      if (!!res.body.name) {
+                        sendLocalNotification({
+                          title: res.body.name,
+                          body: items[0].message.content,
+                        }).catch((error) =>
+                          console.log(
+                            "An error occured when trying to send a notification:\n",
+                            error,
+                          ),
+                        );
+                      }
+                    });
                   }
 
                   newConversationsCache[conversationKey] = {
@@ -411,9 +403,9 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
       }
       await CBRequest("POST", "/api/notification/sendChatNotification", {
         body: { recipientId: otherEndUserId, message },
-    });
+      });
     },
-    [currentUserId,conversations],
+    [currentUserId, conversations],
   );
 
   /**
@@ -519,7 +511,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         createNewMessage,
         getConversation,
         getNumberOfUnreadMessages,
-      startConversation,}}
+        startConversation,
+      }}
     >
       {children}
     </ChatContext.Provider>
