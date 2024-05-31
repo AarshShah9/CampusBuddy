@@ -10,18 +10,21 @@ import { NavigationContextProvider } from "~/contexts/navigationContext";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
-    const { theme } = useThemeContext();
+  const { theme } = useThemeContext();
 
-    return (
-        <NavigationContainer theme={theme}>
-            <StatusBar style="auto" />
-            <NavigationContextProvider>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="SplashScreen" component={SplashScreen} />
-                    <Stack.Screen name="AuthenticationGroup" component={AuthenticationGroup} />
-                    <Stack.Screen name="LandingGroup" component={LandingGroup} />
-                </Stack.Navigator>
-            </NavigationContextProvider>
-        </NavigationContainer>
-    );
+  return (
+    <NavigationContainer theme={theme}>
+      <StatusBar style="auto" />
+      <NavigationContextProvider>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+          <Stack.Screen
+            name="AuthenticationGroup"
+            component={AuthenticationGroup}
+          />
+          <Stack.Screen name="LandingGroup" component={LandingGroup} />
+        </Stack.Navigator>
+      </NavigationContextProvider>
+    </NavigationContainer>
+  );
 }

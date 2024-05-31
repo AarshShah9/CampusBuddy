@@ -1,4 +1,9 @@
-import MapView, { LatLng, Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from "react-native-maps";
+import MapView, {
+  LatLng,
+  Marker,
+  PROVIDER_GOOGLE,
+  PROVIDER_DEFAULT,
+} from "react-native-maps";
 import { useCallback } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { EventMapItem } from "~/types/Events";
@@ -52,7 +57,9 @@ const Map = ({
   return (
     <View style={styles.container}>
       <MapView
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+        provider={
+          Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+        }
         style={{ flex: 1 }}
         initialRegion={{
           latitude: currentLocation.latitude,
