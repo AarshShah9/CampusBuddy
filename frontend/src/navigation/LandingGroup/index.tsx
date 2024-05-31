@@ -11,24 +11,27 @@ import { PUBLISHABLE_KEY } from "@env";
 const Stack = createNativeStackNavigator();
 
 export default function LandingGroup() {
-    return (
-        <ReactQueryProvider>
-            <StripeProvider
-                publishableKey={PUBLISHABLE_KEY}
-                merchantIdentifier="merchant.com.campusbuddy" // todo
-                urlScheme="your-url-scheme" // todo
-            >
-                <BottomSheetModalProvider>
-                    <ChatsContextProvider>
-                        <ChatContextProvider>
-                            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                                <Stack.Screen name="BottomTabsGroup" component={BottomTabsGroup} />
-                                <Stack.Screen name="Messages" component={MessagesGroup} />
-                            </Stack.Navigator>
-                        </ChatContextProvider>
-                    </ChatsContextProvider>
-                </BottomSheetModalProvider>
-            </StripeProvider>
-        </ReactQueryProvider>
-    );
+  return (
+    <ReactQueryProvider>
+      <StripeProvider
+        publishableKey={PUBLISHABLE_KEY}
+        merchantIdentifier="merchant.com.campusbuddy" // todo
+        urlScheme="your-url-scheme" // todo
+      >
+        <BottomSheetModalProvider>
+          <ChatsContextProvider>
+            <ChatContextProvider>
+              <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen
+                  name="BottomTabsGroup"
+                  component={BottomTabsGroup}
+                />
+                <Stack.Screen name="Messages" component={MessagesGroup} />
+              </Stack.Navigator>
+            </ChatContextProvider>
+          </ChatsContextProvider>
+        </BottomSheetModalProvider>
+      </StripeProvider>
+    </ReactQueryProvider>
+  );
 }

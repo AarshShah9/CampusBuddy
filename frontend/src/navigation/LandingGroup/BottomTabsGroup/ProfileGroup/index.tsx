@@ -16,7 +16,6 @@ import ReusableStackScreens from "~/components/ReusableStackScreens";
 import Interests from "~/screens/Interests";
 
 export default function ProfileGroup() {
-
   return (
     <ProfileContextProvider>
       <ReusableStackScreens

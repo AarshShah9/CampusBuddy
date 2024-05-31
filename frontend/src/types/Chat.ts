@@ -52,10 +52,10 @@ export type FirestoreConversationObject = {
 export type UnopenedConversation = { status: "not-opened" };
 
 export type OpenedConversation = {
-    status: "opened";
-    messagesQuery: Query<MessageObject, FirestoreMessageObject>;
-    listener: Unsubscribe;
-    messages: MessageObject[];
-    endReached: boolean;
-    firstTime: boolean;
+  status: "opened";
+  messagesQuery: Query<MessageObject, FirestoreMessageObject>;
+  listener: Unsubscribe;
+  messages: MessageObject[];
+  endReached: boolean;
+  firstTime: boolean;
 };

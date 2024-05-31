@@ -1,22 +1,27 @@
-export type DuplicatedScreen = 
-  "UserProfile" |
-  "EventDetails" |
-  "LookingForDetails" |
-  "LookingForCommentsScreen" |
-  "MarketPlaceDetail" |
-  "Attendees" |
-  "MapDetails" |
-  "OrganizationProfile" |
-  "EditEvent" |
-  "QRCodeScanner" |
-  "EventPricing" |
-  "EventPayment";
+export type DuplicatedScreen =
+  | "UserProfile"
+  | "EventDetails"
+  | "LookingForDetails"
+  | "LookingForCommentsScreen"
+  | "MarketPlaceDetail"
+  | "Attendees"
+  | "MapDetails"
+  | "OrganizationProfile"
+  | "EditEvent"
+  | "QRCodeScanner"
+  | "EventPricing"
+  | "EventPayment";
 
-export type CurrentMainTab = "Home" | "Search" | "CreatePost" | "Maps" | "Profile";
+export type CurrentMainTab =
+  | "Home"
+  | "Search"
+  | "CreatePost"
+  | "Maps"
+  | "Profile";
 
 type RouteNameProp = {
-  routeName: string
-}
+  routeName: string;
+};
 
 type UserProfileRoute = {
   page: "UserProfile";
@@ -105,7 +110,7 @@ type OrganizationSettingsRoute = {
   page: "OrganizationSettings";
 };
 
-type EditEventRoute =  {
+type EditEventRoute = {
   page: "EditEvent";
 };
 
