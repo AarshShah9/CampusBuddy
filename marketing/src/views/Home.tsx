@@ -11,6 +11,7 @@ import Feature from "../sections/Feature";
 const navigation = [
   { name: "Our Clients", href: "#logo-cloud" },
   { name: "Team", href: "#team" },
+  { name: "Features", href: "#features"}
 ];
 
 export default function Home() {
@@ -120,7 +121,10 @@ export default function Home() {
       </header>
       <MainLanding />
       <UVPSection/>
-      <Feature/>
+      <div id="features">
+        <Feature/>
+      </div>
+      
       {/* <div id="logo-cloud">
         <LogoCloud />
       </div> */}
