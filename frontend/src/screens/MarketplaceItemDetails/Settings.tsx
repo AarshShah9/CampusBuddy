@@ -7,19 +7,19 @@ import React, { useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
-import useNavigationContext from "~/hooks/useNavigationContext";
-import useEventsContext from "~/hooks/useEventsContext";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteItem } from "~/lib/apiFunctions/Profile";
-import useAuthContext from "~/hooks/useAuthContext";
+import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
-export default function ItemSettings() {
+type Props = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModalMethods>;
+  self: boolean;
+  deleteHandler: () => void;
+};
+export default function Settings({
+  bottomSheetModalRef,
+  self,
+  deleteHandler,
+}: Props) {
   const { theme } = useThemeContext();
-  const { navigateBack } = useNavigationContext();
-  const queryClient = useQueryClient();
-
-  const { bottomSheetItemModalRef, item, closeModal } = useEventsContext();
-  const { user } = useAuthContext();
 
   const Backdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -28,25 +28,6 @@ export default function ItemSettings() {
     [],
   );
 
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteItem(item?.id!),
-    onSuccess: () => {
-      closeModal();
-      navigateBack();
-      Alert.alert("Success", "Item deleted successfully.");
-      queryClient.invalidateQueries({
-        queryKey: ["search-marketplace-items"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["user-market", user?.id],
-      });
-    },
-    onError: (err) => {
-      Alert.alert("Error", err.message);
-    },
-  });
-
-  const self = item?.self;
   const isPublic = true;
   const snapPoints = self ? ["50%"] : ["35%"];
 
@@ -74,9 +55,7 @@ export default function ItemSettings() {
             },
             {
               text: "Delete",
-              onPress: () => {
-                deleteMutation.mutate();
-              },
+              onPress: deleteHandler,
             },
           ],
         );
@@ -117,7 +96,7 @@ export default function ItemSettings() {
   return (
     <BottomSheetModal
       enablePanDownToClose={true}
-      ref={bottomSheetItemModalRef}
+      ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
       backdropComponent={Backdrop}

@@ -173,7 +173,9 @@ const allowedEndpoints = [
   "/api/upload",
   "/api/user/verify",
   "/api/user/token", // TODO - Remove this endpoint - for testing only
+  "/api/user/getUserNameById/:id",
   "/api/notification/storePushToken",
+  "/api/notification/sendChatNotification",
   "/api/search/",
   "/api/tags/getAllTags",
 ] as const;
@@ -208,6 +210,7 @@ export type IdRequiredEndPoints =
   | "/api/profile/orgEvents/:id"
   | "/api/events/public/:id"
   | "/api/post/:id/toggleAttendance"
+  | "/api/user/getUserNameById/:id"
   | "/api/profile/items/:id";
 
 export type IdAndBodyRequiredEndPoints =

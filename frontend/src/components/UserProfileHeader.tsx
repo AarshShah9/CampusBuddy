@@ -10,9 +10,12 @@ import { getUserProfile } from "~/lib/apiFunctions/Profile";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { useCallback } from "react";
 import useNavigationContext from "~/hooks/useNavigationContext";
+import useAuthContext from "~/hooks/useAuthContext";
 
 export default function UserProfileHeader({ id }: { id: string }) {
   const { theme } = useThemeContext();
+
+  const { user } = useAuthContext();
 
   const { data: profileData } = useQuery<UserProfileHeaderType>({
     queryKey: ["profile", id],
@@ -22,7 +25,7 @@ export default function UserProfileHeader({ id }: { id: string }) {
   const { navigateTo } = useNavigationContext();
 
   const goToMessages = useCallback(() => {
-    navigateTo({ page: "Messages" });
+    navigateTo({ page: "ChatScreen", userId: id });
   }, []);
 
   return (
@@ -76,13 +79,15 @@ export default function UserProfileHeader({ id }: { id: string }) {
             </Text>
             <Text style={styles.profileInfoItem}>Following</Text>
           </View>
-          <TouchableOpacity onPress={goToMessages}>
-            <MaterialCommunityIcons
-              name="chat-outline"
-              size={28}
-              color={theme.colors.primary}
-            />
-          </TouchableOpacity>
+          {id !== user?.id && (
+            <TouchableOpacity onPress={goToMessages}>
+              <MaterialCommunityIcons
+                name="chat-outline"
+                size={28}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.lowerSection}>
           <Text style={{ fontWeight: "bold" }}>{profileData?.user.name}</Text>

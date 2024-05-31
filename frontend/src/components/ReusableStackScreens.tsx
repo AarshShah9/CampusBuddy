@@ -1,8 +1,8 @@
 import ProfilePage from "~/screens/ProfilePage";
 import EventDetails from "~/screens/EventDetails";
-import LookingForDetails from "~/screens/LookingForDetails";
+import PostDetails from "~/screens/PostDetails";
 import LookingForCommentsScreen from "~/screens/LookingForCommentsScreen";
-import MarketPlaceDetail from "~/screens/MarketPlaceDetail";
+import MarketplaceItemDetails from "~/screens/MarketplaceItemDetails";
 import Attendees from "~/screens/Attendees";
 import MapDetails from "~/screens/MapDetails";
 import CreateEvent from "~/screens/CreateEvent";
@@ -88,7 +88,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
       />
       <Stack.Screen
         name={`LookingForDetails-${name}`}
-        component={LookingForDetails}
+        component={PostDetails}
         options={{
           headerStyle: { backgroundColor: theme.colors.primary },
           headerTitle: "",
@@ -110,7 +110,7 @@ function ReusableStackScreens({ name, component, options }: Props) {
       />
       <Stack.Screen
         name={`MarketPlaceDetail-${name}`}
-        component={MarketPlaceDetail}
+        component={MarketplaceItemDetails}
         options={{
           headerStyle: { backgroundColor: theme.colors.primary },
           headerTitle: "",

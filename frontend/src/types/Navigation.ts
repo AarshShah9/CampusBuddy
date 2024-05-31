@@ -31,8 +31,8 @@ type UserProfileRoute = {
 type ChatScreenRoute = {
   page: "ChatScreen";
   userId: string;
-  userName: string;
-  icon: string;
+  userName?: string;
+  icon?: string | null | undefined;
 };
 
 type EventDetailsRoute = {

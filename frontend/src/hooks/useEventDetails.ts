@@ -10,7 +10,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useCallback, useRef } from "react";
 import { Alert } from "react-native";
-import useNavigationContext from "~/hooks/useNavigationContext";
 
 export default function useEventDetails(id: string) {
   const {

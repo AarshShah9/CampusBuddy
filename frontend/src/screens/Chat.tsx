@@ -18,21 +18,37 @@ import { ActivityIndicator } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import useChatContext from "~/hooks/useChatContext";
 import useAppContext from "~/hooks/useAppContext";
+import { OpenedConversation } from "~/types/Chat";
 
-function ListArea({ otherEndUserId }: { otherEndUserId: string }) {
-  const { user, fetchMoreMessages, getConversation, updateMessagesReadStatus } =
+function UnOpenedConversationComponent({
+  otherEndUserId,
+}: {
+  otherEndUserId: string;
+}) {
+  const { startConversation } = useChatContext();
+
+  useEffect(() => {
+    startConversation(otherEndUserId);
+  }, []);
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <ActivityIndicator size={"large"} />
+    </View>
+  );
+}
+
+function OpenedConversationComponent({
+  conversation,
+  otherEndUserId,
+}: {
+  conversation: OpenedConversation;
+  otherEndUserId: string;
+}) {
+  const { user, fetchMoreMessages, updateMessagesReadStatus } =
     useChatContext();
 
   const { id: currentUserId } = user;
-
-  const conversation = getConversation(otherEndUserId);
-
-  if (conversation.status === "not-opened")
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size={"large"} />
-      </View>
-    );
 
   const { messages } = conversation;
 
@@ -88,6 +104,22 @@ function ListArea({ otherEndUserId }: { otherEndUserId: string }) {
         />
       </View>
     </View>
+  );
+}
+
+function ListArea({ otherEndUserId }: { otherEndUserId: string }) {
+  const { getConversation } = useChatContext();
+
+  const conversation = getConversation(otherEndUserId);
+
+  if (!conversation || conversation.status === "not-opened")
+    return <UnOpenedConversationComponent otherEndUserId={otherEndUserId} />;
+
+  return (
+    <OpenedConversationComponent
+      conversation={conversation}
+      otherEndUserId={otherEndUserId}
+    />
   );
 }
 
@@ -166,6 +198,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   messagesArea: {
     flex: 1,
+    paddingHorizontal: 10,
   },
   typingArea: {
     paddingTop: 6,

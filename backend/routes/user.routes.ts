@@ -22,6 +22,7 @@ import {
   testFirebaseToken,
   resetPasswordSendOTP,
   resetPasswordChangePassword,
+  getUserNameById,
 } from "../controllers/user.controller";
 import { verifyAuthentication } from "../middleware/verifyAuth";
 import { upload } from "../utils/S3Uploader";
@@ -55,5 +56,6 @@ router.post(
   uploadProfilePic,
 );
 router.post("/deleteProfilePicture", verifyAuthentication, removeProfilePic);
+router.get("/getUserNameById/:id", verifyAuthentication, getUserNameById);
 
 export default router;

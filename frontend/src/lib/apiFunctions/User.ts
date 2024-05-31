@@ -1,5 +1,7 @@
 //import axios from 'axios'
 
+import { CBRequest } from "../CBRequest";
+
 const mockDatabaseData = {
   Users: [
     {
@@ -80,7 +82,9 @@ const mockDatabaseData = {
   ],
 };
 
-export const getUserDataApi = async (id: string) => {
-  //let res = await axios.get('') fetch user data end point as UserDataType
-  return mockDatabaseData.Users.find((user) => user.id === id);
-};
+export async function getUserDataApi(id: string) {
+  const { body } = await CBRequest("GET", "/api/user/getUserNameById/:id", {
+    params: { id },
+  });
+  return { name: body.name, icon: body.picture };
+}

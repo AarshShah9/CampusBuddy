@@ -16,18 +16,22 @@ import {
   or,
   onSnapshot,
   and,
-  Query,
+
   startAfter,
-  Unsubscribe,
+
   updateDoc,
   doc,
   serverTimestamp,
   addDoc,
   Timestamp,
 } from "firebase/firestore";
-import { FirestoreMessageObject, MessageObject } from "~/types/Chat";
+import { OpenedConversation, UnopenedConversation } from "~/types/Chat";
 import { UserDataType } from "~/types/User";
-import { getSortedArray, initialNumberOfMessages } from "~/lib/helperFunctions";
+import {
+  getSortedArray,
+  initialNumberOfMessages,
+  getSortedKey,
+} from "~/lib/helperFunctions";
 import useChatsContext from "~/hooks/useChatsContext";
 import {
   conversationConverter,
@@ -35,9 +39,7 @@ import {
   messageConverter,
 } from "~/lib/firestoreConfig";
 import usePushNotifications from "~/hooks/usePushNotifications";
-
-const getSortedKey = (arg1: string, arg2: string) =>
-  getSortedArray(arg1, arg2).join("");
+import { CBRequest } from "~/lib/CBRequest";
 
 const currentIsFirstParticipant = (
   currentUserId: string,
@@ -67,8 +69,9 @@ type contextObject = {
   createNewMessage: (otherEndUserId: string, message: string) => Promise<void>;
   getConversation: (
     otherEndUserId: string,
-  ) => OpenedConversation | UnopenedConversation;
+  ) => OpenedConversation | UnopenedConversation | undefined;
   updateMessagesReadStatus: (arg: string) => void;
+  startConversation: (otherEndUserId: string) => Promise<void>;
   getNumberOfUnreadMessages: (
     arg1: string,
     arg2: { firstParticipant: number; secondParticipant: number },
@@ -78,7 +81,8 @@ const ChatContext = createContext<contextObject | null>(null);
 
 export const ChatContextProvider = ({ children }: PropsWithChildren) => {
   // Getting the user from chats context since it wraps this context
-  const { user, conversations, conversationsRef } = useChatsContext();
+  const { user, conversations, conversationsRef, createNewEmptyConversation } =
+    useChatsContext();
 
   // An array of strings which represents conversations, for example: ['user1-user2', 'user2-user5']
   const conversationPairs = conversations.map((conv) =>
@@ -244,10 +248,18 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     conversationKey
                   ] as OpenedConversation;
 
-                  if (!oldConversationObject.firstTime) {
-                    sendLocalNotification({
-                      title: `New Mesage from ${otherEndUserId}`,
-                      body: `You have a new message`,
+                  const items = snapshot
+                    .docChanges()
+                    .filter((item) => item.type === "added")
+                    .map((item) => item.doc.data());if (!oldConversationObject.firstTime&&
+                    !items.some((item) => item.senderId === currentUserId)
+                  ) {
+                    CBRequest("GET", "/api/user/getUserNameById/:id", {
+                      params: { id: otherEndUserId },
+                    }).then((res: any) => {
+                      if (!!res.body.name) {sendLocalNotification({
+                      title: res.body.name,
+                      body: items[0].message.content,
                     }).catch((error) =>
                       console.log(
                         "An error occured when trying to send a notification:\n",
@@ -255,11 +267,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                       ),
                     );
                   }
-
-                  const items = snapshot
-                    .docChanges()
-                    .filter((item) => item.type === "added")
-                    .map((item) => item.doc.data());
+});
+                  }
 
                   newConversationsCache[conversationKey] = {
                     status: "opened",
@@ -290,12 +299,38 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     ],
   );
 
+  type IsPending = { state: true; otherEndUserId: string };
+  type IsNotPending = { state: false };
+  const [pendingConversationOpen, setPendingConversationOpen] = useState<
+    IsPending | IsNotPending
+  >({
+    state: false,
+  });
+
+  useEffect(() => {
+    if (pendingConversationOpen.state) {
+      openConversation(pendingConversationOpen.otherEndUserId);
+      setPendingConversationOpen({ state: false });
+    }
+  }, [conversationsCache, pendingConversationOpen]);
+
+  const startConversation = useCallback(
+    async (otherEndUserId: string) => {
+      await createNewEmptyConversation(otherEndUserId);
+      setPendingConversationOpen({ state: true, otherEndUserId });
+    },
+    [openConversation, createNewEmptyConversation],
+  );
+
   /**
    * Function to retrieve a conversation cache entry
    */
   const getConversation = useCallback(
     (otherEndUserId: string) => {
-      return conversationsCache[getSortedKey(currentUserId, otherEndUserId)];
+      return conversationsCache[getSortedKey(currentUserId, otherEndUserId)] as
+        | OpenedConversation
+        | UnopenedConversation
+        | undefined;
     },
     [conversationsCache],
   );
@@ -374,9 +409,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             updatedAt: timestamp,
           });
       }
-      //await /api/notifyUser?userId=${otherEndUserId}
+      await CBRequest("POST", "/api/notification/sendChatNotification", {
+        body: { recipientId: otherEndUserId, message },
+    });
     },
-    [conversations],
+    [currentUserId,conversations],
   );
 
   /**
@@ -482,7 +519,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         createNewMessage,
         getConversation,
         getNumberOfUnreadMessages,
-      }}
+      startConversation,}}
     >
       {children}
     </ChatContext.Provider>

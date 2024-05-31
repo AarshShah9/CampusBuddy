@@ -15,11 +15,16 @@ import {
   CollectionReference,
   DocumentData,
   onSnapshot,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { ConversationObject } from "~/types/Chat";
 import useAuthContext from "~/hooks/useAuthContext";
 import { UserDataType } from "~/types/User";
-import { initialNumberOfConversations } from "~/lib/helperFunctions";
+import {
+  getSortedKey,
+  initialNumberOfConversations,
+} from "~/lib/helperFunctions";
 import { conversationConverter, firestore } from "~/lib/firestoreConfig";
 
 type contextObject = {
@@ -27,6 +32,7 @@ type contextObject = {
   conversationsRef: CollectionReference<DocumentData, DocumentData>;
   conversations: ConversationObject[];
   fetchMoreConversations: () => void;
+  createNewEmptyConversation: (otherEndUserId: string) => Promise<void>;
   conversationsAreLoading: boolean;
 };
 const ChatsContext = createContext<contextObject | null>(null);
@@ -85,6 +91,32 @@ function AuthenticatedProvider({ children, user }: Props) {
 
   const [conversations, setConversations] = useState<ConversationObject[]>([]);
 
+  const createNewEmptyConversation = useCallback(
+    async (otherEndUserId: string) => {
+      const exists = conversations.find((conv) => {
+        return (
+          getSortedKey(conv.participants[0], conv.participants[1]) ===
+          getSortedKey(currentUserId, otherEndUserId)
+        );
+      });
+      if (exists) return;
+      // Only create conversation if it doesn't exist
+      const timeStamp = serverTimestamp();
+      await addDoc(conversationsRef, {
+        id: "",
+        lastMessage: "",
+        participants: [currentUserId, otherEndUserId],
+        unreadMessages: {
+          firstParticipant: 0,
+          secondParticipant: 0,
+        },
+        createdAt: timeStamp,
+        updatedAt: timeStamp,
+      });
+    },
+    [conversations, conversationsRef, currentUserId],
+  );
+
   // A useEffect to set up a new query listener when the number of docs needed changes
   useEffect(() => {
     let subscriber = onSnapshot(
@@ -110,6 +142,7 @@ function AuthenticatedProvider({ children, user }: Props) {
         conversations,
         conversationsAreLoading,
         fetchMoreConversations,
+        createNewEmptyConversation,
       }}
     >
       {children}

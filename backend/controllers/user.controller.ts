@@ -12,6 +12,7 @@ import {
   UserUpdateType,
   resetPasswordSchema,
   resetPasswordChangePasswordSchema,
+  IdSchema,
 } from "../../shared/zodSchemas";
 import prisma from "../prisma/client";
 import { AppError, AppErrorName } from "../utils/AppError";
@@ -1614,6 +1615,37 @@ export const resetPasswordChangePassword = async (
 
     res.status(200).json({
       message: "Password reset successfully",
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getUserNameById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const id = IdParamSchema.parse(req.params).id;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new AppError(
+        AppErrorName.NOT_FOUND_ERROR,
+        "User not found",
+        404,
+        true,
+      );
+    }
+
+    res.status(200).json({
+      message: "Found User",
+      body: {
+        name: `${user.firstName} ${user.lastName}`,
+        picture: user.profilePic,
+      },
     });
   } catch (error: any) {
     next(error);

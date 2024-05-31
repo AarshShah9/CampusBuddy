@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         fontSize: 18,
         flex: 0.98,
+        color: "white"
     },
     chatListArea: {
         flex: 1,

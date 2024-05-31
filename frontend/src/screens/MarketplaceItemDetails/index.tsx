@@ -12,21 +12,19 @@ import useThemeContext from "~/hooks/useThemeContext";
 import { Button } from "react-native-paper";
 import LocationChip from "~/components/LocationChip";
 import MapComponentSmall from "~/components/MapComponentSmall";
-import React, { useCallback, useLayoutEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useCallback, useLayoutEffect, useState } from "react";
 import {
   NavigationProp,
   ParamListBase,
   useRoute,
 } from "@react-navigation/native";
-import { getMarketPlaceItem } from "~/lib/apiFunctions/Items";
-import { MarketPlaceItemResponse } from "~/types/MarketPlaceItem";
 import Modal from "react-native-modal";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import { Entypo } from "@expo/vector-icons";
-import useEventsContext from "~/hooks/useEventsContext";
+import { useMarketplaceItemDetails } from "~/hooks/useMarketplaceItemDetails";
+import Settings from "./Settings";
 
 // Image Component of marketplace detail
 
@@ -319,34 +317,29 @@ const ItemDescription = (props: ItemDetail) => {
 /**
  * This component is responsible for loading market details based on passed ID.
  * */
-export default function MarketPlaceDetail({
+export default function MarketplaceItemDetail({
   navigation,
 }: {
   navigation: NavigationProp<ParamListBase>;
 }) {
   const { theme } = useThemeContext();
-  const { openItemModal } = useEventsContext();
 
   const {
     params: { id },
   } = useRoute<any>();
 
-  const { data: marketplaceData } = useQuery<MarketPlaceItemResponse>({
-    queryKey: ["marketplace-detail", id],
-    queryFn: () => getMarketPlaceItem(id),
-  });
+  const { marketplaceData, openModal, bottomSheetModalRef, deleteHandler } =
+    useMarketplaceItemDetails(id);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => openItemModal(id, marketplaceData?.self!)}
-        >
+        <TouchableOpacity onPress={openModal}>
           <Entypo name="dots-three-horizontal" size={24} color="white" />
         </TouchableOpacity>
       ),
     });
-  }, [navigation, id, marketplaceData?.self]);
+  }, [navigation, id]);
 
   if (marketplaceData && marketplaceData.isFlagged) {
     Alert.alert(
@@ -356,12 +349,19 @@ export default function MarketPlaceDetail({
   }
 
   return (
-    <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ImageGallery images={marketplaceData?.images} />
-        {marketplaceData && <ItemDescription {...marketplaceData} />}
-      </ScrollView>
-    </View>
+    <>
+      <View style={{ height: "100%", backgroundColor: theme.colors.tertiary }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <ImageGallery images={marketplaceData?.images} />
+          {marketplaceData && <ItemDescription {...marketplaceData} />}
+        </ScrollView>
+      </View>
+      <Settings
+        bottomSheetModalRef={bottomSheetModalRef}
+        self={!!marketplaceData?.self}
+        deleteHandler={deleteHandler}
+      />
+    </>
   );
 }
 

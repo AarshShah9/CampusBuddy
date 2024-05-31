@@ -8,7 +8,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
-import useAuthContext from "~/hooks/useAuthContext";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { EventDetailsType } from ".";
 

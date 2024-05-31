@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { ThemedText } from "~/components/ThemedComponents";
+import { MaterialIcons } from "@expo/vector-icons";
 import useChatContext from "~/hooks/useChatContext";
 import useNavigationContext from "~/hooks/useNavigationContext";
 import useSearchBarContext from "~/hooks/useSearchBarContext";
@@ -39,9 +40,12 @@ export default function ConversationItem({
   const { navigateTo } = useNavigationContext();
   const { theme } = useThemeContext();
 
-  const [fetchedData, setFetchedData] = useState({
+  const [fetchedData, setFetchedData] = useState<{
+    userName: string;
+    icon: string | null;
+  }>({
     userName: "",
-    icon: "#",
+    icon: null,
   });
 
   const { userName, icon } = fetchedData;
@@ -73,7 +77,13 @@ export default function ConversationItem({
     >
       <View style={styles.chatListItemContainer}>
         <View style={styles.chatListItemPictureArea}>
-          <Image style={styles.userIcon} source={{ uri: icon }} />
+          {icon ? (
+            <Image style={styles.userIcon} source={{ uri: icon }} />
+          ) : (
+            <View style={styles.userIcon}>
+              <MaterialIcons name="person" size={40} color="#333" />
+            </View>
+          )}
         </View>
         <View
           style={[
@@ -129,6 +139,9 @@ const styles = StyleSheet.create({
     width: 57,
     height: 57,
     borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "lightgrey",
   },
   chatListItemMessageArea: {
     paddingTop: 10,
