@@ -124,7 +124,9 @@ export default function Home() {
       <div id="features">
         <Feature/>
       </div>
-      
+      <div>
+        <Team/>
+      </div>
       {/* <div id="logo-cloud">
         <LogoCloud />
       </div> */}
