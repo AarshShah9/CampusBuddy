@@ -18,7 +18,9 @@ export const SearchBarContextProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   return (
-    <SearchBarContext.Provider value={{ filterWord, setFilterWord, clearSearchArea }}>
+    <SearchBarContext.Provider
+      value={{ filterWord, setFilterWord, clearSearchArea }}
+    >
       {children}
     </SearchBarContext.Provider>
   );

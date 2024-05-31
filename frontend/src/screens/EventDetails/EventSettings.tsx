@@ -19,7 +19,7 @@ type Props = {
   eventData: EventDetailsType | undefined;
   deleteMutate: () => void;
   flipPublicMutate: () => void;
-}
+};
 export default function EventSettings({
   bottomSheetModalRef,
   closeModal,

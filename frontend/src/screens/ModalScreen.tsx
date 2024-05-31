@@ -5,7 +5,9 @@ import { ThemedText } from "~/components/ThemedComponents";
 
 export default function ModalScreen() {
   const { setOptions: setNavigationOptions } = useNavigation<any>();
-  const { params: { type } } = useRoute<any>();
+  const {
+    params: { type },
+  } = useRoute<any>();
 
   useLayoutEffect(() => {
     setNavigationOptions({

@@ -44,7 +44,10 @@ export default function Attendees() {
       }}
     >
       <View style={[styles.headerContainer]}>
-        <TouchableOpacity style={{ marginLeft: -15 }} onPress={() => navigateBack()}>
+        <TouchableOpacity
+          style={{ marginLeft: -15 }}
+          onPress={() => navigateBack()}
+        >
           {/*TODO MAKE the back button aligned*/}
           <Feather name="chevron-left" size={32} color="white" />
         </TouchableOpacity>

@@ -7,57 +7,57 @@ import Map from "~/components/Map";
 import { useCallback, useLayoutEffect } from "react";
 
 export default function MapDetails() {
-    let {
-        params: { eventData, itemData },
-    } = useRoute<any>();
-    const { theme } = useThemeContext();
-    const { setOptions: setNavigationOptions } = useNavigation<any>();
+  let {
+    params: { eventData, itemData },
+  } = useRoute<any>();
+  const { theme } = useThemeContext();
+  const { setOptions: setNavigationOptions } = useNavigation<any>();
 
-    let data = eventData || itemData;
+  let data = eventData || itemData;
 
-    const openDirections = useCallback(() => {
-        const latitude = data[0].latitude;
-        const longitude = data[0].longitude;
-        const scheme = Platform.select({
-            ios: "maps:0,0?q=",
-            android: "geo:0,0?q=",
-        });
-        const label = "Location";
-        const url = Platform.select({
-            ios: `${scheme}${label}@${latitude},${longitude}`,
-            android: `${scheme}${latitude},${longitude}(${label})`,
-        });
+  const openDirections = useCallback(() => {
+    const latitude = data[0].latitude;
+    const longitude = data[0].longitude;
+    const scheme = Platform.select({
+      ios: "maps:0,0?q=",
+      android: "geo:0,0?q=",
+    });
+    const label = "Location";
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latitude},${longitude}`,
+      android: `${scheme}${latitude},${longitude}(${label})`,
+    });
 
-        Linking.openURL(url!);
-    }, [data]);
+    Linking.openURL(url!);
+  }, [data]);
 
-    const MapDetailsRightHeader = useCallback(() => {
-        return (
-            <TouchableOpacity onPress={openDirections}>
-                <AntDesign name="enviromento" size={24} color="white" />
-            </TouchableOpacity>
-        )
-    }, [openDirections])
-
-    useLayoutEffect(() => {
-        setNavigationOptions({
-            headerRight: MapDetailsRightHeader
-        })
-    }, [])
-
+  const MapDetailsRightHeader = useCallback(() => {
     return (
-        <MainContainer color={theme.colors.primary}>
-            <Map
-                currentLocation={{
-                    latitude: data[0].latitude!,
-                    longitude: data[0].longitude!,
-                }}
-                events={eventData}
-                items={itemData}
-                showInfo={true}
-            />
-        </MainContainer>
+      <TouchableOpacity onPress={openDirections}>
+        <AntDesign name="enviromento" size={24} color="white" />
+      </TouchableOpacity>
     );
+  }, [openDirections]);
+
+  useLayoutEffect(() => {
+    setNavigationOptions({
+      headerRight: MapDetailsRightHeader,
+    });
+  }, []);
+
+  return (
+    <MainContainer color={theme.colors.primary}>
+      <Map
+        currentLocation={{
+          latitude: data[0].latitude!,
+          longitude: data[0].longitude!,
+        }}
+        events={eventData}
+        items={itemData}
+        showInfo={true}
+      />
+    </MainContainer>
+  );
 }
 
 // prettier-ignore

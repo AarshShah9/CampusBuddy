@@ -1,10 +1,10 @@
 import {
-    View,
-    StyleSheet,
-    TextInput,
-    TouchableWithoutFeedback,
-    Pressable,
-    TouchableOpacity,
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableWithoutFeedback,
+  Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import useThemeContext from "~/hooks/useThemeContext";
@@ -20,108 +20,104 @@ import { SearchBarContextProvider } from "~/contexts/searchBarContext";
 import useAppContext from "~/hooks/useAppContext";
 
 const CoversationsArea = () => {
-    const {
-        conversations,
-        user,
-        fetchMoreConversations,
-        conversationsAreLoading,
-    } = useChatsContext();
-    const { id: currentUserId } = user;
+  const {
+    conversations,
+    user,
+    fetchMoreConversations,
+    conversationsAreLoading,
+  } = useChatsContext();
+  const { id: currentUserId } = user;
 
-    const [moreDataFetchingAllowed, setMoreDataFetchingAllowed] = useState(false);
-    const allowMoreDataFetching = useCallback(() => {
-        setMoreDataFetchingAllowed(true);
-    }, []);
+  const [moreDataFetchingAllowed, setMoreDataFetchingAllowed] = useState(false);
+  const allowMoreDataFetching = useCallback(() => {
+    setMoreDataFetchingAllowed(true);
+  }, []);
 
-    const getMoreConversations = () => {
-        if (
-            moreDataFetchingAllowed &&
-            conversations.length >= initialNumberOfConversations
-        )
-            fetchMoreConversations();
-    };
+  const getMoreConversations = () => {
+    if (
+      moreDataFetchingAllowed &&
+      conversations.length >= initialNumberOfConversations
+    )
+      fetchMoreConversations();
+  };
 
-    return (
-        <View style={styles.chatListArea}>
-            <View style={{ flex: 1 }}>
-                <FlashList
-                    onScroll={allowMoreDataFetching}
-                    ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
-                    ListFooterComponent={() => (
-                        <ListLoader isLoading={conversationsAreLoading} />
-                    )}
-                    estimatedItemSize={40}
-                    data={conversations}
-                    renderItem={({ item }) => (
-                        <ConversationItem
-                            userId={item.participants.filter((id) => id !== currentUserId)[0]}
-                            lastMessage={item.lastMessage}
-                            timeUpdated={item.updatedAt}
-                            unreadMessages={item.unreadMessages}
-                        />
-                    )}
-                    onEndReached={getMoreConversations}
-                    onEndReachedThreshold={0}
-                />
-            </View>
-        </View>
-    );
+  return (
+    <View style={styles.chatListArea}>
+      <View style={{ flex: 1 }}>
+        <FlashList
+          onScroll={allowMoreDataFetching}
+          ListHeaderComponent={() => <View style={{ height: 10 }}></View>}
+          ListFooterComponent={() => (
+            <ListLoader isLoading={conversationsAreLoading} />
+          )}
+          estimatedItemSize={40}
+          data={conversations}
+          renderItem={({ item }) => (
+            <ConversationItem
+              userId={item.participants.filter((id) => id !== currentUserId)[0]}
+              lastMessage={item.lastMessage}
+              timeUpdated={item.updatedAt}
+              unreadMessages={item.unreadMessages}
+            />
+          )}
+          onEndReached={getMoreConversations}
+          onEndReachedThreshold={0}
+        />
+      </View>
+    </View>
+  );
 };
 
 const SearchArea = () => {
-    const { theme } = useThemeContext();
+  const { theme } = useThemeContext();
 
-    const { filterWord, setFilterWord, clearSearchArea } = useSearchBarContext();
+  const { filterWord, setFilterWord, clearSearchArea } = useSearchBarContext();
 
-    const { dismissKeyboard } = useAppContext();
+  const { dismissKeyboard } = useAppContext();
 
-    return (
-        <View
-            style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}
-        >
-            <View
-                style={[
-                    styles.searchBar,
-                    { backgroundColor: `${theme.colors.primary}` },
-                ]}
-            >
-                <TouchableOpacity onPress={dismissKeyboard}>
-                    <AntDesign name="search1" size={20} color={'white'} />
-                </TouchableOpacity>
-                <ThemedTextInput
-                    placeholder="Search Chats"
-                    placeholderTextColor={'white'}
-                    style={[styles.searchBarInput]}
-                    value={filterWord}
-                    onChangeText={(text) => setFilterWord(text)}
-                />
-                {filterWord !== "" && (
-                    <TouchableOpacity onPress={clearSearchArea}>
-                        <AntDesign
-                            name="closecircle"
-                            size={15}
-                            color={'white'}
-                        />
-                    </TouchableOpacity>
-                )}
-            </View>
-        </View>
-    );
+  return (
+    <View
+      style={[styles.searchArea, { borderBottomColor: theme.colors.backdrop }]}
+    >
+      <View
+        style={[
+          styles.searchBar,
+          { backgroundColor: `${theme.colors.primary}` },
+        ]}
+      >
+        <TouchableOpacity onPress={dismissKeyboard}>
+          <AntDesign name="search1" size={20} color={"white"} />
+        </TouchableOpacity>
+        <ThemedTextInput
+          placeholder="Search Chats"
+          placeholderTextColor={"white"}
+          style={[styles.searchBarInput]}
+          value={filterWord}
+          onChangeText={(text) => setFilterWord(text)}
+        />
+        {filterWord !== "" && (
+          <TouchableOpacity onPress={clearSearchArea}>
+            <AntDesign name="closecircle" size={15} color={"white"} />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
 };
 
 export default function Chats() {
-    const { dismissKeyboard } = useAppContext();
+  const { dismissKeyboard } = useAppContext();
 
-    return (
-        <TouchableWithoutFeedback onPress={dismissKeyboard}>
-            <View style={{ flex: 1 }}>
-                <SearchBarContextProvider>
-                    <SearchArea />
-                    <CoversationsArea />
-                </SearchBarContextProvider>
-            </View>
-        </TouchableWithoutFeedback>
-    );
+  return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={{ flex: 1 }}>
+        <SearchBarContextProvider>
+          <SearchArea />
+          <CoversationsArea />
+        </SearchBarContextProvider>
+      </View>
+    </TouchableWithoutFeedback>
+  );
 }
 
 // prettier-ignore
