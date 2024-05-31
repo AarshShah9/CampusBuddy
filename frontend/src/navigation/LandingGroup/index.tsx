@@ -20,17 +20,16 @@ export default function LandingGroup() {
       >
         <BottomSheetModalProvider>
           <ChatsContextProvider>
-              <ChatContextProvider>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                  <Stack.Screen
-                    name="BottomTabsGroup"
-                    component={BottomTabsGroup}
-
-                />  <Stack.Screen name="Messages" component={MessagesGroup} />
-                </Stack.Navigator>
-              </ChatContextProvider>
-            </ChatsContextProvider>
-
+            <ChatContextProvider>
+              <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen
+                  name="BottomTabsGroup"
+                  component={BottomTabsGroup}
+                />
+                <Stack.Screen name="Messages" component={MessagesGroup} />
+              </Stack.Navigator>
+            </ChatContextProvider>
+          </ChatsContextProvider>
         </BottomSheetModalProvider>
       </StripeProvider>
     </ReactQueryProvider>

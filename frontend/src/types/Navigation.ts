@@ -173,4 +173,5 @@ export type NavigableStacks =
   | "AuthenticationGroup"
   | "LandingGroup"
   | "ConfirmEmail"
-  | "OrgCreationConfirmation";
+  | "OrgCreationConfirmation"
+  | "Interests";

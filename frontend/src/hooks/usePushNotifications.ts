@@ -89,12 +89,19 @@ export default function usePushNotifications(
   const navigation = useNavigation<any>();
   const onTap = (notification: Notifications.NotificationResponse) => {
     onTapNotification?.(notification);
+    console.log("notification", notification.notification.request.content);
     if (notification.notification.request.content.data?.route) {
       switch (notification.notification.request.content.data.routeName) {
         case "EventDetails":
           navigation.navigate("EventDetails", {
             id: notification.notification.request.content.data.routeParams
               .eventId,
+          });
+          break;
+        case "Messages":
+          navigation.navigate("ChatScreen", {
+            userId:
+              notification.notification.request.content.data.routeParams.userId,
           });
           break;
         default:

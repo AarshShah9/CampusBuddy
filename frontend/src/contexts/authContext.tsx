@@ -51,7 +51,10 @@ type authContext = {
   organization?: OrganizationDataType;
   userType: UserType;
   registerUser: (arg: userRegistrationData) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<boolean | undefined>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ succeeded: boolean; user: UserDataType }>;
   logOut: () => Promise<void>;
   getInstitutions: () => Promise<any>;
   setUser: React.Dispatch<React.SetStateAction<UserDataType | undefined>>;
@@ -127,12 +130,18 @@ export const AuthContextProvider = ({
         setUser(loginRes.data);
       } else {
         Alert.alert("Error Logging In", "Something went wrong!");
-        return false;
+        return { succeeded: false, user: null };
       }
-      return true;
+      return {
+        succeeded: true,
+        user: loginRes.data,
+      };
     } catch (error) {
       Alert.alert("Error Logging In", "Something went wrong!");
-      return false;
+      return {
+        succeeded: false,
+        user: null,
+      };
     }
   }, []);
 
