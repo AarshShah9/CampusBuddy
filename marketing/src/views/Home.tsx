@@ -11,7 +11,7 @@ import Feature from "../sections/Feature";
 const navigation = [
   { name: "Our Clients", href: "#logo-cloud" },
   { name: "Team", href: "#team" },
-  { name: "Features", href: "#features"}
+  { name: "Features", href: "#features" },
 ];
 
 export default function Home() {
@@ -19,7 +19,10 @@ export default function Home() {
 
   return (
     <div className="bg-white">
-      <header style={{backgroundColor:"#3A86FF"}} className="absolute inset-x-0 top-0 z-50">
+      <header
+        style={{ backgroundColor: "#3A86FF" }}
+        className="absolute inset-x-0 top-0 z-50"
+      >
         <nav
           className="flex items-center justify-between p-6 lg:px-8"
           aria-label="Global"
@@ -120,12 +123,12 @@ export default function Home() {
         </Dialog>
       </header>
       <MainLanding />
-      <UVPSection/>
+      <UVPSection />
       <div id="features">
-        <Feature/>
+        <Feature />
       </div>
       <div>
-        <Team/>
+        <Team />
       </div>
       {/* <div id="logo-cloud">
         <LogoCloud />
