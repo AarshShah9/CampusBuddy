@@ -52,7 +52,7 @@ const people = [
 
 export default function Team() {
   return (
-    <div className="flex flex-col sm:mx-20 mb-10">
+    <div style={{ backgroundColor: "#F7F9FF"}} className="flex flex-col sm:px-20 pb-10">
       <div className="text-center p-10 sm:selection:px-52">
         <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-2 ">
           Meet our team
