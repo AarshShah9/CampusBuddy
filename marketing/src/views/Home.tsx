@@ -127,15 +127,12 @@ export default function Home() {
       <div id="features">
         <Feature />
       </div>
-      <div>
-        <Team />
-      </div>
       {/* <div id="logo-cloud">
         <LogoCloud />
       </div> */}
-      {/* <div id="team">
+      <div id="team">
         <Team />
-      </div> */}
+      </div>
 
       <SubscribeForUpdates />
     </div>

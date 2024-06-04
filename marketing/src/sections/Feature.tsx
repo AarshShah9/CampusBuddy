@@ -4,7 +4,7 @@ export default function Feature() {
       <div className="mt-8">
         <div
           style={{ backgroundColor: "#F7F9FF", width: "100%" }}
-          className="flex-col lg:flex-row flex p-14"
+          className="flex-col lg:flex-row flex sm:p-14  p-4 lg:text-left text-center"
         >
           <div
             style={{ width: "100%", justifyContent: "center", display: "flex" }}
@@ -25,10 +25,10 @@ export default function Feature() {
 
         <div
           style={{ width: "100%" }}
-          className=" flex-col lg:flex-row flex p-14"
+          className=" flex-col lg:flex-row flex sm:p-14 p-4 lg:text-left text-center"
         >
           <div className="mx-4 lg:w-11/12 ">
-            <h2 className="lg:text-3xl text-2xl  font-bold tracking-tight text-gray-900">
+            <h2 className="lg:text-3xl text-2xl font-bold tracking-tight text-gray-900">
               Looking For Something?{" "}
             </h2>
             <p className="lg:text-2xl text-sm leading-8 pb-2 text-gray-600 pt-4 ">
@@ -48,7 +48,7 @@ export default function Feature() {
         </div>
         <div
           style={{ backgroundColor: "#F7F9FF" }}
-          className=" flex-col lg:flex-row flex p-14"
+          className=" flex-col lg:flex-row flex sm:p-14 p-4 lg:text-left text-center"
         >
           <div
             style={{ width: "100%", justifyContent: "center", display: "flex" }}
@@ -66,7 +66,7 @@ export default function Feature() {
             </p>
           </div>
         </div>
-        <div className=" flex-col lg:flex-row flex p-14">
+        <div className=" flex-col lg:flex-row flex sm:p-14 p-4 lg:text-left text-center">
           <div className="mx-4 w-11/12 ">
             <h2 className="lg:text-3xl text-2xl  font-bold tracking-tight text-gray-900   ">
               Unlock Insights with Our Analytics
