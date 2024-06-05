@@ -177,6 +177,7 @@ const allowedEndpoints = [
   "/api/notification/storePushToken",
   "/api/notification/sendChatNotification",
   "/api/search/",
+  "/api/tags/getAllTags",
 ] as const;
 
 // Type alias for allowed endpoints to restrict function parameters to valid endpoints

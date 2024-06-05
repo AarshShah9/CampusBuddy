@@ -124,3 +124,11 @@ export const deleteItem = async (id: string) => {
     params: { id },
   });
 };
+
+export const getAllTags = async () => {
+  try {
+    return (await CBRequest("GET", "/api/tags/getAllTags")).data;
+  } catch (err) {
+    console.log(err);
+  }
+};

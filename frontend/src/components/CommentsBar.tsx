@@ -1,6 +1,5 @@
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
-import ReplyChip from "./ReplyChip";
 import { commentType } from "~/screens/LookingForCommentsScreen";
 import { generateImageURL } from "~/lib/CDNFunctions";
 import { convertUTCToTimeAndDate } from "~/lib/timeFunctions";

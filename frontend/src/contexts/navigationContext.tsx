@@ -50,12 +50,11 @@ export const NavigationContextProvider = ({
           screen: page,
           params,
         });
-      } else {
-        let pageToRoute: string = page;
-        if (duplicatedScreens.includes(page as any)) {
-          pageToRoute = `${page}-${currentMainTab}`;
-        }
-        navigate(pageToRoute, { ...params });
+      } else {let pageToRoute: string = page;
+      if (duplicatedScreens.includes(page as any)) {
+        pageToRoute = `${page}-${currentMainTab}`;
+      }
+      navigate(pageToRoute, { ...params });
       }
     },
     [navigate, currentMainTab],

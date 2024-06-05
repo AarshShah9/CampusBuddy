@@ -34,16 +34,16 @@ export default function ChatScreenHeader() {
 
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={styles.iconContainer}>
-        {icon ? (
-          <Image
-            style={{ width: "100%", height: "100%" }}
-            source={{ uri: icon }}
-          />
-        ) : (
+      <View
+        style={styles.iconContainer}>
+      {icon ? (
+        <Image
+          style={{ width: "100%", height: "100%" }}
+          source={{ uri: icon }}
+        />
+      ) : (
           <MaterialIcons name="person" size={30} color="#333" />
-        )}
-      </View>
+        )}</View>
       <ThemedText
         style={[styles.userName, { color: theme.colors.onSecondary }]}
       >

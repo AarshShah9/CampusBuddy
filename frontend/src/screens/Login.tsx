@@ -36,7 +36,7 @@ export default function Login() {
   const { theme } = useThemeContext();
   const { dismissKeyboard } = useAppContext();
   const { navigateTo, replaceStackWith } = useNavigationContext();
-  const { signIn } = useAuthContext();
+  const { signIn, user } = useAuthContext();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -72,9 +72,13 @@ export default function Login() {
       data.password = "hashed-password1238";
     }
 
-    signIn(data.email, data.password).then((succeeded) => {
-      if (succeeded) {
-        replaceStackWith("LandingGroup");
+    signIn(data.email, data.password).then((res) => {
+      if (res.succeeded) {
+        if (res.user.firstTimeLogin) {
+          replaceStackWith("Interests");
+        } else {
+          replaceStackWith("LandingGroup");
+        }
       }
     });
   }, []);

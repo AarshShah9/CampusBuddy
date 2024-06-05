@@ -150,6 +150,7 @@ export const sendChatNotification = async (
       select: {
         firstName: true,
         lastName: true,
+        id: true,
       },
     });
     if (!user) {
@@ -165,6 +166,13 @@ export const sendChatNotification = async (
     const pushNotification: SendPushNotificationProps = {
       title: `${user.firstName} ${user.lastName}`,
       body: message,
+      data: {
+        route: true,
+        routeName: "Messages",
+        routeParams: {
+          userId: recipientId,
+        },
+      },
     };
 
     // send the notification

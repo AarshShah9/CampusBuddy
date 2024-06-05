@@ -20,7 +20,6 @@ import { memo } from "react";
 import { TouchableOpacity, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import useNavigationContext from "~/hooks/useNavigationContext";
-import Interests from "~/screens/Interests";
 
 const MapDetailsLeftHeader = () => {
   const { navigateBack } = useNavigationContext();
@@ -53,17 +52,6 @@ function ReusableStackScreens({ name, component, options }: Props) {
   return (
     <Stack.Navigator>
       <Stack.Screen name={name} component={component} options={options} />
-      <Stack.Screen
-        name={`Interests-${name}`}
-        component={Interests}
-        options={{
-          title: "",
-          headerShown: true,
-          headerBackTitle: "Back",
-          headerTintColor: theme.colors.onSecondary,
-          headerStyle: { backgroundColor: theme.colors.primary },
-        }}
-      />
       <Stack.Screen
         name={`UserProfile-${name}`}
         component={ProfilePage}
