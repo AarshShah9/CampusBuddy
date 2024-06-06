@@ -7,11 +7,12 @@ export default function Feature() {
           className="flex-col lg:flex-row flex sm:p-14  p-4 lg:text-left text-center"
         >
           <div
+          className="order-2 sm:order-1"
             style={{ width: "100%", justifyContent: "center", display: "flex" }}
           >
             <img className="sm:h-6/6 " src="\Features\EventsFeature.png" />
           </div>
-          <div className="lg:mx-4 lg:w-11/12">
+          <div className="lg:mx-4 lg:w-11/12 sm:order-2 order-1">
             <h2 className="lg:text-3xl text-2xl pt-2  font-bold tracking-tight text-gray-900  ">
               Personalized Campus Event at Your Fingertips
             </h2>
@@ -48,14 +49,15 @@ export default function Feature() {
         </div>
         <div
           style={{ backgroundColor: "#F7F9FF" }}
-          className=" flex-col lg:flex-row flex sm:p-14 p-4 lg:text-left text-center"
+          className="flex-col lg:flex-row flex sm:p-14 p-4 lg:text-left text-center"
         >
           <div
+            className="order-2 sm:order-1"
             style={{ width: "100%", justifyContent: "center", display: "flex" }}
           >
             <img className="lg: h-6/6" src="\Features\ProfilePage.png" />
           </div>
-          <div className="mx-4 w-11/12">
+          <div className="mx-4 w-11/12 order-1 sm:order-2">
             <h2 className="lg:text-3xl text-2xl pt-2  font-bold tracking-tight text-gray-900   ">
               Customize your own profile
             </h2>
