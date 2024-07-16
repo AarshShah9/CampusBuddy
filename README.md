@@ -12,6 +12,16 @@
 
 This repo houses the CampusBuddy Tech Start project. We're aiming to build an application that streamlines campus engagement in many different ways. Keep an eye out for our MVP!
 
+## About the Product 
+![Final Showcase (1)_compressed-14](https://github.com/user-attachments/assets/59d5e6e3-3991-4deb-8d23-3f8f3af97d0b)
+![Final Showcase (1)_compressed-11](https://github.com/user-attachments/assets/ce5b5d86-d48a-4019-87d4-e101e30a4fde)
+![Final Showcase (1)_compressed-10](https://github.com/user-attachments/assets/53303df8-6ca3-47b2-9e5d-d72f29bddaea)
+![Final Showcase (1)_compressed-09](https://github.com/user-attachments/assets/2df5def2-f16b-4ee7-a43b-d6bd6996aa0d)
+![Final Showcase (1)_compressed-12](https://github.com/user-attachments/assets/c10c0ace-f9bf-4f8c-b0fb-e70f9b940915)
+![Final Showcase (1)_compressed-07](https://github.com/user-attachments/assets/18a42601-2f07-40bf-b4f6-9e1906d0d68f)
+![Final Showcase (1)_compressed-18](https://github.com/user-attachments/assets/35a95034-fb06-43db-9723-bc76465031fa)
+
+
 ## Contributors
 - Aarsh Shah (Project Manager/ Technical Lead)
 - Yang Liu (Business Strategist)
